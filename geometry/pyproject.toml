@@ -1,0 +1,25 @@
+[project]
+name = "rocketgen"
+version = "0.0.1"
+description = "Rocket Builder geometry engine (build123d port of src/RocketGenerator.fs)"
+requires-python = ">=3.10"
+dependencies = ["build123d>=0.9"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+rocketgen = "rocketgen.cli:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["rocketgen"]
+
+[tool.setuptools.package-data]
+rocketgen = ["data/*.csv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
