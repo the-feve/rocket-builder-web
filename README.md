@@ -16,7 +16,7 @@ The geometry is a Python port, on build123d (OpenCascade), of the Onshape Featur
 - **Phase 1 (feature parity with the FeatureScript):** done, apart from two cosmetic items listed in `geometry/report.md`.
 - **Phase 2 (local web prototype):** done. Form → build → 3D preview (exploded, section) → ZIP of print-oriented STLs. Dark theme by default, with a light-mode toggle.
 - **Phase 3 (hosted beta):** in progress.
-  - Done: stability check (Barrowman CP, CG from the parts + motor + recovery; under 1.0 cal the ZIP is withheld), saved designs and share links (`/d/<id>`, SQLite, edit key per browser until sign-in exists), `Dockerfile`.
+  - Done: stability check (Barrowman CP, CG from the parts + motor + recovery; under 1.0 cal the ZIP is withheld); standard fins auto-grow (span and sweep) until the heaviest motor of the size is stable; motor picker (flight sim of every motor in the bay, recommendation for a target altitude, per-motor stability); saved designs and share links (`/d/<id>`, SQLite, edit key per browser until sign-in exists), `Dockerfile`.
   - Open: the Docker image hasn't been built yet (Docker Hub rate-limited the cloud sandbox); sign-in (replaces the edit key with an owner); deploying it. Both wait on the hosting choice, which goes with the owner's personal-site move off Squarespace.
 
 ```

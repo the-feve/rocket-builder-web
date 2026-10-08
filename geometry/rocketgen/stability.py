@@ -182,6 +182,9 @@ def build_stable(params: DesignParams) -> Rocket:
         rocket = build_rocket(rocket.params.with_(fin_scale=round(k, 3)))
     k = rocket.params.fin_scale
     if k > 1:
-        rocket.notes.insert(0, f"Fins enlarged {k:.2f}x so the rocket is stable with the heaviest "
-                               f"{params.motor} motor ({heaviest(params.motor).code}).")
+        motor = f"the heaviest {params.motor} motor ({heaviest(params.motor).code})"
+        rocket.notes.insert(0, f"Fin span and sweep enlarged {k:.2f}x so the rocket is stable with {motor}."
+                            if Balance(rocket).check().ok else
+                            f"Fin span and sweep enlarged to the {k:.2f}x limit, and the rocket is still unstable with "
+                            f"{motor}. Try another fin shape or a longer body, or use custom fins.")
     return rocket

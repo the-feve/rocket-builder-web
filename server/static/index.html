@@ -68,6 +68,14 @@
   .stab.overstable b.cal { color:var(--warn); }
   .stab small { color:var(--muted); display:block; }
   .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin:0 4px 0 8px; vertical-align:0; }
+  .picker { grid-column:1/-1; }
+  .picker .rec { display:flex; gap:12px; align-items:center; margin:2px 0 6px; }
+  .picker .chip { font:700 18px system-ui; padding:6px 12px; border-radius:6px; background:var(--accent); color:var(--accent-ink); }
+  .picker tr.best td { background:color-mix(in srgb, var(--accent) 18%, transparent); }
+  .picker tr.pick { cursor:pointer; }
+  .picker tr.pick:hover td { background:color-mix(in srgb, var(--accent) 10%, transparent); }
+  .bad { color:var(--err); } .good { color:var(--ok); }
+  details summary { cursor:pointer; margin:4px 0; }
   @media (max-width:800px) {
     main { grid-template-columns:1fr; height:auto; }
     #form { border-right:none; }
@@ -139,9 +147,14 @@
       <label>Filament <select name="material"></select></label>
     </fieldset>
     <fieldset><legend>Flight (stability check)</legend>
-      <label>Motor loaded mass, g <input type="number" name="motor_mass_g" min="1" max="500" step="0.1"></label>
+      <label>Target altitude, m <input type="number" name="target_altitude_m" min="10" max="3000" step="5"></label>
+      <label>Check with motor <select name="flight_motor"></select></label>
       <label>Recovery mass, g <input type="number" name="recovery_mass_g" min="0" max="500" step="0.1"></label>
-      <div class="hint">Blank = the heaviest common motor of this size, and a parachute + cord allowance. Enter your own to check a lighter motor.</div>
+      <div class="hint">Standard fins grow automatically until the heaviest motor of the size is stable. Recovery blank = a parachute + cord allowance.</div>
+      <details><summary class="hint">Advanced</summary>
+        <label>Drag coefficient <input type="number" name="drag_cd" min="0.2" max="1.5" step="0.05"></label>
+        <label>Launch rod, m <input type="number" name="launch_rod_m" min="0.3" max="3" step="0.01"></label>
+      </details>
     </fieldset>
     <div class="actions">
       <button id="build" type="submit">Build</button>
@@ -195,9 +208,16 @@ const sync = () => {
   form.elements.forward_lug_frac.disabled = form.elements.launch_lugs.value !== 'two';
 };
 form.addEventListener('change', sync); sync();
+function fillFlightMotors(keep) {
+  const list = opts.flight_motors[form.elements.motor.value] || [];
+  const heavy = list.reduce((a, m) => (!a || m.mass_g > a.mass_g ? m : a), null);
+  const el = form.elements.flight_motor, prev = keep ?? el.value;
+  el.innerHTML = `<option value="">Heaviest: ${heavy ? heavy.code : '?'} (worst case)</option>` +
+    list.map(m => `<option value="${m.code}">${m.code} · ${m.mass_g} g</option>`).join('');
+  el.value = list.some(m => m.code === prev) ? prev : '';
+}
 async function flightHints() {
-  const m = opts.motor_masses[form.elements.motor.value];
-  form.elements.motor_mass_g.placeholder = m ? `${m.loaded_g} (${m.example})` : '';
+  fillFlightMotors();
   const od = form.elements.body_od_override.value;
   try {
     const r = await (await fetch(`/api/recovery_allowance?motor=${form.elements.motor.value}${od ? `&body_od_override=${od}` : ''}`)).json();
@@ -214,9 +234,10 @@ function params() {
     const el = form.elements[k];
     if (el.type === 'checkbox') out[k] = el.checked;
     else if (el.type === 'number') out[k] = el.value === '' ? null : Number(el.value);
+    else if (k === 'flight_motor') out[k] = el.value || null;
     else out[k] = k === 'fin_count' ? Number(el.value) : el.value;
   }
-  for (const [k, v] of Object.entries(out)) if (v === null && !['body_od_override', 'motor_mass_g', 'recovery_mass_g'].includes(k)) out[k] = opts.defaults[k];
+  for (const [k, v] of Object.entries(out)) if (v === null && !['body_od_override', 'recovery_mass_g'].includes(k)) out[k] = opts.defaults[k];
   return out;
 }
 
@@ -323,6 +344,25 @@ async function showModel(url, parts) {
 }
 
 // ---------- report ----------
+function pickerHtml(f) {
+  const best = f.rows.find(x => x.code === f.recommended);
+  const FT = 3.28084;
+  const rec = best
+    ? `<div class="rec"><span class="chip">${esc(best.motor)}</span><div>Recommended for a ${f.target_m} m target:
+       about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft), ${best.rod_speed_ms} m/s off the rod,
+       ${best.margin_cal} cal stable, ${best.delay_s} s delay, ${best.field_m} m field minimum.</div></div>`
+    : `<div class="rec bad">No motor of this size flies this rocket safely and stably. Make it lighter, or choose a bigger motor size.</div>`;
+  return `<div class="picker"><h2>Motor picker · click a row to check stability with that motor</h2>${rec}
+    <table><tr><th>Motor</th><th class="n">Peak m</th><th class="n">Peak ft</th><th class="n">Off rod m/s</th>
+      <th class="n">Thrust ×wt</th><th class="n">Stability cal</th><th class="n">Liftoff g</th><th>Result</th></tr>
+    ${f.rows.map(x => `<tr class="pick ${x.code === f.recommended ? 'best' : ''}" data-code="${esc(x.code)}">
+      <td>${esc(x.motor)}${x.out_of_production ? ' <small class="hint">out of production</small>' : ''}${x.mass_estimated ? ' <small class="hint">mass est.</small>' : ''}</td>
+      <td class="n">${x.apogee_m}</td><td class="n">${Math.round(x.apogee_m * FT)}</td><td class="n">${x.rod_speed_ms}</td>
+      <td class="n">${x.thrust_to_weight}</td><td class="n">${x.margin_cal.toFixed(2)}</td><td class="n">${x.liftoff_g}</td>
+      <td>${x.problems.length ? `<span class="bad">✕ ${esc(x.problems.join(', '))}</span>` : '<span class="good">✓ Good</span>'}</td></tr>`).join('')}
+    </table><div class="hint">1-D flight simulation from ThrustCurve.org data; delays are the nearest the motor comes in.</div></div>`;
+}
+
 function showReport(r) {
   const fmt = v => typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(2)) : esc(v);
   const st = r.stability;
@@ -335,6 +375,7 @@ function showReport(r) {
         liftoff ${st.liftoff_mass_g} g (motor ${st.motor_mass_g} g, recovery ${st.recovery_mass_g} g).
         An estimate (Barrowman); check your final rocket in OpenRocket.</small></div>
     </div>
+    ${pickerHtml(r.flights)}
     <div>
       <h2>Parts · ${r.total_mass_g} g total (${esc(form.elements.material.value)}, solid)</h2>
       <table><tr><th>Part</th><th class="n">Mass g</th><th class="n">Print height mm</th></tr>
@@ -348,6 +389,9 @@ function showReport(r) {
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
     </div>`;
+  reportEl.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => {
+    form.elements.flight_motor.value = tr.dataset.code; runBuild();
+  });
 }
 
 form.addEventListener('submit', e => { e.preventDefault(); runBuild(); });
@@ -394,6 +438,8 @@ function renderMine() {
     list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
 }
 function setForm(p) {
+  form.elements.motor.value = p.motor ?? opts.defaults.motor;
+  fillFlightMotors(p.flight_motor ?? '');
   for (const k of Object.keys(opts.defaults)) {
     const el = form.elements[k], v = k in p ? p[k] : opts.defaults[k];
     if (!el) continue;

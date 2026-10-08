@@ -40,8 +40,10 @@ class Fin:
 
 def fin_dimensions(params, cal: float) -> Fin:
     """Final fin size. Custom sizes are used as typed; otherwise caliber
-    ratios, with span scaled by sqrt(3 / fin count), all times `fin_scale`
-    (the website's stability auto-size, 1 in the FeatureScript)."""
+    ratios, with span scaled by sqrt(3 / fin count). `fin_scale` (the
+    website's stability auto-size, 1 in the FeatureScript) multiplies span
+    and sweep only: a longer root would grow the fin forward from the tail
+    and move the CP forward, defeating the point."""
     common = dict(
         shape=FinShape(params.fin_shape),
         thickness=params.fin_thickness,
@@ -54,7 +56,7 @@ def fin_dimensions(params, cal: float) -> Fin:
                    sweep=params.fin_sweep, **common)
     p = FIN_PARAMS[common["shape"]]
     k = getattr(params, "fin_scale", 1.0)
-    root = p["root_cal"] * cal * k
+    root = p["root_cal"] * cal
     tip = p["tip_ratio"] * root
     if common["shape"] == FinShape.DELTA:
         tip = max(tip, 3.0)  # zero tip gets a 3 mm flat so it prints

@@ -28,12 +28,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from build123d import export_stl
-from rocketgen.build import build_rocket
 from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
-from rocketgen.stability import load_motor_masses, recovery_allowance_g, stability
+from rocketgen.flight import FIELD_M, motors_for, pick, simulate
+from rocketgen.stability import Balance, build_stable, recovery_allowance_g
 
 import designs
 
@@ -69,12 +69,16 @@ class BuildRequest(BaseModel):
     pad_clearance: float = Field(15.0, ge=0, le=100)
     forward_lug_frac: float = Field(0.5, ge=0.2, le=0.95)
     material: str = "PLA"
-    # Flight: not geometry. None = the heaviest common motor of the size, and the default allowance.
-    motor_mass_g: float | None = Field(None, ge=1, le=500)
+    # Flight: not geometry. flight_motor None = the heaviest motor of the size;
+    # recovery_mass_g None = the default allowance.
+    flight_motor: str | None = None
     recovery_mass_g: float | None = Field(None, ge=0, le=500)
+    target_altitude_m: float = Field(150.0, ge=10, le=3000)
+    drag_cd: float = Field(0.65, ge=0.2, le=1.5)
+    launch_rod_m: float = Field(0.91, ge=0.3, le=3)
 
 
-FLIGHT_FIELDS = ("motor_mass_g", "recovery_mass_g")
+FLIGHT_FIELDS = ("flight_motor", "recovery_mass_g", "target_altitude_m", "drag_cd", "launch_rod_m")
 
 
 app = FastAPI(title="Rocket Builder")
@@ -100,6 +104,7 @@ def _report(rocket) -> dict:
             "Shoulder OD": d.shoulder_od, "Shoulder length": d.shoulder_len,
             "Motor hang-out": t["hang"], "Thread pitch": t["p"], "Thread turns": t["turns"],
             "Body segments": len(rocket.seg_lens),
+            "Fin span/sweep scale": rocket.params.fin_scale,
         },
     }
 
@@ -126,11 +131,11 @@ def _stls(rocket) -> dict[str, bytes]:
 def _stability(st) -> dict:
     return {"cg_mm": round(st.cg, 1), "cp_mm": round(st.cp, 1), "margin_cal": round(st.margin_cal, 2),
             "length_mm": round(st.length, 1), "liftoff_mass_g": round(st.total_mass_g, 1),
-            "motor_mass_g": st.motor_mass_g, "motor_example": st.motor_example,
+            "motor_mass_g": st.motor_mass_g, "motor": st.motor,
             "recovery_mass_g": st.recovery_mass_g, "status": st.status, "ok": st.ok, "message": st.message}
 
 
-def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict) -> bytes:
+def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights: dict | None = None) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in stls.items():
@@ -142,6 +147,10 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict) -> byte
                   f"(motor {stab['motor_mass_g']} g, recovery {stab['recovery_mass_g']} g).",
                   "  Check it in OpenRocket with your actual motor, recovery and paint before flying.",
                   "  Follow the NAR Model Rocket Safety Code."]
+        if flights:
+            lines += ["", f"Motors (target {flights['target_m']:g} m; recommended: {flights['recommended'] or 'none'}):"]
+            lines += [f"  {r['motor']}: {r['apogee_m']} m, {r['margin_cal']} cal, "
+                      + ("OK" if not r["problems"] else ", ".join(r["problems"])) for r in flights["rows"]]
         lines += ["", "Parts (STLs are in print orientation, resting on z = 0):"]
         lines += [f"  {p['name']}: {p['mass_g']} g, {p['height_mm']} mm tall" for p in report["parts"]]
         lines += ["", "Key dimensions (mm):"]
@@ -161,7 +170,8 @@ def options():
         "launch_lugs": list(LUG_OPTIONS),
         "materials": list(MATERIALS),
         "defaults": BuildRequest().model_dump(mode="json"),
-        "motor_masses": load_motor_masses(),
+        "flight_motors": {size: [{"code": m.code, "cls": m.cls, "mass_g": m.mass_g, "out_of_production": m.out_of_production}
+                                 for m in motors_for(size)] for size in load_motors()},
     }
 
 
@@ -185,13 +195,13 @@ def _geometry(geo_params: dict, req: BuildRequest) -> str:
             _geo.move_to_end(key)
             return key
         try:
-            rocket = build_rocket(DesignParams(**{**geo_params, "fin_shape": req.fin_shape}))
+            rocket = build_stable(DesignParams(**{**geo_params, "fin_shape": req.fin_shape}))
         except (GeometryError, ValueError) as ex:
             raise HTTPException(422, str(ex))
         except Exception as ex:  # an OpenCascade failure: never a bare 500
             raise HTTPException(422, f"The geometry engine could not build this design ({type(ex).__name__}). "
                                      "Try slightly different settings.")
-        _geo[key] = {"rocket": rocket, "glb": _glb(rocket), "report": _report(rocket), "stls": None}
+        _geo[key] = {"rocket": rocket, "balance": Balance(rocket), "glb": _glb(rocket), "report": _report(rocket), "stls": None}
         while len(_geo) > MAX_CACHED:
             _geo.popitem(last=False)
     return key
@@ -204,12 +214,37 @@ def build(req: BuildRequest):
         raise HTTPException(422, f"Unknown motor {req.motor!r}.")
     if req.material not in MATERIALS:
         raise HTTPException(422, f"Unknown material {req.material!r}.")
+    motors = {m.code: m for m in motors_for(req.motor)}
+    if req.flight_motor is not None and req.flight_motor not in motors:
+        raise HTTPException(422, f"{req.flight_motor} doesn't fit the {req.motor} motor bay.")
     geo_params = {k: v for k, v in params.items() if k not in FLIGHT_FIELDS}
     geo = _geometry(geo_params, req)
-    st = _stability(stability(_geo[geo]["rocket"], req.motor_mass_g, req.recovery_mass_g))
+    bal: Balance = _geo[geo]["balance"]
+    st = _stability(bal.check(motors.get(req.flight_motor), req.recovery_mass_g))
+    flights = _flights(bal, list(motors.values()), req)
     build_id = _key(params)
-    _builds[build_id] = {"geo": geo, "params": params, "stability": st}
-    return {"id": build_id, **_geo[geo]["report"], "stability": st}
+    _builds[build_id] = {"geo": geo, "params": params, "stability": st, "flights": flights}
+    return {"id": build_id, **_geo[geo]["report"], "stability": st, "flights": flights}
+
+
+def _flights(bal: Balance, motors: list, req: BuildRequest) -> dict:
+    """The motor picker: every motor of the bay size flown, each with its own
+    stability margin; the safe, stable one closest to the target altitude."""
+    rec = recovery_allowance_g(bal.body_od) if req.recovery_mass_g is None else req.recovery_mass_g
+    rows, safe = [], []
+    for m in motors:
+        f = simulate(m, bal.printed_mass_g + rec, bal.body_od, req.drag_cd, req.launch_rod_m)
+        st = bal.check(m, req.recovery_mass_g)
+        problems = list(f.problems) + ([] if st.ok else ["Unstable"])
+        if not problems:
+            safe.append(f)
+        rows.append({"motor": f"{m.code}-{f.delay}", "code": m.code, "cls": m.cls, "apogee_m": round(f.apogee),
+                     "rod_speed_ms": round(f.rod_speed, 1), "thrust_to_weight": round(f.thrust_to_weight, 1),
+                     "coast_s": round(f.coast, 1), "delay_s": f.delay, "margin_cal": round(st.margin_cal, 2),
+                     "liftoff_g": round(st.total_mass_g), "field_m": FIELD_M[m.cls], "problems": problems,
+                     "out_of_production": m.out_of_production, "mass_estimated": m.mass_estimated})
+    best = pick(safe, req.target_altitude_m)
+    return {"target_m": req.target_altitude_m, "rows": rows, "recommended": best and best.motor.code}
 
 
 def _get(build_id: str) -> tuple[dict, dict]:
@@ -232,7 +267,7 @@ def download(build_id: str):
     if g["stls"] is None:
         with _lock:
             g["stls"] = _stls(g["rocket"])
-    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"]), media_type="application/zip",
+    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"]), media_type="application/zip",
                     headers={"Content-Disposition": f'attachment; filename="rocket_{build_id}.zip"'})
 
 

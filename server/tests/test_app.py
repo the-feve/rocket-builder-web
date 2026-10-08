@@ -47,15 +47,27 @@ def test_out_of_bounds_input_is_rejected():
     assert client.post("/api/build", json={"motor": "M99"}).status_code == 422
 
 
+SMALL_FINS = {"custom_fin_size": True, "fin_root_chord": 25, "fin_span": 10, "fin_tip_chord": 12, "fin_sweep": 10}
+
+
 def test_unstable_rocket_previews_but_no_zip():
-    body = client.post("/api/build", json={"motor": "M24"}).json()
+    body = client.post("/api/build", json=SMALL_FINS).json()
     assert not body["stability"]["ok"]
     assert client.get(f"/api/builds/{body['id']}/preview.glb").status_code == 200
     r = client.get(f"/api/builds/{body['id']}/rocket.zip")
     assert r.status_code == 409 and "Unstable" in r.json()["detail"]
-    # The flight masses don't rebuild the geometry; a light motor passes.
-    light = client.post("/api/build", json={"motor": "M24", "motor_mass_g": 20, "recovery_mass_g": 0}).json()
+    # The flight inputs don't rebuild the geometry; a lighter motor is more stable.
+    light = client.post("/api/build", json={**SMALL_FINS, "flight_motor": "A8"}).json()
     assert light["stability"]["margin_cal"] > body["stability"]["margin_cal"]
+    assert client.post("/api/build", json={"flight_motor": "D12"}).status_code == 422  # not an 18 mm motor
+
+
+def test_motor_picker_and_auto_sized_fins():
+    body = client.post("/api/build", json={"motor": "M24", "target_altitude_m": 200}).json()
+    assert body["stability"]["ok"] and body["dimensions"]["Fin span/sweep scale"] > 1
+    f = body["flights"]
+    assert {r["code"] for r in f["rows"]} == {"C11", "D12"} and f["recommended"] in ("C11", "D12")
+    assert all(r["margin_cal"] >= 1 for r in f["rows"])
 
 
 def test_saved_design_share_link_and_edit_key():
