@@ -55,6 +55,7 @@ class DesignParams:
     fin_fillet_upper: float = 1.0
     fin_tip_radius: float = 6.5
     custom_fin_size: bool = False
+    fin_scale: float = 1.0  # the website's stability auto-size (standard sizes only); not in the FeatureScript
     fin_root_chord: float = 40.0
     fin_span: float = 20.0
     fin_tip_chord: float = 20.0
