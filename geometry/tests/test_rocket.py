@@ -221,3 +221,32 @@ def test_rod_line_clears_motor_cap():
     d = compute_derived(DesignParams())
     lug = lug_geometry(d, 3.175, True, 15.0)
     assert lug["center_r"] - lug["standoff_ro"] >= d.thread["r_cap_max"] + 0.5 - 1e-9
+
+
+# ---- stability ------------------------------------------------------------
+
+def test_nose_cp_matches_textbook_values():
+    from rocketgen.stability import nose_cp
+    L, R = 60.0, 10.0
+    assert nose_cp("conical", L, R) == (2.0, pytest.approx(2 * L / 3, rel=1e-3))
+    assert nose_cp("tangent_ogive", L, R)[1] == pytest.approx(0.466 * L, rel=0.02)
+    assert nose_cp("elliptical", L, R)[1] == pytest.approx(L / 3, rel=1e-3)
+
+
+def test_fin_cp_rectangular_fin():
+    # Rectangular fin, no sweep: X = x_le + chord/4 (the quarter-chord point).
+    from rocketgen.stability import fin_cp
+    cn, x = fin_cp(3, 30, 30, 20, 0, 10, 100)
+    assert x == pytest.approx(100 + 7.5) and cn > 0
+
+
+def test_stability_default_and_trends():
+    from rocketgen.stability import stability
+    s = stability(rocket())
+    assert 0.8 < s.margin_cal < 1.5 and s.ok and s.status == "stable"
+    assert 0 < s.cg < s.length and 0 < s.cp < s.length
+    # A lighter motor and less recovery mass at the top: more stable.
+    assert stability(rocket(), motor_mass_g=15).margin_cal > s.margin_cal
+    # The heaviest M24 at minimum diameter needs bigger fins.
+    heavy = stability(rocket(motor="M24"))
+    assert not heavy.ok and "Unstable" in heavy.message

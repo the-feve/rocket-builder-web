@@ -9,13 +9,13 @@
     color-scheme: dark;
     --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#2a313c; --rowline:#212833;
     --field:#0d1117; --accent:#4c8dff; --accent-ink:#fff; --err:#ff8a80; --errbg:#3a1618; --errline:#6e2a2a;
-    --view-top:#1b2230; --view-bot:#0b0e13; --chip:rgba(22,27,34,.85);
+    --view-top:#1b2230; --view-bot:#0b0e13; --chip:rgba(22,27,34,.85); --ok:#56d364; --warn:#e3b341;
   }
   :root[data-theme=light] {
     color-scheme: light;
     --bg:#f5f6f8; --panel:#fff; --ink:#1d2330; --muted:#667085; --line:#dfe3ea; --rowline:#eef0f4;
     --field:#fff; --accent:#2f6fdf; --accent-ink:#fff; --err:#b42318; --errbg:#fef3f2; --errline:#fecdca;
-    --view-top:#e9eef6; --view-bot:#f8f9fb; --chip:rgba(255,255,255,.85);
+    --view-top:#e9eef6; --view-bot:#f8f9fb; --chip:rgba(255,255,255,.85); --ok:#1a7f37; --warn:#9a6700;
   }
   * { box-sizing:border-box; }
   body { margin:0; font:14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
@@ -55,6 +55,19 @@
   .sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px; }
   ul { margin:4px 0; padding-left:18px; }
   .error { grid-column:1/-1; color:var(--err); background:var(--errbg); border:1px solid var(--errline); padding:8px 10px; border-radius:6px; }
+  #designbar { display:flex; gap:6px; align-items:center; padding:8px 0 4px; flex-wrap:wrap; }
+  #designbar input { flex:1 1 120px; min-width:0; padding:4px 6px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:var(--field); }
+  #designbar button, #designbar select { flex:none; padding:4px 8px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
+  #designbar select { max-width:100%; flex:1 1 100%; }
+  #designbar button:hover { border-color:var(--accent); }
+  #savemsg { flex:1 1 100%; font-size:11px; color:var(--muted); min-height:14px; }
+  .stab { grid-column:1/-1; display:flex; gap:14px; align-items:center; padding:8px 10px; border-radius:6px; border:1px solid var(--line); }
+  .stab b.cal { font-size:20px; font-variant-numeric:tabular-nums; }
+  .stab.unstable { border-color:var(--errline); background:var(--errbg); color:var(--err); }
+  .stab.stable b.cal { color:var(--ok); }
+  .stab.overstable b.cal { color:var(--warn); }
+  .stab small { color:var(--muted); display:block; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin:0 4px 0 8px; vertical-align:0; }
   @media (max-width:800px) {
     main { grid-template-columns:1fr; height:auto; }
     #form { border-right:none; }
@@ -77,6 +90,14 @@
 <header><h1>Rocket Builder</h1><span>Local prototype · units mm</span><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
+    <div id="designbar">
+      <input id="dname" maxlength="80" value="My rocket" aria-label="Design name">
+      <button type="button" id="save">Save</button>
+      <button type="button" id="saveas">Save as new</button>
+      <button type="button" id="share">Copy link</button>
+      <select id="mine" aria-label="My rockets"></select>
+      <div id="savemsg"></div>
+    </div>
     <fieldset><legend>Motor</legend>
       <label>Motor size <select name="motor"></select></label>
     </fieldset>
@@ -116,6 +137,11 @@
     </fieldset>
     <fieldset><legend>Material</legend>
       <label>Filament <select name="material"></select></label>
+    </fieldset>
+    <fieldset><legend>Flight (stability check)</legend>
+      <label>Motor loaded mass, g <input type="number" name="motor_mass_g" min="1" max="500" step="0.1"></label>
+      <label>Recovery mass, g <input type="number" name="recovery_mass_g" min="0" max="500" step="0.1"></label>
+      <div class="hint">Blank = the heaviest common motor of this size, and a parachute + cord allowance. Enter your own to check a lighter motor.</div>
     </fieldset>
     <div class="actions">
       <button id="build" type="submit">Build</button>
@@ -169,6 +195,18 @@ const sync = () => {
   form.elements.forward_lug_frac.disabled = form.elements.launch_lugs.value !== 'two';
 };
 form.addEventListener('change', sync); sync();
+async function flightHints() {
+  const m = opts.motor_masses[form.elements.motor.value];
+  form.elements.motor_mass_g.placeholder = m ? `${m.loaded_g} (${m.example})` : '';
+  const od = form.elements.body_od_override.value;
+  try {
+    const r = await (await fetch(`/api/recovery_allowance?motor=${form.elements.motor.value}${od ? `&body_od_override=${od}` : ''}`)).json();
+    form.elements.recovery_mass_g.placeholder = r.recovery_mass_g ?? '';
+  } catch {}
+}
+form.elements.motor.addEventListener('change', flightHints);
+form.elements.body_od_override.addEventListener('change', flightHints);
+flightHints();
 
 function params() {
   const out = {};
@@ -178,7 +216,7 @@ function params() {
     else if (el.type === 'number') out[k] = el.value === '' ? null : Number(el.value);
     else out[k] = k === 'fin_count' ? Number(el.value) : el.value;
   }
-  for (const [k, v] of Object.entries(out)) if (v === null && k !== 'body_od_override') out[k] = opts.defaults[k];
+  for (const [k, v] of Object.entries(out)) if (v === null && !['body_od_override', 'motor_mass_g', 'recovery_mass_g'].includes(k)) out[k] = opts.defaults[k];
   return out;
 }
 
@@ -197,7 +235,7 @@ const hemi = new THREE.HemisphereLight(0xffffff, 0x8890a0, 1.6); scene.add(hemi)
 const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(300, -400, 600); scene.add(sun);
 const fill2 = new THREE.DirectionalLight(0xffffff, 0.5); fill2.position.set(-300, 300, -200); scene.add(fill2);
 const sectionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);  // keeps y <= 0
-let rocket = null, partMeshes = [];
+let rocket = null, partMeshes = [], markers = null;
 
 // ---------- theme ----------
 const themeBtn = document.getElementById('theme');
@@ -232,8 +270,26 @@ function frame(obj) {
   camera.near = dist / 100; camera.far = dist * 10; camera.updateProjectionMatrix();
 }
 
+function setMarkers(st) {
+  // CG and CP balls beside the body, at their heights (measured from the nose tip, the top).
+  if (markers) { scene.remove(markers); markers = null; }
+  if (!rocket || !st) return;
+  partMeshes.forEach(({ mesh }) => { mesh.position.z = 0; });  // measure assembled, not exploded; applyView restores
+  const box = new THREE.Box3().setFromObject(rocket);
+  const r = 0.5 * Math.max(box.max.x - box.min.x, box.max.y - box.min.y);
+  markers = new THREE.Group();
+  for (const [z, color] of [[st.cg_mm, 0x4c8dff], [st.cp_mm, 0xff5a5a]]) {
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(Math.max(2.5, r * 0.12), 20, 14),
+      new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.35 }));
+    ball.position.set(0, -r * 1.15, box.max.z - z);
+    markers.add(ball);
+  }
+  scene.add(markers);
+}
+
 function applyView(reframe) {
   if (!rocket) return;
+  if (markers) markers.visible = !document.getElementById('explode').checked;
   const explode = document.getElementById('explode').checked;
   const section = document.getElementById('section').checked;
   partMeshes.forEach(({ mesh, index }) => {
@@ -269,7 +325,16 @@ async function showModel(url, parts) {
 // ---------- report ----------
 function showReport(r) {
   const fmt = v => typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(2)) : esc(v);
+  const st = r.stability;
   reportEl.innerHTML = `
+    <div class="stab ${st.status}">
+      <div><b class="cal">${st.margin_cal.toFixed(2)}</b> cal<small>stability margin</small></div>
+      <div>${esc(st.message)}
+        <small>From the nose tip: <span class="dot" style="background:#4c8dff"></span>CG ${st.cg_mm} mm
+        <span class="dot" style="background:#ff5a5a"></span>CP ${st.cp_mm} mm · length ${st.length_mm} mm ·
+        liftoff ${st.liftoff_mass_g} g (motor ${st.motor_mass_g} g, recovery ${st.recovery_mass_g} g).
+        An estimate (Barrowman); check your final rocket in OpenRocket.</small></div>
+    </div>
     <div>
       <h2>Parts · ${r.total_mass_g} g total (${esc(form.elements.material.value)}, solid)</h2>
       <table><tr><th>Part</th><th class="n">Mass g</th><th class="n">Print height mm</th></tr>
@@ -285,8 +350,8 @@ function showReport(r) {
     </div>`;
 }
 
-form.addEventListener('submit', async e => {
-  e.preventDefault();
+form.addEventListener('submit', e => { e.preventDefault(); runBuild(); });
+async function runBuild() {
   if (!form.reportValidity()) return;
   buildBtn.disabled = true; zipBtn.classList.add('off');
   const t0 = performance.now();
@@ -300,17 +365,80 @@ form.addEventListener('submit', async e => {
       throw new Error(msg || `Build failed (${res.status})`);
     }
     await showModel(`/api/builds/${body.id}/preview.glb`, body.parts);
+    setMarkers(body.stability); applyView(false);
     showReport(body);
-    zipBtn.href = `/api/builds/${body.id}/rocket.zip`; zipBtn.classList.remove('off');
+    zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
+    zipBtn.classList.toggle('off', !body.stability.ok);
+    zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';
     statusEl.textContent = `Built ${body.parts.length} parts in ${((performance.now() - t0) / 1000).toFixed(1)} s · drag to rotate, scroll to zoom`;
   } catch (err) {
     statusEl.textContent = 'Build failed';
     if (rocket) { scene.remove(rocket); rocket = null; }
+    setMarkers(null);
     reportEl.innerHTML = `<div class="error"><b>Can't build this rocket.</b> ${esc(err.message)}</div>`;
   } finally {
     buildBtn.disabled = false;
   }
-});
+}
+
+// ---------- saved designs and share links ----------
+// Designs saved from this browser, with their edit keys, live in localStorage
+// until sign-in exists; anyone with a link can open (but not change) a design.
+const nameEl = document.getElementById('dname'), mineEl = document.getElementById('mine'), msgEl = document.getElementById('savemsg');
+const loadMine = () => { try { return JSON.parse(localStorage.getItem('myRockets') || '[]'); } catch { return []; } };
+const storeMine = list => { try { localStorage.setItem('myRockets', JSON.stringify(list)); } catch {} };
+let current = null;  // {id, key} of the design on screen, if saved
+function renderMine() {
+  const list = loadMine();
+  mineEl.innerHTML = `<option value="">My rockets (${list.length} saved in this browser)…</option>` +
+    list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
+}
+function setForm(p) {
+  for (const k of Object.keys(opts.defaults)) {
+    const el = form.elements[k], v = k in p ? p[k] : opts.defaults[k];
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
+  }
+  sync(); flightHints();
+}
+const shareUrl = id => `${location.origin}/d/${id}`;
+async function save(asNew) {
+  if (!form.reportValidity()) return;
+  const mine = loadMine();
+  const own = !asNew && current && mine.find(d => d.id === current.id);
+  const body = JSON.stringify({ name: nameEl.value.trim() || 'My rocket', params: params() });
+  const res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
+    method: own ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', ...(own ? { 'X-Edit-Key': own.key } : {}) }, body });
+  const d = await res.json();
+  if (!res.ok) { msgEl.textContent = typeof d.detail === 'string' ? d.detail : 'Could not save.'; return; }
+  const entry = { id: d.id, name: d.name, key: own ? own.key : d.edit_key };
+  storeMine([entry, ...mine.filter(x => x.id !== d.id)]);
+  current = entry; history.replaceState(null, '', `/d/${d.id}`);
+  renderMine(); msgEl.textContent = `Saved. Share link: ${shareUrl(d.id)}`;
+}
+document.getElementById('save').onclick = () => save(false);
+document.getElementById('saveas').onclick = () => save(true);
+document.getElementById('share').onclick = async () => {
+  if (!current) await save(false);
+  if (!current) return;
+  try { await navigator.clipboard.writeText(shareUrl(current.id)); msgEl.textContent = `Link copied: ${shareUrl(current.id)}`; }
+  catch { msgEl.textContent = `Share link: ${shareUrl(current.id)}`; }
+};
+async function openDesign(id) {
+  const res = await fetch(`/api/designs/${encodeURIComponent(id)}`);
+  if (!res.ok) { msgEl.textContent = "That design link doesn't exist."; return; }
+  const d = await res.json();
+  setForm(d.params); nameEl.value = d.name;
+  current = loadMine().find(x => x.id === d.id) || null;
+  history.replaceState(null, '', `/d/${d.id}`);
+  renderMine();
+  msgEl.textContent = current ? '' : 'A shared design: Save as new to keep your own copy.';
+  runBuild();
+}
+mineEl.onchange = () => { if (mineEl.value) openDesign(mineEl.value); };
+renderMine();
+const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
+if (linked) openDesign(linked[1]);
 </script>
 </body>
 </html>

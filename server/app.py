@@ -1,10 +1,12 @@
-"""Phase 2 local prototype: one page, one FastAPI server, synchronous builds.
+"""The designer website: one page, one FastAPI server, synchronous builds.
 
-    cd web/server && uvicorn app:app --reload        # then open http://127.0.0.1:8000
+    cd server && uvicorn app:app --reload        # then open http://127.0.0.1:8000
 
-POST /api/build builds a rocket with rocketgen and caches the result under a
-hash of the parameters; the page then loads the GLB preview and offers the
-ZIP of print-oriented STLs. No accounts, no storage beyond this process.
+POST /api/build builds a rocket with rocketgen and caches the geometry under
+a hash of the geometry parameters; the stability check (motor and recovery
+masses) is cheap and is redone per request. The page then loads the GLB
+preview and offers the ZIP of print-oriented STLs, unless the rocket is
+unstable. Designs are saved in SQLite (designs.py) and shared by link.
 """
 
 from __future__ import annotations
@@ -15,11 +17,12 @@ import json
 import tempfile
 import threading
 import zipfile
+from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
 import trimesh
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -29,10 +32,15 @@ from rocketgen.build import build_rocket
 from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
-from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, load_motors
+from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
+from rocketgen.stability import load_motor_masses, recovery_allowance_g, stability
+
+import designs
 
 STATIC = Path(__file__).resolve().parent / "static"
-GENERATOR_VERSION = "0.0.1"
+GENERATOR_VERSION = "0.1.0"
+SCHEMA_VERSION = 1
+MAX_CACHED = 40  # geometry builds kept in memory
 
 
 class BuildRequest(BaseModel):
@@ -61,10 +69,17 @@ class BuildRequest(BaseModel):
     pad_clearance: float = Field(15.0, ge=0, le=100)
     forward_lug_frac: float = Field(0.5, ge=0.2, le=0.95)
     material: str = "PLA"
+    # Flight: not geometry. None = the heaviest common motor of the size, and the default allowance.
+    motor_mass_g: float | None = Field(None, ge=1, le=500)
+    recovery_mass_g: float | None = Field(None, ge=0, le=500)
 
 
-app = FastAPI(title="Rocket Builder (local prototype)")
-_builds: dict[str, dict] = {}  # build id -> {"glb", "zip", "report"}
+FLIGHT_FIELDS = ("motor_mass_g", "recovery_mass_g")
+
+
+app = FastAPI(title="Rocket Builder")
+_geo: OrderedDict[str, dict] = OrderedDict()  # geometry key -> {"rocket", "glb", "report", "stls"}
+_builds: dict[str, dict] = {}  # build id -> {"geo", "params", "stability"}
 _lock = threading.Lock()  # one OpenCascade build at a time
 
 
@@ -98,22 +113,42 @@ def _glb(rocket) -> bytes:
     return scene.export(file_type="glb")
 
 
-def _zip(rocket, report: dict, params: dict) -> bytes:
+def _stls(rocket) -> dict[str, bytes]:
+    out = {}
+    with tempfile.TemporaryDirectory() as tmp:
+        for p in rocket.parts:
+            path = Path(tmp) / f"{p.name}.stl"
+            export_stl(p.local, path, tolerance=0.01, angular_tolerance=0.1)
+            out[p.name] = path.read_bytes()
+    return out
+
+
+def _stability(st) -> dict:
+    return {"cg_mm": round(st.cg, 1), "cp_mm": round(st.cp, 1), "margin_cal": round(st.margin_cal, 2),
+            "length_mm": round(st.length, 1), "liftoff_mass_g": round(st.total_mass_g, 1),
+            "motor_mass_g": st.motor_mass_g, "motor_example": st.motor_example,
+            "recovery_mass_g": st.recovery_mass_g, "status": st.status, "ok": st.ok, "message": st.message}
+
+
+def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        with tempfile.TemporaryDirectory() as tmp:
-            for p in rocket.parts:
-                path = Path(tmp) / f"{p.name}.stl"
-                export_stl(p.local, path, tolerance=0.01, angular_tolerance=0.1)
-                z.write(path, f"{p.name}.stl")
+        for name, data in stls.items():
+            z.writestr(f"{name}.stl", data)
         lines = ["Rocket Builder build notes", "", report["summary"], ""]
         lines += [f"Note: {n}" for n in report["notes"]]
+        lines += ["", "Stability (from the nose tip, mm):", f"  {stab['message']}",
+                  f"  CG {stab['cg_mm']}, CP {stab['cp_mm']}, liftoff mass {stab['liftoff_mass_g']} g "
+                  f"(motor {stab['motor_mass_g']} g, recovery {stab['recovery_mass_g']} g).",
+                  "  Check it in OpenRocket with your actual motor, recovery and paint before flying.",
+                  "  Follow the NAR Model Rocket Safety Code."]
         lines += ["", "Parts (STLs are in print orientation, resting on z = 0):"]
         lines += [f"  {p['name']}: {p['mass_g']} g, {p['height_mm']} mm tall" for p in report["parts"]]
         lines += ["", "Key dimensions (mm):"]
         lines += [f"  {k}: {round(v, 2) if isinstance(v, float) else v}" for k, v in report["dimensions"].items()]
         z.writestr("build_notes.txt", "\n".join(lines) + "\n")
-        z.writestr("design.json", json.dumps({"generatorVersion": GENERATOR_VERSION, "params": params}, indent=2))
+        z.writestr("design.json", json.dumps({"generatorVersion": GENERATOR_VERSION, "schemaVersion": SCHEMA_VERSION,
+                                              "params": params}, indent=2))
     return buf.getvalue()
 
 
@@ -126,7 +161,40 @@ def options():
         "launch_lugs": list(LUG_OPTIONS),
         "materials": list(MATERIALS),
         "defaults": BuildRequest().model_dump(mode="json"),
+        "motor_masses": load_motor_masses(),
     }
+
+
+@app.get("/api/recovery_allowance")
+def recovery_allowance(motor: str = "M18", body_od_override: float | None = None):
+    """The default recovery mass for the form's placeholder."""
+    if motor not in load_motors():
+        raise HTTPException(422, f"Unknown motor {motor!r}.")
+    d = compute_derived(DesignParams(motor=motor, body_od_override=body_od_override))
+    return {"recovery_mass_g": recovery_allowance_g(d.body_od)}
+
+
+def _key(*parts) -> str:
+    return hashlib.sha256(json.dumps([GENERATOR_VERSION, *parts], sort_keys=True).encode()).hexdigest()[:16]
+
+
+def _geometry(geo_params: dict, req: BuildRequest) -> str:
+    key = _key(geo_params)
+    with _lock:
+        if key in _geo:
+            _geo.move_to_end(key)
+            return key
+        try:
+            rocket = build_rocket(DesignParams(**{**geo_params, "fin_shape": req.fin_shape}))
+        except (GeometryError, ValueError) as ex:
+            raise HTTPException(422, str(ex))
+        except Exception as ex:  # an OpenCascade failure: never a bare 500
+            raise HTTPException(422, f"The geometry engine could not build this design ({type(ex).__name__}). "
+                                     "Try slightly different settings.")
+        _geo[key] = {"rocket": rocket, "glb": _glb(rocket), "report": _report(rocket), "stls": None}
+        while len(_geo) > MAX_CACHED:
+            _geo.popitem(last=False)
+    return key
 
 
 @app.post("/api/build")
@@ -136,40 +204,99 @@ def build(req: BuildRequest):
         raise HTTPException(422, f"Unknown motor {req.motor!r}.")
     if req.material not in MATERIALS:
         raise HTTPException(422, f"Unknown material {req.material!r}.")
-    key = hashlib.sha256(json.dumps([GENERATOR_VERSION, params], sort_keys=True).encode()).hexdigest()[:16]
-    if key not in _builds:
-        with _lock:
-            try:
-                rocket = build_rocket(DesignParams(**{**params, "fin_shape": req.fin_shape}))
-            except (GeometryError, ValueError) as ex:
-                raise HTTPException(422, str(ex))
-            except Exception as ex:  # an OpenCascade failure: never a bare 500
-                raise HTTPException(422, f"The geometry engine could not build this design ({type(ex).__name__}). "
-                                         "Try slightly different settings.")
-            report = _report(rocket)
-            _builds[key] = {"glb": _glb(rocket), "zip": _zip(rocket, report, params), "report": report}
-    return {"id": key, **_builds[key]["report"]}
+    geo_params = {k: v for k, v in params.items() if k not in FLIGHT_FIELDS}
+    geo = _geometry(geo_params, req)
+    st = _stability(stability(_geo[geo]["rocket"], req.motor_mass_g, req.recovery_mass_g))
+    build_id = _key(params)
+    _builds[build_id] = {"geo": geo, "params": params, "stability": st}
+    return {"id": build_id, **_geo[geo]["report"], "stability": st}
 
 
-def _get(build_id: str) -> dict:
-    if build_id not in _builds:
+def _get(build_id: str) -> tuple[dict, dict]:
+    b = _builds.get(build_id)
+    if not b or b["geo"] not in _geo:
         raise HTTPException(404, "Build not found; press Build again.")
-    return _builds[build_id]
+    return b, _geo[b["geo"]]
 
 
 @app.get("/api/builds/{build_id}/preview.glb")
 def preview(build_id: str):
-    return Response(_get(build_id)["glb"], media_type="model/gltf-binary")
+    return Response(_get(build_id)[1]["glb"], media_type="model/gltf-binary")
 
 
 @app.get("/api/builds/{build_id}/rocket.zip")
 def download(build_id: str):
-    return Response(_get(build_id)["zip"], media_type="application/zip",
+    b, g = _get(build_id)
+    if not b["stability"]["ok"]:
+        raise HTTPException(409, b["stability"]["message"])
+    if g["stls"] is None:
+        with _lock:
+            g["stls"] = _stls(g["rocket"])
+    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"]), media_type="application/zip",
                     headers={"Content-Disposition": f'attachment; filename="rocket_{build_id}.zip"'})
+
+
+# ---------- saved designs and share links ----------
+
+class DesignIn(BaseModel):
+    name: str = Field("My rocket", min_length=1, max_length=80)
+    params: BuildRequest
+
+
+class DesignRename(BaseModel):
+    name: str = Field(..., min_length=1, max_length=80)
+
+
+@app.post("/api/designs")
+def save_design(d: DesignIn):
+    """A new saved design. The edit key comes back once; the page keeps it
+    in this browser and sends it to rename or overwrite. Until sign-in
+    exists, it is the only proof of ownership."""
+    return designs.create(d.name, d.params.model_dump(mode="json"), GENERATOR_VERSION, SCHEMA_VERSION)
+
+
+@app.get("/api/designs/{design_id}")
+def load_design(design_id: str):
+    row = designs.get(design_id)
+    if not row:
+        raise HTTPException(404, "That design link doesn't exist.")
+    return row
+
+
+@app.put("/api/designs/{design_id}")
+def update_design(design_id: str, d: DesignIn, x_edit_key: str = Header("")):
+    _owned(design_id, x_edit_key)
+    return designs.update(design_id, d.name, d.params.model_dump(mode="json"), GENERATOR_VERSION, SCHEMA_VERSION)
+
+
+@app.patch("/api/designs/{design_id}")
+def rename_design(design_id: str, d: DesignRename, x_edit_key: str = Header("")):
+    _owned(design_id, x_edit_key)
+    return designs.rename(design_id, d.name)
+
+
+@app.delete("/api/designs/{design_id}")
+def delete_design(design_id: str, x_edit_key: str = Header("")):
+    _owned(design_id, x_edit_key)
+    designs.delete(design_id)
+    return {"deleted": design_id}
+
+
+def _owned(design_id: str, key: str):
+    if not designs.get(design_id):
+        raise HTTPException(404, "That design doesn't exist.")
+    if not designs.check_key(design_id, key):
+        raise HTTPException(403, "This design was saved from another browser; use Save as new to keep a copy.")
 
 
 @app.get("/")
 def index():
+    return FileResponse(STATIC / "index.html")
+
+
+@app.get("/d/{design_id}")
+def shared(design_id: str):
+    """A share link: the page loads the design and builds it."""
     return FileResponse(STATIC / "index.html")
 
 
