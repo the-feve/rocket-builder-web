@@ -7,15 +7,19 @@ The geometry is a Python port, on build123d (OpenCascade), of the Onshape Featur
 | Folder | What |
 |---|---|
 | `geometry/` | `rocketgen`, the geometry engine: parameters in, one solid per part out, STL export. See `geometry/README.md` and `geometry/report.md`. |
+| `server/` | The designer website: FastAPI + one page with a three.js preview. See `server/README.md`. |
 | `docs/` | Platform spec and plan |
 
 ## Status
 
 - **Phase 0 (spike):** done.
 - **Phase 1 (feature parity with the FeatureScript):** done, apart from two cosmetic items listed in `geometry/report.md`.
-- **Next: Phase 2,** a local web prototype: form → build → 3D preview → ZIP download.
+- **Phase 2 (local web prototype):** done. Form → build → 3D preview (exploded, section) → ZIP of print-oriented STLs. Dark theme by default, with a light-mode toggle.
+- **Next: Phase 3,** hosted beta: stability check, saved designs and share links, sign-in, deployed.
 
 ```
 cd geometry && pip install -e ".[test]" && python -m pytest -q
 python -m rocketgen.cli --fins swept --out out/m18_swept --png
+
+cd ../server && pip install -r requirements.txt && uvicorn app:app --reload   # open http://127.0.0.1:8000
 ```
