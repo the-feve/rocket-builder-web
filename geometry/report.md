@@ -83,7 +83,7 @@ Sample STLs (print orientation, one per part, plus `assembled.stl`): `examples/m
 ## Deliberate differences from the FeatureScript (owner's requests, 2026-10-09)
 
 - **Nose insert 30% shorter:** `Derived.nose_shoulder_len = max(0.7 x shoulder_len, 7 mm)` for the nose only; body-to-body joints keep the full shoulder. The anchor section's length (`sec_len`) and the nose placement use it; overall length is unaffected (the tip is still nose_len above the body top).
-- **Shock-cord strap rotated 90 degrees:** a horizontal bridge across a vertical cord channel (the cord drops in from the open top behind the bar), instead of the FeatureScript's vertical bar with the cord threaded sideways. Underside: a 45-degree cone rising inward from the bore wall plus a 45-degree pointed arch under the bar, so it prints upright without supports (`test_anchor_strap_prints_without_supports`). Channel 0.4 x bore ID, clamped to 4-8 mm; bar 2 mm thick, 2.5 mm off the wall. The back is trimmed to the bore + half a wall, so it follows the curve on small tubes.
+- **Shock-cord strap rotated 90 degrees and simplified:** a straight bar across the bore (a chord from wall to wall), standing 2.5 mm off the wall at its middle, so the cord drops in from the open top behind the bar (the FeatureScript's bar runs vertically with the cord threaded sideways). Seen from the axis its underside is a 45-degree pointed arch springing from the wall at both ends, where the bar thins to nothing against the curved wall, with 2 mm of bar above the apex: it prints upright without supports (`test_anchor_strap_prints_without_supports`). Bar 2 mm thick; cord gap 10-16 mm across (M13-M29); ends run half a wall into the wall.
 
 ## Open item: leading-edge root fillet
 

@@ -220,11 +220,15 @@ def test_anchor_strap_prints_without_supports(motor):
     for f in strap.faces():
         if f.normal_at().Z < -0.72:
             assert all(math.hypot(v.X, v.Y) >= ri - 1e-3 for v in f.vertices()), "unsupported overhang"
-    # Probe the channel: a 1 mm square rod down the middle, between bar and wall.
+    # Probe the cord gap: a 1 mm square rod down the middle, between bar and wall.
     from build123d import Solid
     probe = Solid.make_box(1, 1, 200).translate((ri - s["hole_depth"] / 2 - 0.5, -0.5, -50))
-    assert strap.intersect(probe) is None or not list(strap.intersect(probe).solids())
-    assert 4.0 <= s["width"] <= 8.0
+    hit = strap.intersect(probe)
+    assert hit is None or not list(hit.solids())
+    assert s["cord_width"] >= 9.0  # room to lace a flat shock cord
+    # Nothing outside half a wall into the wall.
+    bb = strap.bounding_box()
+    assert max(bb.max.X, -bb.min.X, bb.max.Y, -bb.min.Y) <= ri + d.wall / 2 + 1e-3
 
 
 def test_nose_shoulder_is_shorter_than_body_joints():
