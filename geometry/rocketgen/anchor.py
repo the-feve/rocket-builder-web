@@ -12,7 +12,8 @@ sideways).
 It prints upright with no supports. Seen from the axis, the bar's underside
 is a 45-degree pointed arch springing from the wall at both ends, where the
 bar thins to nothing against the curved wall, so every layer sits on the
-wall or on the layer below. 2 mm of bar stands above the arch's apex. The
+wall or on the layer below. 2 mm of bar stands above the arch's apex, which is rounded (APEX_FILLET)
+so it isn't a stress riser. The
 ends run half a wall into the wall and never break through the outside.
 """
 
@@ -22,7 +23,9 @@ import math
 
 from build123d import Face, Solid, Vector, Wire
 
-from .geom import cylinder, intersect, one_solid, rotated_z
+from .geom import cylinder, intersect, one_solid, rotated_z, try_fillet
+
+APEX_FILLET = 1.5  # radius of the round at the arch's peak
 from .params import Derived
 
 
@@ -85,4 +88,12 @@ def anchor_strap(d: Derived, s0: dict, z_shift: float = 0.0) -> Solid:
                     cylinder(ri + 0.05, z0 - 10, zt + 10))
     # ...and less everything under the 45-degree pointed arch.
     arch = _yz_prism([(-Y, z0 - 1), (Y, z0 - 1), (Y, z0), (0, z0 + Y), (-Y, z0)], front - 1, ri + e + 1)
-    return one_solid(slab.cut(gap).cut(arch), "anchor strap")
+    strap = one_solid(slab.cut(gap).cut(arch), "anchor strap")
+    # Round the arch's peak: a sharp notch where the bar is thinnest is a
+    # stress riser under cord load (owner, 2026-10-09). The rounded top is a
+    # ~2 mm bridge, which prints fine. Cosmetic-style: skipped if it won't build.
+    apex = [ed for ed in strap.edges()
+            if abs(ed.center().Y) < 1e-6 and abs(ed.center().Z - (z0 + Y)) < 1e-6]
+    if apex:
+        strap = try_fillet(strap, APEX_FILLET, apex) or strap
+    return strap

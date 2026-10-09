@@ -217,7 +217,16 @@ def test_anchor_strap_prints_without_supports(motor):
     s = anchor_strap_geometry(d)
     strap = anchor_strap(d, s)
     ri = d.body_id / 2
+    from rocketgen.anchor import APEX_FILLET
+    # The peak's round: on the bar, and again past the cord gap where it is buried.
+    rounds = [f for f in strap.faces() if f.geom_type.name == "CYLINDER"
+              and abs((f.radius or 0) - APEX_FILLET) < 1e-6]
+    assert rounds, "the arch's peak is rounded"
     for f in strap.faces():
+        if f in rounds:
+            # The rounded peak is a short bridge: under 3 mm across.
+            assert f.bounding_box().size.Y < 3.0
+            continue
         if f.normal_at().Z < -0.72:
             assert all(math.hypot(v.X, v.Y) >= ri - 1e-3 for v in f.vertices()), "unsupported overhang"
     # Probe the cord gap: a 1 mm square rod down the middle, between bar and wall.
