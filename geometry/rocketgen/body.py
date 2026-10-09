@@ -59,7 +59,7 @@ def nose_cone(d: Derived, shape: str, nose_len: float) -> Solid:
     FeatureScript. The shoulder bottom is closed by a cap with a domed
     recess and a 2 x 2 mm tie bar for the shock cord.
     """
-    sh = d.shoulder_len
+    sh = d.nose_shoulder_len
     R = d.body_od / 2
     L = nose_len
     wall = d.wall

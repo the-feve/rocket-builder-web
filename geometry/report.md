@@ -78,6 +78,13 @@ Sample STLs (print orientation, one per part, plus `assembled.stl`): `examples/m
 8. **No booleans after a cosmetic fillet on the same part.** A union after a lug round produced an invalid solid. Lugs are now rounded on their own block before the union.
 9. `Face.radius` can be `None` on a cylinder; `is_cylinder_r` asks OpenCascade (`BRepAdaptor_Surface`) instead.
 
+10. *(2026-10-09)* A cut face lying exactly on the bore cylinder (the strap's cord channel, first drawn to radius ri) made the union with the body segment an unsound solid, but only where the bore is straight (with the strap shifted up out of the inner taper). Reach 0.05 mm into the wall instead. Both pieces were valid alone.
+
+## Deliberate differences from the FeatureScript (owner's requests, 2026-10-09)
+
+- **Nose insert 30% shorter:** `Derived.nose_shoulder_len = max(0.7 x shoulder_len, 7 mm)` for the nose only; body-to-body joints keep the full shoulder. The anchor section's length (`sec_len`) and the nose placement use it; overall length is unaffected (the tip is still nose_len above the body top).
+- **Shock-cord strap rotated 90 degrees and simplified:** a straight bar across the bore (a chord from wall to wall), standing 2.5 mm off the wall at its middle, so the cord drops in from the open top behind the bar (the FeatureScript's bar runs vertically with the cord threaded sideways). Seen from the axis its underside is a 45-degree pointed arch springing from the wall at both ends, where the bar thins to nothing against the curved wall, with 2 mm of bar above the apex and the apex rounded (1.5 mm, `APEX_FILLET`, a ~2 mm bridge) so it is not a stress riser: it prints upright without supports (`test_anchor_strap_prints_without_supports`). Bar 2 mm thick; cord gap 10-16 mm across (M13-M29); ends run half a wall into the wall.
+
 ## Open item: leading-edge root fillet
 
 After the main root fillet, the fin's sloping leading face caps the fillet ends. Its edge with the tube becomes a chain of split pieces (10 edges for 3 fins). Tried:
