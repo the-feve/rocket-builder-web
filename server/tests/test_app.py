@@ -38,7 +38,10 @@ def test_build_preview_zip():
 
 
 def test_unbuildable_design_is_a_422_with_a_message():
-    r = client.post("/api/build", json={"body_length": 60})
+    # Too short for the aft segment plus the anchor section under the nose
+    # (M29's anchor section is the longest; the M18 one got shorter with the
+    # 2026-10-09 strap and nose insert).
+    r = client.post("/api/build", json={"motor": "M29", "body_length": 60})
     assert r.status_code == 422 and "Body length" in r.json()["detail"]
 
 

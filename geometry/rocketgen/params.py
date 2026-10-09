@@ -105,6 +105,7 @@ class Derived:
     aft_socket_base: float
     joint_rise: float
     inner_taper_rise: float
+    nose_shoulder_len: float = 0.0
     thread: dict = field(default_factory=dict)
 
 
@@ -183,6 +184,9 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     cal = body_od
     shoulder_od = body_id - 2 * fit_slip
     shoulder_len = max(0.75 * cal - 4.0, 10.0)
+    # The nose's insert is 30% shorter than a body joint's (owner's request,
+    # 2026-10-09: a shorter transition); body-to-body joints keep the full length.
+    nose_shoulder_len = max(0.7 * shoulder_len, 7.0)
     mount_od = bay_id + 2 * wall
 
     fin = fin_dimensions(params, cal)
@@ -202,6 +206,6 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
         shoulder_od=shoulder_od, shoulder_len=shoulder_len, mount_od=mount_od,
         has_mount=has_mount, bay_len=bay_len, zmax=zmax, stop_depth=stop_depth,
         block_thickness=block_thickness, aft_socket_base=aft_socket_base,
-        joint_rise=joint_rise, inner_taper_rise=inner_taper_rise, thread=thread,
+        joint_rise=joint_rise, inner_taper_rise=inner_taper_rise, nose_shoulder_len=nose_shoulder_len, thread=thread,
     )
 

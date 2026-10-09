@@ -208,6 +208,35 @@ def test_anchor_strap_is_inside_the_bore():
     assert r.seg_lens[-1] >= s["sec_len"] - 1e-9  # a short leftover is folded into it
 
 
+@pytest.mark.parametrize("motor", ["M13", "M18", "M29"])
+def test_anchor_strap_prints_without_supports(motor):
+    """Every face pointing down more steeply than 45 degrees is buried in the
+    wall; the cord channel behind the bar is clear for its full height."""
+    from rocketgen.anchor import anchor_strap, anchor_strap_geometry
+    d = compute_derived(DesignParams(motor=motor))
+    s = anchor_strap_geometry(d)
+    strap = anchor_strap(d, s)
+    ri = d.body_id / 2
+    for f in strap.faces():
+        if f.normal_at().Z < -0.72:
+            assert all(math.hypot(v.X, v.Y) >= ri - 1e-3 for v in f.vertices()), "unsupported overhang"
+    # Probe the channel: a 1 mm square rod down the middle, between bar and wall.
+    from build123d import Solid
+    probe = Solid.make_box(1, 1, 200).translate((ri - s["hole_depth"] / 2 - 0.5, -0.5, -50))
+    assert strap.intersect(probe) is None or not list(strap.intersect(probe).solids())
+    assert 4.0 <= s["width"] <= 8.0
+
+
+def test_nose_shoulder_is_shorter_than_body_joints():
+    r = rocket()
+    d, p = r.derived, r.params
+    assert d.nose_shoulder_len == pytest.approx(max(0.7 * d.shoulder_len, 7.0))
+    assert d.nose_shoulder_len < d.shoulder_len
+    nose = next(q for q in r.parts if q.name == "Nose")
+    height = nose.local.bounding_box().size.Z
+    assert height == pytest.approx(d.nose_shoulder_len + d.joint_rise + p.nose_fineness * d.cal, abs=0.05)
+
+
 def test_rod_standoff_reaches_below_rocket():
     r = rocket()
     standoff = next(p for p in r.parts if p.name == "Rod_Standoff").assembled.bounding_box()

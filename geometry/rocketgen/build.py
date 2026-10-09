@@ -171,9 +171,10 @@ def build_rocket(params: DesignParams) -> Rocket:
         parts.append(Part(seg_part_name(i, n_parts), solid, placement_z))
 
     nose_len = params.nose_fineness * d.cal
-    if nose_len + joint_len > d.zmax:
+    nose_joint = d.nose_shoulder_len + d.joint_rise
+    if nose_len + nose_joint > d.zmax:
         raise GeometryError("This nose (fineness x caliber + shoulder) is taller than the printer's usable Z height. Lower the nose fineness or raise the printer max height.")
-    nose_z = top_z - joint_len
+    nose_z = top_z - nose_joint
     parts.append(Part("Nose", nose_cone(d, params.nose_shape, nose_len).translate((0, 0, nose_z)), nose_z))
     # The cap prints face-down, which is how it is built; its placement is 0.
     parts.append(Part("Motor_Cap", threaded_cap(d.thread), 0.0))
