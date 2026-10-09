@@ -95,3 +95,14 @@ def test_healthz_and_rate_limit(monkeypatch):
     body = {"name": "x", "params": {}}
     assert [client.post("/api/designs", json=body).status_code for _ in range(3)] == [200, 200, 429]
     server._hits.clear()
+
+
+def test_beginner_overall_height():
+    o = client.get("/api/options").json()["beginner"]
+    assert o["fin_shapes"] == ["swept", "delta", "trapezoid"] and 150 < o["overall_length"] < 600
+    for target, fins in [(400.0, "swept"), (o["overall_length"], "trapezoid")]:
+        body = client.post("/api/build", json={"overall_length": target, "fin_shape": fins}).json()
+        assert abs(body["stability"]["length_mm"] - target) <= 0.5, body["stability"]
+        assert body["body_length_mm"] < target
+    r = client.post("/api/build", json={"motor": "M29", "overall_length": 90})
+    assert r.status_code == 422 and "too short" in r.json()["detail"]

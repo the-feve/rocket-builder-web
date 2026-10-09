@@ -268,3 +268,29 @@ def test_flight_sim_matches_the_motor_picker():
     assert flights["C6"].apogee == pytest.approx(357, abs=3) and flights["C6"].ok
     assert not flights["A8"].ok and "Too heavy for this motor" in flights["A8"].problems
     assert pick(list(flights.values()), 150).motor.code == "B6"
+
+
+# ---- overall height (the website's beginner mode) --------------------------
+
+@pytest.mark.parametrize("shape,kw", [
+    (FinShape.CLIPPED_DELTA, {}),                                     # default M18, one body part + anchor
+    (FinShape.SWEPT, {"fin_scale": 1.5}),                             # fins trail below the tail
+    (FinShape.TRAPEZOID, {"body_length": 420.0}),                     # three body parts (two joints)
+    (FinShape.DELTA, {"motor": "M24", "nose_fineness": 4.0}),
+])
+def test_overall_length_matches_the_built_rocket(shape, kw):
+    from rocketgen.build import overall_length
+    from rocketgen.stability import Balance
+    r = rocket(shape, **kw)
+    assert overall_length(r.params) == pytest.approx(Balance(r).length, abs=0.05)
+
+
+def test_body_length_for_hits_the_target():
+    from rocketgen.build import body_length_for, overall_length
+    from rocketgen.geom import GeometryError
+    for motor, target in [("M18", 330.0), ("M18", 520.0), ("M24", 600.0), ("M13", 250.0)]:
+        p = DesignParams(motor=motor, fin_shape=FinShape.SWEPT)
+        b = body_length_for(p, target)
+        assert overall_length(p.with_(body_length=b)) == pytest.approx(target, abs=0.1)
+    with pytest.raises(GeometryError, match="too short"):
+        body_length_for(DesignParams(motor="M29"), 60.0)

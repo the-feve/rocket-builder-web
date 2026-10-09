@@ -60,7 +60,32 @@
   #designbar button, #designbar select { flex:none; padding:4px 8px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
   #designbar select { max-width:100%; flex:1 1 100%; }
   #designbar button:hover { border-color:var(--accent); }
-  #savemsg { flex:1 1 100%; font-size:11px; color:var(--muted); min-height:14px; }
+  #designbar .dlabel { flex:1 1 100%; display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--muted); }
+  #designbar .dlabel label { white-space:nowrap; } #dstate { text-align:right; }
+  #dstate { font-weight:600; }
+  #dstate.mine { color:var(--ok); } #dstate.shared { color:var(--warn); }
+  #designbar button.primary { border-color:var(--accent); }
+  #modebar { display:flex; margin:6px 0 2px; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  #modebar button { flex:1; padding:5px 8px; border:0; border-radius:0; font:600 12px system-ui; color:var(--muted); background:transparent; }
+  #modebar button[aria-pressed=true] { color:var(--accent-ink); background:var(--accent); }
+  #modehint { font-size:11px; color:var(--muted); margin:4px 0 0; }
+  body.beginner .adv, body:not(.beginner) .beg { display:none !important; }
+  #dirty { flex:1 1 100%; font-size:12px; padding:5px 8px; border-radius:5px; color:var(--warn); border:1px solid var(--warn); background:transparent; }
+  #dirty[hidden] { display:none; }
+  #build.attention { box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
+  .actions { flex-wrap:wrap; }
+  #progress { position:absolute; left:0; right:0; top:0; height:4px; background:transparent; }
+  #progress[hidden] { display:none; }
+  #progress div { height:100%; width:0; background:var(--accent); transition:width .25s linear; }
+  #savemsg { flex:1 1 100%; font-size:12px; color:var(--muted); min-height:16px; overflow-wrap:anywhere; }
+  #savemsg.ok { color:var(--ok); } #savemsg.err { color:var(--err); }
+  #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
+  #namedlg::backdrop { background:rgba(0,0,0,.5); }
+  #namedlg h2 { font-size:14px; margin:0 0 4px; } #namedlg p { font-size:12px; color:var(--muted); margin:0 0 10px; }
+  #namedlg input { width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:transparent; }
+  #namedlg menu { display:flex; flex-direction:row-reverse; justify-content:flex-start; gap:6px; margin:12px 0 0; padding:0; }
+  #namedlg button { padding:5px 12px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
+  #namedlg button[value=ok] { border-color:var(--accent); }
   .stab { grid-column:1/-1; display:flex; gap:14px; align-items:center; padding:8px 10px; border-radius:6px; border:1px solid var(--line); }
   .stab b.cal { font-size:20px; font-variant-numeric:tabular-nums; }
   .stab.unstable { border-color:var(--errline); background:var(--errbg); color:var(--err); }
@@ -99,31 +124,43 @@
 <main>
   <form id="form" autocomplete="off">
     <div id="designbar">
-      <input id="dname" maxlength="80" value="My rocket" aria-label="Design name">
+      <div class="dlabel"><label for="dname">Rocket name</label><span id="dstate"></span></div>
+      <input id="dname" maxlength="80" value="My rocket">
+      <button type="button" id="newrocket" class="primary" title="Start a new rocket from the default settings and save it">New rocket</button>
       <button type="button" id="save">Save</button>
       <button type="button" id="saveas">Save as new</button>
       <button type="button" id="share">Copy link</button>
+      <button type="button" id="download" title="Save this design as a file on your computer">Download file</button>
+      <button type="button" id="openfile" title="Open a design file (.json) from your computer">Open file</button>
+      <input type="file" id="filepick" accept=".json,application/json" hidden>
       <select id="mine" aria-label="My rockets"></select>
-      <div id="savemsg"></div>
+      <div id="savemsg" role="status" aria-live="polite"></div>
     </div>
+    <div id="modebar" role="group" aria-label="Mode">
+      <button type="button" data-mode="beginner" aria-pressed="true">Beginner</button>
+      <button type="button" data-mode="advanced" aria-pressed="false">Advanced</button>
+    </div>
+    <div id="modehint"></div>
     <fieldset><legend>Motor</legend>
       <label>Motor size <select name="motor"></select></label>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <label>Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
-      <label>Body OD <input type="number" name="body_od_override" min="5" max="200" step="0.1" placeholder="minimum"></label>
-      <div class="hint">Blank = minimum diameter. A larger OD adds an inner motor mount.</div>
+      <label class="beg">Overall height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="hint beg">Nose tip to fin tips. The body length is worked out to fit.</div>
+      <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
+      <label class="adv">Body OD <input type="number" name="body_od_override" min="5" max="200" step="0.1" placeholder="minimum"></label>
+      <div class="hint adv">Blank = minimum diameter. A larger OD adds an inner motor mount.</div>
       <label>Printer max height <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
       <label>Shape <select name="fin_shape"></select></label>
-      <label>Count <select name="fin_count"><option>3</option><option>4</option><option>5</option></select></label>
-      <label>Thickness <input type="number" name="fin_thickness" min="0.4" max="12" step="0.1"></label>
-      <label>Root fillet <input type="number" name="fin_fillet" min="0" max="20" step="0.1"></label>
-      <label>Leading-edge root fillet <input type="number" name="fin_fillet_upper" min="0" max="10" step="0.1"></label>
-      <label>Tip radius <input type="number" name="fin_tip_radius" min="0" max="50" step="0.1"></label>
-      <label class="check">Custom fin size <input type="checkbox" name="custom_fin_size"></label>
-      <div id="custom-fins" hidden>
+      <label class="adv">Count <select name="fin_count"><option>3</option><option>4</option><option>5</option></select></label>
+      <label class="adv">Thickness <input type="number" name="fin_thickness" min="0.4" max="12" step="0.1"></label>
+      <label class="adv">Root fillet <input type="number" name="fin_fillet" min="0" max="20" step="0.1"></label>
+      <label class="adv">Leading-edge root fillet <input type="number" name="fin_fillet_upper" min="0" max="10" step="0.1"></label>
+      <label class="adv">Tip radius <input type="number" name="fin_tip_radius" min="0" max="50" step="0.1"></label>
+      <label class="check adv">Custom fin size <input type="checkbox" name="custom_fin_size"></label>
+      <div id="custom-fins" class="adv" hidden>
         <label>Root chord <input type="number" name="fin_root_chord" min="5" max="500" step="0.5"></label>
         <label>Span <input type="number" name="fin_span" min="3" max="300" step="0.5"></label>
         <label>Tip chord <input type="number" name="fin_tip_chord" min="1" max="500" step="0.5"></label>
@@ -132,9 +169,9 @@
     </fieldset>
     <fieldset><legend>Nose</legend>
       <label>Shape <select name="nose_shape"></select></label>
-      <label>Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
+      <label class="adv">Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
     </fieldset>
-    <fieldset><legend>Launch lugs</legend>
+    <fieldset class="adv"><legend>Launch lugs</legend>
       <label>Lugs <select name="launch_lugs"></select></label>
       <div class="lug-only">
         <label>Rod diameter <input type="number" name="rod_diameter" min="2" max="13" step="0.005"></label>
@@ -143,10 +180,10 @@
         <label>Forward lug position <input type="number" name="forward_lug_frac" min="0.2" max="0.95" step="0.01"></label>
       </div>
     </fieldset>
-    <fieldset><legend>Material</legend>
+    <fieldset class="adv"><legend>Material</legend>
       <label>Filament <select name="material"></select></label>
     </fieldset>
-    <fieldset><legend>Flight (stability check)</legend>
+    <fieldset class="adv" data-keep><legend>Flight (stability check)</legend>
       <label>Target altitude, m <input type="number" name="target_altitude_m" min="10" max="3000" step="5"></label>
       <label>Check with motor <select name="flight_motor"></select></label>
       <label>Recovery mass, g <input type="number" name="recovery_mass_g" min="0" max="500" step="0.1"></label>
@@ -157,12 +194,14 @@
       </details>
     </fieldset>
     <div class="actions">
+      <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
       <button id="build" type="submit">Build</button>
       <a id="zip" class="btn off" href="#" download>Download STLs (ZIP)</a>
     </div>
   </form>
   <section id="right">
     <div id="view">
+      <div id="progress" hidden><div></div></div>
       <div id="status">Set the options and press Build.</div>
       <div id="viewopts">
         <label><input type="checkbox" id="explode"> Exploded</label>
@@ -172,6 +211,14 @@
     <div id="report"></div>
   </section>
 </main>
+<dialog id="namedlg">
+  <form method="dialog">
+    <h2 id="dlgtitle">Name your rocket</h2>
+    <p id="dlghint"></p>
+    <input id="dlgname" maxlength="80" required aria-labelledby="dlgtitle">
+    <menu><button value="ok">Save</button><button value="cancel" formnovalidate>Cancel</button></menu>
+  </form>
+</dialog>
 
 <script type="module">
 import * as THREE from 'three';
@@ -192,6 +239,10 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 
 // ---------- form ----------
 const opts = await (await fetch('/api/options')).json();
+// Beginner mode (the default) shows motor, printer height, overall height,
+// nose shape and three fin shapes; everything else is sent as the defaults.
+let mode = (() => { try { return localStorage.getItem('mode') === 'advanced' ? 'advanced' : 'beginner'; } catch { return 'beginner'; } })();
+let lastBuild = null;  // {length_mm, body_length_mm} of the model on screen
 const fill = (name, values) => {
   form.elements[name].innerHTML = values.map(v => `<option value="${v}">${LABELS[v] || v}</option>`).join('');
 };
@@ -205,7 +256,7 @@ for (const [k, v] of Object.entries(opts.defaults)) {
 const sync = () => {
   document.getElementById('custom-fins').hidden = !form.elements.custom_fin_size.checked;
   document.querySelector('.lug-only').hidden = form.elements.launch_lugs.value === 'none';
-  form.elements.forward_lug_frac.disabled = form.elements.launch_lugs.value !== 'two';
+  form.elements.forward_lug_frac.disabled = mode === 'beginner' || form.elements.launch_lugs.value !== 'two';
 };
 form.addEventListener('change', sync); sync();
 function fillFlightMotors(keep) {
@@ -228,10 +279,14 @@ form.elements.motor.addEventListener('change', flightHints);
 form.elements.body_od_override.addEventListener('change', flightHints);
 flightHints();
 
+const advEls = () => [...form.elements].filter(el => el.name && el.closest('.adv') && !el.closest('[data-keep]'));
+const ADV = new Set(advEls().map(el => el.name));
 function params() {
   const out = {};
   for (const k of Object.keys(opts.defaults)) {
     const el = form.elements[k];
+    if (mode === 'beginner' && ADV.has(k)) { out[k] = opts.defaults[k]; continue; }
+    if (k === 'overall_length' && mode !== 'beginner') { out[k] = null; continue; }
     if (el.type === 'checkbox') out[k] = el.checked;
     else if (el.type === 'number') out[k] = el.value === '' ? null : Number(el.value);
     else if (k === 'flight_motor') out[k] = el.value || null;
@@ -239,6 +294,77 @@ function params() {
   }
   for (const [k, v] of Object.entries(out)) if (v === null && !['body_od_override', 'recovery_mass_g'].includes(k)) out[k] = opts.defaults[k];
   return out;
+}
+
+// ---------- beginner / advanced ----------
+const MODE_HINT = {
+  beginner: 'Choose the motor, the overall height and the shapes; everything else uses tested defaults.',
+  advanced: 'Every setting. Switching back to Beginner resets these to the defaults.',
+};
+function fillFins() {
+  const list = mode === 'beginner' ? opts.beginner.fin_shapes : opts.fin_shapes, keep = form.elements.fin_shape.value;
+  fill('fin_shape', list);
+  form.elements.fin_shape.value = list.includes(keep) ? keep : (mode === 'beginner' ? opts.beginner.fin_shape : opts.defaults.fin_shape);
+}
+function resetAdvanced() {
+  for (const el of advEls()) {
+    if (!(el.name in opts.defaults)) continue;
+    const v = opts.defaults[el.name];
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
+  }
+}
+function applyMode() {
+  document.body.classList.toggle('beginner', mode === 'beginner');
+  document.querySelectorAll('#modebar button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+  document.getElementById('modehint').textContent = MODE_HINT[mode];
+  for (const el of advEls()) el.disabled = mode === 'beginner';  // hidden fields never block validation
+  form.elements.overall_length.disabled = mode !== 'beginner';
+  fillFins(); sync();
+}
+function switchMode(m) {
+  if (m === mode) return;
+  if (m === 'beginner') {
+    resetAdvanced();
+    form.elements.overall_length.value = lastBuild ? Math.round(lastBuild.length_mm) : (form.elements.overall_length.value || opts.beginner.overall_length);
+  } else if (lastBuild) {
+    form.elements.body_length.value = lastBuild.body_length_mm;  // the same rocket, now by body length
+  }
+  mode = m;
+  try { localStorage.setItem('mode', m); } catch {}
+  applyMode(); markDirty();
+}
+document.querySelectorAll('#modebar button').forEach(b => b.onclick = () => switchMode(b.dataset.mode));
+
+// ---------- "press Build" notice and progress bar ----------
+const dirtyEl = document.getElementById('dirty');
+let edits = 0;  // bumped on every change, so a build that finishes after an edit doesn't clear the notice
+function markDirty(html = 'Settings changed. Press <b>Build</b> to update the 3D model and downloads.') {
+  edits++;
+  dirtyEl.innerHTML = html; dirtyEl.hidden = false;
+  buildBtn.classList.add('attention'); zipBtn.classList.add('off');
+}
+function markClean() { dirtyEl.hidden = true; buildBtn.classList.remove('attention'); }
+const notDesignBar = e => !e.target.closest('#designbar');
+form.addEventListener('input', e => { if (notDesignBar(e)) markDirty(); });
+form.addEventListener('change', e => { if (notDesignBar(e)) markDirty(); });
+const progEl = document.getElementById('progress'), progBar = progEl.firstElementChild;
+let progTimer = null;
+function startProgress() {
+  // Builds report no progress, so the bar eases toward 95% (about 60% at 8 s)
+  // and jumps to the end when the model arrives.
+  const t0 = performance.now();
+  progEl.hidden = false; progBar.style.width = '0';
+  clearInterval(progTimer);
+  progTimer = setInterval(() => {
+    const t = (performance.now() - t0) / 1000;
+    progBar.style.width = `${(95 * (1 - Math.exp(-t / 9))).toFixed(1)}%`;
+    statusEl.textContent = `Building… ${Math.floor(t)} s (a new design can take up to about 30 s)`;
+  }, 200);
+}
+function stopProgress() {
+  clearInterval(progTimer); progTimer = null;
+  progBar.style.width = '100%';
+  setTimeout(() => { if (!progTimer) { progEl.hidden = true; progBar.style.width = '0'; } }, 400);
 }
 
 // ---------- viewer ----------
@@ -398,8 +524,8 @@ form.addEventListener('submit', e => { e.preventDefault(); runBuild(); });
 async function runBuild() {
   if (!form.reportValidity()) return;
   buildBtn.disabled = true; zipBtn.classList.add('off');
-  const t0 = performance.now();
-  statusEl.textContent = 'Building… (a few seconds; the first build of a design takes longest)';
+  const t0 = performance.now(), seq = edits;
+  startProgress();
   try {
     const res = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params()) });
     const body = await res.json();
@@ -409,18 +535,24 @@ async function runBuild() {
       throw new Error(msg || `Build failed (${res.status})`);
     }
     await showModel(`/api/builds/${body.id}/preview.glb`, body.parts);
+    stopProgress();
+    lastBuild = { length_mm: body.stability.length_mm, body_length_mm: body.body_length_mm };
     setMarkers(body.stability); applyView(false);
     showReport(body);
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
     zipBtn.classList.toggle('off', !body.stability.ok);
     zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';
+    if (seq === edits) markClean(); else zipBtn.classList.add('off');
     statusEl.textContent = `Built ${body.parts.length} parts in ${((performance.now() - t0) / 1000).toFixed(1)} s · drag to rotate, scroll to zoom`;
   } catch (err) {
+    stopProgress();
     statusEl.textContent = 'Build failed';
+    markDirty('Build failed. Change the settings and press <b>Build</b> again.');
     if (rocket) { scene.remove(rocket); rocket = null; }
     setMarkers(null);
     reportEl.innerHTML = `<div class="error"><b>Can't build this rocket.</b> ${esc(err.message)}</div>`;
   } finally {
+    if (progTimer) stopProgress();
     buildBtn.disabled = false;
   }
 }
@@ -431,13 +563,25 @@ async function runBuild() {
 const nameEl = document.getElementById('dname'), mineEl = document.getElementById('mine'), msgEl = document.getElementById('savemsg');
 const loadMine = () => { try { return JSON.parse(localStorage.getItem('myRockets') || '[]'); } catch { return []; } };
 const storeMine = list => { try { localStorage.setItem('myRockets', JSON.stringify(list)); } catch {} };
-let current = null;  // {id, key} of the design on screen, if saved
+let current = null;  // {id, key} of the design on screen, if saved from this browser
+let shared = false;  // the design on screen was opened from someone else's link
+const stateEl = document.getElementById('dstate');
+function renderState() {
+  stateEl.className = current ? 'mine' : shared ? 'shared' : '';
+  stateEl.textContent = current ? 'Saved · yours to edit' : shared ? "Shared design · Save makes your own copy" : 'Not saved yet';
+}
 function renderMine() {
   const list = loadMine();
   mineEl.innerHTML = `<option value="">My rockets (${list.length} saved in this browser)…</option>` +
     list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
+  renderState();
 }
+// A design with an overall height is a beginner design; any other saved
+// design opens in Advanced. An empty one (New rocket) keeps the current mode.
 function setForm(p) {
+  mode = p.overall_length != null ? 'beginner' : Object.keys(p).length ? 'advanced' : mode;
+  try { localStorage.setItem('mode', mode); } catch {}
+  applyMode();
   form.elements.motor.value = p.motor ?? opts.defaults.motor;
   fillFlightMotors(p.flight_motor ?? '');
   for (const k of Object.keys(opts.defaults)) {
@@ -445,43 +589,116 @@ function setForm(p) {
     if (!el) continue;
     if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
   }
-  sync(); flightHints();
+  if (mode === 'beginner' && !form.elements.overall_length.value) form.elements.overall_length.value = opts.beginner.overall_length;
+  fillFins(); sync(); flightHints();
+  lastBuild = null; markDirty();
 }
 const shareUrl = id => `${location.origin}/d/${id}`;
-async function save(asNew) {
-  if (!form.reportValidity()) return;
+function say(text, kind = '') { msgEl.textContent = text; msgEl.className = kind; }
+
+// Asks for a name in a small dialog; resolves to the trimmed name, or null on Cancel.
+const dlg = document.getElementById('namedlg'), dlgName = document.getElementById('dlgname');
+function askName(title, hint, suggested) {
+  document.getElementById('dlgtitle').textContent = title;
+  document.getElementById('dlghint').textContent = hint;
+  dlgName.value = suggested;
+  dlg.returnValue = '';
+  dlg.showModal(); dlgName.select();
+  return new Promise(resolve => dlg.addEventListener('close', () =>
+    resolve(dlg.returnValue === 'ok' && dlgName.value.trim() ? dlgName.value.trim() : null), { once: true }));
+}
+
+// Saving your own design overwrites it under its current name. Anything else
+// (a new rocket, Save as new, or a design opened from someone's link) asks
+// for a name first, so it's clear a new saved copy is being made.
+async function save(asNew, chosenName = null) {
+  if (!form.reportValidity()) { say('Fix the highlighted setting before saving.', 'err'); return; }
   const mine = loadMine();
   const own = !asNew && current && mine.find(d => d.id === current.id);
+  if (!own && chosenName) nameEl.value = chosenName;
+  else if (!own) {
+    const base = nameEl.value.trim() || 'My rocket';
+    const name = await askName(asNew && current ? 'Save a copy' : 'Name your rocket',
+      shared && !current ? 'This saves your own copy of the shared design; the original stays as it is.'
+                         : 'Saved rockets appear under "My rockets" in this browser and get a share link.',
+      current || shared ? `${base} (copy)` : base);
+    if (!name) return;
+    nameEl.value = name;
+  }
+  say('Saving…');
   const body = JSON.stringify({ name: nameEl.value.trim() || 'My rocket', params: params() });
-  const res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
-    method: own ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', ...(own ? { 'X-Edit-Key': own.key } : {}) }, body });
-  const d = await res.json();
-  if (!res.ok) { msgEl.textContent = typeof d.detail === 'string' ? d.detail : 'Could not save.'; return; }
+  let res, d;
+  try {
+    res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
+      method: own ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', ...(own ? { 'X-Edit-Key': own.key } : {}) }, body });
+    d = await res.json().catch(() => ({}));
+  } catch { say('Could not reach the server; check your connection and try again.', 'err'); return; }
+  if (!res.ok) { say(typeof d.detail === 'string' ? d.detail : `Could not save (error ${res.status}).`, 'err'); return; }
   const entry = { id: d.id, name: d.name, key: own ? own.key : d.edit_key };
   storeMine([entry, ...mine.filter(x => x.id !== d.id)]);
-  current = entry; history.replaceState(null, '', `/d/${d.id}`);
-  renderMine(); msgEl.textContent = `Saved. Share link: ${shareUrl(d.id)}`;
+  current = entry; shared = false; history.replaceState(null, '', `/d/${d.id}`);
+  renderMine(); say(`Saved "${d.name}". Share link: ${shareUrl(d.id)}`, 'ok');
 }
 document.getElementById('save').onclick = () => save(false);
 document.getElementById('saveas').onclick = () => save(true);
+document.getElementById('newrocket').onclick = async () => {
+  const name = await askName('New rocket', 'Starts from the default settings and saves it under this name.', 'My rocket');
+  if (!name) return;
+  current = null; shared = false;
+  setForm({}); nameEl.value = name;
+  history.replaceState(null, '', '/');
+  await save(true, name);
+  runBuild();
+};
 document.getElementById('share').onclick = async () => {
   if (!current) await save(false);
   if (!current) return;
-  try { await navigator.clipboard.writeText(shareUrl(current.id)); msgEl.textContent = `Link copied: ${shareUrl(current.id)}`; }
-  catch { msgEl.textContent = `Share link: ${shareUrl(current.id)}`; }
+  try { await navigator.clipboard.writeText(shareUrl(current.id)); say(`Link copied: ${shareUrl(current.id)}`, 'ok'); }
+  catch { say(`Share link: ${shareUrl(current.id)}`, 'ok'); }
 };
+// ---------- design files on your own computer ----------
+const slug = t => (t.trim() || 'rocket').replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'rocket';
+document.getElementById('download').onclick = () => {
+  const data = { format: 'rocket-builder-design', schemaVersion: 1, name: nameEl.value.trim() || 'My rocket', mode, params: params() };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  a.download = `${slug(data.name)}.rocket.json`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  say(`Downloaded ${a.download}. Use Open file to load it again.`, 'ok');
+};
+const filePick = document.getElementById('filepick');
+document.getElementById('openfile').onclick = () => filePick.click();
+filePick.onchange = async () => {
+  const f = filePick.files[0];
+  filePick.value = '';
+  if (!f) return;
+  let d;
+  try { d = JSON.parse(await f.text()); } catch { d = null; }
+  // Also reads the design.json inside a downloaded STL ZIP.
+  if (!d || typeof d.params !== 'object' || !d.params) { say(`${f.name} isn't a Rocket Builder design file.`, 'err'); return; }
+  setForm(Object.fromEntries(Object.entries(d.params).filter(([k]) => k in opts.defaults)));
+  nameEl.value = d.name || f.name.replace(/(\.rocket)?\.json$/i, '');
+  current = null; shared = false; history.replaceState(null, '', '/'); renderMine();
+  say(`Opened ${f.name}. It isn't saved on the site until you press Save.`, 'ok');
+  runBuild();
+};
+
 async function openDesign(id) {
   const res = await fetch(`/api/designs/${encodeURIComponent(id)}`);
-  if (!res.ok) { msgEl.textContent = "That design link doesn't exist."; return; }
+  if (!res.ok) { say("That design link doesn't exist.", 'err'); return; }
   const d = await res.json();
   setForm(d.params); nameEl.value = d.name;
   current = loadMine().find(x => x.id === d.id) || null;
+  shared = !current;
   history.replaceState(null, '', `/d/${d.id}`);
   renderMine();
-  msgEl.textContent = current ? '' : 'A shared design: Save as new to keep your own copy.';
+  say(current ? '' : 'Opened from a share link. Save makes your own copy; the original stays as it is.');
   runBuild();
 }
 mineEl.onchange = () => { if (mineEl.value) openDesign(mineEl.value); };
+applyMode();
+if (mode === 'beginner') form.elements.overall_length.value = opts.beginner.overall_length;
+markDirty('Press <b>Build</b> to make the 3D model and downloads.');
 renderMine();
 const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
 if (linked) openDesign(linked[1]);
