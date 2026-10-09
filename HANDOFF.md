@@ -15,6 +15,7 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 - **Auto-sized fins** (`build_stable`): standard fins grow in span and sweep (not root: a longer root moves the CP forward) until the heaviest motor of the size is stable. M24 1.48x, M24L 1.52x, M29 1.91x; M18/M13 unchanged. Rectangular on M29 hits the 2.5x cap at 0.76 cal and is reported unstable. Custom fins are left as typed.
 - **Motor picker** (`geometry/rocketgen/flight.py`, ported from OS_Rocket_Builder `tools/motor-picker.html`; data `geometry/rocketgen/data/web_motors.csv`): every Estes motor for the bay flown in a 1-D sim; checks 5x thrust-to-weight, 15 m/s off the rod, 30 m apogee, and stability with that motor's mass. Recommends the closest safe motor to the target altitude, with its delay. Clicking a row re-checks stability with that motor.
 - **Saved designs + share links** (`server/designs.py`): SQLite at `ROCKETGEN_DB`; `/d/<id>` links; an edit key per browser stands in for sign-in. "My rockets" list in localStorage.
+- **Save flow (2026-10-09):** *New rocket* resets to defaults, asks for a name and saves. *Save* overwrites your own design silently. On an unsaved design, a shared one, or *Save as new*, it asks for a name first (copies suggest "<name> (copy)"). A status label shows *Not saved yet* / *Saved · yours to edit* / *Shared design*, and save messages are coloured, with errors caught. The owner found the old flow unclear: saving kept the shared design's name and showed only a small grey line.
 - **Hosting guards:** `/healthz`; per-address limits (30 new builds / 10 min, 60 saves / hour); 60 s max wait for the build lock (then 503); failed builds logged with parameters; three.js r160 vendored in `server/static/vendor/` (no CDN).
 - **Deploy plumbing:** `Dockerfile` (python:3.12-slim-bookworm), `fly.toml` (app `rocket-fevergeon`, region `sjc` (Fly no longer offers `sea`), shared-cpu-1x 1 GB, suspends when idle, volume `rocket_data` at `/data`), `.github/workflows/ci.yml`, `.github/workflows/deploy.yml` (deploys on push to `main`; skips with a notice until `FLY_API_TOKEN` is set).
 
@@ -43,6 +44,7 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 - 2026-10-09: Hosting: Fly.io for the app (persistent volume keeps SQLite simple), Cloudflare for DNS and Access. Cloudflare Containers rejected for now (no persistent disk; would need D1).
 - 2026-10-09: Region `sjc` (San Jose): `sea` isn't available on Fly any more.
 - 2026-10-09: The deploy workflow passes (green) when the token is missing; check that the run actually ran `flyctl deploy`, not just a green tick.
+- 2026-10-09: Saving stays server-side (SQLite on the Fly volume) with per-browser edit keys until accounts arrive; a download/open design-file option is a possible extra (design.json is already in the ZIP).
 - 2026-10-09: Invite-only beta via Cloudflare Access rather than building sign-in; real accounts wait for public/paid launch.
 
 ## Open items / known limits

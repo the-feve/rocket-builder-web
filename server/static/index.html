@@ -60,7 +60,20 @@
   #designbar button, #designbar select { flex:none; padding:4px 8px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
   #designbar select { max-width:100%; flex:1 1 100%; }
   #designbar button:hover { border-color:var(--accent); }
-  #savemsg { flex:1 1 100%; font-size:11px; color:var(--muted); min-height:14px; }
+  #designbar .dlabel { flex:1 1 100%; display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--muted); }
+  #designbar .dlabel label { white-space:nowrap; } #dstate { text-align:right; }
+  #dstate { font-weight:600; }
+  #dstate.mine { color:var(--ok); } #dstate.shared { color:var(--warn); }
+  #designbar button.primary { border-color:var(--accent); }
+  #savemsg { flex:1 1 100%; font-size:12px; color:var(--muted); min-height:16px; overflow-wrap:anywhere; }
+  #savemsg.ok { color:var(--ok); } #savemsg.err { color:var(--err); }
+  #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
+  #namedlg::backdrop { background:rgba(0,0,0,.5); }
+  #namedlg h2 { font-size:14px; margin:0 0 4px; } #namedlg p { font-size:12px; color:var(--muted); margin:0 0 10px; }
+  #namedlg input { width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:transparent; }
+  #namedlg menu { display:flex; flex-direction:row-reverse; justify-content:flex-start; gap:6px; margin:12px 0 0; padding:0; }
+  #namedlg button { padding:5px 12px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
+  #namedlg button[value=ok] { border-color:var(--accent); }
   .stab { grid-column:1/-1; display:flex; gap:14px; align-items:center; padding:8px 10px; border-radius:6px; border:1px solid var(--line); }
   .stab b.cal { font-size:20px; font-variant-numeric:tabular-nums; }
   .stab.unstable { border-color:var(--errline); background:var(--errbg); color:var(--err); }
@@ -99,12 +112,14 @@
 <main>
   <form id="form" autocomplete="off">
     <div id="designbar">
-      <input id="dname" maxlength="80" value="My rocket" aria-label="Design name">
+      <div class="dlabel"><label for="dname">Rocket name</label><span id="dstate"></span></div>
+      <input id="dname" maxlength="80" value="My rocket">
+      <button type="button" id="newrocket" class="primary" title="Start a new rocket from the default settings and save it">New rocket</button>
       <button type="button" id="save">Save</button>
       <button type="button" id="saveas">Save as new</button>
       <button type="button" id="share">Copy link</button>
       <select id="mine" aria-label="My rockets"></select>
-      <div id="savemsg"></div>
+      <div id="savemsg" role="status" aria-live="polite"></div>
     </div>
     <fieldset><legend>Motor</legend>
       <label>Motor size <select name="motor"></select></label>
@@ -172,6 +187,14 @@
     <div id="report"></div>
   </section>
 </main>
+<dialog id="namedlg">
+  <form method="dialog">
+    <h2 id="dlgtitle">Name your rocket</h2>
+    <p id="dlghint"></p>
+    <input id="dlgname" maxlength="80" required aria-labelledby="dlgtitle">
+    <menu><button value="ok">Save</button><button value="cancel" formnovalidate>Cancel</button></menu>
+  </form>
+</dialog>
 
 <script type="module">
 import * as THREE from 'three';
@@ -431,11 +454,18 @@ async function runBuild() {
 const nameEl = document.getElementById('dname'), mineEl = document.getElementById('mine'), msgEl = document.getElementById('savemsg');
 const loadMine = () => { try { return JSON.parse(localStorage.getItem('myRockets') || '[]'); } catch { return []; } };
 const storeMine = list => { try { localStorage.setItem('myRockets', JSON.stringify(list)); } catch {} };
-let current = null;  // {id, key} of the design on screen, if saved
+let current = null;  // {id, key} of the design on screen, if saved from this browser
+let shared = false;  // the design on screen was opened from someone else's link
+const stateEl = document.getElementById('dstate');
+function renderState() {
+  stateEl.className = current ? 'mine' : shared ? 'shared' : '';
+  stateEl.textContent = current ? 'Saved · yours to edit' : shared ? "Shared design · Save makes your own copy" : 'Not saved yet';
+}
 function renderMine() {
   const list = loadMine();
   mineEl.innerHTML = `<option value="">My rockets (${list.length} saved in this browser)…</option>` +
     list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
+  renderState();
 }
 function setForm(p) {
   form.elements.motor.value = p.motor ?? opts.defaults.motor;
@@ -448,37 +478,78 @@ function setForm(p) {
   sync(); flightHints();
 }
 const shareUrl = id => `${location.origin}/d/${id}`;
-async function save(asNew) {
-  if (!form.reportValidity()) return;
+function say(text, kind = '') { msgEl.textContent = text; msgEl.className = kind; }
+
+// Asks for a name in a small dialog; resolves to the trimmed name, or null on Cancel.
+const dlg = document.getElementById('namedlg'), dlgName = document.getElementById('dlgname');
+function askName(title, hint, suggested) {
+  document.getElementById('dlgtitle').textContent = title;
+  document.getElementById('dlghint').textContent = hint;
+  dlgName.value = suggested;
+  dlg.returnValue = '';
+  dlg.showModal(); dlgName.select();
+  return new Promise(resolve => dlg.addEventListener('close', () =>
+    resolve(dlg.returnValue === 'ok' && dlgName.value.trim() ? dlgName.value.trim() : null), { once: true }));
+}
+
+// Saving your own design overwrites it under its current name. Anything else
+// (a new rocket, Save as new, or a design opened from someone's link) asks
+// for a name first, so it's clear a new saved copy is being made.
+async function save(asNew, chosenName = null) {
+  if (!form.reportValidity()) { say('Fix the highlighted setting before saving.', 'err'); return; }
   const mine = loadMine();
   const own = !asNew && current && mine.find(d => d.id === current.id);
+  if (!own && chosenName) nameEl.value = chosenName;
+  else if (!own) {
+    const base = nameEl.value.trim() || 'My rocket';
+    const name = await askName(asNew && current ? 'Save a copy' : 'Name your rocket',
+      shared && !current ? 'This saves your own copy of the shared design; the original stays as it is.'
+                         : 'Saved rockets appear under "My rockets" in this browser and get a share link.',
+      current || shared ? `${base} (copy)` : base);
+    if (!name) return;
+    nameEl.value = name;
+  }
+  say('Saving…');
   const body = JSON.stringify({ name: nameEl.value.trim() || 'My rocket', params: params() });
-  const res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
-    method: own ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', ...(own ? { 'X-Edit-Key': own.key } : {}) }, body });
-  const d = await res.json();
-  if (!res.ok) { msgEl.textContent = typeof d.detail === 'string' ? d.detail : 'Could not save.'; return; }
+  let res, d;
+  try {
+    res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
+      method: own ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', ...(own ? { 'X-Edit-Key': own.key } : {}) }, body });
+    d = await res.json().catch(() => ({}));
+  } catch { say('Could not reach the server; check your connection and try again.', 'err'); return; }
+  if (!res.ok) { say(typeof d.detail === 'string' ? d.detail : `Could not save (error ${res.status}).`, 'err'); return; }
   const entry = { id: d.id, name: d.name, key: own ? own.key : d.edit_key };
   storeMine([entry, ...mine.filter(x => x.id !== d.id)]);
-  current = entry; history.replaceState(null, '', `/d/${d.id}`);
-  renderMine(); msgEl.textContent = `Saved. Share link: ${shareUrl(d.id)}`;
+  current = entry; shared = false; history.replaceState(null, '', `/d/${d.id}`);
+  renderMine(); say(`Saved "${d.name}". Share link: ${shareUrl(d.id)}`, 'ok');
 }
 document.getElementById('save').onclick = () => save(false);
 document.getElementById('saveas').onclick = () => save(true);
+document.getElementById('newrocket').onclick = async () => {
+  const name = await askName('New rocket', 'Starts from the default settings and saves it under this name.', 'My rocket');
+  if (!name) return;
+  current = null; shared = false;
+  setForm({}); nameEl.value = name;
+  history.replaceState(null, '', '/');
+  await save(true, name);
+  runBuild();
+};
 document.getElementById('share').onclick = async () => {
   if (!current) await save(false);
   if (!current) return;
-  try { await navigator.clipboard.writeText(shareUrl(current.id)); msgEl.textContent = `Link copied: ${shareUrl(current.id)}`; }
-  catch { msgEl.textContent = `Share link: ${shareUrl(current.id)}`; }
+  try { await navigator.clipboard.writeText(shareUrl(current.id)); say(`Link copied: ${shareUrl(current.id)}`, 'ok'); }
+  catch { say(`Share link: ${shareUrl(current.id)}`, 'ok'); }
 };
 async function openDesign(id) {
   const res = await fetch(`/api/designs/${encodeURIComponent(id)}`);
-  if (!res.ok) { msgEl.textContent = "That design link doesn't exist."; return; }
+  if (!res.ok) { say("That design link doesn't exist.", 'err'); return; }
   const d = await res.json();
   setForm(d.params); nameEl.value = d.name;
   current = loadMine().find(x => x.id === d.id) || null;
+  shared = !current;
   history.replaceState(null, '', `/d/${d.id}`);
   renderMine();
-  msgEl.textContent = current ? '' : 'A shared design: Save as new to keep your own copy.';
+  say(current ? '' : 'Opened from a share link. Save makes your own copy; the original stays as it is.');
   runBuild();
 }
 mineEl.onchange = () => { if (mineEl.value) openDesign(mineEl.value); };
