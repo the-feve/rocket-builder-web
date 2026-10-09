@@ -56,6 +56,7 @@ class DesignParams:
     fin_tip_radius: float = 6.5
     custom_fin_size: bool = False
     fin_scale: float = 1.0  # the website's stability auto-size (standard sizes only); not in the FeatureScript
+    wall: float | None = None  # tube, nose and mount wall; None = the settings CSV (1.5 mm). Website only.
     fin_root_chord: float = 40.0
     fin_span: float = 20.0
     fin_tip_chord: float = 20.0
@@ -172,7 +173,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     m = motors[params.motor]
     mtr_d, mtr_len, mtr_hang = m["mtr_d"], m["mtr_len"], m["mtr_hang"]
     z_margin = settings["z_margin"]
-    wall = settings["wall"]
+    wall = params.wall if params.wall else settings["wall"]
     fit_slip = settings["fit_slip"]
     fit_press = settings["fit_press"]
     mtr_clear = settings["mtr_clear"]

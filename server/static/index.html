@@ -148,8 +148,10 @@
       <label class="beg">Overall height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
       <div class="hint beg">Nose tip to fin tips. The body length is worked out to fit.</div>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
-      <label class="adv">Body OD <input type="number" name="body_od_override" min="5" max="200" step="0.1" placeholder="minimum"></label>
-      <div class="hint adv">Blank = minimum diameter. A larger OD adds an inner motor mount.</div>
+      <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
+      <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
+      <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
+      <div class="hint adv" id="odout"></div>
       <label>Printer max height <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
@@ -267,16 +269,30 @@ function fillFlightMotors(keep) {
     list.map(m => `<option value="${m.code}">${m.code} · ${m.mass_g} g</option>`).join('');
   el.value = list.some(m => m.code === prev) ? prev : '';
 }
+const wallMm = () => mode === 'beginner' ? opts.defaults.wall : (Number(form.elements.wall.value) || opts.defaults.wall);
+const stockOd = () => opts.bay_id[form.elements.motor.value] + 2 * wallMm();
 async function flightHints() {
   fillFlightMotors();
-  const od = form.elements.body_od_override.value;
+  const off = mode === 'beginner' ? 0 : Number(form.elements.body_od_offset.value) || 0;
   try {
-    const r = await (await fetch(`/api/recovery_allowance?motor=${form.elements.motor.value}${od ? `&body_od_override=${od}` : ''}`)).json();
+    const r = await (await fetch(`/api/recovery_allowance?motor=${form.elements.motor.value}&body_od_offset=${off}&wall=${wallMm()}`)).json();
     form.elements.recovery_mass_g.placeholder = r.recovery_mass_g ?? '';
   } catch {}
 }
 form.elements.motor.addEventListener('change', flightHints);
-form.elements.body_od_override.addEventListener('change', flightHints);
+form.elements.body_od_offset.addEventListener('change', flightHints);
+// Driven output under the offset: the body OD it gives.
+function showOd() {
+  const off = Number(form.elements.body_od_offset.value) || 0, stock = stockOd();
+  document.getElementById('odout').textContent = off > 0
+    ? `Body OD ${(stock + 2 * off).toFixed(1)} mm (stock ${stock.toFixed(1)} + 2 × ${off}); a larger OD adds an inner motor mount.`
+    : `Body OD ${stock.toFixed(1)} mm (the stock tube for this motor and wall). Each 1 mm of offset adds 2 mm of diameter.`;
+}
+form.elements.body_od_offset.addEventListener('input', showOd);
+form.elements.wall.addEventListener('input', showOd);
+form.elements.wall.addEventListener('change', flightHints);
+form.elements.motor.addEventListener('change', showOd);
+showOd();
 flightHints();
 
 const advEls = () => [...form.elements].filter(el => el.name && el.closest('.adv') && !el.closest('[data-keep]'));
@@ -287,6 +303,7 @@ function params() {
     const el = form.elements[k];
     if (mode === 'beginner' && ADV.has(k)) { out[k] = opts.defaults[k]; continue; }
     if (k === 'overall_length' && mode !== 'beginner') { out[k] = null; continue; }
+    if (!el) { out[k] = opts.defaults[k]; continue; }  // e.g. body_od_override: replaced by the offset
     if (el.type === 'checkbox') out[k] = el.checked;
     else if (el.type === 'number') out[k] = el.value === '' ? null : Number(el.value);
     else if (k === 'flight_motor') out[k] = el.value || null;
@@ -590,6 +607,10 @@ function setForm(p) {
     if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
   }
   if (mode === 'beginner' && !form.elements.overall_length.value) form.elements.overall_length.value = opts.beginner.overall_length;
+  if (p.body_od_override && !p.body_od_offset) {  // saved before the offset field existed
+    form.elements.body_od_offset.value = Math.max(0, (p.body_od_override - stockOd()) / 2).toFixed(1);
+  }
+  showOd();
   fillFins(); sync(); flightHints();
   lastBuild = null; markDirty();
 }

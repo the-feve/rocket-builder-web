@@ -1,6 +1,8 @@
 """Server tests: a default build, its preview and ZIP, stability, saved designs, friendly errors."""
 
 import io
+
+import pytest
 import os
 import tempfile
 import zipfile
@@ -109,3 +111,36 @@ def test_beginner_overall_height():
         assert body["body_length_mm"] < target
     r = client.post("/api/build", json={"motor": "M29", "overall_length": 90})
     assert r.status_code == 422 and "too short" in r.json()["detail"]
+
+
+def test_body_od_offset():
+    o = client.get("/api/options").json()
+    stock = o["stock_od"]["M18"]
+    assert o["defaults"]["body_od_offset"] == 0
+    b = client.post("/api/build", json={"body_od_offset": 5}).json()
+    assert b["dimensions"]["Body OD"] == pytest.approx(stock + 10, abs=1e-6)
+    assert b["dimensions"]["Inner motor mount"] == "yes"
+    # Designs saved before the offset existed carry body_od_override.
+    old = client.post("/api/build", json={"body_od_override": stock + 10}).json()
+    assert old["dimensions"]["Body OD"] == pytest.approx(stock + 10, abs=1e-6)
+    # A huge offset is refused with a message, not a server error.
+    r = client.post("/api/build", json={"motor": "M29", "body_od_offset": 80})
+    assert r.status_code == 422 and r.json()["detail"]
+    assert client.post("/api/build", json={"body_od_offset": 81}).status_code == 422  # over the field's limit
+    ra = client.get("/api/recovery_allowance", params={"motor": "M18", "body_od_offset": 5}).json()
+    assert ra["recovery_mass_g"] > client.get("/api/recovery_allowance", params={"motor": "M18"}).json()["recovery_mass_g"]
+
+
+def test_wall_thickness():
+    o = client.get("/api/options").json()
+    assert o["defaults"]["wall"] == 1.5
+    thin = client.post("/api/build", json={"wall": 1.2}).json()["dimensions"]
+    thick = client.post("/api/build", json={"wall": 2.0}).json()["dimensions"]
+    # Same motor bay, thicker wall: the stock tube grows by twice the change.
+    assert thick["Body OD"] - thin["Body OD"] == pytest.approx(1.6, abs=1e-6)
+    assert thick["Body ID"] == pytest.approx(thick["Body OD"] - 4.0, abs=1e-6)
+    assert thin["Body OD"] == pytest.approx(o["bay_id"]["M18"] + 2.4, abs=1e-3)
+    # The offset is measured from the stock tube for that wall.
+    off = client.post("/api/build", json={"wall": 2.0, "body_od_offset": 3}).json()["dimensions"]
+    assert off["Body OD"] == pytest.approx(thick["Body OD"] + 6, abs=1e-6)
+    assert client.post("/api/build", json={"wall": 0.5}).status_code == 422

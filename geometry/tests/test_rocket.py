@@ -336,3 +336,16 @@ def test_body_length_for_hits_the_target():
         assert overall_length(p.with_(body_length=b)) == pytest.approx(target, abs=0.1)
     with pytest.raises(GeometryError, match="too short"):
         body_length_for(DesignParams(motor="M29"), 60.0)
+
+
+@pytest.mark.parametrize("motor,wall", [("M13", 0.8), ("M13", 3.0), ("M29", 0.8), ("M29", 3.0)])
+def test_wall_thickness_builds(motor, wall):
+    """The website's wall field: thin and thick walls build sound parts, and
+    the stock tube is the motor bay plus two walls."""
+    from rocketgen.geom import meshes
+    r = rocket(motor=motor, wall=wall)
+    d = r.derived
+    assert d.wall == wall and d.body_od == pytest.approx(d.bay_id + 2 * wall)
+    assert d.body_id == pytest.approx(d.body_od - 2 * wall)
+    for p in r.parts:
+        assert p.assembled.is_valid and meshes(p.assembled), p.name
