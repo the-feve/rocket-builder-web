@@ -1,6 +1,8 @@
 """Server tests: a default build, its preview and ZIP, stability, saved designs, friendly errors."""
 
 import io
+
+import pytest
 import os
 import tempfile
 import zipfile
@@ -109,3 +111,21 @@ def test_beginner_overall_height():
         assert body["body_length_mm"] < target
     r = client.post("/api/build", json={"motor": "M29", "overall_length": 90})
     assert r.status_code == 422 and "too short" in r.json()["detail"]
+
+
+def test_body_od_offset():
+    o = client.get("/api/options").json()
+    stock = o["stock_od"]["M18"]
+    assert o["defaults"]["body_od_offset"] == 0
+    b = client.post("/api/build", json={"body_od_offset": 5}).json()
+    assert b["dimensions"]["Body OD"] == pytest.approx(stock + 10, abs=1e-6)
+    assert b["dimensions"]["Inner motor mount"] == "yes"
+    # Designs saved before the offset existed carry body_od_override.
+    old = client.post("/api/build", json={"body_od_override": stock + 10}).json()
+    assert old["dimensions"]["Body OD"] == pytest.approx(stock + 10, abs=1e-6)
+    # A huge offset is refused with a message, not a server error.
+    r = client.post("/api/build", json={"motor": "M29", "body_od_offset": 80})
+    assert r.status_code == 422 and r.json()["detail"]
+    assert client.post("/api/build", json={"body_od_offset": 81}).status_code == 422  # over the field's limit
+    ra = client.get("/api/recovery_allowance", params={"motor": "M18", "body_od_offset": 5}).json()
+    assert ra["recovery_mass_g"] > client.get("/api/recovery_allowance", params={"motor": "M18"}).json()["recovery_mass_g"]
