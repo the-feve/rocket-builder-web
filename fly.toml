@@ -2,7 +2,7 @@
 # Deployed by .github/workflows/deploy.yml on every push to main.
 # If "rocket-fevergeon" is taken on Fly, change `app` to the name you created.
 app = "rocket-fevergeon"
-primary_region = "sea"
+primary_region = "sjc"
 
 [build]
 
@@ -11,7 +11,7 @@ primary_region = "sea"
   PORT = "8000"
 
 # Saved designs (SQLite) live on this volume; create it once:
-#   fly volumes create rocket_data --region sea --size 1
+#   fly volumes create rocket_data --region sjc --size 1
 [mounts]
   source = "rocket_data"
   destination = "/data"
