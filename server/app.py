@@ -36,6 +36,7 @@ from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
 from rocketgen.flight import FIELD_M, motors_for, pick, simulate
+from rocketgen.build import body_length_for, overall_length
 from rocketgen.stability import Balance, build_stable, recovery_allowance_g
 
 import designs
@@ -64,6 +65,9 @@ class BuildRequest(BaseModel):
     nose_shape: str = "tangent_ogive"
     nose_fineness: float = Field(3.0, ge=2, le=5)
     body_length: float = Field(250.0, ge=50, le=2000)
+    # Beginner mode: the overall height (nose tip to fin tips / motor cap);
+    # when set, body_length is worked out from it and the typed one ignored.
+    overall_length: float | None = Field(None, ge=80, le=2500)
     body_od_override: float | None = Field(None, ge=5, le=200)
     print_max_height: float = Field(200.0, ge=50, le=500)
     launch_lugs: str = "two"
@@ -80,6 +84,8 @@ class BuildRequest(BaseModel):
     drag_cd: float = Field(0.65, ge=0.2, le=1.5)
     launch_rod_m: float = Field(0.91, ge=0.3, le=3)
 
+
+BEGINNER_FINS = ["swept", "delta", "trapezoid"]
 
 FLIGHT_FIELDS = ("flight_motor", "recovery_mass_g", "target_altitude_m", "drag_cd", "launch_rod_m")
 
@@ -124,6 +130,7 @@ def _report(rocket) -> dict:
               "mass_g": round(masses[p.name], 1),
               "height_mm": round(p.local.bounding_box().size.Z, 1)} for i, p in enumerate(rocket.parts)]
     return {
+        "body_length_mm": round(rocket.params.body_length, 1),
         "parts": parts,
         "total_mass_g": round(sum(masses.values()), 1),
         "summary": rocket.summary(),
@@ -133,6 +140,7 @@ def _report(rocket) -> dict:
             "Inner motor mount": "yes" if d.has_mount else "no (minimum diameter)",
             "Shoulder OD": d.shoulder_od, "Shoulder length": d.shoulder_len,
             "Motor hang-out": t["hang"], "Thread pitch": t["p"], "Thread turns": t["turns"],
+            "Body length": round(rocket.params.body_length, 1),
             "Body segments": len(rocket.seg_lens),
             "Fin span/sweep scale": rocket.params.fin_scale,
         },
@@ -200,6 +208,10 @@ def options():
         "launch_lugs": list(LUG_OPTIONS),
         "materials": list(MATERIALS),
         "defaults": BuildRequest().model_dump(mode="json"),
+        # Beginner mode: motor, printer height, overall height, nose shape and
+        # one of three standard fin shapes; everything else stays at defaults.
+        "beginner": {"fin_shapes": BEGINNER_FINS, "fin_shape": BEGINNER_FINS[2],
+                     "overall_length": round(overall_length(DesignParams(fin_shape=FinShape(BEGINNER_FINS[2]))))},
         "flight_motors": {size: [{"code": m.code, "cls": m.cls, "mass_g": m.mass_g, "out_of_production": m.out_of_production}
                                  for m in motors_for(size)] for size in load_motors()},
     }
@@ -218,6 +230,20 @@ def _key(*parts) -> str:
     return hashlib.sha256(json.dumps([GENERATOR_VERSION, *parts], sort_keys=True).encode()).hexdigest()[:16]
 
 
+def _build_to_length(params: DesignParams, overall: float | None):
+    """build_stable, sized to an overall height when one is given. Auto-sized
+    fins can change how far the fin tips trail below the tail, so when they
+    do, rebuild once at the corrected body length, starting from the fin
+    scale already found (normally no further scaling)."""
+    if overall is None:
+        return build_stable(params)
+    rocket = build_stable(params.with_(body_length=body_length_for(params, overall)))
+    if abs(Balance(rocket).length - overall) > 0.5:
+        p = rocket.params
+        rocket = build_stable(p.with_(body_length=body_length_for(p, overall)))
+    return rocket
+
+
 def _geometry(geo_params: dict, req: BuildRequest, request: Request) -> str:
     key = _key(geo_params)
     try:
@@ -233,7 +259,8 @@ def _geometry(geo_params: dict, req: BuildRequest, request: Request) -> str:
             return key
         t0 = time.monotonic()
         try:
-            rocket = build_stable(DesignParams(**{**geo_params, "fin_shape": req.fin_shape}))
+            rocket = _build_to_length(DesignParams(**{**{k: v for k, v in geo_params.items() if k != "overall_length"},
+                                                     "fin_shape": req.fin_shape}), req.overall_length)
         except (GeometryError, ValueError) as ex:
             raise HTTPException(422, str(ex))
         except Exception as ex:  # an OpenCascade failure: never a bare 500

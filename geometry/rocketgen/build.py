@@ -85,6 +85,36 @@ def plan_segments(params: DesignParams, d: Derived) -> list[float]:
     return seg_lens
 
 
+def overall_length(params: DesignParams) -> float:
+    """Nose tip to the lowest point (motor cap face or fin tips), without
+    building any solids. Matches stability.Balance.length for the same
+    params: the body parts stack to body_length minus one joint overlap per
+    joint above the aft part, and the nose tip sits nose_len above the
+    top of the body (the nose shoulder fills the last joint)."""
+    d = compute_derived(params)
+    seg_lens = plan_segments(params, d)
+    joint_len = d.shoulder_len + d.joint_rise
+    z_tip = sum(seg_lens) - (len(seg_lens) - 1) * joint_len + params.nose_fineness * d.cal
+    return z_tip - min(0.0, d.thread["z_lowest"])
+
+
+def body_length_for(params: DesignParams, overall: float) -> float:
+    """The body_length that makes the rocket `overall` mm long (the
+    website's beginner mode asks for overall height). The number of body
+    segments depends on the body length, so step until it settles."""
+    b = params.body_length
+    for _ in range(12):
+        try:
+            nb = b + overall - overall_length(params.with_(body_length=b))
+        except GeometryError:
+            raise GeometryError(f"An overall height of {overall:.0f} mm is too short for the {params.motor} motor bay "
+                                "and nose. Make the rocket taller.") from None
+        if abs(nb - b) < 0.05:
+            return round(nb, 1)
+        b = nb
+    return round(b, 1)
+
+
 def build_rocket(params: DesignParams) -> Rocket:
     if params.nose_shape not in NOSE_SHAPES:
         raise ValueError(f"Unknown nose shape {params.nose_shape!r}")
