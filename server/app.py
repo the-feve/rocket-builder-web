@@ -72,6 +72,9 @@ class BuildRequest(BaseModel):
     # The form's "Body OD offset": radial mm added to the motor's stock tube
     # (5 = 10 mm more diameter). When > 0 it sets body_od_override.
     body_od_offset: float = Field(0.0, ge=0, le=80)
+    # Wall thickness of the body tubes, nose cone and motor mount. A thicker
+    # wall around the same motor bay makes the stock tube bigger.
+    wall: float = Field(1.5, ge=0.8, le=3.0)
     print_max_height: float = Field(200.0, ge=50, le=500)
     launch_lugs: str = "two"
     rod_diameter: float = Field(3.175, ge=2, le=13)
@@ -94,15 +97,15 @@ BEGINNER_FINS = ["swept", "delta", "trapezoid"]
 NOT_GEOMETRY = ("overall_length", "body_od_offset")
 
 
-def stock_od(motor: str) -> float:
-    """The minimum-diameter body for a motor size (no OD override)."""
-    return compute_derived(DesignParams(motor=motor)).body_od
+def stock_od(motor: str, wall: float | None = None) -> float:
+    """The minimum-diameter body for a motor size and wall (no OD override)."""
+    return compute_derived(DesignParams(motor=motor, wall=wall)).body_od
 
 
-def resolved_od(motor: str, offset: float, override: float | None) -> float | None:
+def resolved_od(motor: str, offset: float, override: float | None, wall: float | None = None) -> float | None:
     """body_od_override from the form: the offset wins; an older saved design
     may carry only an override."""
-    return stock_od(motor) + 2 * offset if offset else override
+    return stock_od(motor, wall) + 2 * offset if offset else override
 
 
 FLIGHT_FIELDS = ("flight_motor", "recovery_mass_g", "target_altitude_m", "drag_cd", "launch_rod_m")
@@ -226,7 +229,8 @@ def options():
         "launch_lugs": list(LUG_OPTIONS),
         "materials": list(MATERIALS),
         "defaults": BuildRequest().model_dump(mode="json"),
-        "stock_od": {m: round(stock_od(m), 2) for m in load_motors()},
+        "stock_od": {m: round(stock_od(m), 2) for m in load_motors()},  # at the default wall
+        "bay_id": {m: round(compute_derived(DesignParams(motor=m)).bay_id, 3) for m in load_motors()},  # stock OD = bay + 2 x wall
         # Beginner mode: motor, printer height, overall height, nose shape and
         # one of three standard fin shapes; everything else stays at defaults.
         "beginner": {"fin_shapes": BEGINNER_FINS, "fin_shape": BEGINNER_FINS[2],
@@ -237,11 +241,13 @@ def options():
 
 
 @app.get("/api/recovery_allowance")
-def recovery_allowance(motor: str = "M18", body_od_override: float | None = None, body_od_offset: float = 0.0):
+def recovery_allowance(motor: str = "M18", body_od_override: float | None = None, body_od_offset: float = 0.0,
+                       wall: float | None = None):
     """The default recovery mass for the form's placeholder."""
     if motor not in load_motors():
         raise HTTPException(422, f"Unknown motor {motor!r}.")
-    d = compute_derived(DesignParams(motor=motor, body_od_override=resolved_od(motor, body_od_offset, body_od_override)))
+    d = compute_derived(DesignParams(motor=motor, wall=wall,
+                                     body_od_override=resolved_od(motor, body_od_offset, body_od_override, wall)))
     return {"recovery_mass_g": recovery_allowance_g(d.body_od)}
 
 
@@ -305,7 +311,7 @@ def build(req: BuildRequest, request: Request):
     motors = {m.code: m for m in motors_for(req.motor)}
     if req.flight_motor is not None and req.flight_motor not in motors:
         raise HTTPException(422, f"{req.flight_motor} doesn't fit the {req.motor} motor bay.")
-    od = resolved_od(req.motor, req.body_od_offset, req.body_od_override)
+    od = resolved_od(req.motor, req.body_od_offset, req.body_od_override, req.wall)
     if od is not None and od > 200:
         raise HTTPException(422, f"That offset makes the body {od:.0f} mm across; the most is 200 mm.")
     geo_params = {k: v for k, v in params.items() if k not in FLIGHT_FIELDS}
