@@ -1,0 +1,41 @@
+# Fly.io: the designer website (Dockerfile at the repo root).
+# Deployed by .github/workflows/deploy.yml on every push to main.
+# If "rocket-fevergeon" is taken on Fly, change `app` to the name you created.
+app = "rocket-fevergeon"
+primary_region = "sea"
+
+[build]
+
+[env]
+  ROCKETGEN_DB = "/data/designs.sqlite3"
+  PORT = "8000"
+
+# Saved designs (SQLite) live on this volume; create it once:
+#   fly volumes create rocket_data --region sea --size 1
+[mounts]
+  source = "rocket_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  # Sleeps when nobody is using it; the first visit after that takes a few seconds longer.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 20
+    hard_limit = 40
+
+[[http_service.checks]]
+  method = "GET"
+  path = "/healthz"
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "30s"
+
+# OpenCascade builds want about 0.5 GB; 1 GB leaves room for the cache.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"

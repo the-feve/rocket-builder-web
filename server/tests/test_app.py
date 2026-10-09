@@ -84,3 +84,14 @@ def test_saved_design_share_link_and_edit_key():
     assert client.delete(f"/api/designs/{did}", headers={"X-Edit-Key": key}).status_code == 200
     assert client.get(f"/api/designs/{did}").status_code == 404
     assert client.post("/api/designs", json={"name": "bad", "params": {"fin_count": 9}}).status_code == 422
+
+
+def test_healthz_and_rate_limit(monkeypatch):
+    import app as server
+    assert client.get("/healthz").json()["ok"]
+    assert client.get("/static/vendor/three/build/three.module.js").status_code == 200
+    monkeypatch.setattr(server, "SAVES_PER_HOUR", 2)
+    server._hits.clear()
+    body = {"name": "x", "params": {}}
+    assert [client.post("/api/designs", json=body).status_code for _ in range(3)] == [200, 200, 429]
+    server._hits.clear()

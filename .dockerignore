@@ -7,3 +7,5 @@ geometry/report
 server/data
 server/screenshots
 .git
+.github
+fly.toml

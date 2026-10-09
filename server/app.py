@@ -14,15 +14,18 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import logging
+import os
 import tempfile
 import threading
+import time
 import zipfile
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict, deque
 from pathlib import Path
 
 import numpy as np
 import trimesh
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -81,7 +84,34 @@ class BuildRequest(BaseModel):
 FLIGHT_FIELDS = ("flight_motor", "recovery_mass_g", "target_altitude_m", "drag_cd", "launch_rod_m")
 
 
+log = logging.getLogger("rocketbuilder")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+
+# Public-internet guards. A build holds the one OpenCascade lock for 5-10 s,
+# so a visitor waits at most BUILD_WAIT_S for their turn, and each address
+# gets a budget of new (uncached) builds and saves.
+BUILD_WAIT_S = float(os.environ.get("ROCKETGEN_BUILD_WAIT_S", 60))
+BUILDS_PER_10_MIN = int(os.environ.get("ROCKETGEN_BUILDS_PER_10_MIN", 30))
+SAVES_PER_HOUR = int(os.environ.get("ROCKETGEN_SAVES_PER_HOUR", 60))
+
 app = FastAPI(title="Rocket Builder")
+_hits: dict[tuple[str, str], deque] = defaultdict(deque)
+
+
+def _client(request: Request) -> str:
+    # Behind Cloudflare and Fly's proxy the socket address is the proxy's.
+    h = request.headers
+    return h.get("cf-connecting-ip") or h.get("fly-client-ip") or (request.client.host if request.client else "?")
+
+
+def _rate_limit(request: Request, kind: str, limit: int, window_s: float):
+    now = time.monotonic()
+    q = _hits[(kind, _client(request))]
+    while q and now - q[0] > window_s:
+        q.popleft()
+    if len(q) >= limit:
+        raise HTTPException(429, "Too many requests from your address; wait a few minutes and try again.")
+    q.append(now)
 _geo: OrderedDict[str, dict] = OrderedDict()  # geometry key -> {"rocket", "glb", "report", "stls"}
 _builds: dict[str, dict] = {}  # build id -> {"geo", "params", "stability"}
 _lock = threading.Lock()  # one OpenCascade build at a time
@@ -188,27 +218,39 @@ def _key(*parts) -> str:
     return hashlib.sha256(json.dumps([GENERATOR_VERSION, *parts], sort_keys=True).encode()).hexdigest()[:16]
 
 
-def _geometry(geo_params: dict, req: BuildRequest) -> str:
+def _geometry(geo_params: dict, req: BuildRequest, request: Request) -> str:
     key = _key(geo_params)
-    with _lock:
-        if key in _geo:
-            _geo.move_to_end(key)
+    try:
+        _geo.move_to_end(key)  # cached: no lock, no rate limit
+        return key
+    except KeyError:
+        pass
+    _rate_limit(request, "build", BUILDS_PER_10_MIN, 600)
+    if not _lock.acquire(timeout=BUILD_WAIT_S):
+        raise HTTPException(503, "The builder is busy with other rockets; try again in a minute.")
+    try:
+        if key in _geo:  # built by another request while this one waited
             return key
+        t0 = time.monotonic()
         try:
             rocket = build_stable(DesignParams(**{**geo_params, "fin_shape": req.fin_shape}))
         except (GeometryError, ValueError) as ex:
             raise HTTPException(422, str(ex))
         except Exception as ex:  # an OpenCascade failure: never a bare 500
+            log.exception("build failed: %s", json.dumps(geo_params, sort_keys=True))
             raise HTTPException(422, f"The geometry engine could not build this design ({type(ex).__name__}). "
                                      "Try slightly different settings.")
         _geo[key] = {"rocket": rocket, "balance": Balance(rocket), "glb": _glb(rocket), "report": _report(rocket), "stls": None}
         while len(_geo) > MAX_CACHED:
             _geo.popitem(last=False)
+        log.info("built %s in %.1f s (fin scale %s)", key, time.monotonic() - t0, rocket.params.fin_scale)
+    finally:
+        _lock.release()
     return key
 
 
 @app.post("/api/build")
-def build(req: BuildRequest):
+def build(req: BuildRequest, request: Request):
     params = req.model_dump(mode="json")
     if req.motor not in load_motors():
         raise HTTPException(422, f"Unknown motor {req.motor!r}.")
@@ -218,7 +260,7 @@ def build(req: BuildRequest):
     if req.flight_motor is not None and req.flight_motor not in motors:
         raise HTTPException(422, f"{req.flight_motor} doesn't fit the {req.motor} motor bay.")
     geo_params = {k: v for k, v in params.items() if k not in FLIGHT_FIELDS}
-    geo = _geometry(geo_params, req)
+    geo = _geometry(geo_params, req, request)
     bal: Balance = _geo[geo]["balance"]
     st = _stability(bal.check(motors.get(req.flight_motor), req.recovery_mass_g))
     flights = _flights(bal, list(motors.values()), req)
@@ -283,10 +325,11 @@ class DesignRename(BaseModel):
 
 
 @app.post("/api/designs")
-def save_design(d: DesignIn):
+def save_design(d: DesignIn, request: Request):
     """A new saved design. The edit key comes back once; the page keeps it
     in this browser and sends it to rename or overwrite. Until sign-in
     exists, it is the only proof of ownership."""
+    _rate_limit(request, "save", SAVES_PER_HOUR, 3600)
     return designs.create(d.name, d.params.model_dump(mode="json"), GENERATOR_VERSION, SCHEMA_VERSION)
 
 
@@ -322,6 +365,13 @@ def _owned(design_id: str, key: str):
         raise HTTPException(404, "That design doesn't exist.")
     if not designs.check_key(design_id, key):
         raise HTTPException(403, "This design was saved from another browser; use Save as new to keep a copy.")
+
+
+@app.get("/healthz")
+def healthz():
+    """Fly's health check: the process is up and the designs database opens."""
+    designs.get("healthz")
+    return {"ok": True, "generatorVersion": GENERATOR_VERSION}
 
 
 @app.get("/")
