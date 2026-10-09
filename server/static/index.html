@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rocket Builder</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#2a313c; --rowline:#212833;
+    --field:#0d1117; --accent:#4c8dff; --accent-ink:#fff; --err:#ff8a80; --errbg:#3a1618; --errline:#6e2a2a;
+    --view-top:#1b2230; --view-bot:#0b0e13; --chip:rgba(22,27,34,.85); --ok:#56d364; --warn:#e3b341;
+  }
+  :root[data-theme=light] {
+    color-scheme: light;
+    --bg:#f5f6f8; --panel:#fff; --ink:#1d2330; --muted:#667085; --line:#dfe3ea; --rowline:#eef0f4;
+    --field:#fff; --accent:#2f6fdf; --accent-ink:#fff; --err:#b42318; --errbg:#fef3f2; --errline:#fecdca;
+    --view-top:#e9eef6; --view-bot:#f8f9fb; --chip:rgba(255,255,255,.85); --ok:#1a7f37; --warn:#9a6700;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+  header { padding:10px 16px; align-items:center; border-bottom:1px solid var(--line); background:var(--panel); display:flex; align-items:baseline; gap:12px; }
+  header h1 { font-size:17px; margin:0; }
+  header span { color:var(--muted); font-size:12px; }
+  #theme { margin-left:auto; flex:none; padding:3px 10px; font:500 12px system-ui; color:var(--muted); background:transparent; border:1px solid var(--line); }
+  #theme:hover { color:var(--ink); }
+  main { display:grid; grid-template-columns:330px 1fr; height:calc(100vh - 45px); }
+  #form { overflow-y:auto; padding:8px 14px 16px; background:var(--panel); border-right:1px solid var(--line); }
+  fieldset { border:none; border-top:1px solid var(--line); margin:8px 0 0; padding:8px 0 0; }
+  legend { font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); padding:0; }
+  label { display:grid; grid-template-columns:1fr 120px; align-items:center; gap:8px; margin:5px 0; }
+  label.check { grid-template-columns:1fr auto; }
+  input[type=number], select { width:100%; padding:4px 6px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:var(--field); }
+  input:disabled { opacity:.5; }
+  input[type=checkbox] { accent-color:var(--accent); }
+  .hint { color:var(--muted); font-size:11px; margin:-2px 0 4px; }
+  #custom-fins[hidden], .lug-only[hidden] { display:none; }
+  .actions { position:sticky; bottom:-16px; background:var(--panel); padding:10px 0 6px; display:flex; gap:8px; border-top:1px solid var(--line); margin-top:10px; }
+  button, a.btn { flex:1; padding:8px 10px; border-radius:6px; border:1px solid var(--accent); font:600 14px system-ui; cursor:pointer; text-align:center; text-decoration:none; }
+  #build { background:var(--accent); color:var(--accent-ink); }
+  #build:disabled { opacity:.6; cursor:wait; }
+  a.btn { color:var(--accent); background:transparent; }
+  a.btn.off { pointer-events:none; opacity:.4; }
+  #right { display:grid; grid-template-rows:1fr auto; min-width:0; min-height:0; }
+  #view { position:relative; min-height:0; background:linear-gradient(var(--view-top),var(--view-bot)); }
+  #view canvas { display:block; }
+  #status { position:absolute; left:12px; top:10px; padding:4px 8px; background:var(--chip); border-radius:5px; font-size:12px; color:var(--muted); }
+  #viewopts { position:absolute; right:12px; top:10px; display:flex; gap:10px; background:var(--chip); padding:4px 8px; border-radius:5px; font-size:12px; }
+  #viewopts label { display:flex; margin:0; gap:4px; }
+  #report { padding:10px 16px; background:var(--panel); border-top:1px solid var(--line); max-height:32vh; overflow-y:auto; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:6px 24px; }
+  #report h2 { font-size:13px; margin:4px 0; }
+  table { border-collapse:collapse; width:100%; font-size:12.5px; }
+  td, th { padding:2px 6px 2px 0; text-align:left; border-bottom:1px solid var(--rowline); }
+  td.n { text-align:right; font-variant-numeric:tabular-nums; }
+  .sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px; }
+  ul { margin:4px 0; padding-left:18px; }
+  .error { grid-column:1/-1; color:var(--err); background:var(--errbg); border:1px solid var(--errline); padding:8px 10px; border-radius:6px; }
+  #designbar { display:flex; gap:6px; align-items:center; padding:8px 0 4px; flex-wrap:wrap; }
+  #designbar input { flex:1 1 120px; min-width:0; padding:4px 6px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:var(--field); }
+  #designbar button, #designbar select { flex:none; padding:4px 8px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
+  #designbar select { max-width:100%; flex:1 1 100%; }
+  #designbar button:hover { border-color:var(--accent); }
+  #savemsg { flex:1 1 100%; font-size:11px; color:var(--muted); min-height:14px; }
+  .stab { grid-column:1/-1; display:flex; gap:14px; align-items:center; padding:8px 10px; border-radius:6px; border:1px solid var(--line); }
+  .stab b.cal { font-size:20px; font-variant-numeric:tabular-nums; }
+  .stab.unstable { border-color:var(--errline); background:var(--errbg); color:var(--err); }
+  .stab.stable b.cal { color:var(--ok); }
+  .stab.overstable b.cal { color:var(--warn); }
+  .stab small { color:var(--muted); display:block; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin:0 4px 0 8px; vertical-align:0; }
+  .picker { grid-column:1/-1; }
+  .picker .rec { display:flex; gap:12px; align-items:center; margin:2px 0 6px; }
+  .picker .chip { font:700 18px system-ui; padding:6px 12px; border-radius:6px; background:var(--accent); color:var(--accent-ink); }
+  .picker tr.best td { background:color-mix(in srgb, var(--accent) 18%, transparent); }
+  .picker tr.pick { cursor:pointer; }
+  .picker tr.pick:hover td { background:color-mix(in srgb, var(--accent) 10%, transparent); }
+  .bad { color:var(--err); } .good { color:var(--ok); }
+  details summary { cursor:pointer; margin:4px 0; }
+  @media (max-width:800px) {
+    main { grid-template-columns:1fr; height:auto; }
+    #form { border-right:none; }
+    #right { grid-template-rows:60vh auto; }
+    #report { grid-template-columns:1fr; max-height:none; }
+  }
+</style>
+<script>
+  // Dark by default; the header button switches to light and is remembered in this browser.
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch {}
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "/static/vendor/three/build/three.module.js",
+  "three/addons/": "/static/vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header><h1>Rocket Builder</h1><span>Beta · units mm</span><button id="theme" type="button"></button></header>
+<main>
+  <form id="form" autocomplete="off">
+    <div id="designbar">
+      <input id="dname" maxlength="80" value="My rocket" aria-label="Design name">
+      <button type="button" id="save">Save</button>
+      <button type="button" id="saveas">Save as new</button>
+      <button type="button" id="share">Copy link</button>
+      <select id="mine" aria-label="My rockets"></select>
+      <div id="savemsg"></div>
+    </div>
+    <fieldset><legend>Motor</legend>
+      <label>Motor size <select name="motor"></select></label>
+    </fieldset>
+    <fieldset><legend>Body</legend>
+      <label>Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
+      <label>Body OD <input type="number" name="body_od_override" min="5" max="200" step="0.1" placeholder="minimum"></label>
+      <div class="hint">Blank = minimum diameter. A larger OD adds an inner motor mount.</div>
+      <label>Printer max height <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+    </fieldset>
+    <fieldset><legend>Fins</legend>
+      <label>Shape <select name="fin_shape"></select></label>
+      <label>Count <select name="fin_count"><option>3</option><option>4</option><option>5</option></select></label>
+      <label>Thickness <input type="number" name="fin_thickness" min="0.4" max="12" step="0.1"></label>
+      <label>Root fillet <input type="number" name="fin_fillet" min="0" max="20" step="0.1"></label>
+      <label>Leading-edge root fillet <input type="number" name="fin_fillet_upper" min="0" max="10" step="0.1"></label>
+      <label>Tip radius <input type="number" name="fin_tip_radius" min="0" max="50" step="0.1"></label>
+      <label class="check">Custom fin size <input type="checkbox" name="custom_fin_size"></label>
+      <div id="custom-fins" hidden>
+        <label>Root chord <input type="number" name="fin_root_chord" min="5" max="500" step="0.5"></label>
+        <label>Span <input type="number" name="fin_span" min="3" max="300" step="0.5"></label>
+        <label>Tip chord <input type="number" name="fin_tip_chord" min="1" max="500" step="0.5"></label>
+        <label>Sweep <input type="number" name="fin_sweep" min="0" max="500" step="0.5"></label>
+      </div>
+    </fieldset>
+    <fieldset><legend>Nose</legend>
+      <label>Shape <select name="nose_shape"></select></label>
+      <label>Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
+    </fieldset>
+    <fieldset><legend>Launch lugs</legend>
+      <label>Lugs <select name="launch_lugs"></select></label>
+      <div class="lug-only">
+        <label>Rod diameter <input type="number" name="rod_diameter" min="2" max="13" step="0.005"></label>
+        <label class="check">Rod standoff part <input type="checkbox" name="rod_standoff"></label>
+        <label>Pad clearance <input type="number" name="pad_clearance" min="0" max="100" step="0.5"></label>
+        <label>Forward lug position <input type="number" name="forward_lug_frac" min="0.2" max="0.95" step="0.01"></label>
+      </div>
+    </fieldset>
+    <fieldset><legend>Material</legend>
+      <label>Filament <select name="material"></select></label>
+    </fieldset>
+    <fieldset><legend>Flight (stability check)</legend>
+      <label>Target altitude, m <input type="number" name="target_altitude_m" min="10" max="3000" step="5"></label>
+      <label>Check with motor <select name="flight_motor"></select></label>
+      <label>Recovery mass, g <input type="number" name="recovery_mass_g" min="0" max="500" step="0.1"></label>
+      <div class="hint">Standard fins grow automatically until the heaviest motor of the size is stable. Recovery blank = a parachute + cord allowance.</div>
+      <details><summary class="hint">Advanced</summary>
+        <label>Drag coefficient <input type="number" name="drag_cd" min="0.2" max="1.5" step="0.05"></label>
+        <label>Launch rod, m <input type="number" name="launch_rod_m" min="0.3" max="3" step="0.01"></label>
+      </details>
+    </fieldset>
+    <div class="actions">
+      <button id="build" type="submit">Build</button>
+      <a id="zip" class="btn off" href="#" download>Download STLs (ZIP)</a>
+    </div>
+  </form>
+  <section id="right">
+    <div id="view">
+      <div id="status">Set the options and press Build.</div>
+      <div id="viewopts">
+        <label><input type="checkbox" id="explode"> Exploded</label>
+        <label><input type="checkbox" id="section"> Section</label>
+      </div>
+    </div>
+    <div id="report"></div>
+  </section>
+</main>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const LABELS = {
+  clipped_delta: 'Clipped delta', trapezoid: 'Trapezoid', swept: 'Swept', delta: 'Delta', rectangular: 'Rectangular',
+  tangent_ogive: 'Tangent ogive', conical: 'Conical', elliptical: 'Elliptical', parabolic: 'Parabolic', von_karman: 'Von Kármán',
+  two: 'Aft + forward', aft_only: 'Aft only', none: 'None',
+};
+const form = document.getElementById('form');
+const statusEl = document.getElementById('status');
+const reportEl = document.getElementById('report');
+const zipBtn = document.getElementById('zip');
+const buildBtn = document.getElementById('build');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+// ---------- form ----------
+const opts = await (await fetch('/api/options')).json();
+const fill = (name, values) => {
+  form.elements[name].innerHTML = values.map(v => `<option value="${v}">${LABELS[v] || v}</option>`).join('');
+};
+fill('motor', opts.motors); fill('fin_shape', opts.fin_shapes); fill('nose_shape', opts.nose_shapes);
+fill('launch_lugs', opts.launch_lugs); fill('material', opts.materials);
+for (const [k, v] of Object.entries(opts.defaults)) {
+  const el = form.elements[k];
+  if (!el) continue;
+  if (el.type === 'checkbox') el.checked = v; else el.value = v ?? '';
+}
+const sync = () => {
+  document.getElementById('custom-fins').hidden = !form.elements.custom_fin_size.checked;
+  document.querySelector('.lug-only').hidden = form.elements.launch_lugs.value === 'none';
+  form.elements.forward_lug_frac.disabled = form.elements.launch_lugs.value !== 'two';
+};
+form.addEventListener('change', sync); sync();
+function fillFlightMotors(keep) {
+  const list = opts.flight_motors[form.elements.motor.value] || [];
+  const heavy = list.reduce((a, m) => (!a || m.mass_g > a.mass_g ? m : a), null);
+  const el = form.elements.flight_motor, prev = keep ?? el.value;
+  el.innerHTML = `<option value="">Heaviest: ${heavy ? heavy.code : '?'} (worst case)</option>` +
+    list.map(m => `<option value="${m.code}">${m.code} · ${m.mass_g} g</option>`).join('');
+  el.value = list.some(m => m.code === prev) ? prev : '';
+}
+async function flightHints() {
+  fillFlightMotors();
+  const od = form.elements.body_od_override.value;
+  try {
+    const r = await (await fetch(`/api/recovery_allowance?motor=${form.elements.motor.value}${od ? `&body_od_override=${od}` : ''}`)).json();
+    form.elements.recovery_mass_g.placeholder = r.recovery_mass_g ?? '';
+  } catch {}
+}
+form.elements.motor.addEventListener('change', flightHints);
+form.elements.body_od_override.addEventListener('change', flightHints);
+flightHints();
+
+function params() {
+  const out = {};
+  for (const k of Object.keys(opts.defaults)) {
+    const el = form.elements[k];
+    if (el.type === 'checkbox') out[k] = el.checked;
+    else if (el.type === 'number') out[k] = el.value === '' ? null : Number(el.value);
+    else if (k === 'flight_motor') out[k] = el.value || null;
+    else out[k] = k === 'fin_count' ? Number(el.value) : el.value;
+  }
+  for (const [k, v] of Object.entries(out)) if (v === null && !['body_od_override', 'recovery_mass_g'].includes(k)) out[k] = opts.defaults[k];
+  return out;
+}
+
+// ---------- viewer ----------
+const view = document.getElementById('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.localClippingEnabled = true;
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 1, 20000);
+camera.up.set(0, 0, 1);  // the generator is Z-up
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+const hemi = new THREE.HemisphereLight(0xffffff, 0x8890a0, 1.6); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(300, -400, 600); scene.add(sun);
+const fill2 = new THREE.DirectionalLight(0xffffff, 0.5); fill2.position.set(-300, 300, -200); scene.add(fill2);
+const sectionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);  // keeps y <= 0
+let rocket = null, partMeshes = [], markers = null;
+
+// ---------- theme ----------
+const themeBtn = document.getElementById('theme');
+function applyTheme() {
+  const light = document.documentElement.dataset.theme === 'light';
+  themeBtn.textContent = light ? 'Dark mode' : 'Light mode';
+  hemi.groundColor.set(light ? 0x8890a0 : 0x404858);  // less bounce light off a dark floor
+}
+themeBtn.onclick = () => {
+  const light = document.documentElement.dataset.theme !== 'light';
+  if (light) document.documentElement.dataset.theme = 'light'; else delete document.documentElement.dataset.theme;
+  try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch {}
+  applyTheme();
+};
+applyTheme();
+
+function resize() {
+  const w = view.clientWidth, h = view.clientHeight;
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(view); resize();
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+
+function frame(obj) {
+  // Fit the rocket's full height (it is tall and thin) with a margin.
+  const box = new THREE.Box3().setFromObject(obj);
+  const c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
+  const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const dist = 1.08 * Math.max(size.z / 2 / t, Math.max(size.x, size.y) / 2 / (t * camera.aspect)) + Math.max(size.x, size.y) / 2;
+  controls.target.copy(c);
+  camera.position.copy(c).add(new THREE.Vector3(0.75, -1, 0.25).normalize().multiplyScalar(dist));
+  camera.near = dist / 100; camera.far = dist * 10; camera.updateProjectionMatrix();
+}
+
+function setMarkers(st) {
+  // CG and CP balls beside the body, at their heights (measured from the nose tip, the top).
+  if (markers) { scene.remove(markers); markers = null; }
+  if (!rocket || !st) return;
+  partMeshes.forEach(({ mesh }) => { mesh.position.z = 0; });  // measure assembled, not exploded; applyView restores
+  const box = new THREE.Box3().setFromObject(rocket);
+  const r = 0.5 * Math.max(box.max.x - box.min.x, box.max.y - box.min.y);
+  markers = new THREE.Group();
+  for (const [z, color] of [[st.cg_mm, 0x4c8dff], [st.cp_mm, 0xff5a5a]]) {
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(Math.max(2.5, r * 0.12), 20, 14),
+      new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.35 }));
+    ball.position.set(0, -r * 1.15, box.max.z - z);
+    markers.add(ball);
+  }
+  scene.add(markers);
+}
+
+function applyView(reframe) {
+  if (!rocket) return;
+  if (markers) markers.visible = !document.getElementById('explode').checked;
+  const explode = document.getElementById('explode').checked;
+  const section = document.getElementById('section').checked;
+  partMeshes.forEach(({ mesh, index }) => {
+    mesh.position.z = explode ? index * 25 : 0;
+    mesh.material.clippingPlanes = section ? [sectionPlane] : [];
+    mesh.material.needsUpdate = true;
+  });
+  if (reframe) frame(rocket);
+}
+document.getElementById('explode').onchange = () => applyView(true);
+document.getElementById('section').onchange = () => applyView(false);
+
+async function showModel(url, parts) {
+  const gltf = await new GLTFLoader().loadAsync(url);
+  if (rocket) scene.remove(rocket);
+  rocket = gltf.scene; partMeshes = [];
+  // Order parts bottom-up for the exploded view; the cap and standoff sit at the bottom.
+  const order = ['Motor_Cap', 'Rod_Standoff'];
+  rocket.traverse(o => {
+    if (!o.isMesh) return;
+    const name = o.name || o.parent?.name;
+    const p = parts.find(p => p.name === name);
+    const rgb = p ? p.color : [0.7, 0.7, 0.7];
+    o.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(...rgb), roughness: 0.55, metalness: 0.05, side: THREE.DoubleSide });
+    o.geometry.computeVertexNormals();
+    const idx = order.includes(name) ? -1 - order.indexOf(name) : parts.findIndex(q => q.name === name);
+    partMeshes.push({ mesh: o, index: idx });
+  });
+  scene.add(rocket);
+  applyView(true);
+}
+
+// ---------- report ----------
+function pickerHtml(f) {
+  const best = f.rows.find(x => x.code === f.recommended);
+  const FT = 3.28084;
+  const rec = best
+    ? `<div class="rec"><span class="chip">${esc(best.motor)}</span><div>Recommended for a ${f.target_m} m target:
+       about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft), ${best.rod_speed_ms} m/s off the rod,
+       ${best.margin_cal} cal stable, ${best.delay_s} s delay, ${best.field_m} m field minimum.</div></div>`
+    : `<div class="rec bad">No motor of this size flies this rocket safely and stably. Make it lighter, or choose a bigger motor size.</div>`;
+  return `<div class="picker"><h2>Motor picker · click a row to check stability with that motor</h2>${rec}
+    <table><tr><th>Motor</th><th class="n">Peak m</th><th class="n">Peak ft</th><th class="n">Off rod m/s</th>
+      <th class="n">Thrust ×wt</th><th class="n">Stability cal</th><th class="n">Liftoff g</th><th>Result</th></tr>
+    ${f.rows.map(x => `<tr class="pick ${x.code === f.recommended ? 'best' : ''}" data-code="${esc(x.code)}">
+      <td>${esc(x.motor)}${x.out_of_production ? ' <small class="hint">out of production</small>' : ''}${x.mass_estimated ? ' <small class="hint">mass est.</small>' : ''}</td>
+      <td class="n">${x.apogee_m}</td><td class="n">${Math.round(x.apogee_m * FT)}</td><td class="n">${x.rod_speed_ms}</td>
+      <td class="n">${x.thrust_to_weight}</td><td class="n">${x.margin_cal.toFixed(2)}</td><td class="n">${x.liftoff_g}</td>
+      <td>${x.problems.length ? `<span class="bad">✕ ${esc(x.problems.join(', '))}</span>` : '<span class="good">✓ Good</span>'}</td></tr>`).join('')}
+    </table><div class="hint">1-D flight simulation from ThrustCurve.org data; delays are the nearest the motor comes in.</div></div>`;
+}
+
+function showReport(r) {
+  const fmt = v => typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(2)) : esc(v);
+  const st = r.stability;
+  reportEl.innerHTML = `
+    <div class="stab ${st.status}">
+      <div><b class="cal">${st.margin_cal.toFixed(2)}</b> cal<small>stability margin</small></div>
+      <div>${esc(st.message)}
+        <small>From the nose tip: <span class="dot" style="background:#4c8dff"></span>CG ${st.cg_mm} mm
+        <span class="dot" style="background:#ff5a5a"></span>CP ${st.cp_mm} mm · length ${st.length_mm} mm ·
+        liftoff ${st.liftoff_mass_g} g (motor ${st.motor_mass_g} g, recovery ${st.recovery_mass_g} g).
+        An estimate (Barrowman); check your final rocket in OpenRocket.</small></div>
+    </div>
+    ${pickerHtml(r.flights)}
+    <div>
+      <h2>Parts · ${r.total_mass_g} g total (${esc(form.elements.material.value)}, solid)</h2>
+      <table><tr><th>Part</th><th class="n">Mass g</th><th class="n">Print height mm</th></tr>
+      ${r.parts.map(p => `<tr><td><span class="sw" style="background:rgb(${p.color.map(c => Math.round(c * 255))})"></span>${esc(p.name)}</td>
+        <td class="n">${p.mass_g}</td><td class="n">${p.height_mm}</td></tr>`).join('')}</table>
+    </div>
+    <div>
+      <h2>Build notes</h2>
+      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}
+      <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
+      <h2>Key dimensions (mm)</h2>
+      <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
+    </div>`;
+  reportEl.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => {
+    form.elements.flight_motor.value = tr.dataset.code; runBuild();
+  });
+}
+
+form.addEventListener('submit', e => { e.preventDefault(); runBuild(); });
+async function runBuild() {
+  if (!form.reportValidity()) return;
+  buildBtn.disabled = true; zipBtn.classList.add('off');
+  const t0 = performance.now();
+  statusEl.textContent = 'Building… (a few seconds; the first build of a design takes longest)';
+  try {
+    const res = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params()) });
+    const body = await res.json();
+    if (!res.ok) {
+      const msg = typeof body.detail === 'string' ? body.detail
+        : (body.detail || []).map(d => `${d.loc.at(-1)}: ${d.msg}`).join('; ');
+      throw new Error(msg || `Build failed (${res.status})`);
+    }
+    await showModel(`/api/builds/${body.id}/preview.glb`, body.parts);
+    setMarkers(body.stability); applyView(false);
+    showReport(body);
+    zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
+    zipBtn.classList.toggle('off', !body.stability.ok);
+    zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';
+    statusEl.textContent = `Built ${body.parts.length} parts in ${((performance.now() - t0) / 1000).toFixed(1)} s · drag to rotate, scroll to zoom`;
+  } catch (err) {
+    statusEl.textContent = 'Build failed';
+    if (rocket) { scene.remove(rocket); rocket = null; }
+    setMarkers(null);
+    reportEl.innerHTML = `<div class="error"><b>Can't build this rocket.</b> ${esc(err.message)}</div>`;
+  } finally {
+    buildBtn.disabled = false;
+  }
+}
+
+// ---------- saved designs and share links ----------
+// Designs saved from this browser, with their edit keys, live in localStorage
+// until sign-in exists; anyone with a link can open (but not change) a design.
+const nameEl = document.getElementById('dname'), mineEl = document.getElementById('mine'), msgEl = document.getElementById('savemsg');
+const loadMine = () => { try { return JSON.parse(localStorage.getItem('myRockets') || '[]'); } catch { return []; } };
+const storeMine = list => { try { localStorage.setItem('myRockets', JSON.stringify(list)); } catch {} };
+let current = null;  // {id, key} of the design on screen, if saved
+function renderMine() {
+  const list = loadMine();
+  mineEl.innerHTML = `<option value="">My rockets (${list.length} saved in this browser)…</option>` +
+    list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
+}
+function setForm(p) {
+  form.elements.motor.value = p.motor ?? opts.defaults.motor;
+  fillFlightMotors(p.flight_motor ?? '');
+  for (const k of Object.keys(opts.defaults)) {
+    const el = form.elements[k], v = k in p ? p[k] : opts.defaults[k];
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
+  }
+  sync(); flightHints();
+}
+const shareUrl = id => `${location.origin}/d/${id}`;
+async function save(asNew) {
+  if (!form.reportValidity()) return;
+  const mine = loadMine();
+  const own = !asNew && current && mine.find(d => d.id === current.id);
+  const body = JSON.stringify({ name: nameEl.value.trim() || 'My rocket', params: params() });
+  const res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
+    method: own ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', ...(own ? { 'X-Edit-Key': own.key } : {}) }, body });
+  const d = await res.json();
+  if (!res.ok) { msgEl.textContent = typeof d.detail === 'string' ? d.detail : 'Could not save.'; return; }
+  const entry = { id: d.id, name: d.name, key: own ? own.key : d.edit_key };
+  storeMine([entry, ...mine.filter(x => x.id !== d.id)]);
+  current = entry; history.replaceState(null, '', `/d/${d.id}`);
+  renderMine(); msgEl.textContent = `Saved. Share link: ${shareUrl(d.id)}`;
+}
+document.getElementById('save').onclick = () => save(false);
+document.getElementById('saveas').onclick = () => save(true);
+document.getElementById('share').onclick = async () => {
+  if (!current) await save(false);
+  if (!current) return;
+  try { await navigator.clipboard.writeText(shareUrl(current.id)); msgEl.textContent = `Link copied: ${shareUrl(current.id)}`; }
+  catch { msgEl.textContent = `Share link: ${shareUrl(current.id)}`; }
+};
+async function openDesign(id) {
+  const res = await fetch(`/api/designs/${encodeURIComponent(id)}`);
+  if (!res.ok) { msgEl.textContent = "That design link doesn't exist."; return; }
+  const d = await res.json();
+  setForm(d.params); nameEl.value = d.name;
+  current = loadMine().find(x => x.id === d.id) || null;
+  history.replaceState(null, '', `/d/${d.id}`);
+  renderMine();
+  msgEl.textContent = current ? '' : 'A shared design: Save as new to keep your own copy.';
+  runBuild();
+}
+mineEl.onchange = () => { if (mineEl.value) openDesign(mineEl.value); };
+renderMine();
+const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
+if (linked) openDesign(linked[1]);
+</script>
+</body>
+</html>

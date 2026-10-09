@@ -20,6 +20,14 @@ Pictures: `report/lug_aft.png`, `report/lug_fwd.png`, `report/anchor.png`.
 
 Phase 1 OpenCascade findings, added to the list below as items 7 to 9.
 
+## Phase 3: stability (`stability.py`)
+
+Not in the FeatureScript. CP: Barrowman, nose X = L − V/A_base (exact for every profile; the tangent-parabola "parabolic" nose is 0.467 L, not the 0.5 L in the usual table), fins as a trapezoid (tip radius and the hanging-tip flat ignored). CG: part centroids, the motor resting on the cap's face, recovery one caliber under the nose shoulder; the rod standoff is left out (it stays on the pad). Motor masses in `data/web_motor_masses.csv` are the heaviest common motor per size, rounded up, and approximate.
+
+Margins at the defaults (clipped delta, 3 fins, 250 mm, loaded heaviest motor): M13 2.7, M18 1.07, M24 0.32, M24L 0.26, M29 −0.02; M18 swept 0.84, rectangular 0.10, 4 fins 1.13. The printed parts are solid PLA and the aft segment carries most of the mass, so the bigger motors at minimum diameter need custom (larger) fins or a lighter motor. Not yet compared against OpenRocket: worth doing for two or three designs.
+
+Auto-size (`build_stable`): scaling the whole fin made things worse (a longer root grows the fin forward from the tail and moves the CP forward: M24 went from 0.32 to 0.02 cal at 2.5x), so only span and sweep are scaled. The scale comes from a prediction (CP of the scaled fins, CG with the blades' planform mass swapped) aimed at 1.15 cal, then one rebuild. Results with the heaviest motor: M24 1.48x → 1.13 cal, M24L 1.52x, M29 1.91x, rectangular M18 1.37x, swept M18 1.10x; M18 clipped delta and M13 unchanged. Rectangular fins on M29 hit the 2.5x limit at 0.76 cal (no sweep to grow) and are reported unstable.
+
 # Phase 0 (spike)
 
 ## Verdict

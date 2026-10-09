@@ -221,3 +221,50 @@ def test_rod_line_clears_motor_cap():
     d = compute_derived(DesignParams())
     lug = lug_geometry(d, 3.175, True, 15.0)
     assert lug["center_r"] - lug["standoff_ro"] >= d.thread["r_cap_max"] + 0.5 - 1e-9
+
+
+# ---- stability ------------------------------------------------------------
+
+def test_nose_cp_matches_textbook_values():
+    from rocketgen.stability import nose_cp
+    L, R = 60.0, 10.0
+    assert nose_cp("conical", L, R) == (2.0, pytest.approx(2 * L / 3, rel=1e-3))
+    assert nose_cp("tangent_ogive", L, R)[1] == pytest.approx(0.466 * L, rel=0.02)
+    assert nose_cp("elliptical", L, R)[1] == pytest.approx(L / 3, rel=1e-3)
+
+
+def test_fin_cp_rectangular_fin():
+    # Rectangular fin, no sweep: X = x_le + chord/4 (the quarter-chord point).
+    from rocketgen.stability import fin_cp
+    cn, x = fin_cp(3, 30, 30, 20, 0, 10, 100)
+    assert x == pytest.approx(100 + 7.5) and cn > 0
+
+
+def test_stability_default_and_trends():
+    from rocketgen.flight import motors_for
+    from rocketgen.stability import stability
+    s = stability(rocket())
+    assert 0.8 < s.margin_cal < 1.5 and s.ok and s.status == "stable" and s.motor == "C5"
+    assert 0 < s.cg < s.length and 0 < s.cp < s.length
+    # A lighter motor: more stable.
+    a8 = next(m for m in motors_for("M18") if m.code == "A8")
+    assert stability(rocket(), a8).margin_cal > s.margin_cal
+    # The heaviest M24 at minimum diameter needs bigger fins than the standard ones.
+    heavy = stability(rocket(motor="M24"))
+    assert not heavy.ok and "Unstable" in heavy.message
+
+
+def test_auto_size_fins_makes_the_heaviest_motor_stable():
+    from rocketgen.stability import Balance, build_stable
+    r = build_stable(DesignParams(motor="M24"))
+    assert r.params.fin_scale > 1 and Balance(r).check().ok and "enlarged" in r.notes[0]
+    assert build_stable(DesignParams()).params.fin_scale == 1  # already stable: untouched
+
+
+def test_flight_sim_matches_the_motor_picker():
+    # M18, 52 g without motor, 20.8 mm: the HTML picker's numbers.
+    from rocketgen.flight import motors_for, pick, simulate
+    flights = {f.motor.code: f for f in (simulate(m, 52, 20.8) for m in motors_for("M18"))}
+    assert flights["C6"].apogee == pytest.approx(357, abs=3) and flights["C6"].ok
+    assert not flights["A8"].ok and "Too heavy for this motor" in flights["A8"].problems
+    assert pick(list(flights.values()), 150).motor.code == "B6"
