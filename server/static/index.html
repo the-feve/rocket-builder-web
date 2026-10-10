@@ -92,6 +92,10 @@
   #guide h2 { font-size:17px; margin:0 0 4px; } #guide h3 { font-size:13.5px; margin:14px 0 4px; }
   #guide p { margin:4px 0; } #guide .cols { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:0 24px; }
   #guide dl { margin:4px 0; } #guide dt { font-weight:600; margin-top:6px; } #guide dd { margin:0 0 0 14px; color:var(--muted); }
+  #guide nav { font-size:12px; color:var(--muted); margin:2px 0 6px; } #guide nav a { margin-right:10px; }
+  #guide figure { margin:6px 0 10px; } #guide figcaption { font-size:11.5px; color:var(--muted); }
+  #guide svg { width:100%; max-width:560px; height:auto; display:block; color:var(--ink); }
+  #guide .eg { font-family:ui-monospace, monospace; background:var(--chip); padding:0 4px; border-radius:3px; }
   #guide a, .stab a { color:var(--accent); }
   #guide .close { float:right; flex:none; padding:3px 10px; font:500 12px system-ui; border:1px solid var(--line); color:var(--ink); background:transparent; }
   #viewopts button { flex:none; padding:0 6px; font:500 12px system-ui; border:1px solid var(--line); border-radius:4px; color:var(--ink); background:transparent; }
@@ -222,8 +226,9 @@
       <article id="guide" aria-label="User guide">
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
         <h2>How to use Rocket Builder</h2>
-        <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print.</p>
-        <ol>
+        <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>.</p>
+        <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-or">OpenRocket</a></nav>
+        <ol id="guide-use">
           <li>Choose a <b>mode</b> and the <b>motor size</b> you'll fly (on the left).</li>
           <li>Set the size and shapes, then press <b>Build</b>. The first build of a new design takes 10–30 s; a bar along the top shows progress.</li>
           <li>The rocket appears here. Drag to rotate, scroll to zoom. <b>Exploded</b> pulls the parts apart; <b>Section</b> cuts it in half to show the inside.</li>
@@ -232,13 +237,13 @@
         </ol>
         <p>Changing any setting shows <i>Press Build</i>: the model and downloads only update when you build again.</p>
 
-        <h3>Modes</h3>
+        <h3 id="guide-modes">Modes</h3>
         <div class="cols">
           <dl><dt>Beginner</dt><dd>Just the essentials: motor size, the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit), your printer's max height, nose shape and fin shape (swept, delta or trapezoid). Everything else uses proven defaults, and the fins size themselves so the rocket is stable.</dd></dl>
           <dl><dt>Advanced</dt><dd>Every setting: body length instead of overall height, wall thickness, a body OD offset for a fatter rocket (the actual OD is shown under it), fin count, thickness, fillets and custom fin size, nose fineness, launch lugs, filament, and the flight check (target altitude, which motor to check, recovery mass, drag, launch rod). Switching modes carries the size across.</dd></dl>
         </div>
 
-        <h3>The report</h3>
+        <h3 id="guide-report">The report</h3>
         <dl>
           <dt>Stability margin (calibers)</dt>
           <dd>How far the centre of pressure (<span class="dot" style="background:#ff5a5a"></span>CP, red marker) sits behind the centre of gravity (<span class="dot" style="background:#4c8dff"></span>CG, blue marker), measured in body diameters ("calibers"). The CG must be ahead of the CP for the rocket to fly straight. 1–2 cal is ideal. Under 1.0 is <b>unstable</b> and downloads are blocked; over 3 is <b>over-stable</b> (it flies, but turns into the wind). It's checked with the heaviest motor of the size loaded and a parachute allowance, and it also lists the length and liftoff mass.</dd>
@@ -250,6 +255,60 @@
           <dd>How the parts go together, the recovery and anchor details, and anything the builder changed to make the design work (e.g. fins enlarged for stability).</dd>
           <dt>Key dimensions</dt>
           <dd>The main measurements in mm: body OD and ID, motor bay, shoulders, the twist-lock thread, body length and number of sections, and how much the fins were scaled. Useful for fitting the motor and parachute, and for OpenRocket.</dd>
+        </dl>
+
+        <h3 id="guide-terms">Key terms: model rocketry basics</h3>
+        <p>The ideas behind the numbers in the report, from the ground up.</p>
+
+        <h3>Stability: will it fly straight?</h3>
+        <figure>
+          <svg viewBox="0 0 560 130" role="img" aria-label="A rocket lying sideways, nose on the left. The blue CG dot is ahead of the red CP dot; the gap between them, divided by the body diameter, is the stability margin in calibers.">
+            <path d="M20 65 Q60 40 110 40 L440 40 L440 90 L110 90 Q60 90 20 65 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M380 40 L440 8 L470 8 L440 40 M380 90 L440 122 L470 122 L440 90" fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="250" cy="65" r="7" fill="#4c8dff"/><text x="250" y="30" text-anchor="middle" font-size="13" fill="#4c8dff">CG</text>
+            <circle cx="345" cy="65" r="7" fill="#ff5a5a"/><text x="345" y="30" text-anchor="middle" font-size="13" fill="#ff5a5a">CP</text>
+            <path d="M258 65 L337 65" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="297" y="82" text-anchor="middle" font-size="12" fill="currentColor">margin</text>
+            <path d="M500 40 L500 90 M494 40 L506 40 M494 90 L506 90" stroke="currentColor" stroke-width="1.5"/>
+            <text x="512" y="69" font-size="12" fill="currentColor">D</text>
+          </svg>
+          <figcaption>Stability margin = (CP distance − CG distance) ÷ body diameter D. Here the gap is about 2 diameters: 2 calibers.</figcaption>
+        </figure>
+        <dl>
+          <dt>CG: centre of gravity</dt><dd>The balance point: where the rocket would balance on your finger. Weight in the nose moves it forward; the motor and fins pull it back. Always measured with the motor loaded, because the motor is heavy.</dd>
+          <dt>CP: centre of pressure</dt><dd>The point where the air's push on the rocket effectively acts. Fins are big flat areas at the back, so they pull the CP rearward. Bigger fins move it further back.</dd>
+          <dt>Caliber (cal)</dt><dd>One body diameter, used as a unit of length. A 25 mm-wide rocket has 1 cal = 25 mm. Using calibers lets the same rule work for small and large rockets.</dd>
+          <dt>Stability margin</dt><dd>How far the CP is behind the CG, in calibers. If the rocket tilts, the air pushes harder on the tail (behind the CG) and swings the nose back into line, like a weathervane or a dart's flights. Positive and 1–2 cal is the target. Below 1 the correction is too weak (or, if the CP is ahead of the CG, it tumbles or loops). Above about 3 it over-corrects into the wind.</dd>
+          <dt>Unstable / over-stable</dt><dd>Unstable: too little margin; fix with larger fins, a longer body or a lighter motor (or nose weight). Over-stable: so much margin it turns into any crosswind and flies off at an angle (<i>weathercocking</i>); smaller fins help.</dd>
+          <dt>Barrowman method</dt><dd>The standard hand-calculation (developed by James Barrowman in the 1960s) for finding the CP from the nose and fin shapes. It's what this app and most hobby tools use. It assumes a slender rocket at low speed and small angles, which suits model rockets well.</dd>
+        </dl>
+
+        <h3>Motors</h3>
+        <dl>
+          <dt>Motor size (M13, M18, M24, M29)</dt><dd>The motor's diameter in mm. The rocket's motor tube is built to fit; you can then fly any motor of that diameter (and length).</dd>
+          <dt>Motor code, e.g. <span class="eg">C6-5</span></dt><dd><b>C</b>: the <i>impulse class</i>, the total push. Each letter is up to twice the one before (A up to 2.5 N·s, B up to 5, C up to 10, D up to 20…), so a C is roughly twice a B. <b>6</b>: the average thrust in newtons. <b>5</b>: the <i>ejection delay</i> in seconds (below). A <span class="eg">-0</span> motor has no delay (for a booster stage); <span class="eg">P</span> means plugged, no ejection charge.</dd>
+          <dt>Thrust and impulse</dt><dd><i>Thrust</i> is the push, in newtons (1 N ≈ the weight of 100 g). <i>Total impulse</i> (N·s) is thrust × burn time: how much the motor can speed the rocket up overall. A <i>thrust curve</i> is thrust plotted against time; the app uses real measured curves from ThrustCurve.org.</dd>
+          <dt>Thrust-to-weight ratio</dt><dd>Average thrust ÷ the rocket's weight at liftoff. At least 5:1 is the usual safe minimum, so the rocket leaves the pad briskly instead of wobbling off.</dd>
+          <dt>Burnout and coast</dt><dd><i>Burnout</i>: the motor stops pushing. The rocket then <i>coasts</i> upward, slowing under gravity and drag, until it stops climbing.</dd>
+        </dl>
+
+        <h3>Flight</h3>
+        <dl>
+          <dt>Launch rod (or rail) and rod speed</dt><dd>The rocket slides up a guide rod (about 0.9 m for small rockets) through its <i>launch lugs</i>. Until it's moving fast enough, the fins can't steer it, so the speed leaving the rod matters: at least 15 m/s is the usual rule. Faster is better on windy days.</dd>
+          <dt>Apogee</dt><dd>The highest point of the flight, where the rocket stops climbing and starts to fall. "Peak" in the motor picker.</dd>
+          <dt>Ejection delay</dt><dd>The seconds between burnout and the motor's <i>ejection charge</i>, a small charge that fires forward to pop the nose off and push out the parachute. The best delay makes this happen at or just after apogee, while the rocket is slowest. Too short: the parachute opens while still going up fast and can rip. Too long: the rocket is already falling fast. The motor picker chooses the delay closest to the coast time.</dd>
+          <dt>Drag and drag coefficient (Cd)</dt><dd>Drag is air resistance. Cd is a number describing how slippery the shape is (lower is better); 0.5–0.75 is typical for model rockets, and the app assumes 0.65 unless you change it in Advanced.</dd>
+          <dt>Liftoff mass</dt><dd>Everything that leaves the pad: printed parts, the loaded motor, and recovery gear.</dd>
+          <dt>Field size</dt><dd>The safety code's minimum launch-site size for a motor class (e.g. 60 m across for B, 120 m for C). Bigger motors need bigger fields.</dd>
+        </dl>
+
+        <h3>Recovery and parts</h3>
+        <dl>
+          <dt>Recovery system</dt><dd>What brings it down gently: usually a parachute or streamer, tied to a <i>shock cord</i> (elastic or Kevlar) that joins the nose to the body via the anchor. <i>Wadding</i> (or a reusable baffle) protects the parachute from the hot ejection gas. The app allows a few grams for these unless you enter a recovery mass.</dd>
+          <dt>Descent rate</dt><dd>How fast it falls under the parachute. About 3–5 m/s lands without damage; a bigger parachute falls slower but drifts further.</dd>
+          <dt>Nose cone, shoulder and fineness</dt><dd>The nose's shape (ogive, conical, Von Kármán…) and its <i>fineness</i>, length ÷ diameter. The <i>shoulder</i> is the short sleeve that slips into the body tube and holds the nose on until ejection.</dd>
+          <dt>Fins: root, tip, span, sweep</dt><dd><i>Root chord</i>: the fin's length where it meets the body. <i>Tip chord</i>: its outer edge. <i>Span</i>: how far it sticks out. <i>Sweep</i>: how far back the tip is set. A <i>fillet</i> is the rounded joint between fin and body; it makes the joint stronger.</dd>
+          <dt>Motor mount and minimum diameter</dt><dd>When the body is wider than the motor, an inner tube (motor mount) holds the motor. A <i>minimum diameter</i> rocket has the motor fitting the body itself, the lightest and fastest layout.</dd>
         </dl>
 
         <h3 id="guide-or">What is OpenRocket, and what should I check?</h3>
