@@ -27,6 +27,7 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 
 ## Next steps (in order)
 
+0. **Pending merge (2026-10-10):** the Key terms glossary is committed on `claude/confident-wozniak-6hvero` (8c3b0ba) but not yet merged or deployed. Open a PR to `main` and merge it once CI passes; the merge deploys to Fly.
 1. **Owner: Fly.io setup** (Windows PowerShell):
    1. Sign up at https://fly.io/app/sign-up and add a card under Billing.
    2. Install: `powershell -Command "iwr https://fly.io/install.ps1 -useb | iex"`, reopen PowerShell, `fly auth login`.
