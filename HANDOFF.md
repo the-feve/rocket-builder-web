@@ -39,7 +39,7 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 3. **Still to confirm:** a saved design surviving a full restart (`fly apps restart rocket-fevergeon`, then open `/d/WNePTzVr`). Suspend/resume doesn't prove it; the volume mount in the boot log is good evidence.
 4. **After quiverdesignworks.net's DNS moves to Cloudflare** (fevergeon-site `docs/squarespace-cutover.md`; quiverdesignworks-site `TODO.md` P2): `fly certs add rocket.quiverdesignworks.net -a rocket-fevergeon`, a CNAME `rocket` → `rocket-fevergeon.fly.dev` in Cloudflare, then Cloudflare Access (Zero Trust, free ≤ 50 users, email one-time PIN) in front for the invite-only beta. Note: with the Cloudflare proxy on, Fly's certificate check may need the record DNS-only until the cert issues.
 5. **Beta checks:** print and fly one or two rockets; compare 2–3 designs against OpenRocket (stability and apogee). Results go in `geometry/report.md`.
-6. **Phase 4:** paid downloads via the shared Stripe account, every Checkout Session tagged `metadata.store = "rocket-builder"` (rules in the-feve/the-feve-quiverdesignworks-site `docs/stripe-shared-account.md`); check Washington sales tax on digital goods.
+6. **Phase 4:** paid downloads via the shared Stripe account, every Checkout Session tagged `metadata.store = "rocket-builder"` (rules in the-feve/quiverdesignworks-site `docs/stripe-shared-account.md`); check Washington sales tax on digital goods.
 
 ## Decisions log
 
