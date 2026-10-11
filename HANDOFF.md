@@ -37,9 +37,9 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
    6. GitHub → repo Settings → Secrets and variables → Actions → New repository secret: `FLY_API_TOKEN` = that token.
 2. ~~Merge PR #1~~ and ~~check the first deploy~~: done 2026-10-09. The first deploy run skipped itself (green, 8 s) because `FLY_API_TOKEN` had been added to the fevergeon-site repo by mistake; once it was on this repo, a manual run of `deploy.yml` deployed.
 3. **Still to confirm:** a saved design surviving a full restart (`fly apps restart rocket-fevergeon`, then open `/d/WNePTzVr`). Suspend/resume doesn't prove it; the volume mount in the boot log is good evidence.
-4. **After fevergeon.com's DNS moves to Cloudflare** (fevergeon-site `TODO.md` P1): `fly certs add rocket.fevergeon.com -a rocket-fevergeon`, a CNAME `rocket` → `rocket-fevergeon.fly.dev` in Cloudflare, then Cloudflare Access (Zero Trust, free ≤ 50 users, email one-time PIN) in front for the invite-only beta. Note: with the Cloudflare proxy on, Fly's certificate check may need the record DNS-only until the cert issues.
+4. **After quiverdesignworks.net's DNS moves to Cloudflare** (fevergeon-site `docs/squarespace-cutover.md`; quiverdesignworks-site `TODO.md` P2): `fly certs add rocket.quiverdesignworks.net -a rocket-fevergeon`, a CNAME `rocket` → `rocket-fevergeon.fly.dev` in Cloudflare, then Cloudflare Access (Zero Trust, free ≤ 50 users, email one-time PIN) in front for the invite-only beta. Note: with the Cloudflare proxy on, Fly's certificate check may need the record DNS-only until the cert issues.
 5. **Beta checks:** print and fly one or two rockets; compare 2–3 designs against OpenRocket (stability and apogee). Results go in `geometry/report.md`.
-6. **Phase 4:** paid downloads via the shared Stripe account, every Checkout Session tagged `metadata.store = "rocket-builder"` (rules in fevergeon-site `docs/stripe-shared-account.md`); check Washington sales tax on digital goods.
+6. **Phase 4:** paid downloads via the shared Stripe account, every Checkout Session tagged `metadata.store = "rocket-builder"` (rules in the-feve/the-feve-quiverdesignworks-site `docs/stripe-shared-account.md`); check Washington sales tax on digital goods.
 
 ## Decisions log
 
@@ -52,6 +52,7 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 - 2026-10-09: The deploy workflow passes (green) when the token is missing; check that the run actually ran `flyctl deploy`, not just a green tick.
 - 2026-10-09: Saving stays server-side (SQLite on the Fly volume) with per-browser edit keys until accounts arrive; a download/open design-file option is a possible extra (design.json is already in the ZIP).
 - 2026-10-09: Invite-only beta via Cloudflare Access rather than building sign-in; real accounts wait for public/paid launch.
+- 2026-10-11: The public address moves to `rocket.quiverdesignworks.net` (Quiver Design Works LLC hosts everything with a paid return; fevergeon.com is the personal site). The Fly app keeps the name `rocket-fevergeon`; only the domain changes. The QDW site at quiverdesignworks.net lists the app.
 
 ## Open items / known limits
 

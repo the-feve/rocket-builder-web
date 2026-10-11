@@ -18,7 +18,7 @@ The geometry is a Python port, on build123d (OpenCascade), of the Onshape Featur
 - **Phase 3 (hosted beta):** in progress.
   - Done: stability check (Barrowman CP, CG from the parts + motor + recovery; under 1.0 cal the ZIP is withheld); standard fins auto-grow (span and sweep) until the heaviest motor of the size is stable; motor picker (flight sim of every motor in the bay, recommendation for a target altitude, per-motor stability); saved designs and share links (`/d/<id>`, SQLite, edit key per browser until sign-in exists), `Dockerfile`.
   - Ready to host: `/healthz`, per-address rate limits on new builds and saves, a 60 s wait limit for the build lock, error logging, three.js served from the app. CI (`.github/workflows/ci.yml`) runs both test suites and builds and smoke-tests the Docker image; `deploy.yml` deploys to Fly.io on every push to `main` once the `FLY_API_TOKEN` secret is set.
-  - Open: the first Fly deploy; `rocket.fevergeon.com` (after fevergeon.com's DNS moves to Cloudflare); Cloudflare Access for the invite-only beta; checking a few designs against OpenRocket.
+  - Open: the first Fly deploy; `rocket.quiverdesignworks.net` (after quiverdesignworks.net's DNS moves to Cloudflare); Cloudflare Access for the invite-only beta; checking a few designs against OpenRocket.
 
 ```
 cd geometry && pip install -e ".[test]" && python -m pytest -q
@@ -31,4 +31,4 @@ Or in Docker, from the repo root: `docker build -t rocket-builder . && docker ru
 
 ## Hosting
 
-Fly.io, app `rocket-fevergeon` in Seattle (`fly.toml`): one 1 GB machine that sleeps when idle, and a 1 GB volume at `/data` for saved designs. Every push to `main` redeploys through GitHub Actions. Planned address `rocket.fevergeon.com`, a CNAME in fevergeon.com's Cloudflare DNS, with Cloudflare Access in front during the invite-only beta.
+Fly.io, app `rocket-fevergeon` in Seattle (`fly.toml`): one 1 GB machine that sleeps when idle, and a 1 GB volume at `/data` for saved designs. Every push to `main` redeploys through GitHub Actions. Planned address `rocket.quiverdesignworks.net` (Quiver Design Works runs everything with a paid return; decided 2026-10-11), a CNAME in quiverdesignworks.net's Cloudflare DNS, with Cloudflare Access in front during the invite-only beta.
