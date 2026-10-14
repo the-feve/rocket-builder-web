@@ -38,7 +38,7 @@ from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
 from rocketgen.flight import FIELD_M, motors_for, pick, simulate
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
-from rocketgen.stability import MAX_FIN_SCALE, Balance, build_stable, recovery_allowance_g
+from rocketgen.stability import MAX_FIN_SCALE, Balance, advice, build_stable, recovery_allowance_g
 
 import accounts
 import designs
@@ -368,7 +368,11 @@ def build(req: BuildRequest, request: Request):
     geo_params["body_od_override"] = od
     geo = _geometry(geo_params, req, request)
     bal: Balance = _geo[geo]["balance"]
-    st = _stability(bal.check(motors.get(req.flight_motor), req.recovery_mass_g))
+    chk = bal.check(motors.get(req.flight_motor), req.recovery_mass_g)
+    st = _stability(chk)
+    # Outside the 1-2 cal sweet spot: what to change, with predicted scores.
+    st["advice"] = advice(bal, chk, list(motors.values()), beginner=req.overall_length is not None,
+                          motor=motors.get(req.flight_motor), stock_od=stock_od(req.motor, req.wall))
     flights = _flights(bal, list(motors.values()), req)
     build_id = _key(params)
     _builds[build_id] = {"geo": geo, "params": params, "stability": st, "flights": flights}

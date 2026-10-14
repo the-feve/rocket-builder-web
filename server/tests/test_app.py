@@ -137,6 +137,19 @@ def test_beginner_heights_snap_to_ones_that_build():
     assert any(a <= o["beginner"]["overall_length"] <= b for a, b in h["ranges"])
 
 
+def test_score_advice_outside_the_sweet_spot():
+    """A tall Beginner M18 is over-stable: the build says what to change,
+    with step numbers and predicted scores. The default rocket (1-2 cal)
+    gets none."""
+    st = client.post("/api/build", json={"overall_length": 600, "fin_shape": "trapezoid"}).json()["stability"]
+    a = st["advice"]
+    assert st["margin_cal"] > 3 and a["zone"] == "over"
+    assert any("shorter" in i["text"] and "step 4" in i["text"] and i["est_cal"] for i in a["items"])
+    o = client.get("/api/options").json()["beginner"]
+    st = client.post("/api/build", json={"overall_length": o["overall_length"], "fin_shape": "trapezoid"}).json()["stability"]
+    assert 1 <= st["margin_cal"] <= 2 and st["advice"] is None
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]

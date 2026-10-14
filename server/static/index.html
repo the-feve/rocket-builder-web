@@ -168,6 +168,15 @@
   .meter-labels { display:grid; grid-template-columns:repeat(4, 1fr); font-size:11px; color:var(--muted); text-align:center; }
   .tips { margin:6px 0 0; padding-left:18px; font-size:13.5px; line-height:1.45; }
   .tips li { margin:3px 0; }
+  /* "How to improve the score": outside the 1-2 cal sweet spot */
+  .advice { grid-column:1/-1; margin:8px 0 2px; padding:10px 12px; border-radius:8px; border-left:4px solid var(--warn); background:var(--card); font-size:13.5px; line-height:1.45; }
+  .advice.low { border-left-color:var(--err); }
+  .advice h4 { margin:0 0 4px; font-size:14px; }
+  .advice p { margin:0 0 4px; }
+  .advice ol { margin:4px 0 0; padding-left:20px; }
+  .advice li { margin:4px 0; }
+  .advice .est { display:inline-block; margin-left:4px; padding:0 6px; border-radius:9px; font-size:12px; font-weight:700; border:1px solid var(--line); }
+  .advice .est.good { color:var(--ok); border-color:var(--ok); }
   .steps4 { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin:8px 0 4px; padding:0; list-style:none; counter-reset:s; }
   .steps4 li { counter-increment:s; border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; background:var(--panel); }
   .steps4 li::before { content:counter(s); display:inline-grid; place-items:center; width:20px; height:20px; margin-right:6px; border-radius:50%; background:var(--ink); color:var(--bg); font-size:11px; font-weight:700; }
@@ -1376,15 +1385,26 @@ function motorBuyHtml(designation) {
 
 // Beginner report: the stability score explained, the best motor and what to do next.
 // The full report sits underneath in "Grown-up details".
+// What to change to bring the score into the 1-2 cal sweet spot (server: stability.advice),
+// each with its predicted score where one can be worked out.
+function adviceHtml(st) {
+  const a = st.advice;
+  if (!a || !a.items.length) return '';
+  const chip = e => e == null ? '' : `<span class="est ${e >= 1 && e <= 2 ? 'good' : ''}">≈ ${e.toFixed(1)} cal</span>`;
+  return `<div class="advice ${a.zone}"><h4>${a.zone === 'low' ? 'How to make it stable' : 'How to get into the 1–2 sweet spot'}</h4>
+    <p>${esc(a.intro)}</p><ol>${a.items.map(i => `<li>${esc(i.text)}${chip(i.est_cal)}</li>`).join('')}</ol>
+    <p class="hint">Estimates: build again to check. One change at a time makes it easy to see what helped.</p></div>`;
+}
 function kidReportHtml(r) {
   const st = r.stability, cal = st.margin_cal, f = r.flights;
   const best = f.rows.find(x => x.code === f.recommended);
   const verdict = { unstable: 'Too wobbly', stable: cal > 2 ? 'Very stable' : 'Just right!', overstable: 'Too stable' }[st.status] || st.status;
+  const adv = adviceHtml(st);
   const what = {
-    unstable: `The balance point (blue) isn't far enough in front of the push point (red), so it could wobble or tumble. You can't download it until the score is at least 1. <b>Try:</b> make your rocket taller (step 4), or pick different fins (step 5).`,
+    unstable: `The balance point (blue) isn't far enough in front of the push point (red), so it could wobble or tumble. You can't download it until the score is at least 1.${adv ? '' : ' <b>Try:</b> make your rocket taller (step 4), or pick different fins (step 5).'}`,
     stable: cal > 2 ? 'The blue balance point is well in front of the red push point. It will fly straight. (1 to 2 is the sweet spot, but this is fine.)'
                     : 'The blue balance point is about the right distance in front of the red push point. It will fly nice and straight.',
-    overstable: 'It will fly, but it turns into the wind like a weathervane, so it may not go straight up on a windy day. A shorter rocket helps.',
+    overstable: `It will fly, but it turns into the wind like a weathervane, so it may not go straight up on a windy day.${adv ? '' : ' A shorter rocket helps.'}`,
   }[st.status] || '';
   const pos = Math.max(0, Math.min(4, cal)) / 4 * 100;
   const FT = 3.28084;
@@ -1401,6 +1421,7 @@ function kidReportHtml(r) {
       <div class="meter" role="img" aria-label="Stability ${cal.toFixed(2)} cal on a scale from 0 to 4"><i style="left:${pos}%"></i></div>
       <div class="meter-labels"><span>0–1 wobbly</span><span>1–2 just right</span><span>2–3 very stable</span><span>3+ too stable</span></div>
       <p>${what}</p>
+      ${adv}
       <ul class="tips">
         <li>The <b style="color:#3d8bfd">blue dot</b> next to your rocket is its balance point; the <b style="color:#ff5a5a">red dot</b> is where the air pushes. Blue should be above (in front of) red.</li>
         <li><b>1 cal = one body width.</b> A score of ${cal.toFixed(1)} means the blue dot is ${cal.toFixed(1)} body widths in front of the red one.</li>
@@ -1443,6 +1464,7 @@ function showReport(r) {
         liftoff ${st.liftoff_mass_g} g (motor ${st.motor_mass_g} g, recovery ${st.recovery_mass_g} g).
         An estimate (Barrowman); check your final rocket in <a href="#guide-or" class="orlink">OpenRocket</a>.</small></div>
     </div>
+    ${kid ? '' : adviceHtml(st)}
     ${kid ? '' : `<div style="grid-column:1/-1">${orderRowHtml(st.ok, false)}</div>`}
     ${pickerHtml(r.flights)}
     <div>

@@ -370,3 +370,28 @@ def test_height_ranges_match_the_build():
     ph = min_printer_height(p)
     assert 80 < ph < 150
     assert height_ranges(p.with_(print_max_height=ph - 1), 80, 1000) == []
+
+
+def test_score_advice_estimates_match_rebuilds():
+    """The score advice's height estimate (no rebuild) lands close to a real
+    rebuild at that height, and the advice suggests shortening an
+    over-stable rocket and nothing inside the 1-2 cal sweet spot."""
+    from rocketgen.build import body_length_for
+    from rocketgen.flight import motors_for
+    from rocketgen.stability import Balance, advice
+    p = DesignParams(motor="M18", fin_shape=FinShape("trapezoid"))
+    b = Balance(build_rocket(p.with_(body_length=body_length_for(p, 600))))
+    st = b.check()
+    assert st.margin_cal > 3
+    est = b.predict_length(450 - b.length)
+    real = Balance(build_rocket(p.with_(body_length=body_length_for(p, 450)))).check().margin_cal
+    assert est == pytest.approx(real, abs=0.15)
+    a = advice(b, st, motors_for("M18"), beginner=True)
+    assert a["zone"] == "over" and a["items"][0]["kind"] == "shorter" and "step 4" in a["items"][0]["text"]
+    assert 1.0 <= a["items"][0]["est_cal"] <= 2.0
+    # Nose weight: grams that bring an unstable rocket to about 1.5 cal.
+    assert b.predict(nose_g=0) == pytest.approx(st.margin_cal, abs=1e-6)
+    assert b.predict(nose_g=20) > st.margin_cal
+    ok = Balance(build_rocket(p.with_(body_length=body_length_for(p, 312), fin_scale=1.15)))
+    if 1.0 <= ok.check().margin_cal <= 2.0:
+        assert advice(ok, ok.check(), motors_for("M18"), beginner=True) is None
