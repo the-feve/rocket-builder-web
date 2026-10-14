@@ -110,8 +110,12 @@ def test_beginner_overall_height():
         body = client.post("/api/build", json={"overall_length": target, "fin_shape": fins}).json()
         assert abs(body["stability"]["length_mm"] - target) <= 0.5, body["stability"]
         assert body["body_length_mm"] < target
+    # Too short for the motor: built at the shortest height that works instead.
     r = client.post("/api/build", json={"motor": "M29", "overall_length": 90})
-    assert r.status_code == 422 and "too short" in r.json()["detail"]
+    assert r.status_code == 200 and r.json()["stability"]["length_mm"] > 200
+    # Nothing fits this printer at all: still refused with the reason.
+    r = client.post("/api/build", json={"motor": "M29", "print_max_height": 100, "overall_length": 400})
+    assert r.status_code == 422 and r.json()["detail"]
 
 
 def test_sizes_match_what_builds():
