@@ -79,6 +79,7 @@ Sample STLs (print orientation, one per part, plus `assembled.stl`): `examples/m
 9. `Face.radius` can be `None` on a cylinder; `is_cylinder_r` asks OpenCascade (`BRepAdaptor_Surface`) instead.
 
 10. *(2026-10-09)* A cut face lying exactly on the bore cylinder (the strap's cord channel, first drawn to radius ri) made the union with the body segment an unsound solid, but only where the bore is straight (with the strap shifted up out of the inner taper). Reach 0.05 mm into the wall instead. Both pieces were valid alone.
+11. *(2026-10-14)* Which overall heights build is decided entirely by the plan checks (`plan_rocket`: segment split, aft segment vs fin root and motor bay socket, forward lug, nose vs printer), so `height_ranges` can answer without OpenCascade. Real builds at every segment-count transition (M13–M29, printers 150/200/250 mm, ±1 mm) all succeeded; the only failing heights are below the minimum. Near that minimum, auto-sized fins trail further below the tail, so the corrected body length can drop the aft segment under the socket limit (M29 at 276 mm: fins grew 2.5x and the fallback build came out 311 mm). So the website's ranges require a height to plan at fin scale 1 **and** at `MAX_FIN_SCALE`; the checks only get stricter as fins grow.
 
 ## Deliberate differences from the FeatureScript (owner's requests, 2026-10-09)
 

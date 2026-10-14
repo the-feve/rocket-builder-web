@@ -115,7 +115,24 @@ def body_length_for(params: DesignParams, overall: float) -> float:
     return round(b, 1)
 
 
-def build_rocket(params: DesignParams) -> Rocket:
+@dataclass
+class Plan:
+    """Everything build_rocket works out before making any solid."""
+    d: Derived
+    seg_lens: list[float]
+    joint_len: float
+    fin: object
+    body_parts: list[dict]
+    lug: dict | None
+    fwd: dict | None
+    nose_len: float
+    nose_joint: float
+
+
+def plan_rocket(params: DesignParams) -> Plan:
+    """build_rocket's checks without building solids (milliseconds), so the
+    website can tell which heights will build before anyone presses Build.
+    Raises the same GeometryError messages build_rocket would."""
     if params.nose_shape not in NOSE_SHAPES:
         raise ValueError(f"Unknown nose shape {params.nose_shape!r}")
     if params.fin_count not in (3, 4, 5):
@@ -143,12 +160,94 @@ def build_rocket(params: DesignParams) -> Rocket:
         body_parts.append({"lo": top_z, "hi": placement_z + seg_lens[i], "placement_z": placement_z})
         top_z = placement_z + seg_lens[i]
 
-    # Lugs between fins 0 and 1, on one line; the anchor strap at 90 degrees.
-    lug_angle = 180 / params.fin_count
-    anchor_angle = 90.0
     lug = None if params.launch_lugs == "none" else lug_geometry(d, params.rod_diameter, params.rod_standoff,
                                                                   params.pad_clearance)
     fwd = plan_forward_lug(params.forward_lug_frac, body_parts, lug) if params.launch_lugs == "two" else None
+
+    nose_len = params.nose_fineness * d.cal
+    nose_joint = d.nose_shoulder_len + d.joint_rise
+    if nose_len + nose_joint > d.zmax:
+        raise GeometryError("This nose (fineness x caliber + shoulder) is taller than the printer's usable Z height. Lower the nose fineness or raise the printer max height.")
+    return Plan(d, seg_lens, joint_len, fin, body_parts, lug, fwd, nose_len, nose_joint)
+
+
+def height_ok(params: DesignParams, overall: float, fin_scales: tuple[float, ...] = (1.0,)) -> bool:
+    """Whether a rocket `overall` mm tall builds with these settings (the
+    plan checks only; body_length is worked out as the website does), at
+    every one of `fin_scales`. Auto-sized fins trail further below the tail
+    as they grow, which shortens the body for the same height, so the
+    website checks both ends of the auto-size range (the checks only get
+    stricter as the fins grow)."""
+    try:
+        for k in fin_scales:
+            p = params.with_(fin_scale=k)
+            b = body_length_for(p, overall)
+            if not 50 <= b <= 2000:  # the form's Body length limits
+                return False
+            plan_rocket(p.with_(body_length=b))
+        return True
+    except GeometryError:
+        return False
+
+
+def height_ranges(params: DesignParams, lo: int = 80, hi: int = 2500,
+                  fin_scales: tuple[float, ...] = (1.0,), step: int = 5) -> list[list[int]]:
+    """The overall heights (whole mm, lo..hi) that build, as [first, last]
+    ranges. Usually one range: too short leaves no room in the aft segment
+    for the motor bay and fins; the top is the body-length limit. Heights in
+    between that can't be split into printable segments show up as gaps.
+    Scans every `step` mm and finds each edge to the mm (a gap narrower than
+    `step` could be missed; 1 mm sweeps of every motor found none at all)."""
+    ok = {}
+
+    def good(h: int) -> bool:
+        if h not in ok:
+            ok[h] = height_ok(params, h, fin_scales)
+        return ok[h]
+
+    coarse = list(range(lo, hi, step)) + [hi]
+    for a, b in zip(coarse, coarse[1:]):
+        if good(a) != good(b):  # an edge in (a, b]: walk it
+            for h in range(a + 1, b):
+                good(h)
+    out: list[list[int]] = []
+    prev = False
+    for h in sorted(ok):  # between two good checked heights, all are taken as good
+        if ok[h]:
+            if prev:
+                out[-1][1] = h
+            else:
+                out.append([h, h])
+        prev = ok[h]
+    return out
+
+
+def min_printer_height(params: DesignParams, lo: int = 50, hi: int = 500,
+                       fin_scales: tuple[float, ...] = (1.0,)) -> int | None:
+    """The lowest printer max height (whole mm) at which some overall height
+    builds; None if even `hi` doesn't."""
+    def any_height(ph: int) -> bool:
+        p = params.with_(print_max_height=ph)
+        return any(height_ok(p, h, fin_scales) for h in range(80, 1001, 5))
+    if not any_height(hi):
+        return None
+    while lo < hi:
+        mid = (lo + hi) // 2
+        lo, hi = (lo, mid) if any_height(mid) else (mid + 1, hi)
+    return lo
+
+
+def build_rocket(params: DesignParams) -> Rocket:
+    plan = plan_rocket(params)
+    d, seg_lens, joint_len, fin = plan.d, plan.seg_lens, plan.joint_len, plan.fin
+    body_parts, lug, fwd = plan.body_parts, plan.lug, plan.fwd
+    seg_len = seg_lens[0]
+    n_parts = len(seg_lens)
+    top_z = body_parts[-1]["hi"]
+
+    # Lugs between fins 0 and 1, on one line; the anchor strap at 90 degrees.
+    lug_angle = 180 / params.fin_count
+    anchor_angle = 90.0
 
     aft = build_aft(d, seg_len, fin, params.fin_count)
     notes = list(aft.notes)
@@ -170,10 +269,7 @@ def build_rocket(params: DesignParams) -> Rocket:
             solid = add_lug(solid, d, lug, fwd["z0"], fwd["z1"], True, lug_angle)
         parts.append(Part(seg_part_name(i, n_parts), solid, placement_z))
 
-    nose_len = params.nose_fineness * d.cal
-    nose_joint = d.nose_shoulder_len + d.joint_rise
-    if nose_len + nose_joint > d.zmax:
-        raise GeometryError("This nose (fineness x caliber + shoulder) is taller than the printer's usable Z height. Lower the nose fineness or raise the printer max height.")
+    nose_len, nose_joint = plan.nose_len, plan.nose_joint
     nose_z = top_z - nose_joint
     parts.append(Part("Nose", nose_cone(d, params.nose_shape, nose_len).translate((0, 0, nose_z)), nose_z))
     # The cap prints face-down, which is how it is built; its placement is 0.

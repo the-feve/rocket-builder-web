@@ -64,6 +64,7 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 ## Done
 
 - [x] Printer height before rocket height; tutorial button overlap fixed; motor, fins and height in saved names (2026-10-14)
+- [x] Beginner heights (and printer) snap to ones that build; built height matches the chosen one (2026-10-14)
 - [x] Print-order portal with coupon codes; order folders with batch sheet; `/admin`; PC sync script (2026-10-14)
 - [x] Accounts (email + password), saved rockets per account, skip-tutorial setting (2026-10-14)
 - [x] Order Rocket Supplies page at /ordersupplies (Amazon affiliate list, drawings per item), linked from the header, the score and the welcome (2026-10-14)

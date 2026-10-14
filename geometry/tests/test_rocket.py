@@ -349,3 +349,24 @@ def test_wall_thickness_builds(motor, wall):
     assert d.body_id == pytest.approx(d.body_od - 2 * wall)
     for p in r.parts:
         assert p.assembled.is_valid and meshes(p.assembled), p.name
+
+
+def test_height_ranges_match_the_build():
+    """The website snaps Beginner heights to these ranges, so the lowest one
+    must build and the one below it must not (here: the aft segment is too
+    short for the M24 motor bay)."""
+    from rocketgen.build import body_length_for, height_ranges, min_printer_height, plan_rocket
+    from rocketgen.geom import GeometryError
+    from rocketgen.stability import Balance
+    p = DesignParams(motor="M24", fin_shape=FinShape("trapezoid"))
+    ranges = height_ranges(p, 150, 400)
+    lo = ranges[0][0]
+    assert ranges == [[lo, 400]] and 180 < lo < 260
+    r = build_rocket(p.with_(body_length=body_length_for(p, lo)))
+    assert r.parts and Balance(r).length == pytest.approx(lo, abs=0.1)
+    with pytest.raises(GeometryError, match="Aft segment"):
+        plan_rocket(p.with_(body_length=body_length_for(p, lo - 1)))
+    # A printer too short for any M24 rocket.
+    ph = min_printer_height(p)
+    assert 80 < ph < 150
+    assert height_ranges(p.with_(print_max_height=ph - 1), 80, 1000) == []

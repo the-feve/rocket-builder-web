@@ -20,6 +20,7 @@ import tempfile
 import threading
 import time
 import zipfile
+from functools import lru_cache
 from collections import OrderedDict, defaultdict, deque
 from pathlib import Path
 
@@ -36,8 +37,8 @@ from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
 from rocketgen.flight import FIELD_M, motors_for, pick, simulate
-from rocketgen.build import body_length_for, overall_length
-from rocketgen.stability import Balance, build_stable, recovery_allowance_g
+from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
+from rocketgen.stability import MAX_FIN_SCALE, Balance, build_stable, recovery_allowance_g
 
 import accounts
 import designs
@@ -253,6 +254,31 @@ def options():
     }
 
 
+@lru_cache(maxsize=256)
+def _heights(motor: str, print_max_height: int, fin_shape: str, nose_shape: str) -> dict:
+    p = DesignParams(motor=motor, print_max_height=print_max_height, fin_shape=FinShape(fin_shape), nose_shape=nose_shape)
+    k = (1.0, MAX_FIN_SCALE)  # Beginner fins auto-size anywhere in this range
+    return {"ranges": height_ranges(p, fin_scales=k), "printer_min": min_printer_height(p, fin_scales=k)}
+
+
+@app.get("/api/heights")
+def heights(motor: str = "M18", print_max_height: int = 200, fin_shape: str = BEGINNER_FINS[2],
+            nose_shape: str = "tangent_ogive"):
+    """Beginner mode: the overall heights (whole mm) that build with this
+    motor, printer and fin/nose shape, as [first, last] ranges, and the
+    lowest printer height that builds anything. The page snaps the height
+    (and printer) to the nearest one that works, so Build never fails on
+    segment sizes, and the rocket comes out the height asked for whatever
+    size the fins grow to. Plan checks only: no solids, under a second, cached."""
+    if motor not in load_motors():
+        raise HTTPException(422, f"Unknown motor {motor!r}.")
+    if fin_shape not in {s.value for s in FinShape} or nose_shape not in NOSE_SHAPES:
+        raise HTTPException(422, "Unknown fin or nose shape.")
+    if not 50 <= print_max_height <= 500:
+        raise HTTPException(422, "Printer max height must be 50 to 500 mm.")
+    return _heights(motor, print_max_height, fin_shape, nose_shape)
+
+
 @app.get("/api/recovery_allowance")
 def recovery_allowance(motor: str = "M18", body_od_override: float | None = None, body_od_offset: float = 0.0,
                        wall: float | None = None):
@@ -271,14 +297,25 @@ def _key(*parts) -> str:
 def _build_to_length(params: DesignParams, overall: float | None):
     """build_stable, sized to an overall height when one is given. Auto-sized
     fins can change how far the fin tips trail below the tail, so when they
-    do, rebuild once at the corrected body length, starting from the fin
-    scale already found (normally no further scaling)."""
+    do, rebuild at the corrected body length, starting from the fin scale
+    already found. The shorter body can need bigger fins again, so repeat
+    until the height settles (fins only grow, up to MAX_FIN_SCALE; usually
+    one or two rounds)."""
     if overall is None:
         return build_stable(params)
     rocket = build_stable(params.with_(body_length=body_length_for(params, overall)))
-    if abs(Balance(rocket).length - overall) > 0.5:
+    for _ in range(4):
+        if abs(Balance(rocket).length - overall) <= 0.5:
+            break
         p = rocket.params
-        rocket = build_stable(p.with_(body_length=body_length_for(p, overall)))
+        try:
+            rocket = build_stable(p.with_(body_length=body_length_for(p, overall)))
+        except GeometryError:
+            # The corrected (shorter) body leaves the aft segment too short
+            # for the motor bay. /api/heights keeps Beginner heights clear of
+            # this; for a height typed past it, keep the last build (taller
+            # than asked, as the report shows) rather than fail.
+            break
     return rocket
 
 
