@@ -235,3 +235,21 @@ def test_account_prefs_skip_tutorial():
     assert b.post("/api/my/prefs", json={"skip_tutorial": True}).status_code == 401
     r = b.post("/api/auth/login", json={"email": "prefs@example.com", "password": "rocket123"})
     assert r.json()["user"]["prefs"]["skip_tutorial"] is True
+
+
+def test_order_supplies_page():
+    import re
+    import supplies
+    r = client.get("/ordersupplies")
+    assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
+    g = supplies.gear()
+    n = sum(len(c["items"]) for c in g["categories"])
+    assert r.text.count(f"tag={g['storeId']}") == n
+    assert supplies.DISCLOSURE in r.text
+    assert "$" not in re.sub(r"<style>.*?</style>", "", r.text, flags=re.S)  # no prices
+    seen = set()
+    for c in g["categories"]:
+        for it in c["items"]:
+            assert supplies.ASIN.match(it["asin"]) and it["asin"] not in seen and it["name"] and it["note"]
+            seen.add(it["asin"])
+    assert client.get("/api/options").json()["supplies_url"] == "/ordersupplies"

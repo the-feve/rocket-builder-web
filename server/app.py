@@ -26,7 +26,7 @@ from pathlib import Path
 import numpy as np
 import trimesh
 from fastapi import Cookie, FastAPI, Header, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -43,6 +43,7 @@ import accounts
 import designs
 import notify
 import orders
+import supplies
 
 STATIC = Path(__file__).resolve().parent / "static"
 GENERATOR_VERSION = "0.1.0"
@@ -125,8 +126,8 @@ BUILDS_PER_10_MIN = int(os.environ.get("ROCKETGEN_BUILDS_PER_10_MIN", 30))
 SAVES_PER_HOUR = int(os.environ.get("ROCKETGEN_SAVES_PER_HOUR", 60))
 AUTH_PER_10_MIN = int(os.environ.get("ROCKETGEN_AUTH_PER_10_MIN", 20))  # sign-up / sign-in attempts per address
 ORDERS_PER_DAY = int(os.environ.get("ROCKETGEN_ORDERS_PER_DAY", 10))
-# The rocket gear list (Amazon affiliate links) on fevergeon.com; the app links to it.
-SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "https://fevergeon.com/cad/rocket-builder/gear/")
+# "Order Rocket Supplies": the Amazon affiliate gear list, served here at /ordersupplies (supplies.py).
+SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "/ordersupplies")
 # Who can see every order: signed-in accounts with these emails, or the PC sync with this token.
 ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get("ROCKETGEN_ADMIN_EMAILS", "").split(",") if e.strip()}
 SYNC_TOKEN = os.environ.get("ROCKETGEN_SYNC_TOKEN", "")
@@ -596,6 +597,12 @@ def admin_order_status(order_id: str, body: StatusIn, request: Request):
     if not order:
         raise HTTPException(404, "No such order.")
     return order
+
+
+@app.get("/ordersupplies")
+def order_supplies():
+    """Launch pads, motors, recovery, filament and paint: Amazon affiliate links (server/gear.json)."""
+    return HTMLResponse(supplies.page(), headers=PAGE_HEADERS)
 
 
 @app.get("/admin")
