@@ -11,7 +11,6 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [ ] **(owner)** `ROCKETGEN_ADMIN_EMAILS`: the owner's account email(s) for `/admin`; then create that account on the site
 - [ ] **(owner)** `ROCKETGEN_COUPON_CODES`: comma-separated codes that make an order free (needed for any order until payment exists)
 - [ ] **(owner)** `ROCKETGEN_SYNC_TOKEN`: long random string; the same value as `ROCKET_SYNC_TOKEN` on the PC
-- [ ] **(owner)** `ROCKETGEN_SUPPLIES_URL`: the Amazon affiliate page (or send it to be set as the default in code)
 - [ ] **(owner)** PC sync: `tools/README.md` (save the token with `setx`, test `sync_orders.py`, add the Task Scheduler task)
 - [ ] **(owner)** Place a test order with a coupon; check the folder in `C:\RocketOrders`, the `/admin` page and the email
 
@@ -58,4 +57,4 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 
 - [x] Print-order portal with coupon codes; order folders with batch sheet; `/admin`; PC sync script (2026-10-14)
 - [x] Accounts (email + password), saved rockets per account, skip-tutorial setting (2026-10-14)
-- [x] Supplies link with the Amazon Associates disclosure (hidden until the URL is set) (2026-10-14)
+- [x] Gear link to fevergeon.com/cad/rocket-builder/gear/ (the Amazon affiliate gear list), with the Associates disclosure (2026-10-14)

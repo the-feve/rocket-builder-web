@@ -125,8 +125,8 @@ BUILDS_PER_10_MIN = int(os.environ.get("ROCKETGEN_BUILDS_PER_10_MIN", 30))
 SAVES_PER_HOUR = int(os.environ.get("ROCKETGEN_SAVES_PER_HOUR", 60))
 AUTH_PER_10_MIN = int(os.environ.get("ROCKETGEN_AUTH_PER_10_MIN", 20))  # sign-up / sign-in attempts per address
 ORDERS_PER_DAY = int(os.environ.get("ROCKETGEN_ORDERS_PER_DAY", 10))
-# The owner's Amazon affiliate page for supplies; the links are hidden while it's empty.
-SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "")
+# The rocket gear list (Amazon affiliate links) on fevergeon.com; the app links to it.
+SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "https://fevergeon.com/cad/rocket-builder/gear/")
 # Who can see every order: signed-in accounts with these emails, or the PC sync with this token.
 ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get("ROCKETGEN_ADMIN_EMAILS", "").split(",") if e.strip()}
 SYNC_TOKEN = os.environ.get("ROCKETGEN_SYNC_TOKEN", "")
