@@ -48,7 +48,8 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 
 - [ ] **(owner)** Photos: add your own photos of the gear you use to `server/static/gear/` and set `"photo"` on those items in `server/gear.json`
 - [ ] Live Amazon product images (and prices) through the Creators API once the Associates account qualifies (10 qualifying sales in 30 days); register under Associates Central → Tools → Creators API, then fetch images server-side and cache them no longer than Amazon allows
-- [ ] Motors for other sizes (13, 24, 29 mm) in gear.json with `"motors"` tags, so their builds get a motor link too (today only 18 mm A8-3, B4-4, B6-4, C6-5)
+- [x] Motors for 13, 24 and 29 mm added (2026-10-14; checked in stock on Amazon): 1/2A3-4T, A3-4T, A3-6T, A10-3T, C6-7, C11-3, D12-3, F15-4
+- [ ] Not on Amazon (unavailable) on 2026-10-14: D12-5, D12-7, C11-5, C11-7, E16-x, 1/4A3-3T; re-check, and add them with `"motors"` tags when listed (D12-5 especially). E9/E12 (24 mm long) are out of production
 - [ ] **(owner)** Re-check the list every few months (`checked` in gear.json): discontinued items, better picks
 
 ## Data and legal (needed before opening ordering to the public)
