@@ -430,15 +430,21 @@ def healthz():
     return {"ok": True, "generatorVersion": GENERATOR_VERSION}
 
 
+# The page changes with every deploy: make browsers (Safari especially) check
+# for a new copy each time instead of showing a cached old one. "no-cache"
+# still lets them reuse it when the ETag hasn't changed.
+PAGE_HEADERS = {"Cache-Control": "no-cache"}
+
+
 @app.get("/")
 def index():
-    return FileResponse(STATIC / "index.html")
+    return FileResponse(STATIC / "index.html", headers=PAGE_HEADERS)
 
 
 @app.get("/d/{design_id}")
 def shared(design_id: str):
     """A share link: the page loads the design and builds it."""
-    return FileResponse(STATIC / "index.html")
+    return FileResponse(STATIC / "index.html", headers=PAGE_HEADERS)
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")

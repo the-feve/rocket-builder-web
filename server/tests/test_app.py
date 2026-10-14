@@ -144,3 +144,9 @@ def test_wall_thickness():
     off = client.post("/api/build", json={"wall": 2.0, "body_od_offset": 3}).json()["dimensions"]
     assert off["Body OD"] == pytest.approx(thick["Body OD"] + 6, abs=1e-6)
     assert client.post("/api/build", json={"wall": 0.5}).status_code == 422
+
+
+def test_page_is_not_cached_stale():
+    for path in ("/", "/d/anything"):
+        r = client.get(path)
+        assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
