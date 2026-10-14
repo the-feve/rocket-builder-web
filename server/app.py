@@ -422,7 +422,7 @@ def current_user(request: Request) -> dict | None:
 
 
 def _signed_in(user: dict, request: Request) -> JSONResponse:
-    res = JSONResponse({"user": {"email": user["email"]}})
+    res = JSONResponse({"user": {"email": user["email"], "prefs": user["prefs"]}})
     https = request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
     res.set_cookie(SESSION_COOKIE, accounts.new_session(user["id"]), max_age=accounts.SESSION_DAYS * 86400,
                    httponly=True, samesite="lax", secure=https, path="/")
@@ -461,7 +461,20 @@ def logout(rb_session: str | None = Cookie(None)):
 @app.get("/api/auth/me")
 def me(request: Request):
     user = current_user(request)
-    return {"user": {"email": user["email"]} if user else None}
+    return {"user": {"email": user["email"], "prefs": user["prefs"]} if user else None}
+
+
+class Prefs(BaseModel):
+    skip_tutorial: bool | None = None
+
+
+@app.post("/api/my/prefs")
+def my_prefs(body: Prefs, request: Request):
+    """Account settings, e.g. skip the tutorial when signed in."""
+    user = current_user(request)
+    if not user:
+        raise HTTPException(401, "Sign in first.")
+    return {"prefs": accounts.set_prefs(user["id"], body.model_dump(exclude_none=True))}
 
 
 @app.get("/api/my/designs")

@@ -55,7 +55,16 @@
     background:transparent; border:1px solid var(--line); border-radius:6px; cursor:pointer; }
   #theme:hover { color:var(--ink); border-color:var(--muted); }
   header { flex:none; }
-  main { flex:1 1 auto; min-height:0; display:grid; grid-template-columns:330px minmax(0,1fr); }
+  main { flex:1 1 auto; min-height:0; display:grid; grid-template-columns:var(--formw, 330px) 0 minmax(0,1fr); }
+  /* Drag handle between the form and the 3D view (wider computers and tablets only). */
+  #splitter { position:relative; z-index:5; width:0; cursor:col-resize; touch-action:none; }
+  #splitter::before { content:""; position:absolute; top:0; bottom:0; left:-5px; width:10px; }
+  #splitter::after { content:""; position:absolute; top:50%; left:-3px; width:6px; height:44px; margin-top:-22px; border-radius:3px;
+    background:var(--line); border:1px solid var(--panel); transition:background .15s; }
+  #splitter:hover::after, #splitter.drag::after, #splitter:focus-visible::after { background:var(--accent); }
+  #splitter:focus-visible { outline:none; }
+  body.dragging, body.dragging * { cursor:col-resize !important; user-select:none !important; }
+  body.dragging #view canvas { pointer-events:none; }
   #form { overflow-y:auto; -webkit-overflow-scrolling:touch; padding:8px 14px 16px calc(14px + var(--safe-l)); background:var(--panel); border-right:1px solid var(--line); }
   fieldset { border:none; border-top:1px solid var(--line); margin:10px 0 0; padding:8px 0 0; min-width:0; }
   legend { font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:0 6px 0 0; }
@@ -135,6 +144,10 @@
   .choices button[aria-pressed=true] { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
   .choices svg { width:72px; height:46px; display:block; color:var(--ink); }
   .choice-why { min-height:2.9em; }
+  .acctstep { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:4px 0 6px; font-size:14px; }
+  .acctstep button { flex:none; padding:8px 16px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--ink); }
+  .acctstep button.primary { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .acctstep .ok { color:var(--ok); font-weight:600; }
   .tag { display:inline-block; font-size:11px; font-weight:600; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); margin-left:4px; vertical-align:1px; }
 
   /* Beginner report */
@@ -173,6 +186,7 @@
   #tutbar { position:sticky; top:0; z-index:3; display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 -14px 6px; padding:10px 14px;
     background:var(--card); border-bottom:1px solid var(--line); font-size:14px; }
   #tutbar[hidden] { display:none; }
+  #tutbar.locked .prog { display:none; }
   #tutbar .prog { flex:1 1 100%; height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
   #tutbar .prog i { display:block; height:100%; background:var(--accent); transition:width .25s; }
   #tutbar b { font-size:15px; }
@@ -202,6 +216,7 @@
   #kidguide .btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
   #kidguide .btns button { flex:0 1 auto; padding:9px 16px; }
   #kidguide .go { background:var(--ink); color:var(--bg); }
+  #kidguide .kidpref { display:flex; gap:8px; align-items:center; margin-top:8px; } #kidguide .kidpref[hidden] { display:none; }
   #kidguide .ghost { background:transparent; color:var(--ink); border-color:var(--line); }
   #kidguide svg { width:100%; max-width:460px; height:auto; display:block; color:var(--ink); margin:6px 0; }
   .safety { margin-top:12px; padding:10px 12px; border-radius:8px; border-left:4px solid var(--warn); background:var(--card); font-size:13.5px; }
@@ -217,6 +232,12 @@
   #savemsg.ok { color:var(--ok); } #savemsg.err { color:var(--err); }
   #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
   #namedlg::backdrop, #authdlg::backdrop, #orderdlg::backdrop, #ordersdlg::backdrop { background:rgba(0,0,0,.5); }
+  #acctdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(380px, 92vw); }
+  #acctdlg::backdrop { background:rgba(0,0,0,.5); }
+  #acctdlg h2 { font-size:17px; margin:0 0 4px; } #acctdlg p { margin:4px 0 8px; font-size:14px; }
+  #acctdlg .prefrow { display:flex; gap:8px; align-items:center; font-size:14px; font-weight:600; margin:10px 0 2px; }
+  #acctdlg menu { display:flex; justify-content:flex-end; gap:8px; margin:12px 0 0; padding:0; }
+  #acctdlg menu button { flex:none; padding:8px 16px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--ink); }
   #orderdlg, #ordersdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(560px, 94vw); max-height:92dvh; overflow-y:auto; }
   #orderdlg h2, #ordersdlg h2 { font-size:18px; margin:0 0 4px; } #orderdlg p { font-size:13px; color:var(--muted); margin:0 0 8px; }
   #orderdlg .ogrid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0 10px; }
@@ -290,7 +311,7 @@
 
   /* Tablets (iPad portrait, split view): narrower form column. */
   @media (max-width:1100px) and (min-width:801px) {
-    main { grid-template-columns:320px minmax(0,1fr); }
+    main { grid-template-columns:var(--formw, 320px) 0 minmax(0,1fr); }
     label { grid-template-columns:1fr 128px; }
     #report { grid-template-columns:1fr; max-height:36vh; max-height:36dvh; }
   }
@@ -299,6 +320,7 @@
     body { height:auto; min-height:100dvh; }
     main { display:flex; flex-direction:column; }
     #right { display:contents; }
+    #splitter { display:none; }
     #view { order:1; height:52vh; height:52svh; min-height:280px; max-height:620px; flex:none; border-bottom:1px solid var(--line); }
     #form { order:2; overflow:visible; border-right:none; padding-left:calc(14px + var(--safe-l)); padding-right:calc(14px + var(--safe-r)); }
     #report { order:3; grid-template-columns:1fr; max-height:none; overflow:visible; }
@@ -355,6 +377,7 @@
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
       <span>Tutorial · <b id="tutcount">Step 1 of 6</b></span><span class="sp"></span>
+      <button type="button" class="next" id="tutstartbtn" hidden>Start the tutorial</button>
       <button type="button" class="link" id="tutskip">Skip tutorial</button>
       <button type="button" class="link" id="tutadv">Go to Advanced</button>
       <div class="prog"><i id="tutprog"></i></div>
@@ -380,32 +403,35 @@
       <button type="button" data-mode="advanced" aria-pressed="false">Advanced</button>
     </div>
     <div id="modehint"></div>
+    <div class="step beg" data-tstep="1"><span class="n">1</span>Make an account <span class="tag">grown-ups</span></div>
+    <p class="why beg" data-tstep="1">An account <b>keeps your rockets safe</b>, so you can open them on any device, and lets a grown-up order a printed rocket. It's free. No account? You can still save rockets in this browser and add an account later.</p>
+    <div class="acctstep beg" data-tstep="1" id="acctstep"></div>
     <fieldset><legend>Motor</legend>
-      <div class="step beg" data-tstep="1"><span class="n">1</span>Pick a motor size</div>
-      <p class="why beg" data-tstep="1">The <b>motor</b> is the part that pushes your rocket into the sky. You buy motors at a hobby store and slide one into the back of your rocket. The number is how wide the motor is, in millimeters. <a href="#guide-motors" class="more" data-guide>More about motors</a></p>
-      <label data-tstep="1">Motor size <select name="motor"></select></label>
-      <p class="why beg" id="motorwhy" data-tstep="1"></p>
+      <div class="step beg" data-tstep="2"><span class="n">2</span>Pick a motor size</div>
+      <p class="why beg" data-tstep="2">The <b>motor</b> is the part that pushes your rocket into the sky. You buy motors at a hobby store and slide one into the back of your rocket. The number is how wide the motor is, in millimeters. <a href="#guide-motors" class="more" data-guide>More about motors</a></p>
+      <label data-tstep="2">Motor size <select name="motor"></select></label>
+      <p class="why beg" id="motorwhy" data-tstep="2"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <div class="step beg" data-tstep="2"><span class="n">2</span>How tall is your rocket?</div>
-      <p class="why beg" data-tstep="2">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
-      <input type="range" class="slider beg" id="heightslider" data-tstep="2" min="150" max="900" step="10" aria-label="Rocket height">
-      <label class="beg" data-tstep="2">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
-      <div class="conv beg" id="heightconv" data-tstep="2"></div>
+      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall is your rocket?</div>
+      <p class="why beg" data-tstep="3">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <input type="range" class="slider beg" id="heightslider" data-tstep="3" min="150" max="900" step="10" aria-label="Rocket height">
+      <label class="beg" data-tstep="3">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="conv beg" id="heightconv" data-tstep="3"></div>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
       <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
-      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
-      <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
-      <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall can your 3D printer print?</div>
+      <p class="why beg" data-tstep="4">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label data-tstep="4"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
-      <div class="step beg" data-tstep="4"><span class="n">4</span>Choose your fins</div>
-      <p class="why beg" data-tstep="4">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
-      <div class="choices beg" id="finpick" data-tstep="4" role="group" aria-label="Fin shape"></div>
-      <p class="why beg choice-why" id="finwhy" data-tstep="4"></p>
+      <div class="step beg" data-tstep="5"><span class="n">5</span>Choose your fins</div>
+      <p class="why beg" data-tstep="5">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
+      <div class="choices beg" id="finpick" data-tstep="5" role="group" aria-label="Fin shape"></div>
+      <p class="why beg choice-why" id="finwhy" data-tstep="5"></p>
       <label class="advshow">Shape <select name="fin_shape"></select></label>
       <label class="adv">Count <select name="fin_count"><option>3</option><option>4</option><option>5</option></select></label>
       <label class="adv">Thickness <input type="number" name="fin_thickness" min="0.4" max="12" step="0.1"></label>
@@ -421,10 +447,10 @@
       </div>
     </fieldset>
     <fieldset><legend>Nose</legend>
-      <div class="step beg" data-tstep="5"><span class="n">5</span>Choose a nose cone</div>
-      <p class="why beg" data-tstep="5">The nose cone is the pointy top. It <b>helps the rocket slice through the air</b>, and it pops off at the top of the flight so the parachute can come out. <a href="#guide-parts" class="more" data-guide>More about parts</a></p>
-      <div class="choices beg" id="nosepick" data-tstep="5" role="group" aria-label="Nose shape"></div>
-      <p class="why beg choice-why" id="nosewhy" data-tstep="5"></p>
+      <div class="step beg" data-tstep="6"><span class="n">6</span>Choose a nose cone</div>
+      <p class="why beg" data-tstep="6">The nose cone is the pointy top. It <b>helps the rocket slice through the air</b>, and it pops off at the top of the flight so the parachute can come out. <a href="#guide-parts" class="more" data-guide>More about parts</a></p>
+      <div class="choices beg" id="nosepick" data-tstep="6" role="group" aria-label="Nose shape"></div>
+      <p class="why beg choice-why" id="nosewhy" data-tstep="6"></p>
       <label class="advshow">Shape <select name="nose_shape"></select></label>
       <label class="adv">Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
     </fieldset>
@@ -450,14 +476,15 @@
         <label>Launch rod, m <input type="number" name="launch_rod_m" min="0.3" max="3" step="0.01"></label>
       </details>
     </fieldset>
-    <div class="step beg" data-tstep="6"><span class="n">6</span>Build it and check the stability score</div>
-    <p class="why beg" data-tstep="6">Press <b>Build my rocket</b>. In 10 to 30 seconds your rocket appears in 3D with a <b>stability score in "cal"</b> that tells you if it will fly straight. 1 to 2 cal is just right. <a href="#" class="more" data-kidguide>How the score works</a></p>
-    <div class="actions" data-tstep="6">
+    <div class="step beg" data-tstep="7"><span class="n">7</span>Build it and check the stability score</div>
+    <p class="why beg" data-tstep="7">Press <b>Build my rocket</b>. In 10 to 30 seconds your rocket appears in 3D with a <b>stability score in "cal"</b> that tells you if it will fly straight. 1 to 2 cal is just right. <a href="#" class="more" data-kidguide>How the score works</a></p>
+    <div class="actions" data-tstep="7">
       <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
       <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs (ZIP)</span></a>
     </div>
   </form>
+  <div id="splitter" role="separator" aria-orientation="vertical" aria-label="Resize the design panel" tabindex="0" title="Drag to resize; double-click to reset"></div>
   <section id="right">
     <div id="view">
       <div id="progress" hidden><div></div></div>
@@ -473,7 +500,7 @@
         <p class="lead">Design your own model rocket, see it in 3D, then print it on a 3D printer and fly it.</p>
         <h3>How it works</h3>
         <ol class="steps4">
-          <li><b>Design it.</b> Pick a motor, how tall, the fins and the nose. Each step tells you what it does.</li>
+          <li><b>Design it.</b> A grown-up can make a free account first. Then pick a motor, how tall, the fins and the nose. Each step tells you what it does.</li>
           <li><b>Build and check.</b> Press <i>Build my rocket</i>. It appears here with a stability score.</li>
           <li><b>Print it.</b> Download the files and print the parts on a 3D printer.</li>
           <li><b>Fly it!</b> Add a motor and parachute and launch it with a grown-up.</li>
@@ -506,6 +533,7 @@
           <button type="button" class="ghost" id="kidfull">Read the full guide</button>
         </div>
         <p class="hint" id="kidreplay" hidden>You've done the tutorial before. <a href="#" id="replaytut">Replay it</a></p>
+        <label class="hint kidpref" id="kidprefrow" hidden><input type="checkbox" id="kidskippref"> Skip the tutorial when I'm signed in (you can change this under your account)</label>
       </article>
       <article id="guide" aria-label="User guide">
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
@@ -643,6 +671,14 @@
     <menu><button type="button" id="orderclose">Done</button></menu>
   </div>
 </dialog>
+<dialog id="acctdlg" aria-labelledby="accttitle">
+  <h2 id="accttitle">Your account</h2>
+  <p id="acctemail"></p>
+  <label class="prefrow"><input type="checkbox" id="prefskip"> Skip the tutorial when I sign in</label>
+  <p class="hint">On: the site opens straight to the design steps. Off: it starts with the welcome and the tutorial.</p>
+  <p><a href="#" id="acctorders">My orders</a></p>
+  <menu><button type="button" id="acctclose">Close</button><button type="button" id="acctsignout">Sign out</button></menu>
+</dialog>
 <dialog id="ordersdlg" aria-labelledby="orderstitle">
   <h2 id="orderstitle">My orders</h2>
   <div id="orderslist"></div>
@@ -702,11 +738,15 @@ const guideOpen = () => !guideEl.hidden || !kidGuideEl.hidden;
 guideBtn.onclick = () => showGuide(!guideOpen());
 document.getElementById('guideclose').onclick = () => showGuide(false);
 // ---------- guided tutorial ----------
-// "Start designing" walks through the six Beginner steps one at a time; the
+// The page opens with the form locked (greyed out) and the welcome guide on
+// the right, so people start there: "Start designing" runs the tutorial,
+// "Skip tutorial" / "Go to Advanced" unlock it straight away. An account
+// with "skip the tutorial" set opens unlocked.
+// "Start designing" walks through the seven Beginner steps one at a time; the
 // other steps and controls are greyed out and inert. Finishing (or building
 // on the last step) unlocks the whole Beginner form. Done once, it's
 // remembered in this browser; the quick start can replay it.
-const TUT_STEPS = 6;
+const TUT_STEPS = 7;  // 1 is the account step
 const tutDone = () => { try { return localStorage.getItem('tutorialDone') === '1'; } catch { return false; } };
 let tutStep = 0;  // 0 = no tutorial running
 const tutBar = document.getElementById('tutbar'), tutDoneEl = document.getElementById('tutdone');
@@ -714,9 +754,21 @@ const tutNav = document.createElement('div');
 tutNav.className = 'tutnext';
 tutNav.innerHTML = '<button type="button" class="back">Back</button><button type="button" class="next">Next</button>';
 const narrow = () => matchMedia('(max-width: 800px)').matches;
+function lockForm() {
+  // Everything greyed and inert until the tutorial starts or is skipped.
+  const f = document.getElementById('form');
+  tutStep = 0; tutNav.remove();
+  f.classList.add('tut'); tutBar.hidden = false; tutBar.classList.add('locked'); tutDoneEl.hidden = true;
+  document.getElementById('tutcount').textContent = 'Start with the welcome guide';
+  document.getElementById('tutstartbtn').hidden = false;
+  f.querySelectorAll('[data-tstep]').forEach(el => { el.classList.remove('tcur'); el.inert = true; });
+  for (const el of [document.getElementById('designbar'), document.getElementById('modebar'), document.getElementById('modehint')]) { el.classList.add('tlock'); el.inert = true; }
+}
+const formLocked = () => document.getElementById('form').classList.contains('tut') && !tutStep;
 function tutShow() {
   const f = document.getElementById('form');
-  f.classList.add('tut'); tutBar.hidden = false; tutDoneEl.hidden = true;
+  f.classList.add('tut'); tutBar.hidden = false; tutBar.classList.remove('locked'); tutDoneEl.hidden = true;
+  document.getElementById('tutstartbtn').hidden = true;
   document.getElementById('tutcount').textContent = `Step ${tutStep} of ${TUT_STEPS}`;
   document.getElementById('tutprog').style.width = `${tutStep / TUT_STEPS * 100}%`;
   f.querySelectorAll('[data-tstep]').forEach(el => {
@@ -745,7 +797,7 @@ function tutStart() {
 function tutEnd(finished, msg) {
   tutStep = 0;
   const f = document.getElementById('form');
-  f.classList.remove('tut'); tutBar.hidden = true; tutNav.remove();
+  f.classList.remove('tut'); tutBar.hidden = true; tutBar.classList.remove('locked'); tutNav.remove();
   f.querySelectorAll('[data-tstep]').forEach(el => { el.classList.remove('tcur'); el.inert = false; });
   for (const el of document.querySelectorAll('.tlock')) { el.classList.remove('tlock'); el.inert = false; }
   if (finished) { try { localStorage.setItem('tutorialDone', '1'); } catch {} }
@@ -764,9 +816,12 @@ document.getElementById('kidskip').onclick = skipTut;
 document.getElementById('kidskip2').onclick = skipTut;
 document.getElementById('kidadv').onclick = goAdvanced;
 document.getElementById('kidstart').onclick = () => {
-  if (tutDone()) { showGuide(false); if (narrow()) document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  else tutStart();
+  if (tutDone()) {
+    showGuide(false); tutEnd(false);
+    if (narrow()) document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else tutStart();
 };
+document.getElementById('tutstartbtn').onclick = () => tutStart();
 document.getElementById('replaytut').onclick = e => { e.preventDefault(); tutStart(); };
 document.getElementById('kidreplay').hidden = !tutDone();
 function openFull(anchor) {
@@ -868,7 +923,7 @@ function params() {
 
 // ---------- beginner / advanced ----------
 const MODE_HINT = {
-  beginner: 'Six easy steps. Each one tells you what it does; Rocket Builder takes care of the rest.',
+  beginner: 'Follow the numbered steps. Each one tells you what it does; Rocket Builder takes care of the rest.',
   advanced: 'Every setting. Switching back to Beginner resets these to the defaults.',
 };
 function fillFins() {
@@ -1048,6 +1103,42 @@ const fill2 = new THREE.DirectionalLight(0xffffff, 0.5); fill2.position.set(-300
 const sectionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);  // keeps y <= 0
 let rocket = null, partMeshes = [], markers = null;
 const CG_COLOR = 0x3d8bfd, CP_COLOR = 0xff5a5a;  // also used for the report's legend dots
+
+// ---------- resizable design panel ----------
+// Drag the handle between the form and the 3D view; the width is remembered
+// in this browser. Arrow keys nudge it; double-click resets it.
+(() => {
+  const split = document.getElementById('splitter'), mainEl = document.querySelector('main'), root = document.documentElement;
+  const MIN = 260, maxW = () => Math.max(MIN, Math.min(720, mainEl.clientWidth * 0.6));
+  const set = (w, save) => {
+    w = Math.round(Math.min(maxW(), Math.max(MIN, w)));
+    root.style.setProperty('--formw', `${w}px`);
+    split.setAttribute('aria-valuenow', String(w));
+    if (save) { try { localStorage.setItem('formWidth', String(w)); } catch {} }
+  };
+  const reset = () => { root.style.removeProperty('--formw'); try { localStorage.removeItem('formWidth'); } catch {} };
+  try { const w = Number(localStorage.getItem('formWidth')); if (w) set(w, false); } catch {}
+  split.setAttribute('aria-valuemin', String(MIN));
+  split.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    split.setPointerCapture(e.pointerId); split.classList.add('drag'); document.body.classList.add('dragging');
+    const left = mainEl.getBoundingClientRect().left;
+    const move = ev => set(ev.clientX - left, false);
+    const up = ev => {
+      set(ev.clientX - left, true);
+      split.classList.remove('drag'); document.body.classList.remove('dragging');
+      split.removeEventListener('pointermove', move); split.removeEventListener('pointerup', up); split.removeEventListener('pointercancel', up);
+    };
+    split.addEventListener('pointermove', move); split.addEventListener('pointerup', up); split.addEventListener('pointercancel', up);
+  });
+  split.addEventListener('dblclick', reset);
+  split.addEventListener('keydown', e => {
+    const cur = document.getElementById('form').getBoundingClientRect().width;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); set(cur + (e.key === 'ArrowRight' ? 20 : -20), true); }
+    else if (e.key === 'Home') { e.preventDefault(); reset(); }
+  });
+  addEventListener('resize', () => { const w = parseFloat(root.style.getPropertyValue('--formw')); if (w && w > maxW()) set(w, false); });
+})();
 
 // ---------- theme ----------
 // No pinned choice = follow the system (as fevergeon.com and quiverdesignworks.net do).
@@ -1474,9 +1565,31 @@ async function refreshAccount() {
   } catch { accountList = []; }
   renderMine();
 }
+function renderAcctStep() {
+  const box = document.getElementById('acctstep');
+  box.innerHTML = user
+    ? `<span class="ok">✓ Signed in as ${esc(user.email)}.</span> Your rockets save to your account.`
+    : '<button type="button" class="primary" data-signup>Create an account</button><button type="button" data-login>Sign in</button>';
+  const row = document.getElementById('kidprefrow');
+  row.hidden = !user;
+  document.getElementById('kidskippref').checked = !!user?.prefs?.skip_tutorial;
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-signup]')) openAuth('up');
+  else if (e.target.closest('[data-login]')) openAuth('in');
+});
+async function savePrefs(changes) {
+  try {
+    const r = await fetch('/api/my/prefs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changes) });
+    if (r.ok && user) user.prefs = (await r.json()).prefs;
+  } catch {}
+  renderAcctStep(); document.getElementById('prefskip').checked = !!user?.prefs?.skip_tutorial;
+}
+document.getElementById('kidskippref').onchange = e => savePrefs({ skip_tutorial: e.target.checked });
 function renderUser() {
+  renderAcctStep();
   acctBtn.textContent = user ? user.email : 'Sign in';
-  acctBtn.title = user ? 'Signed in. Click to sign out.' : 'Sign in or create an account';
+  acctBtn.title = user ? 'Your account: settings, orders, sign out' : 'Sign in or create an account';
   document.getElementById('acctnote').hidden = !!user;
   document.getElementById('acctlinks').hidden = !user;
 }
@@ -1526,26 +1639,29 @@ document.getElementById('authform').addEventListener('submit', async e => {
     if (!r.ok) { err.textContent = typeof d.detail === 'string' ? d.detail : 'Something went wrong; try again.'; return; }
     authDlg.close(); document.getElementById('authpw').value = '';
     await afterSignIn(d.user, authTab === 'up');
+    if (formLocked() && user.prefs?.skip_tutorial) skipTut();
     if (afterAuth) { const f = afterAuth; afterAuth = null; f(); }
   } catch { err.textContent = 'Could not reach the server; check your connection.'; }
   finally { go.disabled = false; }
 });
-acctBtn.onclick = async () => {
+// Signed in, the header button opens the account panel: settings, orders, sign out.
+const acctDlg = document.getElementById('acctdlg');
+acctBtn.onclick = () => {
   if (!user) { openAuth('in'); return; }
-  if (!confirmSignOut()) return;
+  document.getElementById('acctemail').textContent = `Signed in as ${user.email}`;
+  document.getElementById('prefskip').checked = !!user.prefs?.skip_tutorial;
+  acctDlg.showModal();
+};
+document.getElementById('prefskip').onchange = e => savePrefs({ skip_tutorial: e.target.checked });
+document.getElementById('acctclose').onclick = () => acctDlg.close();
+document.getElementById('acctorders').onclick = e => { e.preventDefault(); acctDlg.close(); document.getElementById('myorders').click(); };
+document.getElementById('acctsignout').onclick = async () => {
+  acctDlg.close();
   try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
   user = null; accountList = [];
   if (current && !localMine().some(d => d.id === current.id)) current = null;
   renderUser(); renderMine(); say('Signed out.', 'ok');
 };
-// A two-click sign-out instead of a browser confirm() (blocked in some embedded browsers).
-let signOutArmed = 0;
-function confirmSignOut() {
-  if (Date.now() - signOutArmed < 4000) return true;
-  signOutArmed = Date.now(); acctBtn.textContent = 'Sign out?';
-  setTimeout(() => { if (user) acctBtn.textContent = user.email; }, 4000);
-  return false;
-}
 document.addEventListener('click', e => { const a = e.target.closest('a[data-signin]'); if (a) { e.preventDefault(); openAuth('up'); } });
 
 // ---------- print orders ----------
@@ -1616,10 +1732,11 @@ try {
 } catch {}
 applyMode();
 if (mode === 'beginner') form.elements.overall_length.value = opts.beginner.overall_length;
-showGuide(true);
+const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
+if (user?.prefs?.skip_tutorial || linked) showGuide(false);  // returning user who skips it, or a share link: straight in
+else { showGuide(true); lockForm(); }
 markDirty('Press <b>Build</b> to make the 3D model and downloads.');
 renderMine();
-const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
 if (linked) openDesign(linked[1]);
 </script>
 </body>
