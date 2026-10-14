@@ -95,11 +95,11 @@
     {
       "id": "motors",
       "title": "Motors",
-      "intro": "These ship from third-party sellers by ground because motors count as hazmat. Check the delivery estimate before ordering, and follow your local fire rules.",
+      "intro": "Motors come in sizes: 13 mm minis, 18 mm (the most common), 24 mm and 29 mm. Buy the size your rocket was built for. After a build, Rocket Builder recommends a motor and links it here; the number after the dash is the delay, so match that too. Motors are bought and handled by a grown-up.",
       "items": [
         {
           "asin": "B09QRB6ML3",
-          "name": "A8-3, B4-4, C6-5 Mini Bulk Pack (9 motors)",
+          "name": "A8-3, B4-4, C6-5 Bulk Pack, 18 mm (9 motors)",
           "note": "Three of each size, so you can work up from a low first flight.",
           "pick": true,
           "motors": [
@@ -110,7 +110,7 @@
         },
         {
           "asin": "B09QP9544K",
-          "name": "A8-3, B4-4, B6-4 Mini Bulk Pack (9 motors)",
+          "name": "A8-3, B4-4, B6-4 Bulk Pack, 18 mm (9 motors)",
           "note": "Same idea, without the C motors, for small or light rockets.",
           "motors": [
             "A8-3",
@@ -120,7 +120,7 @@
         },
         {
           "asin": "B01LWATRJW",
-          "name": "Estes C6-5, 3-pack",
+          "name": "Estes C6-5, 18 mm 3-pack",
           "note": "Standard 18 mm C motor with a 5-second delay.",
           "motors": [
             "C6-5"
@@ -128,7 +128,7 @@
         },
         {
           "asin": "B0DGYLST5B",
-          "name": "Estes A8-3, bagged",
+          "name": "Estes A8-3, 18 mm bag",
           "note": "Low and slow. Good for first flights and small fields.",
           "motors": [
             "A8-3"
@@ -136,10 +136,82 @@
         },
         {
           "asin": "B0CKSXLTZN",
-          "name": "Estes B4-4, bagged",
+          "name": "Estes B4-4, 18 mm bag",
           "note": "A middle step between A and C.",
           "motors": [
             "B4-4"
+          ]
+        },
+        {
+          "asin": "B0FBBV1WZ2",
+          "name": "Estes C6-7, 18 mm bag",
+          "note": "C motor with a longer, 7-second delay, for light rockets that coast higher.",
+          "motors": [
+            "C6-7"
+          ]
+        },
+        {
+          "asin": "B0FBC52V16",
+          "name": "Estes 1/2A3-4T, 13 mm 4-pack",
+          "note": "Smallest mini motor: short, low flights for tiny rockets and small fields.",
+          "motors": [
+            "1/2A3-4"
+          ]
+        },
+        {
+          "asin": "B0FBBZ6VPL",
+          "name": "Estes A3-4T, 13 mm 4-pack",
+          "note": "The standard mini motor, with a 4-second delay.",
+          "motors": [
+            "A3-4"
+          ]
+        },
+        {
+          "asin": "B0FBC667ZD",
+          "name": "Estes A3-6T, 13 mm 4-pack",
+          "note": "Mini motor with a longer 6-second delay, for very light rockets.",
+          "motors": [
+            "A3-6"
+          ]
+        },
+        {
+          "asin": "B0FBBZQQSK",
+          "name": "Estes A10-3T, 13 mm 4-pack",
+          "note": "Punchier mini motor: a quick push off the pad for slightly heavier minis.",
+          "motors": [
+            "A10-3"
+          ]
+        },
+        {
+          "asin": "B09JBPQKNW",
+          "name": "Estes C11-3 Bulk Pack, 24 mm",
+          "note": "A strong C motor for 24 mm rockets; the short delay suits heavier ones.",
+          "motors": [
+            "C11-3"
+          ]
+        },
+        {
+          "asin": "B0FBBZSGNB",
+          "name": "Estes D12-3, 24 mm 2-pack",
+          "note": "The standard D motor for 24 mm rockets, with a 3-second delay for heavier builds.",
+          "motors": [
+            "D12-3"
+          ]
+        },
+        {
+          "asin": "B00G4DSCLG",
+          "name": "Estes F15-4, 29 mm 2-pack",
+          "note": "Big, high flights for 29 mm rockets. Needs a large field (about 300 m).",
+          "motors": [
+            "F15-4"
+          ]
+        },
+        {
+          "asin": "B0FBBQVYJL",
+          "name": "Estes F15-4 Bulk Pack, 29 mm (8 motors)",
+          "note": "The same F15-4 in bulk, for a full season of 29 mm flights.",
+          "motors": [
+            "F15-4"
           ]
         }
       ]
