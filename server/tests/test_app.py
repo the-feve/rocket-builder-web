@@ -114,6 +114,29 @@ def test_beginner_overall_height():
     assert r.status_code == 422 and "too short" in r.json()["detail"]
 
 
+def test_beginner_heights_snap_to_ones_that_build():
+    """/api/heights: the lowest M29 height builds at exactly that height, with
+    the fins auto-sized to the limit (they trail further below the tail, so
+    the body is shorter for the same height). Below the old plain-fin
+    minimum the build fails. A printer too short for any M24 rocket reports
+    the smallest that works."""
+    h = client.get("/api/heights", params={"motor": "M29", "print_max_height": 200, "fin_shape": "trapezoid"}).json()
+    lo = h["ranges"][0][0]
+    assert len(h["ranges"]) == 1 and 280 < lo < 340 and h["ranges"][0][1] > 1500 and h["printer_min"] < 200
+    ok = client.post("/api/build", json={"motor": "M29", "overall_length": lo, "fin_shape": "trapezoid"})
+    assert ok.status_code == 200, ok.text
+    assert abs(ok.json()["stability"]["length_mm"] - lo) <= 0.5
+    bad = client.post("/api/build", json={"motor": "M29", "overall_length": 270, "fin_shape": "trapezoid"})
+    assert bad.status_code == 422
+    h = client.get("/api/heights", params={"motor": "M24", "print_max_height": 90}).json()
+    assert h["ranges"] == [] and 90 < h["printer_min"] < 150
+    assert client.get("/api/heights", params={"motor": "M99"}).status_code == 422
+    # The default Beginner rocket is a height that works.
+    o = client.get("/api/options").json()
+    h = client.get("/api/heights").json()
+    assert any(a <= o["beginner"]["overall_length"] <= b for a, b in h["ranges"])
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]

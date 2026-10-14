@@ -180,7 +180,14 @@
   /* Guided tutorial: one Beginner step at a time; everything else greyed out and inert */
   #form.tut [data-tstep]:not(.tcur), #form.tut .tlock { opacity:.28; filter:grayscale(1); pointer-events:none; user-select:none; transition:opacity .2s; }
   #form.tut .tcur { position:relative; }
-  #form.tut .actions:not(.tcur) { position:static; }  /* don't pin a greyed-out Build bar over the current step */
+  /* No pinned Build bar during the tutorial: on step 7 it slid over the Back / Finish row under it. */
+  #form.tut .actions { position:static; border-top:0; padding-bottom:0; }
+  #form.tut .actions + .tutnext { margin-top:4px; padding-top:10px; border-top:1px solid var(--line); }
+  /* On the Build step, Build is the main button; Finish without building is the quiet one. */
+  .tutnext.last .next { background:transparent; color:var(--ink); border-color:var(--line); }
+  .tutnext.last .back, .tutnext.last .next { flex:1; }
+  .snapmsg { margin:2px 0 6px; padding:6px 9px; border-radius:6px; border-left:3px solid var(--warn); background:var(--card); font-size:13px; }
+  .snapmsg[hidden] { display:none; }
   #form.tut .step.tcur { margin-top:18px; }
   #form.tut .step { scroll-margin-top:96px; }
   #tutbar { position:sticky; top:0; z-index:3; display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 -14px 6px; padding:10px 14px;
@@ -421,19 +428,21 @@
       <p class="why beg" id="motorwhy" data-tstep="2"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall is your rocket?</div>
-      <p class="why beg" data-tstep="3">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
-      <input type="range" class="slider beg" id="heightslider" data-tstep="3" min="150" max="900" step="10" aria-label="Rocket height">
-      <label class="beg" data-tstep="3">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
-      <div class="conv beg" id="heightconv" data-tstep="3"></div>
+      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
+      <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. It comes first because it decides which rocket heights will work. If your rocket is taller than the printer, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall is your rocket?</div>
+      <p class="why beg" data-tstep="4">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <input type="range" class="slider beg" id="heightslider" data-tstep="4" min="150" max="900" step="10" aria-label="Rocket height">
+      <label class="beg" data-tstep="4">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="conv beg" id="heightconv" data-tstep="4"></div>
+      <p class="hint beg heightnote" id="heightnote" data-tstep="4">Not every height works: each body piece has to fit your printer, and the bottom piece needs room for the motor and the fins, so a big motor needs a taller rocket. If you pick a height that can't be built, it moves to the closest one that can.<span id="heightrange"></span></p>
+      <p class="snapmsg beg" id="heightsnap" data-tstep="4" role="status" aria-live="polite" hidden></p>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
       <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
-      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall can your 3D printer print?</div>
-      <p class="why beg" data-tstep="4">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
-      <label data-tstep="4"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
       <div class="step beg" data-tstep="5"><span class="n">5</span>Choose your fins</div>
@@ -510,7 +519,7 @@
           <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
         <h3>How it works</h3>
         <ol class="steps4">
-          <li><b>Design it.</b> A grown-up can make a free account first. Then pick a motor, how tall, the fins and the nose. Each step tells you what it does.</li>
+          <li><b>Design it.</b> A grown-up can make a free account first. Then pick a motor, your printer's size, how tall, the fins and the nose. Each step tells you what it does.</li>
           <li><b>Build and check.</b> Press <i>Build my rocket</i>. It appears here with a stability score.</li>
           <li><b>Print it.</b> Download the files and print the parts on a 3D printer.</li>
           <li><b>Fly it!</b> Add a motor and parachute and launch it with a grown-up.</li>
@@ -564,7 +573,7 @@
 
         <h3 id="guide-modes">Modes</h3>
         <div class="cols">
-          <dl><dt>Beginner</dt><dd>Made for young builders (about grades 3–7): six numbered steps, each explaining what it does in plain words. Motor size, the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit; slider or typed), your printer's max height, then fin shape (swept, delta or trapezoid) and nose shape picked from pictures. Everything else uses proven defaults, and the fins size themselves so the rocket is stable. The report shows a stability score meter, the best motor and how high it should fly, and next steps; the full numbers are under <i>Grown-up details</i>. The <b>Guide</b> button opens a quick start, which links to this full guide.</dd></dl>
+          <dl><dt>Beginner</dt><dd>Made for young builders (about grades 3–7): numbered steps, each explaining what it does in plain words. Motor size, your printer's max height, then the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit; slider or typed; heights that can't be split into printable pieces move to the closest one that can), then fin shape (swept, delta or trapezoid) and nose shape picked from pictures. Everything else uses proven defaults, and the fins size themselves so the rocket is stable. The report shows a stability score meter, the best motor and how high it should fly, and next steps; the full numbers are under <i>Grown-up details</i>. The <b>Guide</b> button opens a quick start, which links to this full guide.</dd></dl>
           <dl><dt>Advanced</dt><dd>Every setting: body length instead of overall height, wall thickness, a body OD offset for a fatter rocket (the actual OD is shown under it), fin count, thickness, fillets and custom fin size, nose fineness, launch lugs, filament, and the flight check (target altitude, which motor to check, recovery mass, drag, launch rod). Switching modes carries the size across.</dd></dl>
         </div>
 
@@ -793,8 +802,9 @@ function tutShow() {
   // Back / Next sit right under the current step (on the last step, Build is the next move).
   const pieces = [...f.querySelectorAll(`[data-tstep="${tutStep}"]`)];
   const last = pieces[pieces.length - 1];
-  if (tutStep === TUT_STEPS) { tutNav.querySelector('.next').textContent = 'Finish without building'; last.after(tutNav); }
-  else { tutNav.querySelector('.next').textContent = 'Next'; last.after(tutNav); }
+  tutNav.querySelector('.next').textContent = tutStep === TUT_STEPS ? 'Finish without building' : 'Next';
+  tutNav.classList.toggle('last', tutStep === TUT_STEPS);
+  last.after(tutNav);
   tutNav.querySelector('.back').disabled = tutStep === 1;
   tutNav.hidden = false;
   const head = f.querySelector(`.step[data-tstep="${tutStep}"]`);
@@ -959,6 +969,7 @@ function applyMode() {
   form.elements.overall_length.disabled = mode !== 'beginner';
   fillFins(); sync();
   renderChoices(); motorWhy(); heightConv();  // after fillFins, so the fin pictures match this mode's shapes
+  if (mode === 'beginner') refreshHeights(0);
 }
 function switchMode(m) {
   if (m === mode) return;
@@ -1062,6 +1073,56 @@ function heightConv() {
 }
 hSlider.addEventListener('input', () => { hBox.value = hSlider.value; heightConv(); });
 hBox.addEventListener('input', heightConv);
+// Not every height builds: each body piece must fit the printer and the bottom
+// piece needs room for the motor bay and fins. /api/heights lists the heights
+// that do for this motor, printer and fin/nose shape; the height snaps to the
+// closest one (in the direction it was moved), and a printer too short for
+// any rocket of this motor size snaps up, so Build never fails on piece sizes.
+let hRanges = null, hPrev = Number(hBox.value) || 0, hSeq = 0, heightsReady = Promise.resolve();
+const hRangeEl = document.getElementById('heightrange'), hSnapEl = document.getElementById('heightsnap');
+function snapNote(html) { hSnapEl.innerHTML = html; hSnapEl.hidden = !html; }
+function snapHeight(dir) {
+  const v = Math.round(Number(hBox.value));
+  if (!hRanges?.length || !v) return;
+  if (hRanges.some(([a, b]) => v >= a && v <= b)) { hPrev = v; return; }
+  const up = hRanges.find(([a]) => a > v)?.[0], down = [...hRanges].reverse().find(([, b]) => b < v)?.[1];
+  let to = dir > 0 ? (up ?? down) : dir < 0 ? (down ?? up) : (up == null ? down : down == null ? up : (up - v <= v - down ? up : down));
+  hBox.value = to; heightConv(); hPrev = to;
+  snapNote(`<b>${v} mm</b> can't be built with these choices, so it moved to <b>${to} mm</b>, the closest height that can.`);
+}
+function refreshHeights(dir = 0) {
+  if (mode !== 'beginner') return heightsReady;
+  const ph = form.elements.print_max_height, n = ++hSeq;
+  ph.value = Math.min(500, Math.max(50, Math.round(Number(ph.value) || opts.defaults.print_max_height)));
+  const q = new URLSearchParams({ motor: form.elements.motor.value, print_max_height: ph.value,
+    fin_shape: form.elements.fin_shape.value, nose_shape: form.elements.nose_shape.value });
+  return heightsReady = (async () => {
+    let r;
+    try { const res = await fetch('/api/heights?' + q); if (!res.ok) return; r = await res.json(); } catch { return; }
+    if (n !== hSeq) return;
+    if (!r.ranges.length && r.printer_min && Number(ph.value) < r.printer_min) {
+      const was = ph.value;
+      ph.value = r.printer_min;
+      await refreshHeights(dir);
+      snapNote(`A <b>${was} mm</b> printer is too short for a ${esc(form.elements.motor.value)} rocket, so the printer height moved up to <b>${r.printer_min} mm</b>, the smallest that works.` +
+        (hSnapEl.hidden ? '' : ' ' + hSnapEl.innerHTML));
+      return;
+    }
+    hRanges = r.ranges;
+    snapNote('');
+    if (hRanges.length) {
+      const lo = hRanges[0][0], hi = hRanges[hRanges.length - 1][1];
+      hBox.min = lo; hBox.max = hi;
+      hSlider.min = Math.ceil(lo / 10) * 10; hSlider.max = Math.min(900, hi);
+      hRangeEl.innerHTML = ` With these choices: <b>${lo} to ${hi} mm</b>` +
+        (hRanges.length > 1 ? `, except ${hRanges.slice(1).map((x, i) => `${hRanges[i][1] + 1}–${x[0] - 1}`).join(', ')} mm` : '') + '.';
+      snapHeight(dir);
+    } else hRangeEl.textContent = '';
+  })();
+}
+hBox.addEventListener('change', () => { const v = Number(hBox.value); snapNote(''); snapHeight(Math.sign(v - hPrev)); });
+hSlider.addEventListener('change', () => { const v = Number(hBox.value); snapNote(''); snapHeight(Math.sign(v - hPrev)); });
+for (const k of ['motor', 'print_max_height', 'fin_shape', 'nose_shape']) form.elements[k].addEventListener('change', () => refreshHeights(0));
 
 // ---------- "press Build" notice and progress bar ----------
 const dirtyEl = document.getElementById('dirty');
@@ -1397,6 +1458,7 @@ function showReport(r) {
 
 form.addEventListener('submit', e => { e.preventDefault(); runBuild(); });
 async function runBuild() {
+  await heightsReady;  // a height snap still on its way
   if (!form.reportValidity()) return;
   buildBtn.disabled = true; zipBtn.classList.add('off');
   const t0 = performance.now(), seq = edits;
@@ -1474,6 +1536,7 @@ function setForm(p) {
     if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
   }
   if (mode === 'beginner' && !form.elements.overall_length.value) form.elements.overall_length.value = opts.beginner.overall_length;
+  if (mode === 'beginner') { heightConv(); refreshHeights(0); }
   if (p.body_od_override && !p.body_od_offset) {  // saved before the offset field existed
     form.elements.body_od_offset.value = Math.max(0, (p.body_od_override - stockOd()) / 2).toFixed(1);
   }
@@ -1766,8 +1829,8 @@ try {
   const me = await (await fetch('/api/auth/me')).json();
   if (me.user) { user = me.user; renderUser(); await refreshAccount(); }
 } catch {}
-applyMode();
 if (mode === 'beginner') form.elements.overall_length.value = opts.beginner.overall_length;
+applyMode();
 const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
 if (user?.prefs?.skip_tutorial || linked) showGuide(false);  // returning user who skips it, or a share link: straight in
 else { showGuide(true); lockForm(); }
