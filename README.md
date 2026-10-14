@@ -14,7 +14,7 @@ The geometry is a Python port, on build123d (OpenCascade), of the Onshape Featur
 
 - **Phase 0 (spike):** done.
 - **Phase 1 (feature parity with the FeatureScript):** done, apart from two cosmetic items listed in `geometry/report.md`.
-- **Phase 2 (local web prototype):** done. Form → build → 3D preview (exploded, section) → ZIP of print-oriented STLs. Dark theme by default, with a light-mode toggle.
+- **Phase 2 (local web prototype):** done. Form → build → 3D preview (exploded, section) → ZIP of print-oriented STLs. Styled to match fevergeon.com / quiverdesignworks.net (same greys, accent and buttons); follows the system light/dark setting, with a header toggle to pin one. Works on iPhone and iPad: the preview fills and follows the screen through rotation, sits above the form on phones, renders only when the view changes, and uses 16 px touch-sized fields so iOS doesn't zoom.
 - **Phase 3 (hosted beta):** in progress.
   - Done: stability check (Barrowman CP, CG from the parts + motor + recovery; under 1.0 cal the ZIP is withheld); standard fins auto-grow (span and sweep) until the heaviest motor of the size is stable; motor picker (flight sim of every motor in the bay, recommendation for a target altitude, per-motor stability); saved designs and share links (`/d/<id>`, SQLite, edit key per browser until sign-in exists), `Dockerfile`.
   - Ready to host: `/healthz`, per-address rate limits on new builds and saves, a 60 s wait limit for the build lock, error logging, three.js served from the app. CI (`.github/workflows/ci.yml`) runs both test suites and builds and smoke-tests the Docker image; `deploy.yml` deploys to Fly.io on every push to `main` once the `FLY_API_TOKEN` secret is set.

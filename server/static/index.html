@@ -2,64 +2,103 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rocket Builder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Rocket Builder · Quiver Design Works</title>
 <style>
+  /* Palette matches fevergeon.com and quiverdesignworks.net (shared stylesheet):
+     neutral greys, one blue accent, inverted "ink on paper" primary buttons.
+     Follows the system light/dark setting like those sites; the header button overrides it. */
   :root {
-    color-scheme: dark;
-    --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#2a313c; --rowline:#212833;
-    --field:#0d1117; --accent:#4c8dff; --accent-ink:#fff; --err:#ff8a80; --errbg:#3a1618; --errline:#6e2a2a;
-    --view-top:#1b2230; --view-bot:#0b0e13; --chip:rgba(22,27,34,.85); --ok:#56d364; --warn:#e3b341;
-  }
-  :root[data-theme=light] {
     color-scheme: light;
-    --bg:#f5f6f8; --panel:#fff; --ink:#1d2330; --muted:#667085; --line:#dfe3ea; --rowline:#eef0f4;
-    --field:#fff; --accent:#2f6fdf; --accent-ink:#fff; --err:#b42318; --errbg:#fef3f2; --errline:#fecdca;
-    --view-top:#e9eef6; --view-bot:#f8f9fb; --chip:rgba(255,255,255,.85); --ok:#1a7f37; --warn:#9a6700;
+    --bg:#fff; --panel:#fff; --card:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --rowline:#efeff2;
+    --field:#fff; --accent:#0a58ca; --accent-ink:#fff; --err:#d70015; --errbg:#fff2f3; --errline:#f5c2c7;
+    --view-top:#f5f5f7; --view-bot:#e9e9ee; --chip:rgba(255,255,255,.88); --ok:#1a7f37; --warn:#9a6700;
+    --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme=light]) {
+      color-scheme: dark;
+      --bg:#111113; --panel:#111113; --card:#1c1c1f; --ink:#f2f2f4; --muted:#a1a1a6; --line:#2c2c30; --rowline:#222226;
+      --field:#1c1c1f; --accent:#6ea8fe; --accent-ink:#111113; --err:#ff8a80; --errbg:#2e1416; --errline:#5c2a2c;
+      --view-top:#1c1c1f; --view-bot:#0b0b0d; --chip:rgba(28,28,31,.88); --ok:#56d364; --warn:#e3b341;
+    }
+  }
+  :root[data-theme=dark] {
+    color-scheme: dark;
+    --bg:#111113; --panel:#111113; --card:#1c1c1f; --ink:#f2f2f4; --muted:#a1a1a6; --line:#2c2c30; --rowline:#222226;
+    --field:#1c1c1f; --accent:#6ea8fe; --accent-ink:#111113; --err:#ff8a80; --errbg:#2e1416; --errline:#5c2a2c;
+    --view-top:#1c1c1f; --view-bot:#0b0b0d; --chip:rgba(28,28,31,.88); --ok:#56d364; --warn:#e3b341;
   }
   * { box-sizing:border-box; }
-  body { margin:0; font:14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
-  header { padding:10px 16px; align-items:center; border-bottom:1px solid var(--line); background:var(--panel); display:flex; align-items:baseline; gap:12px; }
-  header h1 { font-size:17px; margin:0; }
-  header span { color:var(--muted); font-size:12px; }
-  #theme { margin-left:auto; flex:none; padding:3px 10px; font:500 12px system-ui; color:var(--muted); background:transparent; border:1px solid var(--line); }
-  #theme:hover { color:var(--ink); }
-  main { display:grid; grid-template-columns:330px 1fr; height:calc(100vh - 45px); }
-  #form { overflow-y:auto; padding:8px 14px 16px; background:var(--panel); border-right:1px solid var(--line); }
-  fieldset { border:none; border-top:1px solid var(--line); margin:8px 0 0; padding:8px 0 0; }
-  legend { font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); padding:0; }
-  label { display:grid; grid-template-columns:1fr 120px; align-items:center; gap:8px; margin:5px 0; }
+  html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+  body { margin:0; font:14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg);
+    -webkit-tap-highlight-color:transparent; display:flex; flex-direction:column; height:100vh; height:100dvh; }
+  a { color:var(--accent); }
+  header { display:flex; align-items:center; flex-wrap:wrap; gap:6px 18px; min-height:52px;
+    padding:calc(8px + var(--safe-t)) calc(16px + var(--safe-r)) 8px calc(16px + var(--safe-l));
+    border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:1.15rem; font-weight:700; letter-spacing:.02em; margin:0; }
+  header nav { display:flex; gap:18px; align-items:center; font-size:14px; }
+  header nav a { color:var(--ink); text-decoration:none; }
+  header nav a:hover { text-decoration:underline; text-underline-offset:5px; }
+  header .units { color:var(--muted); font-size:12px; }
+  #theme { margin-left:auto; flex:none; padding:5px 12px; font:500 12px system-ui, -apple-system, sans-serif; color:var(--muted);
+    background:transparent; border:1px solid var(--line); border-radius:6px; cursor:pointer; }
+  #theme:hover { color:var(--ink); border-color:var(--muted); }
+  header { flex:none; }
+  main { flex:1 1 auto; min-height:0; display:grid; grid-template-columns:330px minmax(0,1fr); }
+  #form { overflow-y:auto; -webkit-overflow-scrolling:touch; padding:8px 14px 16px calc(14px + var(--safe-l)); background:var(--panel); border-right:1px solid var(--line); }
+  fieldset { border:none; border-top:1px solid var(--line); margin:10px 0 0; padding:8px 0 0; min-width:0; }
+  legend { font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:0 6px 0 0; }
+  label { display:grid; grid-template-columns:1fr 120px; align-items:center; gap:8px; margin:6px 0; }
   label.check { grid-template-columns:1fr auto; }
-  input[type=number], select { width:100%; padding:4px 6px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:var(--field); }
+  input[type=number], select { width:100%; padding:5px 7px; border:1px solid var(--line); border-radius:6px; font:inherit; color:var(--ink); background:var(--field); }
+  input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
   input:disabled { opacity:.5; }
-  input[type=checkbox] { accent-color:var(--accent); }
-  .hint { color:var(--muted); font-size:11px; margin:-2px 0 4px; }
+  input[type=checkbox] { accent-color:var(--accent); width:16px; height:16px; margin:0; }
+  .hint { color:var(--muted); font-size:11.5px; margin:-2px 0 4px; }
   #custom-fins[hidden], .lug-only[hidden] { display:none; }
-  .actions { position:sticky; bottom:-16px; background:var(--panel); padding:10px 0 6px; display:flex; gap:8px; border-top:1px solid var(--line); margin-top:10px; }
-  button, a.btn { flex:1; padding:8px 10px; border-radius:6px; border:1px solid var(--accent); font:600 14px system-ui; cursor:pointer; text-align:center; text-decoration:none; }
-  #build { background:var(--accent); color:var(--accent-ink); }
-  #build:disabled { opacity:.6; cursor:wait; }
-  a.btn { color:var(--accent); background:transparent; }
+  .actions { position:sticky; bottom:-16px; background:var(--panel); padding:10px 0 6px; display:flex; gap:8px; border-top:1px solid var(--line); margin-top:12px; }
+  button, a.btn { flex:1; padding:9px 12px; border-radius:6px; border:1px solid transparent; font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; text-align:center; text-decoration:none; }
+  /* Primary action = the sites' .button: ink on paper, inverted per theme. */
+  #build { background:var(--ink); color:var(--bg); }
+  #build:hover { opacity:.88; }
+  #build:disabled { opacity:.5; cursor:wait; }
+  a.btn { color:var(--ink); background:transparent; border-color:var(--line); }
+  a.btn:hover { border-color:var(--accent); color:var(--accent); }
   a.btn.off { pointer-events:none; opacity:.4; }
-  #right { display:grid; grid-template-rows:1fr auto; min-width:0; min-height:0; }
-  #view { position:relative; min-height:0; background:linear-gradient(var(--view-top),var(--view-bot)); }
-  #view canvas { display:block; }
-  #status { position:absolute; left:12px; top:10px; padding:4px 8px; background:var(--chip); border-radius:5px; font-size:12px; color:var(--muted); }
-  #viewopts { position:absolute; right:12px; top:10px; display:flex; gap:10px; background:var(--chip); padding:4px 8px; border-radius:5px; font-size:12px; }
-  #viewopts label { display:flex; margin:0; gap:4px; }
-  #report { padding:10px 16px; background:var(--panel); border-top:1px solid var(--line); max-height:32vh; overflow-y:auto; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:6px 24px; }
-  #report h2 { font-size:13px; margin:4px 0; }
+  #right { display:grid; grid-template-rows:minmax(0,1fr) auto; min-width:0; min-height:0; }
+  /* The canvas is absolutely positioned so it never props its container open:
+     the container sets the size and the canvas follows (fixes iOS rotation / resize). */
+  #view { position:relative; min-height:0; min-width:0; overflow:hidden; background:linear-gradient(var(--view-top),var(--view-bot));
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+  #view canvas { position:absolute; inset:0; width:100% !important; height:100% !important; display:block; touch-action:none; }
+  #status { position:absolute; z-index:1; left:12px; top:10px; right:180px; width:max-content; max-width:calc(100% - 190px); padding:4px 8px; background:var(--chip);
+    border:1px solid var(--line); border-radius:6px; font-size:12px; color:var(--muted); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  #viewopts { position:absolute; z-index:1; right:12px; top:10px; display:flex; gap:12px; background:var(--chip); border:1px solid var(--line);
+    padding:4px 10px; border-radius:6px; font-size:12px; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  #viewopts label { display:flex; margin:0; gap:5px; align-items:center; }
+  #report { padding:10px 16px calc(10px + var(--safe-b)) 16px; padding-right:calc(16px + var(--safe-r)); background:var(--panel); border-top:1px solid var(--line);
+    max-height:32vh; max-height:32dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:6px 24px; }
+  #report h2 { font-size:13px; margin:6px 0 4px; }
   table { border-collapse:collapse; width:100%; font-size:12.5px; }
-  td, th { padding:2px 6px 2px 0; text-align:left; border-bottom:1px solid var(--rowline); }
-  td.n { text-align:right; font-variant-numeric:tabular-nums; }
+  td, th { padding:3px 6px 3px 0; text-align:left; border-bottom:1px solid var(--rowline); }
+  th { color:var(--muted); font-weight:600; }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; }
   .sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px; }
   ul { margin:4px 0; padding-left:18px; }
   .error { grid-column:1/-1; color:var(--err); background:var(--errbg); border:1px solid var(--errline); padding:8px 10px; border-radius:6px; }
   #designbar { display:flex; gap:6px; align-items:center; padding:8px 0 4px; flex-wrap:wrap; }
-  #designbar input { flex:1 1 120px; min-width:0; padding:4px 6px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:var(--field); }
-  #designbar button, #designbar select { flex:none; padding:4px 8px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
-  #designbar select { max-width:100%; flex:1 1 100%; }
-  #designbar button:hover { border-color:var(--accent); }
+  #designbar input { flex:1 1 120px; min-width:0; padding:5px 7px; border:1px solid var(--line); border-radius:6px; font:inherit; color:var(--ink); background:var(--field); }
+  #designbar button, #designbar select { flex:none; padding:5px 9px; font:500 12px system-ui, -apple-system, sans-serif; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:transparent; cursor:pointer; }
+  #designbar select { max-width:100%; flex:1 1 100%; background:var(--field); }
+  #designbar button:hover { border-color:var(--accent); color:var(--accent); }
   #designbar .dlabel { flex:1 1 100%; display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--muted); }
   #designbar .dlabel label { white-space:nowrap; } #dstate { text-align:right; }
   #dstate { font-weight:600; }
@@ -70,7 +109,7 @@
   #modebar button[aria-pressed=true] { color:var(--accent-ink); background:var(--accent); }
   #modehint { font-size:11px; color:var(--muted); margin:4px 0 0; }
   body.beginner .adv, body:not(.beginner) .beg { display:none !important; }
-  #dirty { flex:1 1 100%; font-size:12px; padding:5px 8px; border-radius:5px; color:var(--warn); border:1px solid var(--warn); background:transparent; }
+  #dirty { flex:1 1 100%; font-size:12px; padding:5px 8px; border-radius:6px; color:var(--warn); border:1px solid var(--warn); background:transparent; }
   #dirty[hidden] { display:none; }
   #build.attention { box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
   .actions { flex-wrap:wrap; }
@@ -82,9 +121,9 @@
   #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
   #namedlg::backdrop { background:rgba(0,0,0,.5); }
   #namedlg h2 { font-size:14px; margin:0 0 4px; } #namedlg p { font-size:12px; color:var(--muted); margin:0 0 10px; }
-  #namedlg input { width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--line); border-radius:5px; font:inherit; color:var(--ink); background:transparent; }
+  #namedlg input { width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font:inherit; color:var(--ink); background:transparent; }
   #namedlg menu { display:flex; flex-direction:row-reverse; justify-content:flex-start; gap:6px; margin:12px 0 0; padding:0; }
-  #namedlg button { padding:5px 12px; font:500 12px system-ui; border:1px solid var(--line); border-radius:5px; color:var(--ink); background:transparent; cursor:pointer; }
+  #namedlg button { padding:5px 12px; font:500 12px system-ui; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:transparent; cursor:pointer; }
   #namedlg button[value=ok] { border-color:var(--accent); }
   #report:empty { display:none; }
   #guide { position:absolute; inset:44px 12px 12px; overflow-y:auto; padding:14px 18px; border:1px solid var(--line); border-radius:8px; background:var(--panel); font-size:13px; line-height:1.45; }
@@ -99,9 +138,10 @@
   #guide a, .stab a { color:var(--accent); }
   #guide .close { float:right; flex:none; padding:3px 10px; font:500 12px system-ui; border:1px solid var(--line); color:var(--ink); background:transparent; }
   #viewopts button { flex:none; padding:0 6px; font:500 12px system-ui; border:1px solid var(--line); border-radius:4px; color:var(--ink); background:transparent; }
-  .stab { grid-column:1/-1; display:flex; gap:14px; align-items:center; padding:8px 10px; border-radius:6px; border:1px solid var(--line); }
+  .stab { grid-column:1/-1; display:flex; gap:14px; align-items:center; padding:8px 12px; border-radius:6px; border:1px solid var(--line); background:var(--card); }
   .stab b.cal { font-size:20px; font-variant-numeric:tabular-nums; }
   .stab.unstable { border-color:var(--errline); background:var(--errbg); color:var(--err); }
+  .stab.stable { border-left:4px solid var(--ok); }
   .stab.stable b.cal { color:var(--ok); }
   .stab.overstable b.cal { color:var(--warn); }
   .stab small { color:var(--muted); display:block; }
@@ -114,16 +154,55 @@
   .picker tr.pick:hover td { background:color-mix(in srgb, var(--accent) 10%, transparent); }
   .bad { color:var(--err); } .good { color:var(--ok); }
   details summary { cursor:pointer; margin:4px 0; }
-  @media (max-width:800px) {
-    main { grid-template-columns:1fr; height:auto; }
-    #form { border-right:none; }
-    #right { grid-template-rows:60vh auto; }
-    #report { grid-template-columns:1fr; max-height:none; }
+
+  /* Tablets (iPad portrait, split view): narrower form column. */
+  @media (max-width:1100px) and (min-width:801px) {
+    main { grid-template-columns:320px minmax(0,1fr); }
+    label { grid-template-columns:1fr 128px; }
+    #report { grid-template-columns:1fr; max-height:36vh; max-height:36dvh; }
   }
+  /* Phones and narrow windows: preview on top, then the form, then the report. */
+  @media (max-width:800px) {
+    body { height:auto; min-height:100dvh; }
+    main { display:flex; flex-direction:column; }
+    #right { display:contents; }
+    #view { order:1; height:52vh; height:52svh; min-height:280px; max-height:620px; flex:none; border-bottom:1px solid var(--line); }
+    #form { order:2; overflow:visible; border-right:none; padding-left:calc(14px + var(--safe-l)); padding-right:calc(14px + var(--safe-r)); }
+    #report { order:3; grid-template-columns:1fr; max-height:none; overflow:visible; }
+    .actions { bottom:0; padding-bottom:calc(8px + var(--safe-b)); z-index:2; }
+    label { grid-template-columns:1fr 140px; }
+    #status { right:auto; max-width:calc(100% - 24px); top:auto; bottom:10px; }
+    header nav .long { display:none; }
+    /* The opening guide is too big for the phone's preview box: show it as a full-screen sheet. */
+    #guide { position:fixed; z-index:50; inset:calc(8px + var(--safe-t)) calc(8px + var(--safe-r)) calc(8px + var(--safe-b)) calc(8px + var(--safe-l));
+      padding:14px 16px; box-shadow:0 10px 40px rgba(0,0,0,.45); -webkit-overflow-scrolling:touch; }
+    #guide .close { position:sticky; top:0; min-height:36px; padding:4px 14px; }
+  }
+  @media (max-width:480px) {
+    header { gap:6px 12px; }
+    header .units { display:none; }
+    #theme { padding:5px 9px; }
+  }
+  /* Touch screens: 16px fields stop iOS zooming in on focus; larger tap targets. */
+  @media (pointer:coarse) {
+    body { font-size:15px; }
+    input[type=number], select, #designbar input { font-size:16px; padding:8px 9px; min-height:40px; }
+    #designbar button, #designbar select { font-size:14px; min-height:38px; padding:6px 12px; }
+    input[type=checkbox] { width:22px; height:22px; }
+    label { margin:8px 0; grid-template-columns:1fr minmax(128px, 42%); }
+    label.check { grid-template-columns:1fr auto; }
+    button, a.btn { min-height:46px; font-size:15px; }
+    #theme { min-height:34px; }
+    #viewopts { font-size:14px; padding:6px 10px; gap:14px; }
+    #viewopts input[type=checkbox] { width:18px; height:18px; }
+    #viewopts button { min-height:30px; padding:0 10px; font-size:14px; }
+    table { font-size:13.5px; }
+  }
+  @media (pointer:coarse) and (min-width:801px) { #guide { top:60px; } }
 </style>
 <script>
-  // Dark by default; the header button switches to light and is remembered in this browser.
-  try { if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch {}
+  // Follows the system theme (like fevergeon.com); the header button pins light or dark in this browser.
+  try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
 </script>
 <script type="importmap">
 { "imports": {
@@ -133,7 +212,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><span>Beta · units mm</span><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a></nav><span class="units">Beta · units mm</span><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="designbar">
@@ -246,7 +325,7 @@
         <h3 id="guide-report">The report</h3>
         <dl>
           <dt>Stability margin (calibers)</dt>
-          <dd>How far the centre of pressure (<span class="dot" style="background:#ff5a5a"></span>CP, red marker) sits behind the centre of gravity (<span class="dot" style="background:#4c8dff"></span>CG, blue marker), measured in body diameters ("calibers"). The CG must be ahead of the CP for the rocket to fly straight. 1–2 cal is ideal. Under 1.0 is <b>unstable</b> and downloads are blocked; over 3 is <b>over-stable</b> (it flies, but turns into the wind). It's checked with the heaviest motor of the size loaded and a parachute allowance, and it also lists the length and liftoff mass.</dd>
+          <dd>How far the centre of pressure (<span class="dot" style="background:#ff5a5a"></span>CP, red marker) sits behind the centre of gravity (<span class="dot" style="background:#3d8bfd"></span>CG, blue marker), measured in body diameters ("calibers"). The CG must be ahead of the CP for the rocket to fly straight. 1–2 cal is ideal. Under 1.0 is <b>unstable</b> and downloads are blocked; over 3 is <b>over-stable</b> (it flies, but turns into the wind). It's checked with the heaviest motor of the size loaded and a parachute allowance, and it also lists the length and liftoff mass.</dd>
           <dt>Motor picker</dt>
           <dd>A quick flight simulation for each motor of your size, using thrust curves from ThrustCurve.org. <b>Peak</b>: highest altitude (m and ft). <b>Off rod</b>: speed leaving the launch rod. <b>Thrust ×wt</b>: average thrust ÷ weight. <b>Stability</b>: margin with that motor. <b>Liftoff</b>: total mass. A motor passes (✓ Good) with thrust at least 5× the weight, at least 15 m/s off the rod, at least 30 m of altitude for the parachute to open, and a stable margin. The highlighted chip is the recommendation for your target altitude; click a row to check that motor instead.</dd>
           <dt>Parts</dt>
@@ -265,7 +344,7 @@
           <svg viewBox="0 0 560 130" role="img" aria-label="A rocket lying sideways, nose on the left. The blue CG dot is ahead of the red CP dot; the gap between them, divided by the body diameter, is the stability margin in calibers.">
             <path d="M20 65 Q60 40 110 40 L440 40 L440 90 L110 90 Q60 90 20 65 Z" fill="none" stroke="currentColor" stroke-width="2"/>
             <path d="M380 40 L440 8 L470 8 L440 40 M380 90 L440 122 L470 122 L440 90" fill="none" stroke="currentColor" stroke-width="2"/>
-            <circle cx="250" cy="65" r="7" fill="#4c8dff"/><text x="250" y="30" text-anchor="middle" font-size="13" fill="#4c8dff">CG</text>
+            <circle cx="250" cy="65" r="7" fill="#3d8bfd"/><text x="250" y="30" text-anchor="middle" font-size="13" fill="#3d8bfd">CG</text>
             <circle cx="345" cy="65" r="7" fill="#ff5a5a"/><text x="345" y="30" text-anchor="middle" font-size="13" fill="#ff5a5a">CP</text>
             <path d="M258 65 L337 65" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
             <text x="297" y="82" text-anchor="middle" font-size="12" fill="currentColor">margin</text>
@@ -353,15 +432,20 @@ const reportEl = document.getElementById('report');
 const guideEl = document.getElementById('guide'), guideBtn = document.getElementById('guidebtn');
 function showGuide(on) {
   guideEl.hidden = !on; guideBtn.setAttribute('aria-expanded', String(on));
-  document.getElementById('guideclose').hidden = !rocket;
+  // On a phone the guide covers the screen, so it always needs a way out.
+  document.getElementById('guideclose').hidden = !rocket && !matchMedia('(max-width: 800px)').matches;
 }
 guideBtn.onclick = () => showGuide(guideEl.hidden);
 document.getElementById('guideclose').onclick = () => showGuide(false);
+// The guide starts open; on a phone (full-screen sheet) give it a Close button from the start.
+document.getElementById('guideclose').hidden = !matchMedia('(max-width: 800px)').matches;
 const zipBtn = document.getElementById('zip');
 const buildBtn = document.getElementById('build');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 // ---------- form ----------
+// Decimal keypad on iPhone/iPad instead of the full keyboard.
+for (const el of form.querySelectorAll('input[type=number]')) el.inputMode = 'decimal';
 const opts = await (await fetch('/api/options')).json();
 // Beginner mode (the default) shows motor, printer height, overall height,
 // nose shape and three fin shapes; everything else is sent as the defaults.
@@ -508,42 +592,73 @@ function stopProgress() {
 
 // ---------- viewer ----------
 const view = document.getElementById('view');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(window.devicePixelRatio);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+// iPhones report 3x; 2x looks the same on a rocket preview and is far lighter on the GPU and battery.
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.localClippingEnabled = true;
-view.appendChild(renderer.domElement);
+view.prepend(renderer.domElement);  // first child, so the overlays (status, guide, progress) paint above it
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 1, 20000);
 camera.up.set(0, 0, 1);  // the generator is Z-up
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+const touch = matchMedia('(pointer: coarse)').matches;
+const hintText = touch ? 'drag to rotate, pinch to zoom, two-finger drag to pan' : 'drag to rotate, scroll to zoom';
 const hemi = new THREE.HemisphereLight(0xffffff, 0x8890a0, 1.6); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(300, -400, 600); scene.add(sun);
 const fill2 = new THREE.DirectionalLight(0xffffff, 0.5); fill2.position.set(-300, 300, -200); scene.add(fill2);
 const sectionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);  // keeps y <= 0
 let rocket = null, partMeshes = [], markers = null;
+const CG_COLOR = 0x3d8bfd, CP_COLOR = 0xff5a5a;  // also used for the report's legend dots
 
 // ---------- theme ----------
+// No pinned choice = follow the system (as fevergeon.com and quiverdesignworks.net do).
 const themeBtn = document.getElementById('theme');
+const darkMq = matchMedia('(prefers-color-scheme: dark)');
+const isLight = () => (document.documentElement.dataset.theme || (darkMq.matches ? 'dark' : 'light')) === 'light';
 function applyTheme() {
-  const light = document.documentElement.dataset.theme === 'light';
+  const light = isLight();
   themeBtn.textContent = light ? 'Dark mode' : 'Light mode';
   hemi.groundColor.set(light ? 0x8890a0 : 0x404858);  // less bounce light off a dark floor
+  invalidate();
 }
 themeBtn.onclick = () => {
-  const light = document.documentElement.dataset.theme !== 'light';
-  if (light) document.documentElement.dataset.theme = 'light'; else delete document.documentElement.dataset.theme;
-  try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch {}
+  const next = isLight() ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('theme', next); } catch {}
   applyTheme();
 };
+darkMq.addEventListener?.('change', applyTheme);
+
+// ---------- render on demand ----------
+// Only draw when something changed (orbit, damping, resize, new model); an idle preview
+// costs nothing, which keeps phones and iPads cool and the page responsive.
+let dirty = true;
+function invalidate() { dirty = true; }
+controls.addEventListener('change', invalidate);
+renderer.setAnimationLoop(() => {
+  if (controls.update() || dirty) { dirty = false; renderer.render(scene, camera); }
+});
+document.addEventListener('visibilitychange', () => {
+  renderer.setAnimationLoop(document.hidden ? null : () => {
+    if (controls.update() || dirty) { dirty = false; renderer.render(scene, camera); }
+  });
+  invalidate();
+});
 applyTheme();
 
 function resize() {
-  const w = view.clientWidth, h = view.clientHeight;
-  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  const w = Math.max(1, view.clientWidth), h = Math.max(1, view.clientHeight);
+  // Size the drawing buffer only; CSS keeps the canvas filling #view, so it can shrink on rotation.
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  invalidate();
 }
 new ResizeObserver(resize).observe(view); resize();
-renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+// iOS Safari sometimes reports the old size during a rotation; measure again once it settles.
+addEventListener('orientationchange', () => setTimeout(resize, 300));
+window.visualViewport?.addEventListener('resize', resize);
+renderer.domElement.addEventListener('webglcontextrestored', invalidate);
 
 function frame(obj) {
   // Fit the rocket's full height (it is tall and thin) with a margin.
@@ -564,13 +679,14 @@ function setMarkers(st) {
   const box = new THREE.Box3().setFromObject(rocket);
   const r = 0.5 * Math.max(box.max.x - box.min.x, box.max.y - box.min.y);
   markers = new THREE.Group();
-  for (const [z, color] of [[st.cg_mm, 0x4c8dff], [st.cp_mm, 0xff5a5a]]) {
+  for (const [z, color] of [[st.cg_mm, CG_COLOR], [st.cp_mm, CP_COLOR]]) {
     const ball = new THREE.Mesh(new THREE.SphereGeometry(Math.max(2.5, r * 0.12), 20, 14),
       new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.35 }));
     ball.position.set(0, -r * 1.15, box.max.z - z);
     markers.add(ball);
   }
   scene.add(markers);
+  invalidate();
 }
 
 function applyView(reframe) {
@@ -584,6 +700,7 @@ function applyView(reframe) {
     mesh.material.needsUpdate = true;
   });
   if (reframe) frame(rocket);
+  invalidate();
 }
 document.getElementById('explode').onchange = () => applyView(true);
 document.getElementById('section').onchange = () => applyView(false);
@@ -635,7 +752,7 @@ function showReport(r) {
     <div class="stab ${st.status}">
       <div><b class="cal">${st.margin_cal.toFixed(2)}</b> cal<small>stability margin</small></div>
       <div>${esc(st.message)}
-        <small>From the nose tip: <span class="dot" style="background:#4c8dff"></span>CG ${st.cg_mm} mm
+        <small>From the nose tip: <span class="dot" style="background:#3d8bfd"></span>CG ${st.cg_mm} mm
         <span class="dot" style="background:#ff5a5a"></span>CP ${st.cp_mm} mm · length ${st.length_mm} mm ·
         liftoff ${st.liftoff_mass_g} g (motor ${st.motor_mass_g} g, recovery ${st.recovery_mass_g} g).
         An estimate (Barrowman); check your final rocket in <a href="#guide-or" class="orlink">OpenRocket</a>.</small></div>
@@ -668,6 +785,8 @@ async function runBuild() {
   buildBtn.disabled = true; zipBtn.classList.add('off');
   const t0 = performance.now(), seq = edits;
   startProgress();
+  // On a phone the preview sits above the form: bring it into view so the result is seen.
+  if (matchMedia('(max-width: 800px)').matches && view.getBoundingClientRect().bottom < 80) view.scrollIntoView({ behavior: 'smooth', block: 'start' });
   try {
     const res = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params()) });
     const body = await res.json();
@@ -685,13 +804,13 @@ async function runBuild() {
     zipBtn.classList.toggle('off', !body.stability.ok);
     zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';
     if (seq === edits) markClean(); else zipBtn.classList.add('off');
-    statusEl.textContent = `Built ${body.parts.length} parts in ${((performance.now() - t0) / 1000).toFixed(1)} s · drag to rotate, scroll to zoom`;
+    statusEl.textContent = `Built ${body.parts.length} parts in ${((performance.now() - t0) / 1000).toFixed(1)} s · ${hintText}`;
   } catch (err) {
     stopProgress();
     statusEl.textContent = 'Build failed';
     markDirty('Build failed. Change the settings and press <b>Build</b> again.');
     if (rocket) { scene.remove(rocket); rocket = null; }
-    setMarkers(null);
+    setMarkers(null); invalidate();
     reportEl.innerHTML = `<div class="error"><b>Can't build this rocket.</b> ${esc(err.message)}</div>`;
   } finally {
     if (progTimer) stopProgress();
