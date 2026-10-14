@@ -263,9 +263,17 @@
   #ordergo:disabled { opacity:.6; cursor:wait; }
   #orderslist table { font-size:14px; }
   .orderrow { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0 2px; }
-  .orderrow button, .orderrow a { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; cursor:pointer; }
-  .orderrow .printbtn { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
-  .orderrow .shopbtn { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  /* The two calls to action after a build: big, coloured, same shape. White on
+     these blues/ambers passes contrast in both themes. */
+  .orderrow { gap:10px; }
+  .orderrow .printbtn, .orderrow .shopbtn { flex:1 1 220px; display:flex; align-items:center; gap:12px; padding:14px 18px; border-radius:10px;
+    border:0; color:#fff; text-align:left; font:700 17px system-ui, -apple-system, sans-serif; text-decoration:none; cursor:pointer;
+    box-shadow:0 2px 10px rgba(0,0,0,.25); transition:transform .12s, filter .12s; }
+  .orderrow .printbtn { background:linear-gradient(135deg, #0a58ca, #3b5bdb); }
+  .orderrow .shopbtn { background:linear-gradient(135deg, #b45309, #c2410c); }
+  .orderrow .printbtn:hover, .orderrow .shopbtn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+  .orderrow .ico { flex:none; font-size:26px; line-height:1; }
+  .orderrow small { display:block; margin-top:2px; font:500 13px system-ui, -apple-system, sans-serif; opacity:.9; }
   .motorbuy { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 2px; }
   .motorbuy .shopbtn { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; color:var(--ink); border:1px solid var(--line); }
   .motorbuy .shopbtn:hover { border-color:var(--accent); color:var(--accent); }
@@ -1415,8 +1423,10 @@ function kidReportHtml(r) {
 
 // "Order a printed rocket" and the supplies link (when it's set), under the score.
 function orderRowHtml(ok, kid) {
-  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener">Order rocket supplies</a>` : '';
-  return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order>${kid ? 'Order it printed for you' : 'Order a printed rocket'}</button>` : ''}${shop}</div>
+  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">🧰</span>
+    <span>Order rocket supplies<small>Motors, launch pad, igniters, parachutes</small></span></a>` : '';
+  return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order><span class="ico" aria-hidden="true">🚀</span>
+    <span>${kid ? 'Order it printed for you' : 'Order a printed rocket'}<small>We print it and mail it to you</small></span></button>` : ''}${shop}</div>
     ${shop ? '<p class="affil">Ordering through my supplies links supports Rocket Builder. As an Amazon Associate, I earn from qualifying purchases.</p>' : ''}`;
 }
 
@@ -1457,6 +1467,23 @@ function showReport(r) {
 }
 
 form.addEventListener('submit', e => { e.preventDefault(); runBuild(); });
+// POST /api/build. A server that restarts mid-build (a deploy, or Fly waking
+// the machine) answers with an empty or non-JSON reply, or none at all: retry
+// once after a pause, then report it as the server's fault, not the design's.
+class Hiccup extends Error { hiccup = true; }
+async function postBuild(p) {
+  for (let attempt = 0; ; attempt++) {
+    let res, text;
+    try {
+      res = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
+      text = await res.text();
+      return { res, body: JSON.parse(text) };
+    } catch {
+      if (attempt === 0) { await new Promise(r => setTimeout(r, 4000)); continue; }
+      throw new Hiccup(`The rocket server didn't answer${res ? ` (${res.status})` : ''}. It may have just restarted for an update. Press Build again in a moment.`);
+    }
+  }
+}
 async function runBuild() {
   await heightsReady;  // a height snap still on its way
   if (!form.reportValidity()) return;
@@ -1466,8 +1493,7 @@ async function runBuild() {
   // On a phone the preview sits above the form: bring it into view so the result is seen.
   if (matchMedia('(max-width: 800px)').matches && view.getBoundingClientRect().bottom < 80) view.scrollIntoView({ behavior: 'smooth', block: 'start' });
   try {
-    const res = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params()) });
-    const body = await res.json();
+    const { res, body } = await postBuild(params());
     if (!res.ok) {
       const msg = typeof body.detail === 'string' ? body.detail
         : (body.detail || []).map(d => `${d.loc.at(-1)}: ${d.msg}`).join('; ');
@@ -1488,7 +1514,8 @@ async function runBuild() {
   } catch (err) {
     stopProgress();
     statusEl.textContent = 'Build failed';
-    markDirty('Build failed. Change the settings and press <b>Build</b> again.');
+    markDirty(err.hiccup ? 'The server didn\'t answer. Press <b>Build</b> again; your settings are fine.'
+                         : 'Build failed. Change the settings and press <b>Build</b> again.');
     if (rocket) { scene.remove(rocket); rocket = null; }
     setMarkers(null); invalidate();
     reportEl.innerHTML = `<div class="error"><b>Can't build this rocket.</b> ${esc(err.message)}</div>`;
