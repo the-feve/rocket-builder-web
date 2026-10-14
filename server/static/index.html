@@ -219,6 +219,10 @@
   #kidguide .kidpref { display:flex; gap:8px; align-items:center; margin-top:8px; } #kidguide .kidpref[hidden] { display:none; }
   #kidguide .ghost { background:transparent; color:var(--ink); border-color:var(--line); }
   #kidguide svg { width:100%; max-width:460px; height:auto; display:block; color:var(--ink); margin:6px 0; }
+  .supplynote { margin-top:12px; padding:12px 14px; border-radius:8px; border-left:4px solid var(--accent); background:var(--card); font-size:14px; }
+  .supplynote[hidden] { display:none; }
+  .supplynote a { font-weight:700; }
+  .supplynote small { display:block; color:var(--muted); font-size:11.5px; margin-top:4px; }
   .safety { margin-top:12px; padding:10px 12px; border-radius:8px; border-left:4px solid var(--warn); background:var(--card); font-size:13.5px; }
   #guide .backkid { float:right; margin-left:8px; padding:3px 10px; font:500 12px system-ui; border:1px solid var(--line); color:var(--ink); background:transparent; flex:none; }
   #dirty { flex:1 1 100%; font-size:12px; padding:5px 8px; border-radius:6px; color:var(--warn); border:1px solid var(--warn); background:transparent; }
@@ -340,6 +344,7 @@
   @media (max-width:480px) {
     header { gap:6px 12px; }
     header .units { display:none; }
+    header nav .qdw { display:none; }
     #theme { padding:5px 9px; }
   }
   /* Touch screens: 16px fields stop iOS zooming in on focus; larger tap targets. */
@@ -372,7 +377,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Rocket gear: motors, launch pads, recovery and filament">Gear</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint">Order Rocket Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
@@ -498,6 +503,8 @@
         <button type="button" class="close" id="kidskip">Skip tutorial</button>
         <h2>Welcome, rocket builder!</h2>
         <p class="lead">Design your own model rocket, see it in 3D, then print it on a 3D printer and fly it.</p>
+        <div class="supplynote" data-supplies hidden><b>Need to get your own supplies for building and launching?</b> <a href="#" data-supplies-link target="_blank" rel="noopener">Order through my link here to support me!</a> Launch pads, motors, igniters, parachutes, filament and paint, all in one list.
+          <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
         <h3>How it works</h3>
         <ol class="steps4">
           <li><b>Design it.</b> A grown-up can make a free account first. Then pick a motor, how tall, the fins and the nose. Each step tells you what it does.</li>
@@ -540,6 +547,8 @@
         <button type="button" class="backkid beg" id="backkid">← Quick start</button>
         <h2>How to use Rocket Builder</h2>
         <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>.</p>
+        <div class="supplynote" data-supplies hidden><b>Need to get your own supplies for building and launching?</b> <a href="#" data-supplies-link target="_blank" rel="noopener">Order through my link here to support me!</a>
+          <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
         <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-or">OpenRocket</a></nav>
         <ol id="guide-use">
           <li>Choose a <b>mode</b> and the <b>motor size</b> you'll fly (on the left).</li>
@@ -1322,9 +1331,9 @@ function kidReportHtml(r) {
 
 // "Order a printed rocket" and the supplies link (when it's set), under the score.
 function orderRowHtml(ok, kid) {
-  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener">${kid ? 'Get motors and gear' : 'Rocket gear list'}</a>` : '';
+  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener">Order rocket supplies</a>` : '';
   return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order>${kid ? 'Order it printed for you' : 'Order a printed rocket'}</button>` : ''}${shop}</div>
-    ${shop ? '<p class="affil">The gear list links to Amazon. As an Amazon Associate, I earn from qualifying purchases.</p>' : ''}`;
+    ${shop ? '<p class="affil">Ordering through my supplies links supports Rocket Builder. As an Amazon Associate, I earn from qualifying purchases.</p>' : ''}`;
 }
 
 function showReport(r) {
@@ -1724,7 +1733,11 @@ document.getElementById('myorders').onclick = async e => {
   } catch { box.textContent = 'Could not reach the server.'; }
 };
 // Supplies link in the header, once the affiliate URL is set on the server.
-if (opts.supplies_url) { const a = document.getElementById('supplieslink'); a.href = opts.supplies_url; a.hidden = false; }
+if (opts.supplies_url) {
+  const a = document.getElementById('supplieslink'); a.href = opts.supplies_url; a.hidden = false;
+  document.querySelectorAll('[data-supplies]').forEach(el => el.hidden = false);
+  document.querySelectorAll('[data-supplies-link]').forEach(el => el.href = opts.supplies_url);
+}
 renderUser();
 try {
   const me = await (await fetch('/api/auth/me')).json();

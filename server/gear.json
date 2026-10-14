@@ -1,0 +1,317 @@
+{
+  "storeId": "quiverdesig09-20",
+  "checked": "2026-10-14",
+  "categories": [
+    {
+      "id": "launch",
+      "title": "Launch pad",
+      "intro": "A pad, a rod and a controller. The combo is the easiest way to start.",
+      "items": [
+        {
+          "asin": "B075V79LKX",
+          "name": "Estes Porta-Pad II Launch Pad + Electron Beam Controller (2222)",
+          "note": "Pad and controller in one box. Flies mini, A–C and D motors on the standard 1/8\" rod.",
+          "pick": true
+        },
+        {
+          "asin": "B0006NAQ78",
+          "name": "Estes Porta-Pad II Launch Pad (2215)",
+          "note": "The pad on its own, if you already have a controller."
+        },
+        {
+          "asin": "B0007UBGC4",
+          "name": "Estes 1/8\" Two-Piece Launch Rod (2243)",
+          "note": "Spare rod. They bend, and you'll want one in the truck."
+        }
+      ]
+    },
+    {
+      "id": "controllers",
+      "title": "Launch controllers",
+      "intro": "The controller fires the igniter from a safe distance over its cable. All of these use a safety key or arming step before launch.",
+      "items": [
+        {
+          "asin": "B00FU4AX44",
+          "name": "Estes Pro Series II Launch Controller (2240)",
+          "note": "Two-button arming, so a bump can't launch. Runs on 6 C batteries and can fire up to 2 rockets.",
+          "pick": true
+        },
+        {
+          "asin": "B0006MZKG6",
+          "name": "Estes E Launch Controller (2230)",
+          "note": "Safety switch and continuity check. Handles E motors and everything smaller; 4 AA batteries."
+        },
+        {
+          "asin": "B07F3SQCKP",
+          "name": "Estes Electron Beam Launch Controller (2220)",
+          "note": "The controller from the Porta-Pad combo, sold on its own as a replacement."
+        }
+      ]
+    },
+    {
+      "id": "igniters",
+      "title": "Igniters",
+      "intro": "Each launch uses one igniter. Buy extras: they're cheap and a dud ends the day.",
+      "items": [
+        {
+          "asin": "B09GL4N6QM",
+          "name": "Estes Starters, 6-pack (2302)",
+          "note": "Standard igniters for Estes motors.",
+          "pick": true
+        },
+        {
+          "asin": "B00CJ2GYSE",
+          "name": "Estes Igniter Plugs, standard motors",
+          "note": "Plugs that hold the igniter in the nozzle."
+        }
+      ]
+    },
+    {
+      "id": "motors",
+      "title": "Motors",
+      "intro": "These ship from third-party sellers by ground because motors count as hazmat. Check the delivery estimate before ordering, and follow your local fire rules.",
+      "items": [
+        {
+          "asin": "B09QRB6ML3",
+          "name": "A8-3, B4-4, C6-5 Mini Bulk Pack (9 motors)",
+          "note": "Three of each size, so you can work up from a low first flight.",
+          "pick": true
+        },
+        {
+          "asin": "B09QP9544K",
+          "name": "A8-3, B4-4, B6-4 Mini Bulk Pack (9 motors)",
+          "note": "Same idea, without the C motors, for small or light rockets."
+        },
+        {
+          "asin": "B01LWATRJW",
+          "name": "Estes C6-5, 3-pack",
+          "note": "Standard 18 mm C motor with a 5-second delay."
+        },
+        {
+          "asin": "B0DGYLST5B",
+          "name": "Estes A8-3, bagged",
+          "note": "Low and slow. Good for first flights and small fields."
+        },
+        {
+          "asin": "B0CKSXLTZN",
+          "name": "Estes B4-4, bagged",
+          "note": "A middle step between A and C."
+        }
+      ]
+    },
+    {
+      "id": "wadding",
+      "title": "Recovery wadding",
+      "intro": "Flame-resistant wadding goes between the motor and the parachute so the ejection charge doesn't burn it.",
+      "items": [
+        {
+          "asin": "B0006NAQ6O",
+          "name": "Estes Recovery Wadding, 75 sheets (2274)",
+          "note": "The standard. A few loosely packed sheets per flight.",
+          "pick": true
+        },
+        {
+          "asin": "B0134C30GQ",
+          "name": "Estes Recovery Wadding, 3-pack (2274)",
+          "note": "The same wadding in bulk."
+        }
+      ]
+    },
+    {
+      "id": "parachutes",
+      "title": "Parachutes",
+      "intro": "Bigger parachutes land softer but drift further. Printed rockets are heavier than cardboard ones, so size up.",
+      "items": [
+        {
+          "asin": "B0006N6T6A",
+          "name": "Estes 12\" Printed Parachute (2264)",
+          "note": "Small or light rockets."
+        },
+        {
+          "asin": "B00A4UXATY",
+          "name": "Estes 15\" Parachute (2265)",
+          "note": "A good middle size for 18 mm printed rockets.",
+          "pick": true
+        },
+        {
+          "asin": "B0006NAQ6Y",
+          "name": "Estes 18\" Parachute (2267)",
+          "note": "Heavier rockets, or when you want a softer landing."
+        },
+        {
+          "asin": "B0006NAQ6E",
+          "name": "Estes 24\" Parachute (2271)",
+          "note": "24 and 29 mm rockets."
+        },
+        {
+          "asin": "B004091ZIS",
+          "name": "StratoChute 24\" Rip-Stop Nylon Parachute",
+          "note": "Nylon outlasts plastic chutes and survives many more flights."
+        }
+      ]
+    },
+    {
+      "id": "shock-cords",
+      "title": "Shock cords",
+      "intro": "The shock cord ties the nose cone, parachute and body together so nothing comes down on its own.",
+      "items": [
+        {
+          "asin": "B001BHKAQK",
+          "name": "Estes Shock Cords and Mount Pack (2278)",
+          "note": "Elastic cords with paper mounts. Fits most small rockets.",
+          "pick": true
+        },
+        {
+          "asin": "B00KZ220F6",
+          "name": "Paracord Planet 1/16\" Elastic Shock Cord",
+          "note": "Cut your own longer cords for bigger rockets."
+        },
+        {
+          "asin": "B08P16FTLG",
+          "name": "emma kites Braided Kevlar Cord",
+          "note": "Flame-resistant leader where the cord meets the motor mount, so the ejection charge can't burn through it."
+        }
+      ]
+    },
+    {
+      "id": "filament",
+      "title": "Filament",
+      "intro": "What I print my rockets with. All Sunlu, 1.75 mm, 1 kg spools; other colors are on each listing.",
+      "items": [
+        {
+          "asin": "B07XG3RM58",
+          "name": "Sunlu PLA, 1 kg",
+          "note": "Easiest to print and stiff. Fine for nose cones, fins and small rockets."
+        },
+        {
+          "asin": "B0DHCT8YDN",
+          "name": "Sunlu PLA+ 2.0, 1 kg",
+          "note": "Tougher PLA. Takes hard landings better."
+        },
+        {
+          "asin": "B0DJS3PJVX",
+          "name": "Sunlu PETG, 1 kg",
+          "note": "Tougher and more heat-tolerant than PLA. Good all-round rocket material.",
+          "pick": true
+        },
+        {
+          "asin": "B0B18CQGQJ",
+          "name": "Sunlu ASA, 1 kg",
+          "note": "Best heat and UV resistance, for motor mounts and fin cans. Needs an enclosure to print well."
+        }
+      ]
+    },
+    {
+      "id": "glue",
+      "title": "Glue",
+      "intro": "Super glue (CA) bonds PLA, ABS and ASA well. PETG is slicker, so scuff both faces with sandpaper before gluing it. ABS and ASA parts can also be welded with acetone; PLA and PETG can't.",
+      "items": [
+        {
+          "asin": "B00C32ME6G",
+          "name": "Starbond Super Fast Thin CA Glue, Pro Kit",
+          "note": "Thin glue wicks into a tight joint, like a fin in its slot. Comes with micro tips.",
+          "pick": true
+        },
+        {
+          "asin": "B0006HUJCQ",
+          "name": "Loctite Super Glue Gel Control",
+          "note": "Gel doesn't run, so it's easier on gaps and vertical joints."
+        },
+        {
+          "asin": "B0CBSFMLCF",
+          "name": "3D Printing Super Glue Liquid, 1.75 oz",
+          "note": "Made for printed parts: PLA, ABS, PETG and TPU."
+        },
+        {
+          "asin": "B00BUVAZ5S",
+          "name": "Starbond CA Accelerator Spray",
+          "note": "Sets CA instantly, so you aren't holding parts together while it cures."
+        }
+      ]
+    },
+    {
+      "id": "paint",
+      "title": "Primer and spray paint",
+      "intro": "Filler primer hides layer lines; sand it smooth, then paint. Bright colors are much easier to find in a field.",
+      "items": [
+        {
+          "asin": "B006ZLQ4HQ",
+          "name": "Rust-Oleum Automotive Filler & Sandable Primer, gray",
+          "note": "Thick primer that fills layer lines and sands smooth.",
+          "pick": true
+        },
+        {
+          "asin": "B07LFZ884F",
+          "name": "Krylon Fusion All-In-One, Gloss Black",
+          "note": "Made to bond to plastic, with primer built in."
+        },
+        {
+          "asin": "B002BWOS6W",
+          "name": "Rust-Oleum Painter's Touch 2X, Gloss Apple Red",
+          "note": "Covers well and is rated for plastic. A color you'll spot in the grass."
+        },
+        {
+          "asin": "B07LFWZ84M",
+          "name": "Krylon ColorMaxx, Gloss White",
+          "note": "Paint and primer in one. A clean base for stripes and roll patterns."
+        }
+      ]
+    },
+    {
+      "id": "stencils",
+      "title": "Masking tape and design stencils",
+      "intro": "Fine masking tape gives the crisp stripes and checkered roll patterns real rockets wear; stencils add stars and shapes.",
+      "items": [
+        {
+          "asin": "B00GQPJX38",
+          "name": "Tamiya Masking Tape, 6 mm & 10 mm",
+          "note": "Thin, crisp-edged model tape that doesn't let paint bleed under it.",
+          "pick": true
+        },
+        {
+          "asin": "B0CPXRVB24",
+          "name": "Tamiya Masking Tape, 1, 2 & 3 mm set",
+          "note": "Very narrow tape for pinstripes and following curves."
+        },
+        {
+          "asin": "B0D923RZD2",
+          "name": "Star Stencils, 8 sizes",
+          "note": "Stars in several sizes for fins and nose cones."
+        },
+        {
+          "asin": "B0H31Z8W6V",
+          "name": "Marspark Small Geometric Stencils, 66 patterns",
+          "note": "3\" stencils with lots of patterns for adding designs."
+        }
+      ]
+    },
+    {
+      "id": "letters",
+      "title": "Letter and number stencils",
+      "intro": "Name your rocket or number it for launch day. Pick the size by the body tube: 1/2\" fits an 18 mm rocket, 1–2\" suits bigger ones.",
+      "items": [
+        {
+          "asin": "B008FP8WCA",
+          "name": "1/2\" Military Letter and Number Stencils (Mylar)",
+          "note": "Stencil-style lettering like on real rockets. Thin Mylar bends around a body tube.",
+          "pick": true
+        },
+        {
+          "asin": "B0DZ5X79KM",
+          "name": "Military Letter and Number Stencils, 1/2\", 3/4\" & 1\"",
+          "note": "Three sizes of the same style, so lettering can match across rockets."
+        },
+        {
+          "asin": "B0BLGH65N1",
+          "name": "1\" Letter and Number Stencils",
+          "note": "A cheap plastic set for larger rockets."
+        },
+        {
+          "asin": "B0F3CQMCGT",
+          "name": "2\" Letter Stencils, 2-pack (72 stencils)",
+          "note": "Big letters for 24 and 29 mm rockets, or the range box."
+        }
+      ]
+    }
+  ]
+}

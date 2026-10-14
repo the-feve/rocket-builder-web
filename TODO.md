@@ -44,6 +44,12 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [ ] Capacity: pause ordering, or show a lead time, when the queue is long
 - [ ] Backups of the Fly volume (`/data`: designs, accounts, orders and order files), e.g. a nightly copy to R2/S3
 
+## Supplies page
+
+- [ ] **(owner)** Photos: add your own photos of the gear you use to `server/static/gear/` and set `"photo"` on those items in `server/gear.json`
+- [ ] Live Amazon product images (and prices) through the Creators API once the Associates account qualifies (10 qualifying sales in 30 days); register under Associates Central → Tools → Creators API, then fetch images server-side and cache them no longer than Amazon allows
+- [ ] **(owner)** Re-check the list every few months (`checked` in gear.json): discontinued items, better picks
+
 ## Data and legal (needed before opening ordering to the public)
 
 - [ ] **(owner)** Privacy policy page: what's stored (email, designs, shipping addresses, order history), why, how long, how to delete; Stripe holds card data
@@ -57,4 +63,4 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 
 - [x] Print-order portal with coupon codes; order folders with batch sheet; `/admin`; PC sync script (2026-10-14)
 - [x] Accounts (email + password), saved rockets per account, skip-tutorial setting (2026-10-14)
-- [x] Gear link to fevergeon.com/cad/rocket-builder/gear/ (the Amazon affiliate gear list), with the Associates disclosure (2026-10-14)
+- [x] Order Rocket Supplies page at /ordersupplies (Amazon affiliate list, drawings per item), linked from the header, the score and the welcome (2026-10-14)
