@@ -8,6 +8,7 @@ primary_region = "sjc"
 
 [env]
   ROCKETGEN_DB = "/data/designs.sqlite3"
+  ROCKETGEN_ORDERS_DIR = "/data/orders"  # print-order folders (STLs + batch sheet), on the volume
   PORT = "8000"
 
 # Saved designs (SQLite) live on this volume; create it once:

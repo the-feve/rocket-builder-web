@@ -41,6 +41,8 @@ from rocketgen.stability import Balance, build_stable, recovery_allowance_g
 
 import accounts
 import designs
+import notify
+import orders
 
 STATIC = Path(__file__).resolve().parent / "static"
 GENERATOR_VERSION = "0.1.0"
@@ -122,6 +124,12 @@ BUILD_WAIT_S = float(os.environ.get("ROCKETGEN_BUILD_WAIT_S", 60))
 BUILDS_PER_10_MIN = int(os.environ.get("ROCKETGEN_BUILDS_PER_10_MIN", 30))
 SAVES_PER_HOUR = int(os.environ.get("ROCKETGEN_SAVES_PER_HOUR", 60))
 AUTH_PER_10_MIN = int(os.environ.get("ROCKETGEN_AUTH_PER_10_MIN", 20))  # sign-up / sign-in attempts per address
+ORDERS_PER_DAY = int(os.environ.get("ROCKETGEN_ORDERS_PER_DAY", 10))
+# The owner's Amazon affiliate page for supplies; the links are hidden while it's empty.
+SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "")
+# Who can see every order: signed-in accounts with these emails, or the PC sync with this token.
+ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get("ROCKETGEN_ADMIN_EMAILS", "").split(",") if e.strip()}
+SYNC_TOKEN = os.environ.get("ROCKETGEN_SYNC_TOKEN", "")
 
 app = FastAPI(title="Rocket Builder")
 _hits: dict[tuple[str, str], deque] = defaultdict(deque)
@@ -225,6 +233,7 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
 @app.get("/api/options")
 def options():
     return {
+        "supplies_url": SUPPLIES_URL,
         "motors": sorted(load_motors()),
         "fin_shapes": [s.value for s in FinShape],
         "nose_shapes": list(NOSE_SHAPES),
@@ -470,6 +479,115 @@ def claim_designs(body: Claim, request: Request):
     if not user:
         raise HTTPException(401, "Sign in first.")
     return {"claimed": sum(designs.claim(i.id, i.key, user["id"]) for i in body.items)}
+
+
+# ---------- print orders ----------
+class Shipping(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    line1: str = Field(..., min_length=1, max_length=120)
+    line2: str = Field("", max_length=120)
+    city: str = Field(..., min_length=1, max_length=80)
+    state: str = Field(..., min_length=1, max_length=40)
+    zip: str = Field(..., min_length=3, max_length=12)
+    country: str = Field("USA", max_length=60)
+    phone: str = Field("", max_length=30)
+
+
+class OrderIn(BaseModel):
+    design_name: str = Field("My rocket", min_length=1, max_length=80)
+    design_id: str | None = Field(None, max_length=40)
+    params: BuildRequest
+    quantity: int = Field(1, ge=1, le=5)
+    color: str = Field("Any", max_length=40)
+    shipping: Shipping
+    notes: str = Field("", max_length=1000)
+    coupon: str = Field("", max_length=40)
+
+
+@app.post("/api/orders")
+def place_order(o: OrderIn, request: Request):
+    """Order a printed copy of the rocket. Builds it (or reuses the cached
+    build), saves the order folder and tells the owner. Payment isn't built
+    yet, so a valid coupon code is required and the order is free."""
+    user = current_user(request)
+    if not user:
+        raise HTTPException(401, "Sign in (or create an account) to order a printed rocket.")
+    if not orders.coupon_ok(o.coupon):
+        raise HTTPException(402, "Paid printing is coming soon. For now, orders need a coupon code."
+                            if not o.coupon else "That coupon code isn't valid.")
+    _rate_limit(request, "order", ORDERS_PER_DAY, 86400)
+    res = build(o.params, request)
+    b, g = _get(res["id"])
+    if not b["stability"]["ok"]:
+        raise HTTPException(409, "This rocket isn't stable yet, so it can't be printed. " + b["stability"]["message"])
+    if g["stls"] is None:
+        with _lock:
+            g["stls"] = _stls(g["rocket"])
+    rocket_zip = _zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"])
+    order = orders.create(user=user, design_name=o.design_name, design_id=o.design_id, params=b["params"],
+                          quantity=o.quantity, material=o.params.material, color=o.color,
+                          shipping=o.shipping.model_dump(), notes=o.notes, coupon=o.coupon, price=0.0,
+                          rocket_zip=rocket_zip, parts=g["report"]["parts"], stability=b["stability"],
+                          recommended_motor=b["flights"]["recommended"])
+    log.info("order %s from %s", order["id"], user["email"])
+    notify.owner(f"New rocket order {order['id']}: {o.design_name} x{o.quantity}",
+                 orders._sheet(order) + f"\nFiles: {orders.folder(order)}\nOrders page: {request.base_url}admin\n")
+    return {"id": order["id"], "batch": order["batch"], "status": order["status"], "price": order["price"]}
+
+
+@app.get("/api/my/orders")
+def my_orders(request: Request):
+    user = current_user(request)
+    if not user:
+        raise HTTPException(401, "Sign in to see your orders.")
+    return {"orders": [{k: o[k] for k in ("id", "status", "created_at", "design_name", "quantity", "color", "material")}
+                       for o in orders.list_for_user(user["id"])]}
+
+
+def _admin(request: Request) -> None:
+    auth = request.headers.get("authorization", "")
+    if SYNC_TOKEN and auth == f"Bearer {SYNC_TOKEN}":
+        return
+    user = current_user(request)
+    if not (user and user["email"] in ADMIN_EMAILS):
+        raise HTTPException(403, "Only the shop owner can see orders.")
+
+
+class StatusIn(BaseModel):
+    status: str
+
+
+@app.get("/api/admin/orders")
+def admin_orders(request: Request, since: float = 0):
+    _admin(request)
+    return {"orders": orders.list_all(since), "now": time.time()}
+
+
+@app.get("/api/admin/orders/{order_id}/files.zip")
+def admin_order_files(order_id: str, request: Request):
+    _admin(request)
+    order = orders.get(order_id)
+    if not order or not orders.folder(order).is_dir():
+        raise HTTPException(404, "No such order (or its files are missing).")
+    return Response(orders.folder_zip(order), media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{order_id}.zip"'})
+
+
+@app.post("/api/admin/orders/{order_id}/status")
+def admin_order_status(order_id: str, body: StatusIn, request: Request):
+    _admin(request)
+    try:
+        order = orders.set_status(order_id, body.status)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from None
+    if not order:
+        raise HTTPException(404, "No such order.")
+    return order
+
+
+@app.get("/admin")
+def admin_page():
+    return FileResponse(STATIC / "admin.html", headers=PAGE_HEADERS)
 
 
 # ---------- saved designs ----------

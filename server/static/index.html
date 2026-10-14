@@ -216,7 +216,27 @@
   #savemsg { flex:1 1 100%; font-size:12px; color:var(--muted); min-height:16px; overflow-wrap:anywhere; }
   #savemsg.ok { color:var(--ok); } #savemsg.err { color:var(--err); }
   #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
-  #namedlg::backdrop, #authdlg::backdrop { background:rgba(0,0,0,.5); }
+  #namedlg::backdrop, #authdlg::backdrop, #orderdlg::backdrop, #ordersdlg::backdrop { background:rgba(0,0,0,.5); }
+  #orderdlg, #ordersdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(560px, 94vw); max-height:92dvh; overflow-y:auto; }
+  #orderdlg h2, #ordersdlg h2 { font-size:18px; margin:0 0 4px; } #orderdlg p { font-size:13px; color:var(--muted); margin:0 0 8px; }
+  #orderdlg .ogrid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0 10px; }
+  #orderdlg fieldset.ship { border:1px solid var(--line); border-radius:8px; padding:4px 12px 8px; margin:8px 0; }
+  #orderdlg fieldset.ship legend { display:block; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:0 4px; }
+  #orderdlg label.stack, #ordersdlg label.stack { display:flex; flex-direction:column; align-items:stretch; text-align:left; gap:4px; margin:6px 0; font-size:13px; font-weight:600; }
+  #orderdlg input, #orderdlg select, #orderdlg textarea { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; font-size:16px; font-weight:400; color:var(--ink); background:var(--field); }
+  #orderdlg .autherr { color:var(--err); min-height:1em; margin:6px 0 0; }
+  #orderdlg menu, #ordersdlg menu { display:flex; flex-direction:row-reverse; gap:8px; margin:12px 0 0; padding:0; }
+  #orderdlg menu button, #ordersdlg menu button { flex:none; padding:8px 16px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--ink); }
+  #ordergo, #orderclose { background:var(--ink) !important; color:var(--bg) !important; border-color:var(--ink) !important; }
+  #ordergo:disabled { opacity:.6; cursor:wait; }
+  #orderslist table { font-size:14px; }
+  .orderrow { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0 2px; }
+  .orderrow button, .orderrow a { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; cursor:pointer; }
+  .orderrow .printbtn { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
+  .orderrow .shopbtn { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .affil { font-size:11.5px; color:var(--muted); margin:4px 0 0; }
+  #acctlinks { flex:1 1 100%; margin:2px 0 0; } #acctlinks[hidden] { display:none; }
+  @media (max-width:480px) { #orderdlg .ogrid { grid-template-columns:1fr 1fr; } }
   #authdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(380px, 92vw); }
   #authdlg h2 { font-size:17px; margin:10px 0 4px; } #authdlg p { font-size:13px; color:var(--muted); margin:0 0 10px; }
   .authtabs { display:flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
@@ -330,7 +350,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="sponsored noopener" hidden title="Our Amazon supplies list (affiliate link)">Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
@@ -353,6 +373,7 @@
       <select id="mine" aria-label="My rockets"></select>
       <div id="savemsg" role="status" aria-live="polite"></div>
       <div id="acctnote" class="hint"><a href="#" data-signin>Sign in or create an account</a> to keep your rockets and open them on any device.</div>
+      <div id="acctlinks" class="hint" hidden><a href="#" id="myorders">My orders</a></div>
     </div>
     <div id="modebar" role="group" aria-label="Mode">
       <button type="button" data-mode="beginner" aria-pressed="true">Beginner</button>
@@ -590,6 +611,43 @@
     <div id="report"></div>
   </section>
 </main>
+<dialog id="orderdlg" aria-labelledby="ordertitle">
+  <form id="orderform" novalidate>
+    <h2 id="ordertitle">Order a printed rocket</h2>
+    <p id="orderhint">We 3D-print this rocket's parts and mail them to you, ready to put together. You add a motor, a parachute and a grown-up, then launch.</p>
+    <div class="ogrid">
+      <label class="stack">Rocket <input id="o_name" maxlength="80" readonly></label>
+      <label class="stack">How many <select id="o_qty"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+      <label class="stack">Colour <select id="o_color"><option>Any</option><option>Red</option><option>Orange</option><option>Yellow</option><option>Green</option><option>Blue</option><option>Purple</option><option>White</option><option>Black</option><option>Mixed colours</option></select></label>
+    </div>
+    <fieldset class="ship"><legend>Ship to</legend>
+      <label class="stack">Name <input id="o_shipname" autocomplete="name" required maxlength="100"></label>
+      <label class="stack">Address <input id="o_line1" autocomplete="address-line1" required maxlength="120"></label>
+      <label class="stack">Apartment, suite (optional) <input id="o_line2" autocomplete="address-line2" maxlength="120"></label>
+      <div class="ogrid">
+        <label class="stack">City <input id="o_city" autocomplete="address-level2" required maxlength="80"></label>
+        <label class="stack">State <input id="o_state" autocomplete="address-level1" required maxlength="40"></label>
+        <label class="stack">ZIP <input id="o_zip" autocomplete="postal-code" inputmode="numeric" required maxlength="12"></label>
+      </div>
+      <label class="stack">Phone (optional, for delivery questions) <input id="o_phone" type="tel" autocomplete="tel" maxlength="30"></label>
+    </fieldset>
+    <label class="stack">Notes (optional) <textarea id="o_notes" rows="2" maxlength="1000" placeholder="Anything we should know"></textarea></label>
+    <label class="stack">Coupon code <input id="o_coupon" maxlength="40" autocapitalize="characters" autocomplete="off"></label>
+    <p class="hint">Paid printing is coming soon. For now, printed rockets need a coupon code and are free.</p>
+    <p class="autherr" id="ordererr" role="alert"></p>
+    <menu><button type="submit" id="ordergo">Place order</button><button type="button" id="ordercancel">Cancel</button></menu>
+  </form>
+  <div id="orderdone" hidden>
+    <h2>Order placed!</h2>
+    <p id="orderdonetext"></p>
+    <menu><button type="button" id="orderclose">Done</button></menu>
+  </div>
+</dialog>
+<dialog id="ordersdlg" aria-labelledby="orderstitle">
+  <h2 id="orderstitle">My orders</h2>
+  <div id="orderslist"></div>
+  <menu><button type="button" id="ordersclose">Close</button></menu>
+</dialog>
 <dialog id="authdlg" aria-labelledby="authtitle">
   <form method="dialog" id="authform" novalidate>
     <div class="authtabs" role="tablist">
@@ -1166,8 +1224,16 @@ function kidReportHtml(r) {
         <li><b>Fly it</b> with a grown-up, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">safety code</a>.</li>
       </ol>
       <p class="hint">Save your rocket with <b>Save</b> at the top, or share it with <b>Copy link to share</b>.</p>
+      ${orderRowHtml(st.ok, true)}
     </div>
   </div>`;
+}
+
+// "Order a printed rocket" and the supplies link (when it's set), under the score.
+function orderRowHtml(ok, kid) {
+  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="sponsored noopener">${kid ? 'Get motors and supplies' : 'Shop supplies'}</a>` : '';
+  return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order>${kid ? 'Order it printed for you' : 'Order a printed rocket'}</button>` : ''}${shop}</div>
+    ${shop ? '<p class="affil">Supplies links go to Amazon. As an Amazon Associate, Quiver Design Works earns from qualifying purchases.</p>' : ''}`;
 }
 
 function showReport(r) {
@@ -1183,6 +1249,7 @@ function showReport(r) {
         liftoff ${st.liftoff_mass_g} g (motor ${st.motor_mass_g} g, recovery ${st.recovery_mass_g} g).
         An estimate (Barrowman); check your final rocket in <a href="#guide-or" class="orlink">OpenRocket</a>.</small></div>
     </div>
+    ${kid ? '' : `<div style="grid-column:1/-1">${orderRowHtml(st.ok, false)}</div>`}
     ${pickerHtml(r.flights)}
     <div>
       <h2>Parts · ${r.total_mass_g} g total (${esc(form.elements.material.value)}, solid)</h2>
@@ -1411,6 +1478,7 @@ function renderUser() {
   acctBtn.textContent = user ? user.email : 'Sign in';
   acctBtn.title = user ? 'Signed in. Click to sign out.' : 'Sign in or create an account';
   document.getElementById('acctnote').hidden = !!user;
+  document.getElementById('acctlinks').hidden = !user;
 }
 async function afterSignIn(u, created) {
   user = u; renderUser();
@@ -1442,7 +1510,7 @@ function setAuthTab(t) {
   document.getElementById('autherr').textContent = '';
 }
 authDlg.querySelectorAll('.authtabs button').forEach(b => b.onclick = () => setAuthTab(b.dataset.tab));
-document.getElementById('authcancel').onclick = () => authDlg.close();
+document.getElementById('authcancel').onclick = () => { afterAuth = null; authDlg.close(); };
 function openAuth(tab = 'in') { setAuthTab(tab); authDlg.showModal(); document.getElementById('authemail').focus(); }
 document.getElementById('authform').addEventListener('submit', async e => {
   e.preventDefault();
@@ -1458,6 +1526,7 @@ document.getElementById('authform').addEventListener('submit', async e => {
     if (!r.ok) { err.textContent = typeof d.detail === 'string' ? d.detail : 'Something went wrong; try again.'; return; }
     authDlg.close(); document.getElementById('authpw').value = '';
     await afterSignIn(d.user, authTab === 'up');
+    if (afterAuth) { const f = afterAuth; afterAuth = null; f(); }
   } catch { err.textContent = 'Could not reach the server; check your connection.'; }
   finally { go.disabled = false; }
 });
@@ -1478,6 +1547,68 @@ function confirmSignOut() {
   return false;
 }
 document.addEventListener('click', e => { const a = e.target.closest('a[data-signin]'); if (a) { e.preventDefault(); openAuth('up'); } });
+
+// ---------- print orders ----------
+const orderDlg = document.getElementById('orderdlg'), orderErr = document.getElementById('ordererr');
+let afterAuth = null;  // e.g. open the order form once signed in
+function openOrder() {
+  if (!user) {
+    afterAuth = openOrder;
+    openAuth('up');
+    document.getElementById('authhint').textContent = 'A grown-up needs an account to order a printed rocket, so we know where to send it and can show the order status.';
+    return;
+  }
+  document.getElementById('orderform').hidden = false; document.getElementById('orderdone').hidden = true;
+  document.getElementById('o_name').value = nameEl.value.trim() || 'My rocket';
+  orderErr.textContent = '';
+  orderDlg.showModal();
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-order]')) openOrder(); });
+document.getElementById('ordercancel').onclick = () => orderDlg.close();
+document.getElementById('orderclose').onclick = () => orderDlg.close();
+document.getElementById('orderform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value.trim();
+  const missing = [['o_shipname', 'name'], ['o_line1', 'address'], ['o_city', 'city'], ['o_state', 'state'], ['o_zip', 'ZIP']].filter(([id]) => !v(id));
+  if (missing.length) { orderErr.textContent = `Please fill in the ${missing.map(m => m[1]).join(', ')}.`; return; }
+  if (!v('o_coupon')) { orderErr.textContent = 'Enter your coupon code. (Paid printing is coming soon.)'; return; }
+  const go = document.getElementById('ordergo'); go.disabled = true; go.textContent = 'Placing order…';
+  orderErr.textContent = '';
+  try {
+    const r = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      design_name: v('o_name'), design_id: current?.id || null, params: params(),
+      quantity: Number(v('o_qty')), color: v('o_color'), notes: v('o_notes'), coupon: v('o_coupon'),
+      shipping: { name: v('o_shipname'), line1: v('o_line1'), line2: v('o_line2'), city: v('o_city'), state: v('o_state'), zip: v('o_zip'), phone: v('o_phone') },
+    }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      orderErr.textContent = typeof d.detail === 'string' ? d.detail : (d.detail || []).map(x => `${x.loc.at(-1)}: ${x.msg}`).join('; ') || `Error ${r.status}`;
+      if (r.status === 401) { user = null; renderUser(); }
+      return;
+    }
+    document.getElementById('orderform').hidden = true; document.getElementById('orderdone').hidden = false;
+    document.getElementById('orderdonetext').innerHTML = `Your order number is <b>${esc(d.id)}</b>. We'll print the parts and send them to the address you gave. You can check its progress any time under <b>My orders</b>.`;
+  } catch { orderErr.textContent = 'Could not reach the server; check your connection and try again.'; }
+  finally { go.disabled = false; go.textContent = 'Place order'; }
+});
+const ordersDlg = document.getElementById('ordersdlg');
+document.getElementById('ordersclose').onclick = () => ordersDlg.close();
+document.getElementById('myorders').onclick = async e => {
+  e.preventDefault();
+  const box = document.getElementById('orderslist');
+  box.textContent = 'Loading…'; ordersDlg.showModal();
+  try {
+    const r = await fetch('/api/my/orders'); const d = await r.json();
+    if (!r.ok) { box.textContent = d.detail || 'Sign in to see your orders.'; return; }
+    const STATUS = { new: 'Received', printing: 'Printing', shipped: 'Shipped', cancelled: 'Cancelled' };
+    box.innerHTML = d.orders.length
+      ? `<table><tr><th>Order</th><th>Rocket</th><th>Placed</th><th>Status</th></tr>${d.orders.map(o => `<tr><td>${esc(o.id)}</td><td>${esc(o.design_name)} × ${o.quantity}</td>
+          <td>${new Date(o.created_at * 1000).toLocaleDateString()}</td><td><b>${esc(STATUS[o.status] || o.status)}</b></td></tr>`).join('')}</table>`
+      : '<p class="hint">No orders yet. Build a rocket and choose <b>Order a printed rocket</b> under its stability score.</p>';
+  } catch { box.textContent = 'Could not reach the server.'; }
+};
+// Supplies link in the header, once the affiliate URL is set on the server.
+if (opts.supplies_url) { const a = document.getElementById('supplieslink'); a.href = opts.supplies_url; a.hidden = false; }
 renderUser();
 try {
   const me = await (await fetch('/api/auth/me')).json();
