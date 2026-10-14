@@ -695,11 +695,11 @@ function applyMode() {
   document.body.classList.toggle('beginner', mode === 'beginner');
   document.querySelectorAll('#modebar button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
   document.getElementById('modehint').textContent = MODE_HINT[mode];
-  renderChoices(); motorWhy(); heightConv();
   if (!builtOnce && guideOpen()) showGuide(true);  // swap quick start <-> full guide with the mode
   for (const el of advEls()) el.disabled = mode === 'beginner';  // hidden fields never block validation
   form.elements.overall_length.disabled = mode !== 'beginner';
   fillFins(); sync();
+  renderChoices(); motorWhy(); heightConv();  // after fillFins, so the fin pictures match this mode's shapes
 }
 function switchMode(m) {
   if (m === mode) return;
