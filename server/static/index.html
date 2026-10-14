@@ -200,6 +200,9 @@
   .tutnext .next { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
   .tutnext .back { background:transparent; color:var(--ink); border:1px solid var(--line); }
   .tutnext button:disabled { opacity:.35; cursor:default; }
+  .tutnext.last { margin:4px 0 10px; }
+  .tutnext.last button { padding:6px 14px; font-size:13px; }
+  .tutnext.last .next { background:transparent; color:var(--ink); border-color:var(--line); }
   #tutdone { margin:8px 0; padding:10px 12px; border-radius:8px; border-left:4px solid var(--ok); background:var(--card); font-size:14px; }
   #tutdone[hidden] { display:none; }
   @media (pointer:coarse) { #tutbar button, .tutnext button { min-height:40px; } }
@@ -421,19 +424,19 @@
       <p class="why beg" id="motorwhy" data-tstep="2"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall is your rocket?</div>
-      <p class="why beg" data-tstep="3">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
-      <input type="range" class="slider beg" id="heightslider" data-tstep="3" min="150" max="900" step="10" aria-label="Rocket height">
-      <label class="beg" data-tstep="3">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
-      <div class="conv beg" id="heightconv" data-tstep="3"></div>
+      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
+      <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall is your rocket?</div>
+      <p class="why beg" data-tstep="4">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <input type="range" class="slider beg" id="heightslider" data-tstep="4" min="150" max="900" step="10" aria-label="Rocket height">
+      <label class="beg" data-tstep="4">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="conv beg" id="heightconv" data-tstep="4"></div>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
       <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
-      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall can your 3D printer print?</div>
-      <p class="why beg" data-tstep="4">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
-      <label data-tstep="4"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
       <div class="step beg" data-tstep="5"><span class="n">5</span>Choose your fins</div>
@@ -793,9 +796,12 @@ function tutShow() {
   // Back / Next sit right under the current step (on the last step, Build is the next move).
   const pieces = [...f.querySelectorAll(`[data-tstep="${tutStep}"]`)];
   const last = pieces[pieces.length - 1];
-  if (tutStep === TUT_STEPS) { tutNav.querySelector('.next').textContent = 'Finish without building'; last.after(tutNav); }
+  // On the last step the Build bar is the step's last piece and is pinned to the
+  // bottom of the panel; Back / Finish go above it so they don't collide with it.
+  if (tutStep === TUT_STEPS) { tutNav.querySelector('.next').textContent = 'Finish without building'; last.before(tutNav); }
   else { tutNav.querySelector('.next').textContent = 'Next'; last.after(tutNav); }
   tutNav.querySelector('.back').disabled = tutStep === 1;
+  tutNav.classList.toggle('last', tutStep === TUT_STEPS);  // Build is the main button there
   tutNav.hidden = false;
   const head = f.querySelector(`.step[data-tstep="${tutStep}"]`);
   head.scrollIntoView({ behavior: 'smooth', block: 'start' });  // scroll-margin keeps it clear of the sticky tutorial bar
@@ -1312,7 +1318,7 @@ function kidReportHtml(r) {
   const best = f.rows.find(x => x.code === f.recommended);
   const verdict = { unstable: 'Too wobbly', stable: cal > 2 ? 'Very stable' : 'Just right!', overstable: 'Too stable' }[st.status] || st.status;
   const what = {
-    unstable: `The balance point (blue) isn't far enough in front of the push point (red), so it could wobble or tumble. You can't download it until the score is at least 1. <b>Try:</b> make your rocket taller (step 2), or pick different fins (step 4).`,
+    unstable: `The balance point (blue) isn't far enough in front of the push point (red), so it could wobble or tumble. You can't download it until the score is at least 1. <b>Try:</b> make your rocket taller (step 4), or pick different fins (step 5).`,
     stable: cal > 2 ? 'The blue balance point is well in front of the red push point. It will fly straight. (1 to 2 is the sweet spot, but this is fine.)'
                     : 'The blue balance point is about the right distance in front of the red push point. It will fly nice and straight.',
     overstable: 'It will fly, but it turns into the wind like a weathervane, so it may not go straight up on a windy day. A shorter rocket helps.',
@@ -1324,7 +1330,7 @@ function kidReportHtml(r) {
        <p>The last number in the motor name is the <b>delay</b>: ${best.delay_s} seconds after the motor stops pushing, it pops the nose off so the parachute comes out near the top of the flight.</p>
        <p>Launch site: a grown-up picks an open field at least <b>${best.field_m} m</b> (${Math.round(best.field_m * FT)} ft) across.</p>
        ${motorBuyHtml(best.motor)}`
-    : `<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 1).</p>`;
+    : `<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 2).</p>`;
   return `<div class="kid">
     <div class="kidcard ${st.status === 'unstable' ? 'bad' : ''}">
       <h3>Stability score</h3>
@@ -1483,6 +1489,17 @@ function setForm(p) {
   lastBuild = null; markDirty();
 }
 const shareUrl = id => `${location.origin}/d/${id}`;
+// Saved names carry the key specs: "Name_Motor_Fins_Height", e.g.
+// "Zoomer_M18_Trapezoid_340". The name box shows only the name; the specs are
+// added (or refreshed) on every save, and stripped again when a design opens.
+const SPEC_RE = /_M\d+L?_[A-Za-z]+_\d+$/;
+const baseName = n => (n || '').replace(SPEC_RE, '').trim() || 'My rocket';
+function specName(base) {
+  const fin = (LABELS[form.elements.fin_shape.value] || form.elements.fin_shape.value).replace(/[^A-Za-z]/g, '');
+  const h = mode === 'beginner' ? Number(form.elements.overall_length.value)
+    : (lastBuild ? lastBuild.length_mm : Number(form.elements.body_length.value));
+  return `${baseName(base)}_${form.elements.motor.value}_${fin}_${Math.round(h) || 0}`.slice(0, 80);
+}
 function say(text, kind = '') { msgEl.textContent = text; msgEl.className = kind; }
 
 // Asks for a name in a small dialog; resolves to the trimmed name, or null on Cancel.
@@ -1515,7 +1532,7 @@ async function save(asNew, chosenName = null) {
     nameEl.value = name;
   }
   say('Saving…');
-  const body = JSON.stringify({ name: nameEl.value.trim() || 'My rocket', params: params() });
+  const body = JSON.stringify({ name: specName(nameEl.value), params: params() });
   let res, d;
   try {
     res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
@@ -1549,7 +1566,7 @@ document.getElementById('share').onclick = async () => {
 // ---------- design files on your own computer ----------
 const slug = t => (t.trim() || 'rocket').replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'rocket';
 document.getElementById('download').onclick = () => {
-  const data = { format: 'rocket-builder-design', schemaVersion: 1, name: nameEl.value.trim() || 'My rocket', mode, params: params() };
+  const data = { format: 'rocket-builder-design', schemaVersion: 1, name: specName(nameEl.value), mode, params: params() };
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   a.download = `${slug(data.name)}.rocket.json`;
@@ -1567,7 +1584,7 @@ filePick.onchange = async () => {
   // Also reads the design.json inside a downloaded STL ZIP.
   if (!d || typeof d.params !== 'object' || !d.params) { say(`${f.name} isn't a Rocket Builder design file.`, 'err'); return; }
   setForm(Object.fromEntries(Object.entries(d.params).filter(([k]) => k in opts.defaults)));
-  nameEl.value = d.name || f.name.replace(/(\.rocket)?\.json$/i, '');
+  nameEl.value = baseName(d.name || f.name.replace(/(\.rocket)?\.json$/i, ''));
   current = null; shared = false; history.replaceState(null, '', '/'); renderMine();
   say(`Opened ${f.name}. It isn't saved on the site until you press Save.`, 'ok');
   runBuild();
@@ -1577,7 +1594,7 @@ async function openDesign(id) {
   const res = await fetch(`/api/designs/${encodeURIComponent(id)}`);
   if (!res.ok) { say("That design link doesn't exist.", 'err'); return; }
   const d = await res.json();
-  setForm(d.params); nameEl.value = d.name;
+  setForm(d.params); nameEl.value = baseName(d.name);
   current = loadMine().find(x => x.id === d.id) || null;
   shared = !current;
   history.replaceState(null, '', `/d/${d.id}`);
