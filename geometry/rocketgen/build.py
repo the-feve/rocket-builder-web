@@ -115,6 +115,108 @@ def body_length_for(params: DesignParams, overall: float) -> float:
     return round(b, 1)
 
 
+def layout_problem(params: DesignParams, d: Derived | None = None) -> str | None:
+    """The reason build_rocket would reject this body layout, without building
+    anything (the same checks it makes before any solid): body too short, an
+    anchor section too tall for the printer, an aft part too short for the
+    fins or motor bay, or a nose too tall. None when the layout works."""
+    d = d or compute_derived(params)
+    try:
+        seg_lens = plan_segments(params, d)
+    except GeometryError as ex:
+        return str(ex)
+    joint_len = d.shoulder_len + d.joint_rise
+    fin = fin_dimensions(params, d.cal)
+    if seg_lens[0] < fin.root + 10:
+        return "Aft segment is too short for this fin root chord."
+    if seg_lens[0] < d.aft_socket_base + joint_len:
+        return "Aft segment is too short for the motor bay plus a full-depth socket above it."
+    if params.nose_fineness * d.cal + d.nose_shoulder_len + d.joint_rise > d.zmax:
+        return "The nose is taller than the printer's usable Z height."
+    if params.launch_lugs == "two":  # the forward lug must fit wholly on one body part
+        parts, top = [{"lo": 0.0, "hi": seg_lens[0]}], seg_lens[0]
+        for s in seg_lens[1:]:
+            parts.append({"lo": top, "hi": top - joint_len + s})
+            top = top - joint_len + s
+        try:
+            plan_forward_lug(params.forward_lug_frac, parts,
+                             lug_geometry(d, params.rod_diameter, params.rod_standoff, params.pad_clearance))
+        except GeometryError as ex:
+            return str(ex)
+    return None
+
+
+def _ranges(values: list[float], ok: list[bool], step: float) -> list[list[float]]:
+    out: list[list[float]] = []
+    for v, good in zip(values, ok):
+        if not good:
+            continue
+        if out and v - out[-1][1] <= step + 1e-6:
+            out[-1][1] = v
+        else:
+            out.append([v, v])
+    return out
+
+
+def size_options(params: DesignParams, height_step: float = 2.0, body_step: float = 1.0,
+                 max_overall: float = 2500.0, max_body: float = 2000.0) -> dict:
+    """Which overall heights (Beginner) and body lengths (Advanced) build with
+    these settings, as [lo, hi] ranges sampled every `height_step` /
+    `body_step` mm. Each overall height goes through body_length_for exactly
+    as a build does, then the layout checks. Some heights are impossible
+    because the body is cut into printer-height sections and a leftover too
+    short to stand alone is merged into the top section, which can then be
+    too tall to print; very short rockets leave the aft part too short for
+    the motor bay or fins. No solids are built: one compute_derived, then
+    arithmetic, so a full scan takes a fraction of a second."""
+    d = compute_derived(params)
+    joint_len = d.shoulder_len + d.joint_rise
+    nose = params.nose_fineness * d.cal - min(0.0, d.thread["z_lowest"])
+
+    def overall_for(b: float) -> float:
+        seg = plan_segments(params.with_(body_length=b), d)
+        return sum(seg) - (len(seg) - 1) * joint_len + nose
+
+    def body_for(h: float) -> float | None:  # body_length_for, reusing d
+        b = params.body_length
+        for _ in range(12):
+            try:
+                nb = b + h - overall_for(b)
+            except GeometryError:
+                return None
+            if abs(nb - b) < 0.05:
+                return round(nb, 1)
+            b = nb
+        return round(b, 1)
+
+    bodies = [round(50 + i * body_step, 3) for i in range(int((max_body - 50) / body_step) + 1)]
+    body_ok = [layout_problem(params.with_(body_length=b), d) is None for b in bodies]
+    heights = [round(80 + i * height_step, 3) for i in range(int((max_overall - 80) / height_step) + 1)]
+    height_ok = []
+    for h in heights:
+        b = body_for(h)
+        height_ok.append(b is not None and 50 <= b <= max_body and layout_problem(params.with_(body_length=b), d) is None)
+    return {"height_step": height_step, "heights": _ranges(heights, height_ok, height_step),
+            "body_step": body_step, "bodies": _ranges(bodies, body_ok, body_step),
+            "section_mm": round(d.zmax, 1),
+            "nose_problem": layout_problem(params.with_(body_length=max_body), d) if not any(body_ok) else None}
+
+
+def nearest_height(params: DesignParams, overall: float) -> float | None:
+    """The overall height size_options allows that is closest to `overall`
+    (the next one up on a tie, since taller is the usual fix), or None when
+    nothing fits. `overall` itself when it is allowed."""
+    opts = size_options(params)
+    best = None
+    for lo, hi in opts["heights"]:
+        if lo <= overall <= hi:
+            return overall
+        h = lo if lo > overall else hi
+        if best is None or abs(h - overall) < abs(best - overall) or (abs(h - overall) == abs(best - overall) and h > best):
+            best = h
+    return best
+
+
 def build_rocket(params: DesignParams) -> Rocket:
     if params.nose_shape not in NOSE_SHAPES:
         raise ValueError(f"Unknown nose shape {params.nose_shape!r}")

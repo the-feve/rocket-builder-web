@@ -36,7 +36,7 @@ from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
 from rocketgen.flight import FIELD_M, motors_for, pick, simulate
-from rocketgen.build import body_length_for, overall_length
+from rocketgen.build import body_length_for, nearest_height, overall_length, size_options
 from rocketgen.stability import Balance, build_stable, recovery_allowance_g
 
 import accounts
@@ -275,10 +275,20 @@ def _build_to_length(params: DesignParams, overall: float | None):
     scale already found (normally no further scaling)."""
     if overall is None:
         return build_stable(params)
+    # A height the sectioning can't make (the page normally snaps these
+    # already) moves to the nearest one that can.
+    overall = nearest_height(params, overall) or overall
     rocket = build_stable(params.with_(body_length=body_length_for(params, overall)))
     if abs(Balance(rocket).length - overall) > 0.5:
         p = rocket.params
-        rocket = build_stable(p.with_(body_length=body_length_for(p, overall)))
+        # Bigger fins trail further below the tail, which shortens the body
+        # for the same height; at the short end that can leave the aft
+        # section too short, so take the nearest height that still fits.
+        target = nearest_height(p, overall) or overall
+        rocket = build_stable(p.with_(body_length=body_length_for(p, target)))
+        if abs(target - overall) > 1:
+            rocket.notes.insert(0, f"Height changed to {Balance(rocket).length:.0f} mm so the bigger fins fit "
+                                   "the printed sections.")
     return rocket
 
 
@@ -312,6 +322,31 @@ def _geometry(geo_params: dict, req: BuildRequest, request: Request) -> str:
     finally:
         _lock.release()
     return key
+
+
+_sizes: OrderedDict[str, dict] = OrderedDict()
+
+
+@app.post("/api/sizes")
+def sizes(req: BuildRequest):
+    """Which overall heights / body lengths build with these settings (motor,
+    printer height, fins, nose, wall...), so the page can skip the ones the
+    body sectioning can't make. Arithmetic only (no solids), cached."""
+    if req.motor not in load_motors():
+        raise HTTPException(422, f"Unknown motor {req.motor!r}.")
+    params = req.model_dump(mode="json")
+    geo = {k: v for k, v in params.items() if k not in FLIGHT_FIELDS and k not in NOT_GEOMETRY}
+    geo["body_od_override"] = resolved_od(req.motor, req.body_od_offset, req.body_od_override, req.wall)
+    key = _key("sizes", geo)
+    if key not in _sizes:
+        try:
+            _sizes[key] = size_options(DesignParams(**{**geo, "fin_shape": req.fin_shape}))
+        except (GeometryError, ValueError) as ex:
+            raise HTTPException(422, str(ex))
+        while len(_sizes) > 256:
+            _sizes.popitem(last=False)
+    _sizes.move_to_end(key)
+    return _sizes[key]
 
 
 @app.post("/api/build")

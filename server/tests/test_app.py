@@ -114,6 +114,28 @@ def test_beginner_overall_height():
     assert r.status_code == 422 and "too short" in r.json()["detail"]
 
 
+def test_sizes_match_what_builds():
+    """/api/sizes says which overall heights build; a valid one builds at that
+    height, and one it can't make (too short, or in a gap) builds at the
+    nearest one that works instead of failing."""
+    p = {"motor": "M18", "print_max_height": 150, "fin_shape": "trapezoid"}
+    s = client.post("/api/sizes", json=p).json()
+    hs = s["heights"]
+    assert hs and s["bodies"] and s["section_mm"] < 150
+    lo, hi = hs[0]
+    mid = round((lo + hi) / 2 / s["height_step"]) * s["height_step"]
+    ok = client.post("/api/build", json={**p, "overall_length": mid})
+    assert ok.status_code == 200, ok.text
+    assert ok.json()["stability"]["length_mm"] == pytest.approx(mid, abs=1)
+    short = client.post("/api/build", json={**p, "overall_length": lo - 20})
+    assert short.status_code == 200, short.text
+    assert short.json()["stability"]["length_mm"] >= lo - 1
+    # At the short end with a small printer the fins auto-grow, which used to
+    # leave the aft section too short ("Aft segment is too short ...").
+    edge = client.post("/api/build", json={"motor": "M18", "print_max_height": 120, "overall_length": 182})
+    assert edge.status_code == 200, edge.text
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]

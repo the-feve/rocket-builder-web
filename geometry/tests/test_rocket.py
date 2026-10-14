@@ -349,3 +349,34 @@ def test_wall_thickness_builds(motor, wall):
     assert d.body_id == pytest.approx(d.body_od - 2 * wall)
     for p in r.parts:
         assert p.assembled.is_valid and meshes(p.assembled), p.name
+
+
+def test_size_options_agree_with_the_builder():
+    """size_options' ranges come from the same checks build_rocket makes before
+    building solids: inside a range the layout is fine, just below the
+    shortest body build_rocket refuses it."""
+    from rocketgen.build import body_length_for, build_rocket, layout_problem, size_options
+    from rocketgen.geom import GeometryError
+    for p in (DesignParams(), DesignParams(motor="M24", print_max_height=150)):
+        o = size_options(p)
+        assert o["heights"] and o["bodies"] and o["nose_problem"] is None
+        lo, hi = o["heights"][0]
+        for h in (lo, (lo + hi) / 2, min(hi, lo + 400)):
+            assert layout_problem(p.with_(body_length=body_length_for(p, h))) is None
+        shortest = o["bodies"][0][0]
+        assert layout_problem(p.with_(body_length=shortest - 2)) is not None
+        with pytest.raises(GeometryError):
+            build_rocket(p.with_(body_length=shortest - 2))
+    tiny = size_options(DesignParams(motor="M29", print_max_height=100))
+    assert tiny["heights"] == [] and tiny["nose_problem"]
+
+
+def test_nearest_height():
+    from rocketgen.build import nearest_height, size_options
+    p = DesignParams(motor="M18", print_max_height=120)
+    lo = size_options(p)["heights"][0][0]
+    assert nearest_height(p, lo + 10) == lo + 10
+    assert nearest_height(p, lo - 30) == lo
+    # Bigger fins trail lower, so the shortest workable height goes up.
+    assert nearest_height(p.with_(fin_scale=2.0), lo) > lo
+    assert nearest_height(DesignParams(motor="M29", print_max_height=100), 300) is None

@@ -134,6 +134,9 @@
   .why b { color:var(--ink); font-weight:600; }
   .why a, .more { color:var(--accent); white-space:nowrap; }
   .more { font-size:13px; }
+  .sizenote { margin:4px 0 8px; padding:8px 10px; border-radius:6px; background:var(--card); border-left:3px solid var(--line); font-size:12.5px; line-height:1.45; color:var(--muted); }
+  .sizenote b { color:var(--ink); }
+  .sizenote .snapped { display:block; margin-top:4px; color:var(--warn); font-weight:600; }
   .conv { margin:-2px 0 6px; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
   .conv b { color:var(--ink); }
   input[type=range].slider { width:100%; margin:4px 0 2px; accent-color:var(--accent); }
@@ -200,6 +203,9 @@
   .tutnext .next { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
   .tutnext .back { background:transparent; color:var(--ink); border:1px solid var(--line); }
   .tutnext button:disabled { opacity:.35; cursor:default; }
+  .tutnext.last { margin:4px 0 10px; }
+  .tutnext.last button { padding:6px 14px; font-size:13px; }
+  .tutnext.last .next { background:transparent; color:var(--ink); border-color:var(--line); }
   #tutdone { margin:8px 0; padding:10px 12px; border-radius:8px; border-left:4px solid var(--ok); background:var(--card); font-size:14px; }
   #tutdone[hidden] { display:none; }
   @media (pointer:coarse) { #tutbar button, .tutnext button { min-height:40px; } }
@@ -421,19 +427,20 @@
       <p class="why beg" id="motorwhy" data-tstep="2"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall is your rocket?</div>
-      <p class="why beg" data-tstep="3">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
-      <input type="range" class="slider beg" id="heightslider" data-tstep="3" min="150" max="900" step="10" aria-label="Rocket height">
-      <label class="beg" data-tstep="3">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
-      <div class="conv beg" id="heightconv" data-tstep="3"></div>
+      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
+      <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall is your rocket?</div>
+      <p class="why beg" data-tstep="4">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <input type="range" class="slider beg" id="heightslider" data-tstep="4" min="150" max="900" step="2" aria-label="Rocket height">
+      <label class="beg" data-tstep="4">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="conv beg" id="heightconv" data-tstep="4"></div>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
+      <p class="sizenote" id="sizenote" data-tstep="4" hidden></p>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
       <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
-      <div class="step beg" data-tstep="4"><span class="n">4</span>How tall can your 3D printer print?</div>
-      <p class="why beg" data-tstep="4">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
-      <label data-tstep="4"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
       <div class="step beg" data-tstep="5"><span class="n">5</span>Choose your fins</div>
@@ -793,9 +800,12 @@ function tutShow() {
   // Back / Next sit right under the current step (on the last step, Build is the next move).
   const pieces = [...f.querySelectorAll(`[data-tstep="${tutStep}"]`)];
   const last = pieces[pieces.length - 1];
-  if (tutStep === TUT_STEPS) { tutNav.querySelector('.next').textContent = 'Finish without building'; last.after(tutNav); }
+  // On the last step the Build bar is the step's last piece and is pinned to the
+  // bottom of the panel; Back / Finish go above it so they don't collide with it.
+  if (tutStep === TUT_STEPS) { tutNav.querySelector('.next').textContent = 'Finish without building'; last.before(tutNav); }
   else { tutNav.querySelector('.next').textContent = 'Next'; last.after(tutNav); }
   tutNav.querySelector('.back').disabled = tutStep === 1;
+  tutNav.classList.toggle('last', tutStep === TUT_STEPS);  // Build is the main button there
   tutNav.hidden = false;
   const head = f.querySelector(`.step[data-tstep="${tutStep}"]`);
   head.scrollIntoView({ behavior: 'smooth', block: 'start' });  // scroll-margin keeps it clear of the sticky tutorial bar
@@ -959,6 +969,7 @@ function applyMode() {
   form.elements.overall_length.disabled = mode !== 'beginner';
   fillFins(); sync();
   renderChoices(); motorWhy(); heightConv();  // after fillFins, so the fin pictures match this mode's shapes
+  queueSizes();  // which heights / body lengths work in this mode
 }
 function switchMode(m) {
   if (m === mode) return;
@@ -1060,8 +1071,74 @@ function heightConv() {
   document.getElementById('heightconv').innerHTML = `<b>${(mm / 10).toFixed(1)} cm</b> · <b>${(mm / 25.4).toFixed(1)} inches</b> · about ${ruler < 0.95 ? `${Math.round(ruler * 100)}% of` : ruler < 1.1 ? 'as long as' : `${(Math.round(ruler * 2) / 2)} ×`} a 12-inch ruler`;
   hSlider.value = Math.min(Math.max(mm, Number(hSlider.min)), Number(hSlider.max));
 }
-hSlider.addEventListener('input', () => { hBox.value = hSlider.value; heightConv(); });
 hBox.addEventListener('input', heightConv);
+
+// ---------- heights that build ----------
+// The body prints in sections no taller than the printer, joined by twist
+// locks. Some heights leave a section too short to print or too short for the
+// motor and fins, so those heights can't be built. /api/sizes lists the
+// heights (Beginner) and body lengths (Advanced) that work for the current
+// motor, printer, fins and nose; the inputs snap to the nearest one.
+const SIZE_FIELDS = new Set(['motor', 'print_max_height', 'fin_shape', 'nose_shape', 'nose_fineness', 'wall', 'body_od_offset',
+  'custom_fin_size', 'fin_root_chord', 'fin_span', 'fin_tip_chord', 'fin_sweep', 'fin_count']);
+let sizeInfo = null, sizeTimer = 0, sizeSeq = 0;
+function nearestOk(v, ranges) {
+  if (!ranges?.length || !Number.isFinite(v)) return v;
+  let best = null;
+  for (const [lo, hi] of ranges) {
+    if (v >= lo && v <= hi) return v;
+    for (const e of [lo, hi]) if (best === null || Math.abs(e - v) < Math.abs(best - v)) best = e;
+  }
+  return best;
+}
+const fmtRanges = rs => rs.map(([lo, hi]) => hi >= 1800 ? `${Math.ceil(lo)} mm and up` : `${Math.ceil(lo)}–${Math.floor(hi)} mm`).join(', ');
+function renderSizeNote(changedFrom, why = '') {
+  const el = document.getElementById('sizenote');
+  if (!sizeInfo) { el.hidden = true; return; }
+  const beg = mode === 'beginner', rs = beg ? sizeInfo.heights : sizeInfo.bodies;
+  const ph = form.elements.print_max_height.value;
+  let html = `<b>Not every ${beg ? 'height' : 'body length'} works.</b> The body prints in pieces no taller than your printer `
+    + `(about ${Math.round(sizeInfo.section_mm)} mm each) that twist together. ${beg ? 'Heights' : 'Lengths'} that would leave a piece too short `
+    + `to print, or too short for the motor and fins, are skipped, so the box jumps to the nearest one that works.`;
+  html += rs.length
+    ? ` With a ${esc(ph)} mm printer and this motor: <b>${fmtRanges(rs)}</b>.`
+    : ` <b>Nothing fits with a ${esc(ph)} mm printer and this motor</b> (${esc(sizeInfo.nose_problem || 'the motor bay is too long')}). Try a taller printer height or a smaller motor.`;
+  if (changedFrom != null) html += ` <span class="snapped">Changed from ${Math.round(changedFrom)} to ${Math.round(beg ? hBox.value : form.elements.body_length.value)} mm${why}.</span>`;
+  el.innerHTML = html; el.hidden = false;
+}
+function snapSize(announce = true) {
+  if (!sizeInfo) return;
+  const beg = mode === 'beginner', box = beg ? hBox : form.elements.body_length;
+  const v = Number(box.value), ok = nearestOk(v, beg ? sizeInfo.heights : sizeInfo.bodies);
+  if (beg && sizeInfo.heights.length) {
+    hSlider.min = Math.max(80, Math.ceil(sizeInfo.heights[0][0]));
+    hSlider.max = Math.max(Number(hSlider.min) + 10, Math.min(900, Math.floor(sizeInfo.heights.at(-1)[1])));
+  }
+  if (box.value !== '' && ok !== v) {
+    box.value = Math.round(ok);
+    if (beg) heightConv();
+    renderSizeNote(announce ? v : null);
+    markDirty();
+  } else renderSizeNote();
+}
+async function refreshSizes() {
+  const seq = ++sizeSeq;
+  try {
+    const r = await fetch('/api/sizes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params()) });
+    if (!r.ok || seq !== sizeSeq) return;
+    sizeInfo = await r.json();
+    snapSize();
+  } catch {}
+}
+const queueSizes = () => { clearTimeout(sizeTimer); sizeTimer = setTimeout(refreshSizes, 250); };
+form.addEventListener('change', e => { if (SIZE_FIELDS.has(e.target.name)) queueSizes(); });
+// The slider moves through workable heights only; typed values snap when the box is left.
+hSlider.addEventListener('input', () => {
+  hBox.value = sizeInfo ? Math.round(nearestOk(Number(hSlider.value), sizeInfo.heights)) : hSlider.value;
+  heightConv(); renderSizeNote();
+});
+hBox.addEventListener('change', () => snapSize());
+form.elements.body_length.addEventListener('change', () => snapSize());
 
 // ---------- "press Build" notice and progress bar ----------
 const dirtyEl = document.getElementById('dirty');
@@ -1414,6 +1491,11 @@ async function runBuild() {
     await showModel(`/api/builds/${body.id}/preview.glb`, body.parts);
     stopProgress();
     lastBuild = { length_mm: body.stability.length_mm, body_length_mm: body.body_length_mm };
+    // Auto-grown fins can push the height to the next one that prints; show what was built.
+    const asked = Number(hBox.value), got = Math.round(body.stability.length_mm);
+    if (mode === 'beginner' && seq === edits && Number.isFinite(asked) && Math.abs(got - asked) > 1.5) {
+      hBox.value = got; hSlider.value = got; heightConv(); renderSizeNote(asked, ' so the bigger fins (added for stability) fit the printed pieces');
+    }
     setMarkers(body.stability); applyView(false);
     builtOnce = true; lastReport = body;
     if (tutStep) tutEnd(true, '<b>You built your first rocket!</b> Check its stability score. Every step is unlocked now, so try changing things and building again.');
@@ -1479,10 +1561,21 @@ function setForm(p) {
   }
   showOd();
   fillFins(); sync(); flightHints();
-  renderChoices(); motorWhy(); heightConv();
+  renderChoices(); motorWhy(); heightConv(); queueSizes();
   lastBuild = null; markDirty();
 }
 const shareUrl = id => `${location.origin}/d/${id}`;
+// Saved names carry the key specs: "Name_Motor_Fins_Height", e.g.
+// "Zoomer_M18_Trapezoid_340". The name box shows only the name; the specs are
+// added (or refreshed) on every save, and stripped again when a design opens.
+const SPEC_RE = /_M\d+L?_[A-Za-z]+_\d+$/;
+const baseName = n => (n || '').replace(SPEC_RE, '').trim() || 'My rocket';
+function specName(base) {
+  const fin = (LABELS[form.elements.fin_shape.value] || form.elements.fin_shape.value).replace(/[^A-Za-z]/g, '');
+  const h = mode === 'beginner' ? Number(form.elements.overall_length.value)
+    : (lastBuild ? lastBuild.length_mm : Number(form.elements.body_length.value));
+  return `${baseName(base)}_${form.elements.motor.value}_${fin}_${Math.round(h) || 0}`.slice(0, 80);
+}
 function say(text, kind = '') { msgEl.textContent = text; msgEl.className = kind; }
 
 // Asks for a name in a small dialog; resolves to the trimmed name, or null on Cancel.
@@ -1515,7 +1608,7 @@ async function save(asNew, chosenName = null) {
     nameEl.value = name;
   }
   say('Saving…');
-  const body = JSON.stringify({ name: nameEl.value.trim() || 'My rocket', params: params() });
+  const body = JSON.stringify({ name: specName(nameEl.value), params: params() });
   let res, d;
   try {
     res = await fetch(own ? `/api/designs/${own.id}` : '/api/designs', {
@@ -1549,7 +1642,7 @@ document.getElementById('share').onclick = async () => {
 // ---------- design files on your own computer ----------
 const slug = t => (t.trim() || 'rocket').replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'rocket';
 document.getElementById('download').onclick = () => {
-  const data = { format: 'rocket-builder-design', schemaVersion: 1, name: nameEl.value.trim() || 'My rocket', mode, params: params() };
+  const data = { format: 'rocket-builder-design', schemaVersion: 1, name: specName(nameEl.value), mode, params: params() };
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   a.download = `${slug(data.name)}.rocket.json`;
@@ -1567,7 +1660,7 @@ filePick.onchange = async () => {
   // Also reads the design.json inside a downloaded STL ZIP.
   if (!d || typeof d.params !== 'object' || !d.params) { say(`${f.name} isn't a Rocket Builder design file.`, 'err'); return; }
   setForm(Object.fromEntries(Object.entries(d.params).filter(([k]) => k in opts.defaults)));
-  nameEl.value = d.name || f.name.replace(/(\.rocket)?\.json$/i, '');
+  nameEl.value = baseName(d.name || f.name.replace(/(\.rocket)?\.json$/i, ''));
   current = null; shared = false; history.replaceState(null, '', '/'); renderMine();
   say(`Opened ${f.name}. It isn't saved on the site until you press Save.`, 'ok');
   runBuild();
@@ -1577,7 +1670,7 @@ async function openDesign(id) {
   const res = await fetch(`/api/designs/${encodeURIComponent(id)}`);
   if (!res.ok) { say("That design link doesn't exist.", 'err'); return; }
   const d = await res.json();
-  setForm(d.params); nameEl.value = d.name;
+  setForm(d.params); nameEl.value = baseName(d.name);
   current = loadMine().find(x => x.id === d.id) || null;
   shared = !current;
   history.replaceState(null, '', `/d/${d.id}`);
