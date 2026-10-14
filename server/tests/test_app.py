@@ -8,6 +8,7 @@ import tempfile
 import zipfile
 
 os.environ["ROCKETGEN_DB"] = os.path.join(tempfile.mkdtemp(), "designs.sqlite3")
+os.environ["ROCKETGEN_ORDERS_DIR"] = os.path.join(tempfile.mkdtemp(), "orders")
 
 from fastapi.testclient import TestClient
 
@@ -179,3 +180,46 @@ def test_accounts_signup_login_and_owned_designs():
     b.post("/api/auth/logout")
     assert b.get("/api/auth/me").json()["user"] is None
     assert b.get("/api/my/designs").status_code == 401
+
+
+def test_print_order_with_coupon_and_admin(monkeypatch):
+    import app as appmod
+    from fastapi.testclient import TestClient as TC
+    monkeypatch.setenv("ROCKETGEN_COUPON_CODES", "LAUNCHDAY")
+    monkeypatch.setattr(appmod, "ADMIN_EMAILS", {"owner@example.com"})
+    monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
+    ship = {"name": "Pat", "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "zip": "98926"}
+    order = {"design_name": "Zoomer", "params": {}, "quantity": 2, "color": "Red", "shipping": ship, "coupon": "launchday"}
+
+    kid = TC(app)
+    assert kid.post("/api/orders", json=order).status_code == 401  # must sign in
+    kid.post("/api/auth/signup", json={"email": "parent@example.com", "password": "rocket123", "age_ok": True})
+    assert kid.post("/api/orders", json={**order, "coupon": ""}).status_code == 402
+    assert kid.post("/api/orders", json={**order, "coupon": "WRONG"}).status_code == 402
+    r = kid.post("/api/orders", json=order)
+    assert r.status_code == 200, r.text
+    oid = r.json()["id"]
+    assert oid.startswith("RB-") and r.json()["price"] == 0
+    assert [o["id"] for o in kid.get("/api/my/orders").json()["orders"]] == [oid]
+
+    # The order folder has the STLs and the batch sheet.
+    import orders
+    o = orders.get(oid)
+    files = {f.name for f in orders.folder(o).iterdir()}
+    assert {"ORDER.txt", "order.json", "design.json", "build_notes.txt", "Aft.stl", "Nose.stl"} <= files
+    assert "Ellensburg, WA 98926" in (orders.folder(o) / "ORDER.txt").read_text()
+
+    # Only the owner (signed in) or the PC sync (token) sees all orders.
+    assert kid.get("/api/admin/orders").status_code == 403
+    sync = TC(app)
+    assert sync.get("/api/admin/orders", headers={"Authorization": "Bearer nope"}).status_code == 403
+    listing = sync.get("/api/admin/orders", headers={"Authorization": "Bearer sync-secret"}).json()
+    assert oid in [x["id"] for x in listing["orders"]]
+    z = sync.get(f"/api/admin/orders/{oid}/files.zip", headers={"Authorization": "Bearer sync-secret"})
+    assert z.status_code == 200 and zipfile.ZipFile(io.BytesIO(z.content)).namelist()
+    owner = TC(app)
+    owner.post("/api/auth/signup", json={"email": "owner@example.com", "password": "rocket123", "age_ok": True})
+    assert owner.post(f"/api/admin/orders/{oid}/status", json={"status": "shipped"}).json()["status"] == "shipped"
+    assert owner.post(f"/api/admin/orders/{oid}/status", json={"status": "lost"}).status_code == 400
+    assert kid.get("/api/my/orders").json()["orders"][0]["status"] == "shipped"
+    assert owner.get("/admin").status_code == 200
