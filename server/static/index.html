@@ -161,6 +161,32 @@
   details.grownup[open] > .full { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:6px 24px; }
   @media (max-width:1100px) { details.grownup[open] > .full { grid-template-columns:1fr; } }
 
+  /* Guided tutorial: one Beginner step at a time; everything else greyed out and inert */
+  #form.tut [data-tstep]:not(.tcur), #form.tut .tlock { opacity:.28; filter:grayscale(1); pointer-events:none; user-select:none; transition:opacity .2s; }
+  #form.tut .tcur { position:relative; }
+  #form.tut .actions:not(.tcur) { position:static; }  /* don't pin a greyed-out Build bar over the current step */
+  #form.tut .step.tcur { margin-top:18px; }
+  #form.tut .step { scroll-margin-top:96px; }
+  #tutbar { position:sticky; top:0; z-index:3; display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 -14px 6px; padding:10px 14px;
+    background:var(--card); border-bottom:1px solid var(--line); font-size:14px; }
+  #tutbar[hidden] { display:none; }
+  #tutbar .prog { flex:1 1 100%; height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
+  #tutbar .prog i { display:block; height:100%; background:var(--accent); transition:width .25s; }
+  #tutbar b { font-size:15px; }
+  #tutbar .sp { flex:1; }
+  #tutbar button { flex:none; padding:6px 12px; font:600 13px system-ui, -apple-system, sans-serif; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
+  #tutbar button.next { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  #tutbar button:disabled { opacity:.35; cursor:default; }
+  #tutbar .link { border:0; padding:6px 4px; color:var(--muted); font-weight:500; text-decoration:underline; }
+  .tutnext { display:flex; gap:8px; margin:8px 0 4px; }
+  .tutnext button { flex:none; padding:8px 18px; font:600 14px system-ui, -apple-system, sans-serif; border-radius:6px; cursor:pointer; }
+  .tutnext .next { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
+  .tutnext .back { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .tutnext button:disabled { opacity:.35; cursor:default; }
+  #tutdone { margin:8px 0; padding:10px 12px; border-radius:8px; border-left:4px solid var(--ok); background:var(--card); font-size:14px; }
+  #tutdone[hidden] { display:none; }
+  @media (pointer:coarse) { #tutbar button, .tutnext button { min-height:40px; } }
+
   /* Quick-start welcome for Beginner mode */
   #kidguide { position:absolute; inset:44px 12px 12px; overflow-y:auto; padding:18px 20px; border:1px solid var(--line); border-radius:10px; background:var(--panel); font-size:14px; line-height:1.5; }
   #kidguide[hidden] { display:none; }
@@ -288,6 +314,13 @@
 <header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a></nav><span class="units">Beta · units mm</span><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
+    <div id="tutbar" hidden role="region" aria-label="Tutorial">
+      <span>Tutorial · <b id="tutcount">Step 1 of 6</b></span><span class="sp"></span>
+      <button type="button" class="link" id="tutskip">Skip tutorial</button>
+      <button type="button" class="link" id="tutadv">Go to Advanced</button>
+      <div class="prog"><i id="tutprog"></i></div>
+    </div>
+    <div id="tutdone" hidden role="status"></div>
     <div id="designbar">
       <div class="dlabel"><label for="dname">Rocket name</label><span id="dstate"></span></div>
       <input id="dname" maxlength="80" value="My rocket">
@@ -307,31 +340,31 @@
     </div>
     <div id="modehint"></div>
     <fieldset><legend>Motor</legend>
-      <div class="step beg"><span class="n">1</span>Pick a motor size</div>
-      <p class="why beg">The <b>motor</b> is the part that pushes your rocket into the sky. You buy motors at a hobby store and slide one into the back of your rocket. The number is how wide the motor is, in millimeters. <a href="#guide-motors" class="more" data-guide>More about motors</a></p>
-      <label>Motor size <select name="motor"></select></label>
-      <p class="why beg" id="motorwhy"></p>
+      <div class="step beg" data-tstep="1"><span class="n">1</span>Pick a motor size</div>
+      <p class="why beg" data-tstep="1">The <b>motor</b> is the part that pushes your rocket into the sky. You buy motors at a hobby store and slide one into the back of your rocket. The number is how wide the motor is, in millimeters. <a href="#guide-motors" class="more" data-guide>More about motors</a></p>
+      <label data-tstep="1">Motor size <select name="motor"></select></label>
+      <p class="why beg" id="motorwhy" data-tstep="1"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <div class="step beg"><span class="n">2</span>How tall is your rocket?</div>
-      <p class="why beg">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
-      <input type="range" class="slider beg" id="heightslider" min="150" max="900" step="10" aria-label="Rocket height">
-      <label class="beg">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
-      <div class="conv beg" id="heightconv"></div>
+      <div class="step beg" data-tstep="2"><span class="n">2</span>How tall is your rocket?</div>
+      <p class="why beg" data-tstep="2">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <input type="range" class="slider beg" id="heightslider" data-tstep="2" min="150" max="900" step="10" aria-label="Rocket height">
+      <label class="beg" data-tstep="2">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="conv beg" id="heightconv" data-tstep="2"></div>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
       <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
-      <div class="step beg"><span class="n">3</span>How tall can your 3D printer print?</div>
-      <p class="why beg">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
-      <label><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
+      <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
-      <div class="step beg"><span class="n">4</span>Choose your fins</div>
-      <p class="why beg">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
-      <div class="choices beg" id="finpick" role="group" aria-label="Fin shape"></div>
-      <p class="why beg choice-why" id="finwhy"></p>
+      <div class="step beg" data-tstep="4"><span class="n">4</span>Choose your fins</div>
+      <p class="why beg" data-tstep="4">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
+      <div class="choices beg" id="finpick" data-tstep="4" role="group" aria-label="Fin shape"></div>
+      <p class="why beg choice-why" id="finwhy" data-tstep="4"></p>
       <label class="advshow">Shape <select name="fin_shape"></select></label>
       <label class="adv">Count <select name="fin_count"><option>3</option><option>4</option><option>5</option></select></label>
       <label class="adv">Thickness <input type="number" name="fin_thickness" min="0.4" max="12" step="0.1"></label>
@@ -347,10 +380,10 @@
       </div>
     </fieldset>
     <fieldset><legend>Nose</legend>
-      <div class="step beg"><span class="n">5</span>Choose a nose cone</div>
-      <p class="why beg">The nose cone is the pointy top. It <b>helps the rocket slice through the air</b>, and it pops off at the top of the flight so the parachute can come out. <a href="#guide-parts" class="more" data-guide>More about parts</a></p>
-      <div class="choices beg" id="nosepick" role="group" aria-label="Nose shape"></div>
-      <p class="why beg choice-why" id="nosewhy"></p>
+      <div class="step beg" data-tstep="5"><span class="n">5</span>Choose a nose cone</div>
+      <p class="why beg" data-tstep="5">The nose cone is the pointy top. It <b>helps the rocket slice through the air</b>, and it pops off at the top of the flight so the parachute can come out. <a href="#guide-parts" class="more" data-guide>More about parts</a></p>
+      <div class="choices beg" id="nosepick" data-tstep="5" role="group" aria-label="Nose shape"></div>
+      <p class="why beg choice-why" id="nosewhy" data-tstep="5"></p>
       <label class="advshow">Shape <select name="nose_shape"></select></label>
       <label class="adv">Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
     </fieldset>
@@ -376,9 +409,9 @@
         <label>Launch rod, m <input type="number" name="launch_rod_m" min="0.3" max="3" step="0.01"></label>
       </details>
     </fieldset>
-    <div class="step beg"><span class="n">6</span>Build it and check the stability score</div>
-    <p class="why beg">Press <b>Build my rocket</b>. In 10 to 30 seconds your rocket appears in 3D with a <b>stability score in "cal"</b> that tells you if it will fly straight. 1 to 2 cal is just right. <a href="#" class="more" data-kidguide>How the score works</a></p>
-    <div class="actions">
+    <div class="step beg" data-tstep="6"><span class="n">6</span>Build it and check the stability score</div>
+    <p class="why beg" data-tstep="6">Press <b>Build my rocket</b>. In 10 to 30 seconds your rocket appears in 3D with a <b>stability score in "cal"</b> that tells you if it will fly straight. 1 to 2 cal is just right. <a href="#" class="more" data-kidguide>How the score works</a></p>
+    <div class="actions" data-tstep="6">
       <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
       <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs (ZIP)</span></a>
@@ -394,7 +427,7 @@
         <button type="button" id="guidebtn" aria-controls="guide" aria-expanded="true">Guide</button>
       </div>
       <article id="kidguide" aria-label="Quick start" hidden>
-        <button type="button" class="close" id="kidskip">Skip</button>
+        <button type="button" class="close" id="kidskip">Skip tutorial</button>
         <h2>Welcome, rocket builder!</h2>
         <p class="lead">Design your own model rocket, see it in 3D, then print it on a 3D printer and fly it.</p>
         <h3>How it works</h3>
@@ -427,8 +460,11 @@
         <div class="safety"><b>Safety first:</b> rocket motors are handled and launched by a grown-up, in a big open field, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">model rocket safety code</a>.</div>
         <div class="btns">
           <button type="button" class="go" id="kidstart">Start designing</button>
+          <button type="button" class="ghost" id="kidskip2">Skip tutorial</button>
+          <button type="button" class="ghost" id="kidadv">Go to Advanced</button>
           <button type="button" class="ghost" id="kidfull">Read the full guide</button>
         </div>
+        <p class="hint" id="kidreplay" hidden>You've done the tutorial before. <a href="#" id="replaytut">Replay it</a></p>
       </article>
       <article id="guide" aria-label="User guide">
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
@@ -572,11 +608,74 @@ function showGuide(on, which) {
 const guideOpen = () => !guideEl.hidden || !kidGuideEl.hidden;
 guideBtn.onclick = () => showGuide(!guideOpen());
 document.getElementById('guideclose').onclick = () => showGuide(false);
-document.getElementById('kidskip').onclick = () => document.getElementById('kidstart').click();
-document.getElementById('kidstart').onclick = () => {
+// ---------- guided tutorial ----------
+// "Start designing" walks through the six Beginner steps one at a time; the
+// other steps and controls are greyed out and inert. Finishing (or building
+// on the last step) unlocks the whole Beginner form. Done once, it's
+// remembered in this browser; the quick start can replay it.
+const TUT_STEPS = 6;
+const tutDone = () => { try { return localStorage.getItem('tutorialDone') === '1'; } catch { return false; } };
+let tutStep = 0;  // 0 = no tutorial running
+const tutBar = document.getElementById('tutbar'), tutDoneEl = document.getElementById('tutdone');
+const tutNav = document.createElement('div');
+tutNav.className = 'tutnext';
+tutNav.innerHTML = '<button type="button" class="back">Back</button><button type="button" class="next">Next</button>';
+const narrow = () => matchMedia('(max-width: 800px)').matches;
+function tutShow() {
+  const f = document.getElementById('form');
+  f.classList.add('tut'); tutBar.hidden = false; tutDoneEl.hidden = true;
+  document.getElementById('tutcount').textContent = `Step ${tutStep} of ${TUT_STEPS}`;
+  document.getElementById('tutprog').style.width = `${tutStep / TUT_STEPS * 100}%`;
+  f.querySelectorAll('[data-tstep]').forEach(el => {
+    const cur = Number(el.dataset.tstep) === tutStep;
+    el.classList.toggle('tcur', cur);
+    el.inert = !cur;
+  });
+  // Everything that isn't a step (save bar, mode switch, Advanced-only bits) is locked too.
+  for (const el of [document.getElementById('designbar'), document.getElementById('modebar'), document.getElementById('modehint')]) { el.classList.add('tlock'); el.inert = true; }
+  // Back / Next sit right under the current step (on the last step, Build is the next move).
+  const pieces = [...f.querySelectorAll(`[data-tstep="${tutStep}"]`)];
+  const last = pieces[pieces.length - 1];
+  if (tutStep === TUT_STEPS) { tutNav.querySelector('.next').textContent = 'Finish without building'; last.after(tutNav); }
+  else { tutNav.querySelector('.next').textContent = 'Next'; last.after(tutNav); }
+  tutNav.querySelector('.back').disabled = tutStep === 1;
+  tutNav.hidden = false;
+  const head = f.querySelector(`.step[data-tstep="${tutStep}"]`);
+  head.scrollIntoView({ behavior: 'smooth', block: 'start' });  // scroll-margin keeps it clear of the sticky tutorial bar
+  if (tutStep === TUT_STEPS) buildBtn.focus({ preventScroll: true });
+}
+function tutStart() {
+  if (mode !== 'beginner') switchMode('beginner');
   showGuide(false);
-  if (matchMedia('(max-width: 800px)').matches) document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  tutStep = 1; tutShow();
+}
+function tutEnd(finished, msg) {
+  tutStep = 0;
+  const f = document.getElementById('form');
+  f.classList.remove('tut'); tutBar.hidden = true; tutNav.remove();
+  f.querySelectorAll('[data-tstep]').forEach(el => { el.classList.remove('tcur'); el.inert = false; });
+  for (const el of document.querySelectorAll('.tlock')) { el.classList.remove('tlock'); el.inert = false; }
+  if (finished) { try { localStorage.setItem('tutorialDone', '1'); } catch {} }
+  if (msg) { tutDoneEl.innerHTML = msg; tutDoneEl.hidden = false; }
+}
+tutNav.querySelector('.back').onclick = () => { if (tutStep > 1) { tutStep--; tutShow(); } };
+tutNav.querySelector('.next').onclick = () => {
+  if (tutStep < TUT_STEPS) { tutStep++; tutShow(); }
+  else tutEnd(true, '<b>Tutorial done!</b> Every step is unlocked now. Change anything you like, then press <b>Build my rocket</b>.');
 };
+const skipTut = () => { showGuide(false); tutEnd(false, 'Every step is unlocked. Work top to bottom, then press <b>Build my rocket</b>. The <b>Guide</b> button (on the 3D view) brings the welcome back.'); };
+const goAdvanced = () => { showGuide(false); tutEnd(false); switchMode('advanced'); };
+document.getElementById('tutskip').onclick = skipTut;
+document.getElementById('tutadv').onclick = goAdvanced;
+document.getElementById('kidskip').onclick = skipTut;
+document.getElementById('kidskip2').onclick = skipTut;
+document.getElementById('kidadv').onclick = goAdvanced;
+document.getElementById('kidstart').onclick = () => {
+  if (tutDone()) { showGuide(false); if (narrow()) document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else tutStart();
+};
+document.getElementById('replaytut').onclick = e => { e.preventDefault(); tutStart(); };
+document.getElementById('kidreplay').hidden = !tutDone();
 function openFull(anchor) {
   showGuide(true, 'full');
   const t = anchor && document.getElementById(anchor);
@@ -603,7 +702,7 @@ for (const el of form.querySelectorAll('input[type=number]')) el.inputMode = 'de
 const opts = await (await fetch('/api/options')).json();
 // Beginner mode (the default) shows motor, printer height, overall height,
 // nose shape and three fin shapes; everything else is sent as the defaults.
-let mode = (() => { try { return localStorage.getItem('mode') === 'advanced' ? 'advanced' : 'beginner'; } catch { return 'beginner'; } })();
+let mode = 'beginner';  // every launch starts in Beginner; a saved Advanced design switches when it opens
 let lastBuild = null;  // {length_mm, body_length_mm} of the model on screen
 let lastReport = null;  // the last build's report, redrawn when the mode changes
 const fill = (name, values) => {
@@ -709,8 +808,8 @@ function switchMode(m) {
   } else if (lastBuild) {
     form.elements.body_length.value = lastBuild.body_length_mm;  // the same rocket, now by body length
   }
+  if (m === 'advanced' && tutStep) tutEnd(false);
   mode = m;
-  try { localStorage.setItem('mode', m); } catch {}
   applyMode(); markDirty();
   if (lastReport) showReport(lastReport);  // kid report <-> full report
 }
@@ -1092,6 +1191,7 @@ async function runBuild() {
     lastBuild = { length_mm: body.stability.length_mm, body_length_mm: body.body_length_mm };
     setMarkers(body.stability); applyView(false);
     builtOnce = true; lastReport = body;
+    if (tutStep) tutEnd(true, '<b>You built your first rocket!</b> Check its stability score. Every step is unlocked now, so try changing things and building again.');
     showReport(body); showGuide(false);
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
     zipBtn.classList.toggle('off', !body.stability.ok);
@@ -1134,7 +1234,6 @@ function renderMine() {
 // design opens in Advanced. An empty one (New rocket) keeps the current mode.
 function setForm(p) {
   mode = p.overall_length != null ? 'beginner' : Object.keys(p).length ? 'advanced' : mode;
-  try { localStorage.setItem('mode', mode); } catch {}
   applyMode();
   form.elements.motor.value = p.motor ?? opts.defaults.motor;
   fillFlightMotors(p.flight_motor ?? '');
