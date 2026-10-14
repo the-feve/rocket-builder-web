@@ -48,7 +48,10 @@
   header nav a { color:var(--ink); text-decoration:none; }
   header nav a:hover { text-decoration:underline; text-underline-offset:5px; }
   header .units { color:var(--muted); font-size:12px; }
-  #theme { margin-left:auto; flex:none; padding:5px 12px; font:500 12px system-ui, -apple-system, sans-serif; color:var(--muted);
+  #acct { margin-left:auto; flex:none; padding:5px 12px; font:600 12px system-ui, -apple-system, sans-serif; color:var(--ink);
+    background:transparent; border:1px solid var(--line); border-radius:6px; cursor:pointer; max-width:45vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #acct:hover { border-color:var(--accent); }
+  #theme { flex:none; padding:5px 12px; font:500 12px system-ui, -apple-system, sans-serif; color:var(--muted);
     background:transparent; border:1px solid var(--line); border-radius:6px; cursor:pointer; }
   #theme:hover { color:var(--ink); border-color:var(--muted); }
   header { flex:none; }
@@ -213,7 +216,23 @@
   #savemsg { flex:1 1 100%; font-size:12px; color:var(--muted); min-height:16px; overflow-wrap:anywhere; }
   #savemsg.ok { color:var(--ok); } #savemsg.err { color:var(--err); }
   #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
-  #namedlg::backdrop { background:rgba(0,0,0,.5); }
+  #namedlg::backdrop, #authdlg::backdrop { background:rgba(0,0,0,.5); }
+  #authdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(380px, 92vw); }
+  #authdlg h2 { font-size:17px; margin:10px 0 4px; } #authdlg p { font-size:13px; color:var(--muted); margin:0 0 10px; }
+  .authtabs { display:flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .authtabs button { flex:1; padding:7px; border:0; border-radius:0; font:600 13px system-ui, -apple-system, sans-serif; background:transparent; color:var(--muted); cursor:pointer; }
+  .authtabs button[aria-selected=true] { background:var(--ink); color:var(--bg); }
+  #authdlg label.stack { display:flex; flex-direction:column; align-items:stretch; text-align:left; gap:4px; margin:8px 0; font-size:13px; font-weight:600; }
+  #authdlg input[type=email], #authdlg input[type=password] { width:100%; padding:8px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; font-size:16px; color:var(--ink); background:var(--field); }
+  #authdlg .agebox { display:flex; gap:8px; align-items:flex-start; font-size:13px; margin:8px 0; grid-template-columns:none; }
+  #authdlg .agebox[hidden] { display:none; }
+  #authdlg .autherr { color:var(--err); min-height:1em; margin:6px 0 0; }
+  #authdlg menu { display:flex; flex-direction:row-reverse; gap:8px; margin:12px 0 0; padding:0; }
+  #authdlg menu button { flex:none; padding:8px 16px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; }
+  #authgo { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
+  #authcancel { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  #acctnote { flex:1 1 100%; margin:2px 0 0; }
+  #acctnote[hidden] { display:none; }
   #namedlg h2 { font-size:14px; margin:0 0 4px; } #namedlg p { font-size:12px; color:var(--muted); margin:0 0 10px; }
   #namedlg input { width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font:inherit; color:var(--ink); background:transparent; }
   #namedlg menu { display:flex; flex-direction:row-reverse; justify-content:flex-start; gap:6px; margin:12px 0 0; padding:0; }
@@ -311,7 +330,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a></nav><span class="units">Beta · units mm</span><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
@@ -333,6 +352,7 @@
       <input type="file" id="filepick" accept=".json,application/json" hidden>
       <select id="mine" aria-label="My rockets"></select>
       <div id="savemsg" role="status" aria-live="polite"></div>
+      <div id="acctnote" class="hint"><a href="#" data-signin>Sign in or create an account</a> to keep your rockets and open them on any device.</div>
     </div>
     <div id="modebar" role="group" aria-label="Mode">
       <button type="button" data-mode="beginner" aria-pressed="true">Beginner</button>
@@ -570,6 +590,21 @@
     <div id="report"></div>
   </section>
 </main>
+<dialog id="authdlg" aria-labelledby="authtitle">
+  <form method="dialog" id="authform" novalidate>
+    <div class="authtabs" role="tablist">
+      <button type="button" role="tab" data-tab="in" aria-selected="true">Sign in</button>
+      <button type="button" role="tab" data-tab="up" aria-selected="false">Create account</button>
+    </div>
+    <h2 id="authtitle">Sign in</h2>
+    <p id="authhint">Your saved rockets are kept in your account, so you can open them on any device.</p>
+    <label class="stack">Email <input type="email" id="authemail" autocomplete="email" required maxlength="254"></label>
+    <label class="stack">Password <input type="password" id="authpw" autocomplete="current-password" required minlength="8" maxlength="200"></label>
+    <label class="agebox" hidden><input type="checkbox" id="authage"> I'm 13 or older, or I'm a parent or guardian making this account for my child.</label>
+    <p class="autherr" id="autherr" role="alert"></p>
+    <menu><button type="submit" value="ok" id="authgo">Sign in</button><button type="button" id="authcancel">Cancel</button></menu>
+  </form>
+</dialog>
 <dialog id="namedlg">
   <form method="dialog">
     <h2 id="dlgtitle">Name your rocket</h2>
@@ -1215,8 +1250,14 @@ async function runBuild() {
 // Designs saved from this browser, with their edit keys, live in localStorage
 // until sign-in exists; anyone with a link can open (but not change) a design.
 const nameEl = document.getElementById('dname'), mineEl = document.getElementById('mine'), msgEl = document.getElementById('savemsg');
-const loadMine = () => { try { return JSON.parse(localStorage.getItem('myRockets') || '[]'); } catch { return []; } };
-const storeMine = list => { try { localStorage.setItem('myRockets', JSON.stringify(list)); } catch {} };
+// Signed in, "My rockets" is the account's list (any device); edit keys for
+// designs saved in this browser are still kept locally and sent along.
+let user = null, accountList = [];
+const localMine = () => { try { return JSON.parse(localStorage.getItem('myRockets') || '[]'); } catch { return []; } };
+const loadMine = () => user
+  ? accountList.map(d => ({ id: d.id, name: d.name, key: (localMine().find(x => x.id === d.id) || {}).key || '' }))
+  : localMine();
+const storeMine = list => { try { localStorage.setItem('myRockets', JSON.stringify(list.filter(d => d.key))); } catch {} };
 let current = null;  // {id, key} of the design on screen, if saved from this browser
 let shared = false;  // the design on screen was opened from someone else's link
 const stateEl = document.getElementById('dstate');
@@ -1226,7 +1267,7 @@ function renderState() {
 }
 function renderMine() {
   const list = loadMine();
-  mineEl.innerHTML = `<option value="">My rockets (${list.length} saved in this browser)…</option>` +
+  mineEl.innerHTML = `<option value="">My rockets (${list.length} ${user ? 'in your account' : 'saved in this browser'})…</option>` +
     list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
   renderState();
 }
@@ -1293,7 +1334,8 @@ async function save(asNew, chosenName = null) {
   } catch { say('Could not reach the server; check your connection and try again.', 'err'); return; }
   if (!res.ok) { say(typeof d.detail === 'string' ? d.detail : `Could not save (error ${res.status}).`, 'err'); return; }
   const entry = { id: d.id, name: d.name, key: own ? own.key : d.edit_key };
-  storeMine([entry, ...mine.filter(x => x.id !== d.id)]);
+  storeMine([entry, ...localMine().filter(x => x.id !== d.id)]);
+  if (user) await refreshAccount();
   current = entry; shared = false; history.replaceState(null, '', `/d/${d.id}`);
   renderMine(); say(`Saved "${d.name}". Share link: ${shareUrl(d.id)}`, 'ok');
 }
@@ -1354,6 +1396,93 @@ async function openDesign(id) {
   runBuild();
 }
 mineEl.onchange = () => { if (mineEl.value) openDesign(mineEl.value); };
+
+// ---------- accounts ----------
+const acctBtn = document.getElementById('acct'), authDlg = document.getElementById('authdlg');
+let authTab = 'in';
+async function refreshAccount() {
+  try {
+    const r = await fetch('/api/my/designs');
+    accountList = r.ok ? (await r.json()).designs : [];
+  } catch { accountList = []; }
+  renderMine();
+}
+function renderUser() {
+  acctBtn.textContent = user ? user.email : 'Sign in';
+  acctBtn.title = user ? 'Signed in. Click to sign out.' : 'Sign in or create an account';
+  document.getElementById('acctnote').hidden = !!user;
+}
+async function afterSignIn(u, created) {
+  user = u; renderUser();
+  // Move rockets saved in this browser (proved by their edit keys) into the account.
+  const local = localMine();
+  let claimed = 0;
+  if (local.length) {
+    try {
+      const r = await fetch('/api/my/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: local.map(d => ({ id: d.id, key: d.key })) }) });
+      if (r.ok) claimed = (await r.json()).claimed;
+    } catch {}
+  }
+  await refreshAccount();
+  if (current && !loadMine().some(d => d.id === current.id)) current = null;
+  renderMine();
+  say(`${created ? 'Account created' : 'Signed in'} as ${u.email}.${claimed ? ` ${claimed} rocket${claimed > 1 ? 's' : ''} from this browser moved into your account.` : ''}`, 'ok');
+}
+function setAuthTab(t) {
+  authTab = t;
+  authDlg.querySelectorAll('.authtabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  document.getElementById('authtitle').textContent = t === 'up' ? 'Create an account' : 'Sign in';
+  document.getElementById('authgo').textContent = t === 'up' ? 'Create account' : 'Sign in';
+  document.getElementById('authhint').textContent = t === 'up'
+    ? 'Grown-ups: make an account to keep your family\'s rockets and open them on any device. Use at least 8 characters for the password.'
+    : 'Your saved rockets are kept in your account, so you can open them on any device.';
+  authDlg.querySelector('.agebox').hidden = t !== 'up';
+  document.getElementById('authpw').autocomplete = t === 'up' ? 'new-password' : 'current-password';
+  document.getElementById('autherr').textContent = '';
+}
+authDlg.querySelectorAll('.authtabs button').forEach(b => b.onclick = () => setAuthTab(b.dataset.tab));
+document.getElementById('authcancel').onclick = () => authDlg.close();
+function openAuth(tab = 'in') { setAuthTab(tab); authDlg.showModal(); document.getElementById('authemail').focus(); }
+document.getElementById('authform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('authemail').value.trim(), password = document.getElementById('authpw').value;
+  const err = document.getElementById('autherr');
+  if (authTab === 'up' && !document.getElementById('authage').checked) { err.textContent = 'Please tick the box: accounts are for people 13 or older, or a parent or guardian.'; return; }
+  err.textContent = '';
+  const go = document.getElementById('authgo'); go.disabled = true;
+  try {
+    const r = await fetch(authTab === 'up' ? '/api/auth/signup' : '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authTab === 'up' ? { email, password, age_ok: true } : { email, password }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) { err.textContent = typeof d.detail === 'string' ? d.detail : 'Something went wrong; try again.'; return; }
+    authDlg.close(); document.getElementById('authpw').value = '';
+    await afterSignIn(d.user, authTab === 'up');
+  } catch { err.textContent = 'Could not reach the server; check your connection.'; }
+  finally { go.disabled = false; }
+});
+acctBtn.onclick = async () => {
+  if (!user) { openAuth('in'); return; }
+  if (!confirmSignOut()) return;
+  try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+  user = null; accountList = [];
+  if (current && !localMine().some(d => d.id === current.id)) current = null;
+  renderUser(); renderMine(); say('Signed out.', 'ok');
+};
+// A two-click sign-out instead of a browser confirm() (blocked in some embedded browsers).
+let signOutArmed = 0;
+function confirmSignOut() {
+  if (Date.now() - signOutArmed < 4000) return true;
+  signOutArmed = Date.now(); acctBtn.textContent = 'Sign out?';
+  setTimeout(() => { if (user) acctBtn.textContent = user.email; }, 4000);
+  return false;
+}
+document.addEventListener('click', e => { const a = e.target.closest('a[data-signin]'); if (a) { e.preventDefault(); openAuth('up'); } });
+renderUser();
+try {
+  const me = await (await fetch('/api/auth/me')).json();
+  if (me.user) { user = me.user; renderUser(); await refreshAccount(); }
+} catch {}
 applyMode();
 if (mode === 'beginner') form.elements.overall_length.value = opts.beginner.overall_length;
 showGuide(true);

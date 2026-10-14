@@ -1,8 +1,10 @@
 """Saved designs in SQLite: {id, name, params, versions, times}.
 
-One table, no accounts yet. Each design gets a short random id (its share
-link, /d/<id>) and an edit key, stored hashed, that the saving browser keeps.
-When sign-in arrives, `owner` takes over from the edit key.
+Each design gets a short random id (its share link, /d/<id>) and an edit
+key, stored hashed, that the saving browser keeps. A design saved while
+signed in also gets `owner` (a user id, see accounts.py); the owner can edit
+it from any browser, and signing in claims designs saved earlier in that
+browser.
 
 The database file is ROCKETGEN_DB, default data/designs.sqlite3 next to
 this file.
@@ -66,15 +68,15 @@ def check_key(design_id: str, key: str) -> bool:
     return bool(row and key) and hmac.compare_digest(row["edit_key_hash"], _hash(key))
 
 
-def create(name: str, params: dict, generator_version: str, schema_version: int) -> dict:
+def create(name: str, params: dict, generator_version: str, schema_version: int, owner: str | None = None) -> dict:
     key = secrets.token_urlsafe(18)
     now = time.time()
     with _db() as con:
         while True:
             design_id = secrets.token_urlsafe(6)  # 8 characters
             try:
-                con.execute("INSERT INTO designs VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?)",
-                            (design_id, name, json.dumps(params), generator_version, schema_version, _hash(key), now, now))
+                con.execute("INSERT INTO designs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            (design_id, name, json.dumps(params), generator_version, schema_version, _hash(key), owner, now, now))
                 break
             except sqlite3.IntegrityError:
                 continue
@@ -97,3 +99,24 @@ def rename(design_id: str, name: str) -> dict:
 def delete(design_id: str) -> None:
     with _db() as con:
         con.execute("DELETE FROM designs WHERE id = ?", (design_id,))
+
+
+def owner_of(design_id: str) -> str | None:
+    with _db() as con:
+        row = con.execute("SELECT owner FROM designs WHERE id = ?", (design_id,)).fetchone()
+    return row["owner"] if row else None
+
+
+def list_owned(owner: str) -> list[dict]:
+    with _db() as con:
+        rows = con.execute("SELECT * FROM designs WHERE owner = ? ORDER BY updated_at DESC", (owner,)).fetchall()
+    return [_public(r) for r in rows]
+
+
+def claim(design_id: str, key: str, owner: str) -> bool:
+    """Gives an unowned design to `owner` if `key` is its edit key."""
+    if not check_key(design_id, key):
+        return False
+    with _db() as con:
+        cur = con.execute("UPDATE designs SET owner = ? WHERE id = ? AND owner IS NULL", (owner, design_id))
+    return cur.rowcount == 1

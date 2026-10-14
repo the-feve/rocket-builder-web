@@ -150,3 +150,32 @@ def test_page_is_not_cached_stale():
     for path in ("/", "/d/anything"):
         r = client.get(path)
         assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
+
+
+def test_accounts_signup_login_and_owned_designs():
+    from fastapi.testclient import TestClient as TC
+    a, b = TC(app), TC(app)  # two browsers
+    assert a.post("/api/auth/signup", json={"email": "kid@example.com", "password": "rocket123"}).status_code == 400  # no age box
+    assert a.post("/api/auth/signup", json={"email": "kid@example.com", "password": "short", "age_ok": True}).status_code == 400
+    r = a.post("/api/auth/signup", json={"email": "Kid@Example.com", "password": "rocket123", "age_ok": True})
+    assert r.status_code == 200 and r.json()["user"]["email"] == "kid@example.com"
+    assert a.get("/api/auth/me").json()["user"]["email"] == "kid@example.com"
+    assert a.post("/api/auth/signup", json={"email": "kid@example.com", "password": "rocket123", "age_ok": True}).status_code == 400
+
+    # A design saved signed out (edit key) is claimed into the account; one saved signed in is owned.
+    anon = TC(app).post("/api/designs", json={"name": "Old", "params": {}}).json()
+    claim = a.post("/api/my/claim", json={"items": [{"id": anon["id"], "key": anon["edit_key"]}, {"id": anon["id"], "key": "wrong"}]})
+    assert claim.json() == {"claimed": 1}
+    mine = a.post("/api/designs", json={"name": "New", "params": {}}).json()
+    names = [d["name"] for d in a.get("/api/my/designs").json()["designs"]]
+    assert set(names) == {"Old", "New"}
+
+    # Another browser: can't edit until it signs in to the same account, then can without the edit key.
+    assert b.put(f"/api/designs/{mine['id']}", json={"name": "X", "params": {}}).status_code == 403
+    assert b.post("/api/auth/login", json={"email": "kid@example.com", "password": "nope"}).status_code == 401
+    assert b.post("/api/auth/login", json={"email": "KID@example.com", "password": "rocket123"}).status_code == 200
+    assert b.put(f"/api/designs/{mine['id']}", json={"name": "Renamed", "params": {}}).json()["name"] == "Renamed"
+
+    b.post("/api/auth/logout")
+    assert b.get("/api/auth/me").json()["user"] is None
+    assert b.get("/api/my/designs").status_code == 401

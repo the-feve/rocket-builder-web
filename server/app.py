@@ -25,8 +25,8 @@ from pathlib import Path
 
 import numpy as np
 import trimesh
-from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import FileResponse, Response
+from fastapi import Cookie, FastAPI, Header, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -39,6 +39,7 @@ from rocketgen.flight import FIELD_M, motors_for, pick, simulate
 from rocketgen.build import body_length_for, overall_length
 from rocketgen.stability import Balance, build_stable, recovery_allowance_g
 
+import accounts
 import designs
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -120,6 +121,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 BUILD_WAIT_S = float(os.environ.get("ROCKETGEN_BUILD_WAIT_S", 60))
 BUILDS_PER_10_MIN = int(os.environ.get("ROCKETGEN_BUILDS_PER_10_MIN", 30))
 SAVES_PER_HOUR = int(os.environ.get("ROCKETGEN_SAVES_PER_HOUR", 60))
+AUTH_PER_10_MIN = int(os.environ.get("ROCKETGEN_AUTH_PER_10_MIN", 20))  # sign-up / sign-in attempts per address
 
 app = FastAPI(title="Rocket Builder")
 _hits: dict[tuple[str, str], deque] = defaultdict(deque)
@@ -380,13 +382,106 @@ class DesignRename(BaseModel):
     name: str = Field(..., min_length=1, max_length=80)
 
 
+# ---------- accounts ----------
+SESSION_COOKIE = "rb_session"
+
+
+class SignUp(BaseModel):
+    email: str = Field(..., max_length=254)
+    password: str = Field(..., max_length=200)
+    # The site is used by children: accounts are for people 13+ or a parent /
+    # guardian setting one up for their child (COPPA). The form asks for this.
+    age_ok: bool = False
+
+
+class SignIn(BaseModel):
+    email: str = Field(..., max_length=254)
+    password: str = Field(..., max_length=200)
+
+
+class ClaimItem(BaseModel):
+    id: str = Field(..., max_length=40)
+    key: str = Field(..., max_length=80)
+
+
+class Claim(BaseModel):
+    items: list[ClaimItem] = Field(default_factory=list, max_length=500)
+
+
+def current_user(request: Request) -> dict | None:
+    return accounts.user_for_session(request.cookies.get(SESSION_COOKIE))
+
+
+def _signed_in(user: dict, request: Request) -> JSONResponse:
+    res = JSONResponse({"user": {"email": user["email"]}})
+    https = request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
+    res.set_cookie(SESSION_COOKIE, accounts.new_session(user["id"]), max_age=accounts.SESSION_DAYS * 86400,
+                   httponly=True, samesite="lax", secure=https, path="/")
+    return res
+
+
+@app.post("/api/auth/signup")
+def signup(body: SignUp, request: Request):
+    _rate_limit(request, "auth", AUTH_PER_10_MIN, 600)
+    if not body.age_ok:
+        raise HTTPException(400, "Accounts are for people 13 or older, or a parent or guardian setting one up for their child.")
+    try:
+        user = accounts.create_user(body.email, body.password)
+    except accounts.AccountError as e:
+        raise HTTPException(400, str(e)) from None
+    return _signed_in(user, request)
+
+
+@app.post("/api/auth/login")
+def login(body: SignIn, request: Request):
+    _rate_limit(request, "auth", AUTH_PER_10_MIN, 600)
+    user = accounts.authenticate(body.email, body.password)
+    if not user:
+        raise HTTPException(401, "That email and password don't match an account.")
+    return _signed_in(user, request)
+
+
+@app.post("/api/auth/logout")
+def logout(rb_session: str | None = Cookie(None)):
+    accounts.end_session(rb_session)
+    res = JSONResponse({"user": None})
+    res.delete_cookie(SESSION_COOKIE, path="/")
+    return res
+
+
+@app.get("/api/auth/me")
+def me(request: Request):
+    user = current_user(request)
+    return {"user": {"email": user["email"]} if user else None}
+
+
+@app.get("/api/my/designs")
+def my_designs(request: Request):
+    user = current_user(request)
+    if not user:
+        raise HTTPException(401, "Sign in to see your rockets.")
+    return {"designs": [{"id": d["id"], "name": d["name"], "updated_at": d["updated_at"]} for d in designs.list_owned(user["id"])]}
+
+
+@app.post("/api/my/claim")
+def claim_designs(body: Claim, request: Request):
+    """Moves designs saved in this browser (proved by their edit keys) into the account."""
+    user = current_user(request)
+    if not user:
+        raise HTTPException(401, "Sign in first.")
+    return {"claimed": sum(designs.claim(i.id, i.key, user["id"]) for i in body.items)}
+
+
+# ---------- saved designs ----------
 @app.post("/api/designs")
 def save_design(d: DesignIn, request: Request):
     """A new saved design. The edit key comes back once; the page keeps it
-    in this browser and sends it to rename or overwrite. Until sign-in
-    exists, it is the only proof of ownership."""
+    in this browser and sends it to rename or overwrite. Signed in, the
+    design also belongs to the account, which can edit it from anywhere."""
     _rate_limit(request, "save", SAVES_PER_HOUR, 3600)
-    return designs.create(d.name, d.params.model_dump(mode="json"), GENERATOR_VERSION, SCHEMA_VERSION)
+    user = current_user(request)
+    return designs.create(d.name, d.params.model_dump(mode="json"), GENERATOR_VERSION, SCHEMA_VERSION,
+                          owner=user["id"] if user else None)
 
 
 @app.get("/api/designs/{design_id}")
@@ -398,27 +493,31 @@ def load_design(design_id: str):
 
 
 @app.put("/api/designs/{design_id}")
-def update_design(design_id: str, d: DesignIn, x_edit_key: str = Header("")):
-    _owned(design_id, x_edit_key)
+def update_design(design_id: str, d: DesignIn, request: Request, x_edit_key: str = Header("")):
+    _owned(design_id, x_edit_key, request)
     return designs.update(design_id, d.name, d.params.model_dump(mode="json"), GENERATOR_VERSION, SCHEMA_VERSION)
 
 
 @app.patch("/api/designs/{design_id}")
-def rename_design(design_id: str, d: DesignRename, x_edit_key: str = Header("")):
-    _owned(design_id, x_edit_key)
+def rename_design(design_id: str, d: DesignRename, request: Request, x_edit_key: str = Header("")):
+    _owned(design_id, x_edit_key, request)
     return designs.rename(design_id, d.name)
 
 
 @app.delete("/api/designs/{design_id}")
-def delete_design(design_id: str, x_edit_key: str = Header("")):
-    _owned(design_id, x_edit_key)
+def delete_design(design_id: str, request: Request, x_edit_key: str = Header("")):
+    _owned(design_id, x_edit_key, request)
     designs.delete(design_id)
     return {"deleted": design_id}
 
 
-def _owned(design_id: str, key: str):
+def _owned(design_id: str, key: str, request: Request):
+    """The edit key from the saving browser, or being signed in as the owner."""
     if not designs.get(design_id):
         raise HTTPException(404, "That design doesn't exist.")
+    user = current_user(request)
+    if user and designs.owner_of(design_id) == user["id"]:
+        return
     if not designs.check_key(design_id, key):
         raise HTTPException(403, "This design was saved from another browser; use Save as new to keep a copy.")
 
