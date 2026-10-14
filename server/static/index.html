@@ -109,6 +109,74 @@
   #modebar button[aria-pressed=true] { color:var(--accent-ink); background:var(--accent); }
   #modehint { font-size:11px; color:var(--muted); margin:4px 0 0; }
   body.beginner .adv, body:not(.beginner) .beg { display:none !important; }
+  body.beginner .advshow { display:none !important; }  /* hidden in Beginner but still sent (the picture choices set it) */
+
+  /* ---- Beginner mode: a step-by-step builder for ages ~8-13 (grades 3-7) ---- */
+  body.beginner #form { font-size:15px; }
+  body.beginner #form legend { display:none; }
+  body.beginner #form fieldset { border-top:none; margin-top:4px; padding-top:0; }
+  .step { display:flex; align-items:center; gap:10px; margin:16px 0 4px; font-size:16px; font-weight:700; }
+  .step .n { flex:none; display:grid; place-items:center; width:26px; height:26px; border-radius:50%;
+    background:var(--ink); color:var(--bg); font-size:13px; font-weight:700; }
+  .why { margin:2px 0 8px; font-size:13.5px; line-height:1.45; color:var(--muted); }
+  .why b { color:var(--ink); font-weight:600; }
+  .why a, .more { color:var(--accent); white-space:nowrap; }
+  .more { font-size:13px; }
+  .conv { margin:-2px 0 6px; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .conv b { color:var(--ink); }
+  input[type=range].slider { width:100%; margin:4px 0 2px; accent-color:var(--accent); }
+  .choices { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin:6px 0 4px; }
+  .choices button { display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 4px 6px; min-height:0;
+    border:1.5px solid var(--line); border-radius:8px; background:var(--field); color:var(--ink); font:600 12.5px system-ui, -apple-system, sans-serif; cursor:pointer; }
+  .choices button:hover { border-color:var(--muted); }
+  .choices button[aria-pressed=true] { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .choices svg { width:72px; height:46px; display:block; color:var(--ink); }
+  .choice-why { min-height:2.9em; }
+  .tag { display:inline-block; font-size:11px; font-weight:600; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); margin-left:4px; vertical-align:1px; }
+
+  /* Beginner report */
+  .kid { grid-column:1/-1; display:grid; gap:12px; }
+  .kidcard { border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--card); }
+  .kidcard h3 { margin:0 0 6px; font-size:15px; }
+  .kidcard p { margin:4px 0; font-size:13.5px; line-height:1.45; }
+  .kidcard.bad { border-color:var(--errline); background:var(--errbg); }
+  .score { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .score b { font-size:28px; font-variant-numeric:tabular-nums; }
+  .score .verdict { font-weight:700; font-size:16px; }
+  .score.stable .verdict, .score.stable b { color:var(--ok); }
+  .score.overstable .verdict, .score.overstable b { color:var(--warn); }
+  .score.unstable .verdict, .score.unstable b { color:var(--err); }
+  .meter { position:relative; height:14px; border-radius:7px; margin:10px 0 4px; overflow:visible;
+    background:linear-gradient(90deg, #e5484d 0 25%, #30a46c 25% 50%, #7cc68f 50% 75%, #f5a524 75% 100%); }
+  .meter i { position:absolute; top:-5px; width:4px; height:24px; margin-left:-2px; border-radius:2px; background:var(--ink); box-shadow:0 0 0 2px var(--card); }
+  .meter-labels { display:grid; grid-template-columns:repeat(4, 1fr); font-size:11px; color:var(--muted); text-align:center; }
+  .tips { margin:6px 0 0; padding-left:18px; font-size:13.5px; line-height:1.45; }
+  .tips li { margin:3px 0; }
+  .steps4 { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin:8px 0 4px; padding:0; list-style:none; counter-reset:s; }
+  .steps4 li { counter-increment:s; border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; background:var(--panel); }
+  .steps4 li::before { content:counter(s); display:inline-grid; place-items:center; width:20px; height:20px; margin-right:6px; border-radius:50%; background:var(--ink); color:var(--bg); font-size:11px; font-weight:700; }
+  .steps4 b { display:inline; }
+  details.grownup { grid-column:1/-1; border-top:1px solid var(--line); padding-top:6px; }
+  details.grownup > summary { font-weight:600; font-size:13px; color:var(--muted); padding:4px 0; }
+  details.grownup[open] > .full { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:6px 24px; }
+  @media (max-width:1100px) { details.grownup[open] > .full { grid-template-columns:1fr; } }
+
+  /* Quick-start welcome for Beginner mode */
+  #kidguide { position:absolute; inset:44px 12px 12px; overflow-y:auto; padding:18px 20px; border:1px solid var(--line); border-radius:10px; background:var(--panel); font-size:14px; line-height:1.5; }
+  #kidguide[hidden] { display:none; }
+  #kidguide h2 { font-size:22px; margin:0 0 4px; }
+  #kidguide .close { float:right; flex:none; margin-left:8px; padding:4px 12px; font:500 13px system-ui, -apple-system, sans-serif; border:1px solid var(--line); color:var(--ink); background:var(--panel); }
+  body.beginner #report { max-height:46vh; max-height:46dvh; }
+  #kidguide h3 { font-size:15px; margin:16px 0 4px; }
+  #kidguide p { margin:4px 0; }
+  #kidguide .lead { font-size:15px; color:var(--muted); }
+  #kidguide .btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  #kidguide .btns button { flex:0 1 auto; padding:9px 16px; }
+  #kidguide .go { background:var(--ink); color:var(--bg); }
+  #kidguide .ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  #kidguide svg { width:100%; max-width:460px; height:auto; display:block; color:var(--ink); margin:6px 0; }
+  .safety { margin-top:12px; padding:10px 12px; border-radius:8px; border-left:4px solid var(--warn); background:var(--card); font-size:13.5px; }
+  #guide .backkid { float:right; margin-left:8px; padding:3px 10px; font:500 12px system-ui; border:1px solid var(--line); color:var(--ink); background:transparent; flex:none; }
   #dirty { flex:1 1 100%; font-size:12px; padding:5px 8px; border-radius:6px; color:var(--warn); border:1px solid var(--warn); background:transparent; }
   #dirty[hidden] { display:none; }
   #build.attention { box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
@@ -174,9 +242,13 @@
     #status { right:auto; max-width:calc(100% - 24px); top:auto; bottom:10px; }
     header nav .long { display:none; }
     /* The opening guide is too big for the phone's preview box: show it as a full-screen sheet. */
-    #guide { position:fixed; z-index:50; inset:calc(8px + var(--safe-t)) calc(8px + var(--safe-r)) calc(8px + var(--safe-b)) calc(8px + var(--safe-l));
+    #guide, #kidguide { position:fixed; z-index:50; inset:calc(8px + var(--safe-t)) calc(8px + var(--safe-r)) calc(8px + var(--safe-b)) calc(8px + var(--safe-l));
       padding:14px 16px; box-shadow:0 10px 40px rgba(0,0,0,.45); -webkit-overflow-scrolling:touch; }
     #guide .close { position:sticky; top:0; min-height:36px; padding:4px 14px; }
+    #kidguide h2 { font-size:20px; }
+    #kidguide .close { position:sticky; top:0; z-index:1; min-height:36px; }
+    body.beginner #report { order:2; max-height:none; }  /* the score right under the 3D view */
+    body.beginner #form { order:3; }
   }
   @media (max-width:480px) {
     header { gap:6px 12px; }
@@ -198,7 +270,8 @@
     #viewopts button { min-height:30px; padding:0 10px; font-size:14px; }
     table { font-size:13.5px; }
   }
-  @media (pointer:coarse) and (min-width:801px) { #guide { top:60px; } }
+  @media (pointer:coarse) and (min-width:801px) { #guide, #kidguide { top:60px; } }
+  @media (pointer:coarse) { .choices button { min-height:0; font-size:13.5px; } input[type=range].slider { height:30px; } }
 </style>
 <script>
   // Follows the system theme (like fevergeon.com); the header button pins light or dark in this browser.
@@ -220,10 +293,10 @@
       <input id="dname" maxlength="80" value="My rocket">
       <button type="button" id="newrocket" class="primary" title="Start a new rocket from the default settings and save it">New rocket</button>
       <button type="button" id="save">Save</button>
-      <button type="button" id="saveas">Save as new</button>
-      <button type="button" id="share">Copy link</button>
-      <button type="button" id="download" title="Save this design as a file on your computer">Download file</button>
-      <button type="button" id="openfile" title="Open a design file (.json) from your computer">Open file</button>
+      <button type="button" id="saveas" class="adv">Save as new</button>
+      <button type="button" id="share">Copy link<span class="beg"> to share</span></button>
+      <button type="button" id="download" class="adv" title="Save this design as a file on your computer">Download file</button>
+      <button type="button" id="openfile" class="adv" title="Open a design file (.json) from your computer">Open file</button>
       <input type="file" id="filepick" accept=".json,application/json" hidden>
       <select id="mine" aria-label="My rockets"></select>
       <div id="savemsg" role="status" aria-live="polite"></div>
@@ -234,20 +307,32 @@
     </div>
     <div id="modehint"></div>
     <fieldset><legend>Motor</legend>
+      <div class="step beg"><span class="n">1</span>Pick a motor size</div>
+      <p class="why beg">The <b>motor</b> is the part that pushes your rocket into the sky. You buy motors at a hobby store and slide one into the back of your rocket. The number is how wide the motor is, in millimeters. <a href="#guide-motors" class="more" data-guide>More about motors</a></p>
       <label>Motor size <select name="motor"></select></label>
+      <p class="why beg" id="motorwhy"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
-      <label class="beg">Overall height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
-      <div class="hint beg">Nose tip to fin tips. The body length is worked out to fit.</div>
+      <div class="step beg"><span class="n">2</span>How tall is your rocket?</div>
+      <p class="why beg">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <input type="range" class="slider beg" id="heightslider" min="150" max="900" step="10" aria-label="Rocket height">
+      <label class="beg">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
+      <div class="conv beg" id="heightconv"></div>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
       <div class="hint adv">Body tubes, nose cone and motor mount. Multiples of your nozzle width print best (e.g. 1.2, 1.6, 2.0 for 0.4 mm).</div>
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
-      <label>Printer max height <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <div class="step beg"><span class="n">3</span>How tall can your 3D printer print?</div>
+      <p class="why beg">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. If your rocket is taller than this, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
     </fieldset>
     <fieldset><legend>Fins</legend>
-      <label>Shape <select name="fin_shape"></select></label>
+      <div class="step beg"><span class="n">4</span>Choose your fins</div>
+      <p class="why beg">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
+      <div class="choices beg" id="finpick" role="group" aria-label="Fin shape"></div>
+      <p class="why beg choice-why" id="finwhy"></p>
+      <label class="advshow">Shape <select name="fin_shape"></select></label>
       <label class="adv">Count <select name="fin_count"><option>3</option><option>4</option><option>5</option></select></label>
       <label class="adv">Thickness <input type="number" name="fin_thickness" min="0.4" max="12" step="0.1"></label>
       <label class="adv">Root fillet <input type="number" name="fin_fillet" min="0" max="20" step="0.1"></label>
@@ -262,7 +347,11 @@
       </div>
     </fieldset>
     <fieldset><legend>Nose</legend>
-      <label>Shape <select name="nose_shape"></select></label>
+      <div class="step beg"><span class="n">5</span>Choose a nose cone</div>
+      <p class="why beg">The nose cone is the pointy top. It <b>helps the rocket slice through the air</b>, and it pops off at the top of the flight so the parachute can come out. <a href="#guide-parts" class="more" data-guide>More about parts</a></p>
+      <div class="choices beg" id="nosepick" role="group" aria-label="Nose shape"></div>
+      <p class="why beg choice-why" id="nosewhy"></p>
+      <label class="advshow">Shape <select name="nose_shape"></select></label>
       <label class="adv">Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
     </fieldset>
     <fieldset class="adv"><legend>Launch lugs</legend>
@@ -287,10 +376,12 @@
         <label>Launch rod, m <input type="number" name="launch_rod_m" min="0.3" max="3" step="0.01"></label>
       </details>
     </fieldset>
+    <div class="step beg"><span class="n">6</span>Build it and check the stability score</div>
+    <p class="why beg">Press <b>Build my rocket</b>. In 10 to 30 seconds your rocket appears in 3D with a <b>stability score in "cal"</b> that tells you if it will fly straight. 1 to 2 cal is just right. <a href="#" class="more" data-kidguide>How the score works</a></p>
     <div class="actions">
       <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
-      <button id="build" type="submit">Build</button>
-      <a id="zip" class="btn off" href="#" download>Download STLs (ZIP)</a>
+      <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
+      <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs (ZIP)</span></a>
     </div>
   </form>
   <section id="right">
@@ -302,8 +393,46 @@
         <label><input type="checkbox" id="section"> Section</label>
         <button type="button" id="guidebtn" aria-controls="guide" aria-expanded="true">Guide</button>
       </div>
+      <article id="kidguide" aria-label="Quick start" hidden>
+        <button type="button" class="close" id="kidskip">Skip</button>
+        <h2>Welcome, rocket builder!</h2>
+        <p class="lead">Design your own model rocket, see it in 3D, then print it on a 3D printer and fly it.</p>
+        <h3>How it works</h3>
+        <ol class="steps4">
+          <li><b>Design it.</b> Pick a motor, how tall, the fins and the nose. Each step tells you what it does.</li>
+          <li><b>Build and check.</b> Press <i>Build my rocket</i>. It appears here with a stability score.</li>
+          <li><b>Print it.</b> Download the files and print the parts on a 3D printer.</li>
+          <li><b>Fly it!</b> Add a motor and parachute and launch it with a grown-up.</li>
+        </ol>
+        <h3>The stability score (cal): will it fly straight?</h3>
+        <svg viewBox="0 0 460 120" role="img" aria-label="A rocket lying on its side with the nose on the left. A blue dot, the balance point, is in front of a red dot, the push point, by about one and a half body widths.">
+          <path d="M14 60 Q48 38 96 38 L360 38 L360 82 L96 82 Q48 82 14 60 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M306 38 L360 10 L384 10 L360 38 M306 82 L360 110 L384 110 L360 82" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="200" cy="60" r="8" fill="#3d8bfd"/><text x="200" y="28" text-anchor="middle" font-size="13" fill="#3d8bfd">balance point</text>
+          <circle cx="266" cy="60" r="8" fill="#ff5a5a"/><text x="282" y="104" text-anchor="middle" font-size="13" fill="#ff5a5a">push point</text>
+          <path d="M209 60 L257 60" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <path d="M410 38 L410 82 M403 38 L417 38 M403 82 L417 82" stroke="currentColor" stroke-width="1.5"/>
+          <text x="422" y="56" font-size="12" fill="currentColor">1 cal =</text><text x="422" y="70" font-size="12" fill="currentColor">1 width</text>
+        </svg>
+        <p>Every rocket has a <b style="color:#3d8bfd">balance point</b> (blue dot), where it would balance on your finger, and a <b style="color:#ff5a5a">push point</b> (red dot), where the air pushes on it. The fins pull the push point toward the back.</p>
+        <p>For a straight flight, the blue dot must be <b>in front of</b> the red dot. The gap between them is measured in <b>cal</b> (short for caliber): <b>1 cal is one body width</b>.</p>
+        <ul class="tips">
+          <li><b>Under 1 cal:</b> wobbly. It could tumble, so you can't download it yet. Make the rocket taller.</li>
+          <li><b>1 to 2 cal:</b> just right!</li>
+          <li><b>2 to 3 cal:</b> very stable. Still fine.</li>
+          <li><b>Over 3 cal:</b> too stable. It turns into the wind like a weathervane.</li>
+          <li>The score is checked with the <b>heaviest motor</b> of your size loaded, because the motor is heavy and sits at the back.</li>
+          <li>Try it for real: balance your finished rocket (with a motor in) on one finger. That's the blue dot!</li>
+        </ul>
+        <div class="safety"><b>Safety first:</b> rocket motors are handled and launched by a grown-up, in a big open field, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">model rocket safety code</a>.</div>
+        <div class="btns">
+          <button type="button" class="go" id="kidstart">Start designing</button>
+          <button type="button" class="ghost" id="kidfull">Read the full guide</button>
+        </div>
+      </article>
       <article id="guide" aria-label="User guide">
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
+        <button type="button" class="backkid beg" id="backkid">← Quick start</button>
         <h2>How to use Rocket Builder</h2>
         <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>.</p>
         <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-or">OpenRocket</a></nav>
@@ -318,7 +447,7 @@
 
         <h3 id="guide-modes">Modes</h3>
         <div class="cols">
-          <dl><dt>Beginner</dt><dd>Just the essentials: motor size, the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit), your printer's max height, nose shape and fin shape (swept, delta or trapezoid). Everything else uses proven defaults, and the fins size themselves so the rocket is stable.</dd></dl>
+          <dl><dt>Beginner</dt><dd>Made for young builders (about grades 3–7): six numbered steps, each explaining what it does in plain words. Motor size, the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit; slider or typed), your printer's max height, then fin shape (swept, delta or trapezoid) and nose shape picked from pictures. Everything else uses proven defaults, and the fins size themselves so the rocket is stable. The report shows a stability score meter, the best motor and how high it should fly, and next steps; the full numbers are under <i>Grown-up details</i>. The <b>Guide</b> button opens a quick start, which links to this full guide.</dd></dl>
           <dl><dt>Advanced</dt><dd>Every setting: body length instead of overall height, wall thickness, a body OD offset for a fatter rocket (the actual OD is shown under it), fin count, thickness, fillets and custom fin size, nose fineness, launch lugs, filament, and the flight check (target altitude, which motor to check, recovery mass, drag, launch rod). Switching modes carries the size across.</dd></dl>
         </div>
 
@@ -339,7 +468,7 @@
         <h3 id="guide-terms">Key terms: model rocketry basics</h3>
         <p>The ideas behind the numbers in the report, from the ground up.</p>
 
-        <h3>Stability: will it fly straight?</h3>
+        <h3 id="guide-stab">Stability: will it fly straight?</h3>
         <figure>
           <svg viewBox="0 0 560 130" role="img" aria-label="A rocket lying sideways, nose on the left. The blue CG dot is ahead of the red CP dot; the gap between them, divided by the body diameter, is the stability margin in calibers.">
             <path d="M20 65 Q60 40 110 40 L440 40 L440 90 L110 90 Q60 90 20 65 Z" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -362,7 +491,7 @@
           <dt>Barrowman method</dt><dd>The standard hand-calculation (developed by James Barrowman in the 1960s) for finding the CP from the nose and fin shapes. It's what this app and most hobby tools use. It assumes a slender rocket at low speed and small angles, which suits model rockets well.</dd>
         </dl>
 
-        <h3>Motors</h3>
+        <h3 id="guide-motors">Motors</h3>
         <dl>
           <dt>Motor size (M13, M18, M24, M29)</dt><dd>The motor's diameter in mm. The rocket's motor tube is built to fit; you can then fly any motor of that diameter (and length).</dd>
           <dt>Motor code, e.g. <span class="eg">C6-5</span></dt><dd><b>C</b>: the <i>impulse class</i>, the total push. Each letter is up to twice the one before (A up to 2.5 N·s, B up to 5, C up to 10, D up to 20…), so a C is roughly twice a B. <b>6</b>: the average thrust in newtons. <b>5</b>: the <i>ejection delay</i> in seconds (below). A <span class="eg">-0</span> motor has no delay (for a booster stage); <span class="eg">P</span> means plugged, no ejection charge.</dd>
@@ -381,7 +510,7 @@
           <dt>Field size</dt><dd>The safety code's minimum launch-site size for a motor class (e.g. 60 m across for B, 120 m for C). Bigger motors need bigger fields.</dd>
         </dl>
 
-        <h3>Recovery and parts</h3>
+        <h3 id="guide-parts">Recovery and parts</h3>
         <dl>
           <dt>Recovery system</dt><dd>What brings it down gently: usually a parachute or streamer, tied to a <i>shock cord</i> (elastic or Kevlar) that joins the nose to the body via the anchor. <i>Wadding</i> (or a reusable baffle) protects the parachute from the hot ejection gas. The app allows a few grams for these unless you enter a recovery mass.</dd>
           <dt>Descent rate</dt><dd>How fast it falls under the parachute. About 3–5 m/s lands without damage; a bigger parachute falls slower but drifts further.</dd>
@@ -429,16 +558,41 @@ const statusEl = document.getElementById('status');
 const reportEl = document.getElementById('report');
 // The user guide covers the view until the first rocket is built; the Guide
 // button brings it back over the model.
-const guideEl = document.getElementById('guide'), guideBtn = document.getElementById('guidebtn');
-function showGuide(on) {
-  guideEl.hidden = !on; guideBtn.setAttribute('aria-expanded', String(on));
+// In Beginner mode the Guide button opens a short quick start (#kidguide)
+// that links to the full guide; in Advanced it opens the full guide.
+const guideEl = document.getElementById('guide'), kidGuideEl = document.getElementById('kidguide'), guideBtn = document.getElementById('guidebtn');
+let builtOnce = false;
+function showGuide(on, which) {
+  which = which || (document.body.classList.contains('beginner') ? 'kid' : 'full');
+  guideEl.hidden = !(on && which === 'full'); kidGuideEl.hidden = !(on && which === 'kid');
+  guideBtn.setAttribute('aria-expanded', String(!!on));
   // On a phone the guide covers the screen, so it always needs a way out.
-  document.getElementById('guideclose').hidden = !rocket && !matchMedia('(max-width: 800px)').matches;
+  document.getElementById('guideclose').hidden = !builtOnce && !matchMedia('(max-width: 800px)').matches;
 }
-guideBtn.onclick = () => showGuide(guideEl.hidden);
+const guideOpen = () => !guideEl.hidden || !kidGuideEl.hidden;
+guideBtn.onclick = () => showGuide(!guideOpen());
 document.getElementById('guideclose').onclick = () => showGuide(false);
-// The guide starts open; on a phone (full-screen sheet) give it a Close button from the start.
-document.getElementById('guideclose').hidden = !matchMedia('(max-width: 800px)').matches;
+document.getElementById('kidskip').onclick = () => document.getElementById('kidstart').click();
+document.getElementById('kidstart').onclick = () => {
+  showGuide(false);
+  if (matchMedia('(max-width: 800px)').matches) document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+function openFull(anchor) {
+  showGuide(true, 'full');
+  const t = anchor && document.getElementById(anchor);
+  (t || guideEl).scrollIntoView({ block: 'start' });
+}
+document.getElementById('kidfull').onclick = () => openFull();
+document.getElementById('backkid').onclick = () => { showGuide(true, 'kid'); kidGuideEl.scrollTop = 0; };
+// "More about…" links in the form open the full guide at that section; "How the score works" opens the quick start.
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[data-guide], a[data-kidguide]');
+  if (!a) return;
+  e.preventDefault();
+  if (a.hasAttribute('data-kidguide')) showGuide(true, 'kid'); else openFull(a.getAttribute('href').slice(1));
+  if (matchMedia('(max-width: 800px)').matches) return;  // the sheet covers the screen already
+  document.getElementById('view').scrollIntoView({ block: 'nearest' });
+});
 const zipBtn = document.getElementById('zip');
 const buildBtn = document.getElementById('build');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -451,6 +605,7 @@ const opts = await (await fetch('/api/options')).json();
 // nose shape and three fin shapes; everything else is sent as the defaults.
 let mode = (() => { try { return localStorage.getItem('mode') === 'advanced' ? 'advanced' : 'beginner'; } catch { return 'beginner'; } })();
 let lastBuild = null;  // {length_mm, body_length_mm} of the model on screen
+let lastReport = null;  // the last build's report, redrawn when the mode changes
 const fill = (name, values) => {
   form.elements[name].innerHTML = values.map(v => `<option value="${v}">${LABELS[v] || v}</option>`).join('');
 };
@@ -521,7 +676,7 @@ function params() {
 
 // ---------- beginner / advanced ----------
 const MODE_HINT = {
-  beginner: 'Choose the motor, the overall height and the shapes; everything else uses tested defaults.',
+  beginner: 'Six easy steps. Each one tells you what it does; Rocket Builder takes care of the rest.',
   advanced: 'Every setting. Switching back to Beginner resets these to the defaults.',
 };
 function fillFins() {
@@ -540,6 +695,8 @@ function applyMode() {
   document.body.classList.toggle('beginner', mode === 'beginner');
   document.querySelectorAll('#modebar button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
   document.getElementById('modehint').textContent = MODE_HINT[mode];
+  renderChoices(); motorWhy(); heightConv();
+  if (!builtOnce && guideOpen()) showGuide(true);  // swap quick start <-> full guide with the mode
   for (const el of advEls()) el.disabled = mode === 'beginner';  // hidden fields never block validation
   form.elements.overall_length.disabled = mode !== 'beginner';
   fillFins(); sync();
@@ -555,8 +712,97 @@ function switchMode(m) {
   mode = m;
   try { localStorage.setItem('mode', m); } catch {}
   applyMode(); markDirty();
+  if (lastReport) showReport(lastReport);  // kid report <-> full report
 }
 document.querySelectorAll('#modebar button').forEach(b => b.onclick = () => switchMode(b.dataset.mode));
+
+// ---------- Beginner: picture choices and plain-language help ----------
+const FIN_INFO = {
+  trapezoid: ['Trapezoid', 'A classic, strong shape. A great first rocket.'],
+  delta: ['Delta', 'A triangle, like a paper airplane wing. Looks fast!'],
+  swept: ['Swept', 'Tips swept back past the tail. Looks cool, but the tips can snap on a hard landing.'],
+  clipped_delta: ['Clipped delta', 'A triangle with the point cut off. Tough and stable.'],
+  rectangular: ['Rectangle', 'Simple and easy to print.'],
+};
+const FIN_PTS = {  // one fin, nose up: x out from the body, y down the body (root 10..50)
+  trapezoid: '0,10 26,28 26,50 0,50', delta: '0,10 26,50 0,50', swept: '0,10 26,38 26,58 0,50',
+  clipped_delta: '0,10 26,40 26,50 0,50', rectangular: '0,10 26,10 26,50 0,50',
+};
+const NOSE_INFO = {
+  tangent_ogive: ['Ogive', 'Smooth and pointy, like a bullet. Most rockets use this one.'],
+  conical: ['Cone', 'A simple cone, like an ice-cream cone.'],
+  elliptical: ['Round', 'Round and blunt, like the end of an egg. Strong and easy to print.'],
+  parabolic: ['Parabolic', 'A rounded point. Smooth and strong.'],
+  von_karman: ['Von Kármán', 'A very slippery shape used on fast rockets.'],
+};
+function finSvg(shape) {
+  const pts = FIN_PTS[shape] || FIN_PTS.trapezoid;
+  const right = pts.split(' ').map(p => { const [x, y] = p.split(',').map(Number); return `${42 + x},${y - 6}`; }).join(' ');
+  const left = pts.split(' ').map(p => { const [x, y] = p.split(',').map(Number); return `${30 - x},${y - 6}`; }).join(' ');
+  return `<svg viewBox="0 0 72 54" aria-hidden="true"><rect x="30" y="0" width="12" height="46" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <polygon points="${right}" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <polygon points="${left}" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+}
+function noseSvg(shape) {
+  // Nose lying sideways, tip on the left: radius r(x) for x in 0..L, then a stub of body tube.
+  const L = 46, R = 13, cy = 23, x0 = 4;
+  const r = x => {
+    const t = x / L;
+    switch (shape) {
+      case 'conical': return R * t;
+      case 'elliptical': return R * Math.sqrt(Math.max(0, 1 - (1 - t) ** 2));
+      case 'parabolic': return R * (2 * t - t * t);
+      case 'von_karman': { const th = Math.acos(1 - 2 * t); return R / Math.sqrt(Math.PI) * Math.sqrt(th - Math.sin(2 * th) / 2); }
+      default: { const rho = (R * R + L * L) / (2 * R); return Math.sqrt(Math.max(0, rho * rho - (L - x) ** 2)) + R - rho; }
+    }
+  };
+  const top = [], bot = [];
+  for (let i = 0; i <= 30; i++) { const x = L * i / 30; top.push(`${(x0 + x).toFixed(1)},${(cy - r(x)).toFixed(1)}`); bot.unshift(`${(x0 + x).toFixed(1)},${(cy + r(x)).toFixed(1)}`); }
+  const end = x0 + L + 18;
+  return `<svg viewBox="0 0 72 46" aria-hidden="true"><path d="M${top.join(' L')} L${end},${cy - R} L${end},${cy + R} L${bot.join(' L')} Z"
+    fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M${x0 + L},${cy - R} L${x0 + L},${cy + R}" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/></svg>`;
+}
+function renderPicker(id, name, values, info, svg, whyId) {
+  const box = document.getElementById(id), sel = form.elements[name];
+  box.innerHTML = values.map(v => `<button type="button" data-v="${esc(v)}" aria-pressed="${sel.value === v}">${svg(v)}<span>${esc((info[v] || [LABELS[v] || v])[0])}</span></button>`).join('');
+  document.getElementById(whyId).textContent = (info[sel.value] || [])[1] || '';
+  box.querySelectorAll('button').forEach(b => b.onclick = () => {
+    if (sel.value === b.dataset.v) return;
+    sel.value = b.dataset.v;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));  // marks the design changed, like the select
+    renderChoices();
+  });
+}
+function renderChoices() {
+  renderPicker('finpick', 'fin_shape', [...form.elements.fin_shape.options].map(o => o.value), FIN_INFO, finSvg, 'finwhy');
+  renderPicker('nosepick', 'nose_shape', opts.nose_shapes, NOSE_INFO, noseSvg, 'nosewhy');
+}
+// Motor size, in kid terms, with the real motors that fit (from the motor table).
+const SIZE_NOTE = {
+  M13: 'Mini motors: a small, light rocket and short flights. Good for small fields.',
+  M18: 'The most common size in stores. A great choice for a first rocket.',
+  M24: 'Bigger motors for big, high flights. You need a big field.',
+  M24L: 'Long 24 mm motors: very high flights. You need a very big field.',
+  M29: 'Large, powerful motors: for experienced flyers with a big field.',
+};
+function motorWhy() {
+  const size = form.elements.motor.value, list = (opts.flight_motors[size] || []).map(m => m.code);
+  const mm = (size.match(/\d+/) || [''])[0];
+  document.getElementById('motorwhy').innerHTML = `<b>${esc(size)}</b> fits ${mm} mm-wide motors${list.length ? ` like <b>${list.slice(0, 4).map(esc).join(', ')}</b>` : ''}. ${esc(SIZE_NOTE[size] || '')}`;
+}
+form.elements.motor.addEventListener('change', motorWhy);
+// Height: slider and box stay in step; show it in cm and inches too.
+const hSlider = document.getElementById('heightslider'), hBox = form.elements.overall_length;
+function heightConv() {
+  const mm = Number(hBox.value);
+  if (!mm) { document.getElementById('heightconv').textContent = ''; return; }
+  const ruler = mm / 305;  // a 12-inch school ruler
+  document.getElementById('heightconv').innerHTML = `<b>${(mm / 10).toFixed(1)} cm</b> · <b>${(mm / 25.4).toFixed(1)} inches</b> · about ${ruler < 0.95 ? `${Math.round(ruler * 100)}% of` : ruler < 1.1 ? 'as long as' : `${(Math.round(ruler * 2) / 2)} ×`} a 12-inch ruler`;
+  hSlider.value = Math.min(Math.max(mm, Number(hSlider.min)), Number(hSlider.max));
+}
+hSlider.addEventListener('input', () => { hBox.value = hSlider.value; heightConv(); });
+hBox.addEventListener('input', heightConv);
 
 // ---------- "press Build" notice and progress bar ----------
 const dirtyEl = document.getElementById('dirty');
@@ -745,10 +991,56 @@ function pickerHtml(f) {
     </table><div class="hint">1-D flight simulation from ThrustCurve.org data; delays are the nearest the motor comes in.</div></div>`;
 }
 
+// Beginner report: the stability score explained, the best motor and what to do next.
+// The full report sits underneath in "Grown-up details".
+function kidReportHtml(r) {
+  const st = r.stability, cal = st.margin_cal, f = r.flights;
+  const best = f.rows.find(x => x.code === f.recommended);
+  const verdict = { unstable: 'Too wobbly', stable: cal > 2 ? 'Very stable' : 'Just right!', overstable: 'Too stable' }[st.status] || st.status;
+  const what = {
+    unstable: `The balance point (blue) isn't far enough in front of the push point (red), so it could wobble or tumble. You can't download it until the score is at least 1. <b>Try:</b> make your rocket taller (step 2), or pick different fins (step 4).`,
+    stable: cal > 2 ? 'The blue balance point is well in front of the red push point. It will fly straight. (1 to 2 is the sweet spot, but this is fine.)'
+                    : 'The blue balance point is about the right distance in front of the red push point. It will fly nice and straight.',
+    overstable: 'It will fly, but it turns into the wind like a weathervane, so it may not go straight up on a windy day. A shorter rocket helps.',
+  }[st.status] || '';
+  const pos = Math.max(0, Math.min(4, cal)) / 4 * 100;
+  const FT = 3.28084;
+  const flight = best
+    ? `<p>Best motor: <b>${esc(best.motor)}</b>. It should fly about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft) high${best.apogee_m >= 9 ? `, as high as a <b>${Math.round(best.apogee_m / 3)}-story building</b>` : ''}!</p>
+       <p>The last number in the motor name is the <b>delay</b>: ${best.delay_s} seconds after the motor stops pushing, it pops the nose off so the parachute comes out near the top of the flight.</p>
+       <p>Launch site: a grown-up picks an open field at least <b>${best.field_m} m</b> (${Math.round(best.field_m * FT)} ft) across.</p>`
+    : `<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 1).</p>`;
+  return `<div class="kid">
+    <div class="kidcard ${st.status === 'unstable' ? 'bad' : ''}">
+      <h3>Stability score</h3>
+      <div class="score ${st.status}"><b>${cal.toFixed(2)}</b><span>cal</span><span class="verdict">${verdict}</span></div>
+      <div class="meter" role="img" aria-label="Stability ${cal.toFixed(2)} cal on a scale from 0 to 4"><i style="left:${pos}%"></i></div>
+      <div class="meter-labels"><span>0–1 wobbly</span><span>1–2 just right</span><span>2–3 very stable</span><span>3+ too stable</span></div>
+      <p>${what}</p>
+      <ul class="tips">
+        <li>The <b style="color:#3d8bfd">blue dot</b> next to your rocket is its balance point; the <b style="color:#ff5a5a">red dot</b> is where the air pushes. Blue should be above (in front of) red.</li>
+        <li><b>1 cal = one body width.</b> A score of ${cal.toFixed(1)} means the blue dot is ${cal.toFixed(1)} body widths in front of the red one.</li>
+        <li>${form.elements.flight_motor.value ? `Checked with the motor you picked (${esc(st.motor)}) loaded.` : `Checked with the heaviest motor of this size (${esc(st.motor)}) loaded: the hardest case, because the motor is heavy and sits at the back.`}</li>
+      </ul>
+    </div>
+    <div class="kidcard"><h3>How high will it go?</h3>${flight}</div>
+    <div class="kidcard"><h3>What's next?</h3>
+      <ol class="steps4">
+        <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}.</li>
+        <li><b>Print</b> each part. Your rocket has ${r.parts.length} parts.</li>
+        <li><b>Put it together</b>: see <i>Build notes</i> in Grown-up details.</li>
+        <li><b>Fly it</b> with a grown-up, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">safety code</a>.</li>
+      </ol>
+      <p class="hint">Save your rocket with <b>Save</b> at the top, or share it with <b>Copy link to share</b>.</p>
+    </div>
+  </div>`;
+}
+
 function showReport(r) {
   const fmt = v => typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(2)) : esc(v);
   const st = r.stability;
-  reportEl.innerHTML = `
+  const kid = document.body.classList.contains('beginner');
+  reportEl.innerHTML = (kid ? kidReportHtml(r) + '<details class="grownup"><summary>Grown-up details: motor table, parts, build notes and measurements</summary><div class="full">' : '') + `
     <div class="stab ${st.status}">
       <div><b class="cal">${st.margin_cal.toFixed(2)}</b> cal<small>stability margin</small></div>
       <div>${esc(st.message)}
@@ -770,9 +1062,9 @@ function showReport(r) {
       <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
-    </div>`;
+    </div>` + (kid ? '</div></details>' : '');
   reportEl.querySelector('.orlink').onclick = e => {
-    e.preventDefault(); showGuide(true); document.getElementById('guide-or').scrollIntoView({ block: 'start' });
+    e.preventDefault(); openFull('guide-or');
   };
   reportEl.querySelectorAll('tr.pick').forEach(tr => tr.onclick = () => {
     form.elements.flight_motor.value = tr.dataset.code; runBuild();
@@ -799,6 +1091,7 @@ async function runBuild() {
     stopProgress();
     lastBuild = { length_mm: body.stability.length_mm, body_length_mm: body.body_length_mm };
     setMarkers(body.stability); applyView(false);
+    builtOnce = true; lastReport = body;
     showReport(body); showGuide(false);
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
     zipBtn.classList.toggle('off', !body.stability.ok);
@@ -856,6 +1149,7 @@ function setForm(p) {
   }
   showOd();
   fillFins(); sync(); flightHints();
+  renderChoices(); motorWhy(); heightConv();
   lastBuild = null; markDirty();
 }
 const shareUrl = id => `${location.origin}/d/${id}`;
@@ -963,6 +1257,7 @@ async function openDesign(id) {
 mineEl.onchange = () => { if (mineEl.value) openDesign(mineEl.value); };
 applyMode();
 if (mode === 'beginner') form.elements.overall_length.value = opts.beginner.overall_length;
+showGuide(true);
 markDirty('Press <b>Build</b> to make the 3D model and downloads.');
 renderMine();
 const linked = location.pathname.match(/^\/d\/([\w-]+)$/);
