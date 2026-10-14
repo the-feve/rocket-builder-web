@@ -1,11 +1,10 @@
 # Handoff
 
-_Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and `docs/web_platform_spec.md`._
+_Last updated 2026-10-14. Read this first, then `README.md` (Status) and `docs/web_platform_spec.md`._
 
 ## Where things stand
 
-- **PR [the-feve/rocket-builder-web#1](https://github.com/the-feve/rocket-builder-web/pull/1)** (`claude/optimistic-ptolemy-utrlds` → `main`) holds everything since Phase 1. **CI is green** on head `977f3c2`: geometry tests (42), server tests (8), and the Docker image builds, starts and serves a rocket. It waits only on the owner to merge.
-- `main` still has only Phase 1 (the geometry engine).
+- Everything is on `main` and deployed (latest: PR #9, kid-friendly Beginner mode + site look + iOS/iPad; PR #10, a Beginner fin-picker fix). No open PRs; merged branches are deleted (2026-10-14 cleanup; PR #7's address notes are folded in below).
 - **Live since 2026-10-09: https://rocket-fevergeon.fly.dev** (Fly app `rocket-fevergeon`, region `sjc`, volume `rocket_data` mounted at `/data`). PR #1 is merged; pushes to `main` deploy automatically. Checked after the first deploy: `/healthz`, an M24 build (24.7 s cold, stable 1.13 cal, recommends C11), preview GLB, the STL ZIP, saving a design and its `/d/<id>` share link (test design `WNePTzVr`). The machine auto-suspends after about 7 idle minutes; a cold boot takes about 17 s before uvicorn answers.
 
 ### What the designer does now (`server/`, FastAPI + one page with a three.js preview)
@@ -29,7 +28,7 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 
 ## Next steps (in order)
 
-0. **Pending merge (2026-10-10):** the Key terms glossary is committed on `claude/confident-wozniak-6hvero` (8c3b0ba) but not yet merged or deployed. Open a PR to `main` and merge it once CI passes; the merge deploys to Fly.
+0. ~~Pending merge: the Key terms glossary~~: merged to `main` (PR #6).
 1. **Owner: Fly.io setup** (Windows PowerShell):
    1. Sign up at https://fly.io/app/sign-up and add a card under Billing.
    2. Install: `powershell -Command "iwr https://fly.io/install.ps1 -useb | iex"`, reopen PowerShell, `fly auth login`.
@@ -40,9 +39,9 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
    6. GitHub → repo Settings → Secrets and variables → Actions → New repository secret: `FLY_API_TOKEN` = that token.
 2. ~~Merge PR #1~~ and ~~check the first deploy~~: done 2026-10-09. The first deploy run skipped itself (green, 8 s) because `FLY_API_TOKEN` had been added to the fevergeon-site repo by mistake; once it was on this repo, a manual run of `deploy.yml` deployed.
 3. **Still to confirm:** a saved design surviving a full restart (`fly apps restart rocket-fevergeon`, then open `/d/WNePTzVr`). Suspend/resume doesn't prove it; the volume mount in the boot log is good evidence.
-4. **After fevergeon.com's DNS moves to Cloudflare** (fevergeon-site `TODO.md` P1): `fly certs add rocket.fevergeon.com -a rocket-fevergeon`, a CNAME `rocket` → `rocket-fevergeon.fly.dev` in Cloudflare, then Cloudflare Access (Zero Trust, free ≤ 50 users, email one-time PIN) in front for the invite-only beta. Note: with the Cloudflare proxy on, Fly's certificate check may need the record DNS-only until the cert issues.
+4. **After quiverdesignworks.net's DNS moves to Cloudflare** (fevergeon-site `docs/squarespace-cutover.md`, nameserver switch due 2026-10-13 evening; quiverdesignworks-site `TODO.md` P2): `fly certs add rocket.quiverdesignworks.net -a rocket-fevergeon`, a CNAME `rocket` → `rocket-fevergeon.fly.dev` in Cloudflare, then Cloudflare Access (Zero Trust, free ≤ 50 users, email one-time PIN) in front for the invite-only beta. Note: with the Cloudflare proxy on, Fly's certificate check may need the record DNS-only until the cert issues.
 5. **Beta checks:** print and fly one or two rockets; compare 2–3 designs against OpenRocket (stability and apogee). Results go in `geometry/report.md`.
-6. **Phase 4:** paid downloads via the shared Stripe account, every Checkout Session tagged `metadata.store = "rocket-builder"` (rules in fevergeon-site `docs/stripe-shared-account.md`); check Washington sales tax on digital goods.
+6. **Phase 4:** paid downloads via the shared Stripe account, every Checkout Session tagged `metadata.store = "rocket-builder"` (rules in the-feve/quiverdesignworks-site `docs/stripe-shared-account.md`); check Washington sales tax on digital goods.
 
 ## Decisions log
 
@@ -54,6 +53,8 @@ _Last updated 2026-10-09 (night). Read this first, then `README.md` (Status) and
 - 2026-10-09: Region `sjc` (San Jose): `sea` isn't available on Fly any more.
 - 2026-10-09: The deploy workflow passes (green) when the token is missing; check that the run actually ran `flyctl deploy`, not just a green tick.
 - 2026-10-09: Saving stays server-side (SQLite on the Fly volume) with per-browser edit keys until accounts arrive; a download/open design-file option is a possible extra (design.json is already in the ZIP).
+- 2026-10-11: Address `rocket.quiverdesignworks.net` instead of `rocket.fevergeon.com`: Quiver Design Works hosts everything paid. The fevergeon-site repo was renamed `the-feve/quiverdesignworks-site`.
+- 2026-10-14: Beginner mode is for young builders (about grades 3–7); the site look matches fevergeon.com / quiverdesignworks.net.
 - 2026-10-09: Invite-only beta via Cloudflare Access rather than building sign-in; real accounts wait for public/paid launch.
 
 ## Open items / known limits
