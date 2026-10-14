@@ -223,3 +223,15 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     assert owner.post(f"/api/admin/orders/{oid}/status", json={"status": "lost"}).status_code == 400
     assert kid.get("/api/my/orders").json()["orders"][0]["status"] == "shipped"
     assert owner.get("/admin").status_code == 200
+
+
+def test_account_prefs_skip_tutorial():
+    from fastapi.testclient import TestClient as TC
+    a = TC(app)
+    a.post("/api/auth/signup", json={"email": "prefs@example.com", "password": "rocket123", "age_ok": True})
+    assert a.get("/api/auth/me").json()["user"]["prefs"] == {}
+    assert a.post("/api/my/prefs", json={"skip_tutorial": True}).json()["prefs"] == {"skip_tutorial": True}
+    b = TC(app)
+    assert b.post("/api/my/prefs", json={"skip_tutorial": True}).status_code == 401
+    r = b.post("/api/auth/login", json={"email": "prefs@example.com", "password": "rocket123"})
+    assert r.json()["user"]["prefs"]["skip_tutorial"] is True

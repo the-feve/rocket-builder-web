@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import re
 import secrets
 import sqlite3
@@ -46,10 +47,19 @@ class AccountError(ValueError):
     """A user-facing problem with sign-up or sign-in."""
 
 
+PREF_KEYS = {"skip_tutorial": bool}  # account settings the page can change
+
+
 def _db() -> sqlite3.Connection:
     con = designs._db()
     con.executescript(_SCHEMA)
+    if "prefs" not in {r[1] for r in con.execute("PRAGMA table_info(users)")}:  # added 2026-10-14
+        con.execute("ALTER TABLE users ADD COLUMN prefs TEXT NOT NULL DEFAULT '{}'")
     return con
+
+
+def _user(row) -> dict:
+    return {"id": row["id"], "email": row["email"], "prefs": json.loads(row["prefs"] or "{}")}
 
 
 def _sha(s: str) -> str:
@@ -85,10 +95,11 @@ def create_user(email: str, password: str) -> dict:
     user_id = secrets.token_urlsafe(9)
     try:
         with _db() as con:
-            con.execute("INSERT INTO users VALUES (?, ?, ?, ?)", (user_id, email, hash_password(password), time.time()))
+            con.execute("INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)",
+                        (user_id, email, hash_password(password), time.time()))
     except sqlite3.IntegrityError:
         raise AccountError("There's already an account with that email. Sign in instead.") from None
-    return {"id": user_id, "email": email}
+    return {"id": user_id, "email": email, "prefs": {}}
 
 
 def authenticate(email: str, password: str) -> dict | None:
@@ -97,11 +108,11 @@ def authenticate(email: str, password: str) -> dict | None:
     except AccountError:
         return None
     with _db() as con:
-        row = con.execute("SELECT id, email, password_hash FROM users WHERE email = ?", (email,)).fetchone()
+        row = con.execute("SELECT id, email, password_hash, prefs FROM users WHERE email = ?", (email,)).fetchone()
     if not row:
         hash_password(password or "")  # same time either way, so emails can't be probed by timing
         return None
-    return {"id": row["id"], "email": row["email"]} if check_password(password or "", row["password_hash"]) else None
+    return _user(row) if check_password(password or "", row["password_hash"]) else None
 
 
 def new_session(user_id: str) -> str:
@@ -117,9 +128,9 @@ def user_for_session(token: str | None) -> dict | None:
     if not token:
         return None
     with _db() as con:
-        row = con.execute("SELECT u.id, u.email FROM sessions s JOIN users u ON u.id = s.user_id "
+        row = con.execute("SELECT u.id, u.email, u.prefs FROM sessions s JOIN users u ON u.id = s.user_id "
                           "WHERE s.token_hash = ? AND s.expires_at > ?", (_sha(token), time.time())).fetchone()
-    return {"id": row["id"], "email": row["email"]} if row else None
+    return _user(row) if row else None
 
 
 def end_session(token: str | None) -> None:
@@ -130,5 +141,14 @@ def end_session(token: str | None) -> None:
 
 def get_user(user_id: str) -> dict | None:
     with _db() as con:
-        row = con.execute("SELECT id, email FROM users WHERE id = ?", (user_id,)).fetchone()
-    return {"id": row["id"], "email": row["email"]} if row else None
+        row = con.execute("SELECT id, email, prefs FROM users WHERE id = ?", (user_id,)).fetchone()
+    return _user(row) if row else None
+
+
+def set_prefs(user_id: str, changes: dict) -> dict:
+    """Merges known settings (PREF_KEYS) into the account's; returns them all."""
+    user = get_user(user_id)
+    prefs = {**user["prefs"], **{k: PREF_KEYS[k](v) for k, v in changes.items() if k in PREF_KEYS}}
+    with _db() as con:
+        con.execute("UPDATE users SET prefs = ? WHERE id = ?", (json.dumps(prefs), user_id))
+    return prefs
