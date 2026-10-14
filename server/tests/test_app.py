@@ -244,7 +244,11 @@ def test_order_supplies_page():
     assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
     g = supplies.gear()
     n = sum(len(c["items"]) for c in g["categories"])
-    assert r.text.count(f"tag={g['storeId']}") == n
+    assert r.text.count(f"tag={g['storeId']}") == n + len(g["starterKit"]["items"])
+    for k in g["starterKit"]["items"]:  # kit entries must be items on the list
+        assert any(it["asin"] == k["asin"] for c in g["categories"] for it in c["items"]), k["asin"]
+    links = client.get("/api/options").json()["motor_links"]
+    assert links["B4-4"][0]["url"].endswith(f"tag={g['storeId']}") and "C6-5" in links
     assert supplies.DISCLOSURE in r.text
     assert "$" not in re.sub(r"<style>.*?</style>", "", r.text, flags=re.S)  # no prices
     seen = set()

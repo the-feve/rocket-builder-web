@@ -235,6 +235,7 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
 def options():
     return {
         "supplies_url": SUPPLIES_URL,
+        "motor_links": supplies.motor_links(),  # motor (e.g. "B4-4") -> Amazon packs, for "Get these motors"
         "motors": sorted(load_motors()),
         "fin_shapes": [s.value for s in FinShape],
         "nose_shapes": list(NOSE_SHAPES),

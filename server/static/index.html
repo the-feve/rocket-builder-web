@@ -259,6 +259,9 @@
   .orderrow button, .orderrow a { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; cursor:pointer; }
   .orderrow .printbtn { background:var(--ink); color:var(--bg); border:1px solid var(--ink); }
   .orderrow .shopbtn { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .motorbuy { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 2px; }
+  .motorbuy .shopbtn { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; color:var(--ink); border:1px solid var(--line); }
+  .motorbuy .shopbtn:hover { border-color:var(--accent); color:var(--accent); }
   .affil { font-size:11.5px; color:var(--muted); margin:4px 0 0; }
   #acctlinks { flex:1 1 100%; margin:2px 0 0; } #acctlinks[hidden] { display:none; }
   @media (max-width:480px) { #orderdlg .ogrid { grid-template-columns:1fr 1fr; } }
@@ -1270,7 +1273,7 @@ function pickerHtml(f) {
   const rec = best
     ? `<div class="rec"><span class="chip">${esc(best.motor)}</span><div>Recommended for a ${f.target_m} m target:
        about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft), ${best.rod_speed_ms} m/s off the rod,
-       ${best.margin_cal} cal stable, ${best.delay_s} s delay, ${best.field_m} m field minimum.</div></div>`
+       ${best.margin_cal} cal stable, ${best.delay_s} s delay, ${best.field_m} m field minimum.</div></div>${motorBuyHtml(best.motor)}`
     : `<div class="rec bad">No motor of this size flies this rocket safely and stably. Make it lighter, or choose a bigger motor size.</div>`;
   return `<div class="picker"><h2>Motor picker · click a row to check stability with that motor</h2>${rec}
     <table><tr><th>Motor</th><th class="n">Peak m</th><th class="n">Peak ft</th><th class="n">Off rod m/s</th>
@@ -1281,6 +1284,25 @@ function pickerHtml(f) {
       <td class="n">${x.thrust_to_weight}</td><td class="n">${x.margin_cal.toFixed(2)}</td><td class="n">${x.liftoff_g}</td>
       <td>${x.problems.length ? `<span class="bad">✕ ${esc(x.problems.join(', '))}</span>` : '<span class="good">✓ Good</span>'}</td></tr>`).join('')}
     </table><div class="hint">1-D flight simulation from ThrustCurve.org data; delays are the nearest the motor comes in.</div></div>`;
+}
+
+// "Get these motors": affiliate links for the recommended motor, from the
+// supplies list (gear.json "motors"). Exact match first (e.g. B4-4); else the
+// same motor with another delay, flagged so nobody buys the wrong delay unaware.
+function motorBuyHtml(designation) {
+  const links = opts.motor_links || {};
+  let hit = links[designation], other = null;
+  if (!hit) {
+    const code = designation.split('-')[0];
+    other = Object.keys(links).find(k => k.split('-')[0] === code);
+    hit = other && links[other];
+  }
+  if (!hit) return '';
+  const [first, ...rest] = hit;
+  const more = rest.length ? ` <span class="hint">or <a href="${esc(rest[0].url)}" target="_blank" rel="sponsored noopener">${esc(rest[0].name)}</a></span>` : '';
+  return `<p class="motorbuy"><a class="shopbtn" href="${esc(first.url)}" target="_blank" rel="sponsored noopener">Get ${esc(other || designation)} motors on Amazon ↗</a>${more}</p>
+    ${other ? `<p class="hint">Those have a ${esc(other.split('-')[1])}-second delay; ${esc(designation)} (${esc(designation.split('-')[1])} s) suits this rocket best. A hobby store may carry it.</p>` : ''}
+    <p class="affil">As an Amazon Associate, I earn from qualifying purchases.</p>`;
 }
 
 // Beginner report: the stability score explained, the best motor and what to do next.
@@ -1300,7 +1322,8 @@ function kidReportHtml(r) {
   const flight = best
     ? `<p>Best motor: <b>${esc(best.motor)}</b>. It should fly about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft) high${best.apogee_m >= 9 ? `, as high as a <b>${Math.round(best.apogee_m / 3)}-story building</b>` : ''}!</p>
        <p>The last number in the motor name is the <b>delay</b>: ${best.delay_s} seconds after the motor stops pushing, it pops the nose off so the parachute comes out near the top of the flight.</p>
-       <p>Launch site: a grown-up picks an open field at least <b>${best.field_m} m</b> (${Math.round(best.field_m * FT)} ft) across.</p>`
+       <p>Launch site: a grown-up picks an open field at least <b>${best.field_m} m</b> (${Math.round(best.field_m * FT)} ft) across.</p>
+       ${motorBuyHtml(best.motor)}`
     : `<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 1).</p>`;
   return `<div class="kid">
     <div class="kidcard ${st.status === 'unstable' ? 'bad' : ''}">
