@@ -101,6 +101,26 @@ class Balance:
                       for name, m in rocket.mass_g().items() if name != "Rod_Standoff"]
         self.motor_z = -d.thread["hang"] + d.mtr_len / 2  # resting on the cap's face
         self.recovery_z = parts["Nose"].placement_z - d.cal  # packed just under the nose shoulder
+        self.nose_z = parts["Nose"].assembled.center(CenterOf.MASS).Z  # where nose weight (clay) sits, roughly
+        # For predict_length: the body between the aft part and the anchor
+        # section (the Seg_* parts) is what grows or shrinks; the aft part
+        # stays, and the anchor section, nose and parachute slide with the top.
+        masses = rocket.mass_g()
+        joint = d.shoulder_len + d.joint_rise
+        self.aft_top = rocket.seg_lens[0]
+        anchor = parts["Anchor_Seg"]
+        self.mid_len = max(anchor.placement_z + joint - self.aft_top, 0.0)  # exposed height of the Seg_* parts
+        mid = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in parts if n.startswith("Seg_")]
+        self.mid_m = sum(m for m, _ in mid)
+        self.mid_z = sum(m * z for m, z in mid) / self.mid_m if mid else self.aft_top
+        # g per mm of height: measured from the Seg_* parts (joints and lug included), else a plain tube
+        # plus one joint overlap per printed section.
+        tube = math.pi / 4 * (d.body_od ** 2 - d.body_id ** 2) * MATERIALS[p.material] / 1000.0
+        self.mid_g_per_mm = (self.mid_m / self.mid_len if self.mid_m and self.mid_len > 20
+                             else tube * d.zmax / max(d.zmax - joint, 1.0))
+        self.slides = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in ("Anchor_Seg", "Nose")]
+        self.fixed = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in parts
+                      if n not in ("Anchor_Seg", "Nose", "Rod_Standoff") and not n.startswith("Seg_")]
 
     @property
     def printed_mass_g(self) -> float:
@@ -140,6 +160,186 @@ class Balance:
         moments = self.parts + [(-m0, z0), (m1, z1), (heaviest(self.params.motor).mass_g, self.motor_z),
                                 (recovery_allowance_g(self.body_od), self.recovery_z)]
         return self._margin(rocket_cp(scaled, self.cal, self.body_od, self.z_tip), moments)[0]
+
+
+    def predict(self, motor: Motor | None = None, recovery_mass_g: float | None = None,
+                nose_g: float = 0.0, **fin_changes) -> float:
+        """The margin if this rocket flew `motor`, carried `nose_g` grams of
+        nose weight, or had its fins changed (fin_shape, fin_count,
+        fin_scale, fin_span...), without rebuilding: the fin blades' mass and
+        CP are swapped as in predicted_margin. The body is unchanged, so a
+        fin change that would move the tail (more trailing fins) is
+        approximate."""
+        motor = motor or heaviest(self.params.motor)
+        rec = recovery_allowance_g(self.body_od) if recovery_mass_g is None else recovery_mass_g
+        moments = self.parts + [(motor.mass_g, self.motor_z), (rec, self.recovery_z)]
+        cp = self.cp
+        if fin_changes:
+            changed = self.params.with_(**fin_changes)
+            rho = MATERIALS[self.params.material] / 1000.0
+            m0, z0 = _fin_blades(self.params, self.cal, rho)
+            m1, z1 = _fin_blades(changed, self.cal, rho)
+            moments += [(-m0, z0), (m1, z1)]
+            cp = rocket_cp(changed, self.cal, self.body_od, self.z_tip)
+        if nose_g:
+            moments.append((nose_g, self.nose_z))
+        return self._margin(cp, moments)[0]
+
+
+    def predict_length(self, delta: float, motor: Motor | None = None, recovery_mass_g: float | None = None) -> float | None:
+        """The margin if the rocket were `delta` mm taller (negative:
+        shorter), without rebuilding: the middle of the body (the Seg_*
+        parts) grows or shrinks at its measured weight per mm, and the anchor
+        section, nose and parachute slide with the top. None when shorter
+        would cut into the aft part or anchor section (no estimate then).
+        Checked against rebuilds: within about 0.2 cal for changes of a few
+        hundred mm."""
+        new_len = self.mid_len + delta
+        if new_len < 0:
+            return None
+        motor = motor or heaviest(self.params.motor)
+        rec = recovery_allowance_g(self.body_od) if recovery_mass_g is None else recovery_mass_g
+        mid_m = self.mid_g_per_mm * new_len
+        moments = (self.fixed + [(motor.mass_g, self.motor_z), (mid_m, self.mid_z + delta / 2)]
+                   + [(m, z + delta) for m, z in self.slides] + [(rec, self.recovery_z + delta)])
+        z_tip = self.z_tip + delta
+        cg = z_tip - sum(m * z for m, z in moments) / sum(m for m, _ in moments)
+        R = self.body_od / 2
+        cn_n, x_n = nose_cp(self.params.nose_shape, self.params.nose_fineness * self.cal, R)
+        fin = fin_dimensions(self.params, self.cal)
+        cn_f, x_f = fin_cp(self.params.fin_count, fin.root, fin.tip, fin.span, fin.sweep, R, z_tip - fin.root)
+        return ((cn_n * x_n + cn_f * x_f) / (cn_n + cn_f) - cg) / self.cal
+
+    def length_for(self, target: float, motor: Motor | None = None, recovery_mass_g: float | None = None,
+                   limit: float = 1500.0) -> float | None:
+        """The body length change (mm) that predict_length puts at `target`
+        cal, or None if none within +-limit (or no shorter body is left)."""
+        lo, hi = -min(limit, self.mid_len), limit
+        f = lambda dl: self.predict_length(dl, motor, recovery_mass_g) - target
+        if f(lo) * f(hi) > 0:
+            return None
+        for _ in range(50):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if f(lo) * f(mid) > 0 else (lo, mid)
+        return (lo + hi) / 2
+
+
+SWEET_SPOT = (MIN_MARGIN_CAL, 2.0)  # the page's green "just right" zone
+TARGET_CAL = 1.5
+
+
+def advice(bal: Balance, st: Stability, motors: list[Motor], beginner: bool,
+           motor: Motor | None = None, stock_od: float | None = None) -> dict | None:
+    """What to change to bring the score into the 1-2 cal sweet spot, best
+    first, each with the predicted score where it can be worked out without
+    rebuilding (motor, nose weight, fins, body width). None inside the sweet
+    spot. `beginner`: only the Beginner steps' levers, with step numbers;
+    `stock_od`: the motor size's minimum body OD (for the body-width tip)."""
+    m = st.margin_cal
+    if SWEET_SPOT[0] <= m <= SWEET_SPOT[1]:
+        return None
+    p = bal.params
+    low = m < SWEET_SPOT[0]
+    items: list[dict] = []
+
+    def add(text: str, est: float | None = None, kind: str = ""):
+        if low and est is not None and est < SWEET_SPOT[0]:
+            text += " Not enough on its own: combine it with another change."
+        items.append({"text": text, "est_cal": None if est is None else round(est, 2), "kind": kind})
+
+    def step(n: int) -> str:
+        return f" (step {n})" if beginner else ""
+
+    rows = sorted(((x, bal.predict(x, st.recovery_mass_g)) for x in motors), key=lambda r: r[0].mass_g)
+    current = motor or heaviest(p.motor)
+    shapes = ["swept", "delta", "trapezoid"] if beginner else ["swept", "delta", "trapezoid", "clipped_delta", "rectangular"]
+    if low:
+        # Taller first: it's the usual fix and always in reach (the body length isn't capped like the fins).
+        dl = bal.length_for(TARGET_CAL, motor, st.recovery_mass_g)
+        if dl is not None and 0 < dl <= 400:
+            dl = math.ceil(dl / 10) * 10
+            e = bal.predict_length(dl, motor, st.recovery_mass_g)
+            add(f"Make the rocket taller{step(4)}: about {dl:.0f} mm taller (around {bal.length + dl:.0f} mm in all) "
+                f"gives about {e:.1f} cal. A longer body moves the balance point forward, away from the fins.", e, "taller")
+        else:
+            e = bal.predict_length(200, motor, st.recovery_mass_g)
+            add(f"Making it taller{step(4)} helps, but not enough on its own: 200 mm taller only gets about {e:.1f} cal. "
+                "Start with the other changes below.", None, "taller")
+        if not p.custom_fin_size:
+            best = max(((sh, bal.predict(fin_shape=sh, fin_scale=MAX_FIN_SCALE)) for sh in shapes if sh != p.fin_shape),
+                       key=lambda r: r[1], default=None)
+            if best and best[1] > m + 0.1:
+                add(f"Try {best[0].replace('_', ' ')} fins{step(5)}: they reach about {best[1]:.1f} cal when they grow to full size.",
+                    best[1], "fins")
+        else:
+            for k in (1.25, 1.5, 2.0):
+                e = bal.predict(fin_span=p.fin_span * k, fin_sweep=p.fin_sweep * k)
+                if e >= TARGET_CAL or k == 2.0:
+                    add(f"Make the fins bigger: span and sweep {int((k - 1) * 100)}% larger gives about {e:.1f} cal "
+                        "(or untick Custom fin size and they grow by themselves).", e, "fins")
+                    break
+        if not beginner and p.fin_count < 5:
+            e = bal.predict(fin_count=p.fin_count + 1)
+            add(f"Use {p.fin_count + 1} fins instead of {p.fin_count}: about {e:.1f} cal.", e, "fins")
+        lighter = [(x, e) for x, e in rows if e >= SWEET_SPOT[0] and x.mass_g < current.mass_g]
+        if lighter:
+            x, e = lighter[-1]  # the heaviest one that's still stable: the most altitude
+            add(f"Fly a lighter motor: with a {x.code} the score is about {e:.1f} cal. The motor sits at the back, "
+                "so a lighter one moves the balance point forward. (A bigger motor size does the opposite.)", e, "motor")
+        for g in range(1, 201):
+            e = bal.predict(motor, st.recovery_mass_g, nose_g=g)
+            if e >= TARGET_CAL:
+                if g <= max(40, bal.printed_mass_g * 0.4):
+                    add(f"Add about {g} g of modelling clay inside the tip of the nose cone: about {e:.1f} cal. "
+                        "It makes the rocket heavier, so it flies a little lower.", e, "noseweight")
+                break
+        if stock_od and bal.body_od > stock_od + 0.5:
+            e = m * bal.body_od / stock_od
+            add(f"Make the body skinnier (Body OD offset 0, {stock_od:.0f} mm across): about {e:.1f} cal. "
+                "The score counts in body widths, so a thinner body scores higher.", e, "od")
+    else:
+        dl = bal.length_for(TARGET_CAL, motor, st.recovery_mass_g)
+        if dl is not None and dl < 0:
+            dl = -math.floor(-dl / 10) * 10
+            e = bal.predict_length(dl, motor, st.recovery_mass_g)
+            add(f"Make the rocket shorter{step(4)}: about {-dl:.0f} mm shorter (around {bal.length + dl:.0f} mm in all) "
+                f"gives about {e:.1f} cal. A shorter body moves the balance point back toward the fins.", e, "shorter")
+        elif bal.mid_len > 20:
+            dl = -bal.mid_len
+            e = bal.predict_length(dl, motor, st.recovery_mass_g)
+            add(f"Make the rocket shorter{step(4)}: down to about {bal.length + dl:.0f} mm (about as short as this motor "
+                f"size allows) gives about {e:.1f} cal. A shorter body moves the balance point back toward the fins.", e, "shorter")
+        else:
+            add(f"It's already about as short as this motor size allows{step(4)}, so try the changes below.", kind="shorter")
+        if not p.custom_fin_size:
+            opts = [(sh, bal.predict(fin_shape=sh, fin_scale=1.0)) for sh in shapes if sh != p.fin_shape]
+            fit = [r for r in opts if r[1] >= SWEET_SPOT[0]]
+            if fit:
+                sh, e = min(fit, key=lambda r: abs(r[1] - TARGET_CAL))
+                if e < m - 0.1 and m - e >= 0.3 * (m - SWEET_SPOT[1]):  # skip a tip that barely helps
+                    add(f"Try {sh.replace('_', ' ')} fins{step(5)}: about {e:.1f} cal.", e, "fins")
+        else:
+            e = bal.predict(fin_span=p.fin_span * 0.75, fin_sweep=p.fin_sweep * 0.75)
+            add(f"Make the fins smaller: span and sweep 25% smaller gives about {e:.1f} cal.", e, "fins")
+        if not beginner and p.fin_count > 3:
+            e = bal.predict(fin_count=p.fin_count - 1)
+            add(f"Use {p.fin_count - 1} fins instead of {p.fin_count}: about {e:.1f} cal.", e, "fins")
+        heavier = [(x, e) for x, e in rows if x.mass_g > current.mass_g]
+        if heavier:
+            x, e = heavier[-1]
+            add(f"A heavier motor lowers the score: with a {x.code} it is about {e:.1f} cal.", e, "motor")
+        add(f"A bigger motor size{step(2)} also lowers the score (a heavier motor at the back), and flies higher.", kind="motorsize")
+        if not beginner:
+            add("A wider body (Body OD offset) lowers the score too: it counts in body widths.", kind="od")
+    if low:
+        intro = (f"{m:.2f} cal is under 1, so it could wobble or tumble. "
+                 "The balance point needs to move forward (toward the nose), or the push point back (toward the fins). Things that help:")
+    elif m > 3.0:
+        intro = (f"{m:.2f} cal is more than it needs: it will turn into the wind like a weathervane. "
+                 "The balance point is far in front of the push point. To get closer to 1-2 cal:")
+    else:
+        intro = f"{m:.2f} cal is fine to fly, a bit above the 1-2 sweet spot. If you want it closer:"
+    return {"zone": "low" if low else "over" if m > 3.0 else "high", "intro": intro, "items": items}
 
 
 def stability(rocket: Rocket, motor: Motor | None = None, recovery_mass_g: float | None = None) -> Stability:
