@@ -372,7 +372,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="sponsored noopener" hidden title="Our Amazon supplies list (affiliate link)">Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Rocket gear: motors, launch pads, recovery and filament">Gear</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
@@ -1322,9 +1322,9 @@ function kidReportHtml(r) {
 
 // "Order a printed rocket" and the supplies link (when it's set), under the score.
 function orderRowHtml(ok, kid) {
-  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="sponsored noopener">${kid ? 'Get motors and supplies' : 'Shop supplies'}</a>` : '';
+  const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener">${kid ? 'Get motors and gear' : 'Rocket gear list'}</a>` : '';
   return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order>${kid ? 'Order it printed for you' : 'Order a printed rocket'}</button>` : ''}${shop}</div>
-    ${shop ? '<p class="affil">Supplies links go to Amazon. As an Amazon Associate, Quiver Design Works earns from qualifying purchases.</p>' : ''}`;
+    ${shop ? '<p class="affil">The gear list links to Amazon. As an Amazon Associate, I earn from qualifying purchases.</p>' : ''}`;
 }
 
 function showReport(r) {
