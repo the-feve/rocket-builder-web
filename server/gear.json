@@ -1,6 +1,32 @@
 {
   "storeId": "quiverdesig09-20",
   "checked": "2026-10-14",
+  "starterKit": {
+    "title": "First launch starter kit",
+    "intro": "New to model rockets? These five are everything you need, besides your printed rocket, for a first launch day.",
+    "items": [
+      {
+        "asin": "B075V79LKX",
+        "why": "Launch pad, rod and launch controller in one box."
+      },
+      {
+        "asin": "B09QRB6ML3",
+        "why": "Nine motors: start low with an A, then step up to B and C."
+      },
+      {
+        "asin": "B0006NAQ6O",
+        "why": "Wadding protects the parachute from the hot gas that pushes it out."
+      },
+      {
+        "asin": "B00A4UXATY",
+        "why": "A 15-inch parachute fits most 18 mm printed rockets."
+      },
+      {
+        "asin": "B09GL4N6QM",
+        "why": "Spare igniters, so one dud doesn't end the day."
+      }
+    ]
+  },
   "categories": [
     {
       "id": "launch",
@@ -75,27 +101,46 @@
           "asin": "B09QRB6ML3",
           "name": "A8-3, B4-4, C6-5 Mini Bulk Pack (9 motors)",
           "note": "Three of each size, so you can work up from a low first flight.",
-          "pick": true
+          "pick": true,
+          "motors": [
+            "A8-3",
+            "B4-4",
+            "C6-5"
+          ]
         },
         {
           "asin": "B09QP9544K",
           "name": "A8-3, B4-4, B6-4 Mini Bulk Pack (9 motors)",
-          "note": "Same idea, without the C motors, for small or light rockets."
+          "note": "Same idea, without the C motors, for small or light rockets.",
+          "motors": [
+            "A8-3",
+            "B4-4",
+            "B6-4"
+          ]
         },
         {
           "asin": "B01LWATRJW",
           "name": "Estes C6-5, 3-pack",
-          "note": "Standard 18 mm C motor with a 5-second delay."
+          "note": "Standard 18 mm C motor with a 5-second delay.",
+          "motors": [
+            "C6-5"
+          ]
         },
         {
           "asin": "B0DGYLST5B",
           "name": "Estes A8-3, bagged",
-          "note": "Low and slow. Good for first flights and small fields."
+          "note": "Low and slow. Good for first flights and small fields.",
+          "motors": [
+            "A8-3"
+          ]
         },
         {
           "asin": "B0CKSXLTZN",
           "name": "Estes B4-4, bagged",
-          "note": "A middle step between A and C."
+          "note": "A middle step between A and C.",
+          "motors": [
+            "B4-4"
+          ]
         }
       ]
     },

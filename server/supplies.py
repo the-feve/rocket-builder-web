@@ -57,6 +57,41 @@ def _icon(cat_id: str) -> str:
     return f'<svg viewBox="0 0 64 64" aria-hidden="true">{ICONS.get(cat_id, _FALLBACK)}</svg>'
 
 
+def _items() -> dict:
+    """ASIN -> (category id, item)."""
+    return {it["asin"]: (c["id"], it) for c in gear()["categories"] for it in c["items"]}
+
+
+def motor_links() -> dict[str, list[dict]]:
+    """Motor designation (e.g. "B4-4") -> affiliate links to packs that contain it,
+    single-motor packs first. Items list theirs under "motors" in gear.json."""
+    g, out = gear(), {}
+    for c in g["categories"]:
+        for it in c["items"]:
+            for m in it.get("motors", []):
+                out.setdefault(m, []).append({"name": it["name"], "url": amazon_url(it["asin"], g.get("storeId", "")),
+                                              "size": len(it["motors"])})
+    for links in out.values():
+        links.sort(key=lambda x: x["size"])
+    return out
+
+
+def _starter_kit(store: str) -> str:
+    kit = gear().get("starterKit")
+    if not kit:
+        return ""
+    items, rows = _items(), []
+    for n, k in enumerate(kit["items"], 1):
+        cat, it = items[k["asin"]]
+        rows.append(f'<li><a href="{escape(amazon_url(k["asin"], store))}" target="_blank" rel="sponsored noopener">'
+                    f'<span class="num">{n}</span><span class="pic">{_icon(cat)}</span>'
+                    f'<span class="txt"><strong>{escape(it["name"])}</strong><span class="note">{escape(k["why"])}</span>'
+                    f'<span class="cta">View on Amazon ↗</span></span></a></li>')
+    return (f'<section class="kit" id="starter-kit"><h2>{escape(kit["title"])}</h2><p>{escape(kit["intro"])}</p>'
+            f'<ol class="kitlist">{"".join(rows)}</ol><p class="kitnote">Then browse the full list below for spares, '
+            f'bigger parachutes, filament, glue and paint.</p></section>')
+
+
 def page() -> str:
     g = gear()
     store = g.get("storeId", "")
@@ -74,7 +109,7 @@ def page() -> str:
                 f'<span class="cta">View on Amazon ↗</span></span></a></li>')
         sections.append(f'<section id="{escape(c["id"])}"><h2><span class="hicon">{_icon(c["id"])}</span>{escape(c["title"])}</h2>'
                         f'<p>{escape(c["intro"])}</p><ul class="items">{"".join(cards)}</ul></section>')
-    return _PAGE.replace("{{TOC}}", toc).replace("{{SECTIONS}}", "".join(sections)).replace("{{DISCLOSURE}}", DISCLOSURE)
+    return _PAGE.replace("{{KIT}}", _starter_kit(store)).replace("{{TOC}}", toc).replace("{{SECTIONS}}", "".join(sections)).replace("{{DISCLOSURE}}", DISCLOSURE)
 
 
 _PAGE = """<!doctype html>
@@ -123,8 +158,18 @@ _PAGE = """<!doctype html>
   .cta { color:var(--accent); font-size:.9rem; font-weight:600; margin-top:2px; }
   .tag { align-self:flex-start; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent);
     border:1px solid var(--accent); border-radius:999px; padding:0 8px; }
+  .kit { margin:22px 0 8px; padding:18px 18px 10px; border:2px solid var(--accent); border-radius:12px; }
+  .kit h2 { margin:0 0 2px; }
+  .kitlist { list-style:none; padding:0; margin:12px 0 4px; display:grid; gap:10px; }
+  .kitlist a { display:grid; grid-template-columns:28px 64px 1fr; gap:12px; align-items:center; padding:10px; border:1px solid var(--line);
+    border-radius:10px; color:var(--ink); text-decoration:none; background:var(--bg); transition:border-color .15s; }
+  .kitlist a:hover { border-color:var(--accent); }
+  .kitlist .num { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--ink); color:var(--bg); font-weight:700; font-size:.9rem; }
+  .kitlist .pic { width:64px; height:64px; } .kitlist .pic svg { width:40px; height:40px; }
+  .kitnote { color:var(--muted); font-size:.9rem; }
   footer { border-top:1px solid var(--line); color:var(--muted); font-size:.9rem; padding:20px 16px 32px; text-align:center; }
-  @media (max-width:480px) { .items a { grid-template-columns:64px 1fr; } .pic { width:64px; height:64px; } .pic svg { width:40px; height:40px; } }
+  @media (max-width:480px) { .kitlist a { grid-template-columns:24px 48px 1fr; } .kitlist .pic { width:48px; height:48px; } .kitlist .pic svg { width:32px; height:32px; }
+    .items a { grid-template-columns:64px 1fr; } .pic { width:64px; height:64px; } .pic svg { width:40px; height:40px; } }
 </style>
 </head>
 <body>
@@ -134,6 +179,7 @@ _PAGE = """<!doctype html>
   <p class="lede">Everything you need to build and fly a rocket from Rocket Builder, apart from the rocket itself: a launch pad, motors, igniters, parachutes, filament, glue and paint. Items marked <b>Start here</b> are what I'd buy first.</p>
   <div class="notice"><b>Ordering through these links supports me and Rocket Builder</b>, at no extra cost to you.
     <small>{{DISCLOSURE}} Links open Amazon, where you'll see the current price. Motors are bought and handled by a grown-up.</small></div>
+  {{KIT}}
   <nav class="toc" aria-label="Categories">{{TOC}}</nav>
   {{SECTIONS}}
 </main>
