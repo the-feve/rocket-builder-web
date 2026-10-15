@@ -1,10 +1,12 @@
 # Handoff
 
-_Last updated 2026-10-14. Read this first, then `TODO.md` (ordering, payment and data to-dos), `README.md` (Status) and `docs/web_platform_spec.md`._
+_Last updated 2026-10-15. Read this first, then `TODO.md` (ordering, payment and data to-dos), `README.md` (Status) and `docs/web_platform_spec.md`._
 
 ## Where things stand
 
-- Everything is on `main` and deployed (latest: PR #9, kid-friendly Beginner mode + site look + iOS/iPad; PR #10, a Beginner fin-picker fix). No open PRs; merged branches are deleted (2026-10-14 cleanup; PR #7's address notes are folded in below).
+- Everything is on `main` and deployed (latest: PR #29, personal-use file license, 2026-10-15). No open PRs. Also live at https://rocket.quiverdesignworks.net.
+- **Session of 2026-10-14/15 (PRs #23–#29), newest entries below:** heights snap to ones that build (printer step before height), build retry after a restart, big order buttons, score advice outside 1–2 cal, order names with motor + customer code, parachute size, report divider, compare two rockets, launch field size, paid print orders through Stripe (**not switched on yet: Next steps 7**), personal-use file license. Parallel sessions had duplicated work (PR #21 closed unmerged; PR #22 kept); check open PRs and `git branch -r` before starting.
+- **Start here next session:** owner switches on paid orders (Next steps 7: restricted Stripe key, webhook, `ROCKETGEN_PUBLIC_URL` on Fly) and sets real prices / shipping in `server/shop.json`; one real order + refund from a normal browser. Then the open items in `TODO.md` (lawyer look at `server/terms.py`; beta print-and-fly checks).
 - **Live since 2026-10-09: https://rocket-fevergeon.fly.dev** (Fly app `rocket-fevergeon`, region `sjc`, volume `rocket_data` mounted at `/data`). PR #1 is merged; pushes to `main` deploy automatically. Checked after the first deploy: `/healthz`, an M24 build (24.7 s cold, stable 1.13 cal, recommends C11), preview GLB, the STL ZIP, saving a design and its `/d/<id>` share link (test design `WNePTzVr`). The machine auto-suspends after about 7 idle minutes; a cold boot takes about 17 s before uvicorn answers.
 
 ### What the designer does now (`server/`, FastAPI + one page with a three.js preview)
