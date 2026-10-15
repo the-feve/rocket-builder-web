@@ -15,8 +15,12 @@ ORDERS_DIR/<batch>/<order name>/ (orders from before names: <order id>/):
 The order record itself is in the designs SQLite file (`orders` table).
 tools/sync_orders.py copies new order folders to the owner's PC.
 
-Payment isn't built yet: an order needs a valid coupon code
-(ROCKETGEN_COUPON_CODES, comma-separated) and is then free.
+A coupon code (ROCKETGEN_COUPON_CODES, comma-separated) makes an order free,
+with the address typed in the form. Otherwise it's paid through Stripe
+Checkout (shop.py): the order waits as "awaiting_payment" until the webhook
+says it's paid (then "new", with the address Stripe collected), or
+"expired" if the checkout lapses. Waiting and expired orders stay off the
+admin page and the PC sync.
 """
 
 from __future__ import annotations
@@ -34,7 +38,8 @@ from pathlib import Path
 import designs
 
 ORDERS_DIR = Path(os.environ.get("ROCKETGEN_ORDERS_DIR", Path(__file__).resolve().parent / "data" / "orders"))
-STATUSES = ("new", "printing", "shipped", "cancelled")
+STATUSES = ("new", "printing", "shipped", "cancelled")  # what the owner sets
+UNPAID = ("awaiting_payment", "expired")  # paid checkout not finished
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS orders (
@@ -88,7 +93,11 @@ def _sheet(o: dict) -> str:
     lines = [f"ROCKET BUILDER PRINT ORDER {o.get('name', o['id'])}", f"Batch {o['batch']}   Received {when}   Status {o['status']}", "",
              f"Rocket: {o['design_name']}" + (f"   (saved design /d/{o['design_id']})" if o.get("design_id") else ""),
              f"Quantity: {o['quantity']}   Filament: {o['material']}   Colour: {o['color']}",
-             f"Price: ${o['price']:.2f}" + (f" (coupon {o['coupon']})" if o.get("coupon") else ""), "",
+             f"Price: ${o['price']:.2f}" + (f" (coupon {o['coupon']})" if o.get("coupon") else "")
+             + (f"   Paid ${o['paid']['total_cents'] / 100:.2f} incl. shipping ${o['paid']['shipping_cents'] / 100:.2f}"
+                f" and tax ${o['paid']['tax_cents'] / 100:.2f}" if o.get("paid") else ""),
+             *([f"Box: {o['package']['box']['length']} x {o['package']['box']['width']} x {o['package']['box']['height']} in, "
+                f"about {o['package']['weight_oz']} oz"] if o.get("package") else []), "",
              "Customer", f"  {o['email']}" + (f"   (customer {o['customer']})" if o.get("customer") else ""), "", "Ship to", f"  {s['name']}", f"  {s['line1']}"]
     if s.get("line2"):
         lines.append(f"  {s['line2']}")
@@ -108,14 +117,15 @@ def _sheet(o: dict) -> str:
 
 def create(*, user: dict, design_name: str, design_id: str | None, params: dict, quantity: int, material: str,
            color: str, shipping: dict, notes: str, coupon: str | None, price: float, rocket_zip: bytes,
-           parts: list[dict], stability: dict, recommended_motor: str | None) -> dict:
+           parts: list[dict], stability: dict, recommended_motor: str | None, status: str = "new",
+           package: dict | None = None) -> dict:
     now = time.time()
     day = datetime.fromtimestamp(now, timezone.utc).strftime("%Y%m%d")
     data = {"design_name": design_name, "design_id": design_id, "params": params, "quantity": quantity,
             "material": material, "color": color, "shipping": shipping, "notes": notes,
             "coupon": coupon.strip().upper() if coupon else None, "price": price,
             "parts": [{"name": p["name"], "height_mm": p["height_mm"], "mass_g": p["mass_g"]} for p in parts],
-            "stability": stability, "recommended_motor": recommended_motor}
+            "stability": stability, "recommended_motor": recommended_motor, "package": package}
     with _db() as con:
         con.execute("BEGIN IMMEDIATE")  # the day's sequence number can't be taken twice
         n = con.execute("SELECT COUNT(*) FROM orders WHERE batch = ?", (f"B{day}",)).fetchone()[0] + 1
@@ -123,7 +133,7 @@ def create(*, user: dict, design_name: str, design_id: str | None, params: dict,
         data["name"] = order_name(order_id, params.get("motor", "M"), user["id"])
         data["customer"] = customer_code(user["id"])
         con.execute("INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (order_id, f"B{day}", user["id"], user["email"], "new", json.dumps(data), now, now))
+                    (order_id, f"B{day}", user["id"], user["email"], status, json.dumps(data), now, now))
     order = get(order_id)
     write_folder(order, rocket_zip)
     return order
@@ -153,10 +163,52 @@ def list_for_user(user_id: str) -> list[dict]:
     return [_public(r) for r in rows]
 
 
-def list_all(since: float = 0) -> list[dict]:
+def list_all(since: float = 0, unpaid: bool = False) -> list[dict]:
+    """Orders changed since `since`; checkouts not paid (yet) only with unpaid=True."""
     with _db() as con:
         rows = con.execute("SELECT * FROM orders WHERE updated_at > ? ORDER BY created_at DESC", (since,)).fetchall()
-    return [_public(r) for r in rows]
+    return [o for o in map(_public, rows) if unpaid or o["status"] not in UNPAID]
+
+
+def _update(order_id: str, status: str, **data) -> dict | None:
+    with _db() as con:
+        row = con.execute("SELECT data FROM orders WHERE id = ?", (order_id,)).fetchone()
+        if not row:
+            return None
+        merged = {**json.loads(row["data"]), **data}
+        con.execute("UPDATE orders SET status = ?, data = ?, updated_at = ? WHERE id = ?",
+                    (status, json.dumps(merged), time.time(), order_id))
+    order = get(order_id)
+    if folder(order).is_dir():
+        (folder(order) / "order.json").write_text(json.dumps(order, indent=2))
+        (folder(order) / "ORDER.txt").write_text(_sheet(order))
+    return order
+
+
+def mark_paid(order_id: str, session: dict) -> dict | None:
+    """From a completed Checkout Session: status new, the address Stripe
+    collected and what was paid. Repeats (Stripe retries) change nothing."""
+    order = get(order_id)
+    if not order or order["status"] not in UNPAID:
+        return None
+    sd = (session.get("collected_information") or {}).get("shipping_details") or session.get("shipping_details") or {}
+    a, cust = sd.get("address") or {}, session.get("customer_details") or {}
+    shipping = {"name": sd.get("name") or cust.get("name") or "", "line1": a.get("line1") or "", "line2": a.get("line2") or "",
+                "city": a.get("city") or "", "state": a.get("state") or "", "zip": a.get("postal_code") or "",
+                "country": a.get("country") or "US", "phone": cust.get("phone") or ""}
+    tot = session.get("total_details") or {}
+    paid = {"session_id": session.get("id"), "payment_intent": session.get("payment_intent"),
+            "total_cents": session.get("amount_total") or 0, "tax_cents": tot.get("amount_tax") or 0,
+            "shipping_cents": tot.get("amount_shipping") or 0, "email": cust.get("email") or order["email"],
+            "paid_at": time.time()}
+    return _update(order_id, "new", shipping=shipping, paid=paid)
+
+
+def mark_expired(order_id: str) -> dict | None:
+    order = get(order_id)
+    if not order or order["status"] != "awaiting_payment":
+        return None
+    return _update(order_id, "expired")
 
 
 def set_status(order_id: str, status: str) -> dict | None:

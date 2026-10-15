@@ -68,8 +68,9 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] Score advice outside the 1-2 cal sweet spot, with predicted scores (2026-10-14)
 - [x] Compare two rockets side by side (scores, summaries, which is better and why) (2026-10-15)
 - [x] Launch field size with parachute drift (2026-10-15)
-- [ ] Print orders through the quiverdesignworks.net/store checkout (Stripe)
-- [ ] Shipping estimate when ordering
+- [x] Paid print orders through Stripe Checkout on the shared account, shipped via the store's Pirate Ship CSV (2026-10-15)
+- [x] Shipping estimate from packed weight and box (2026-10-15)
+- [ ] Owner: Stripe restricted key + webhook + `ROCKETGEN_PUBLIC_URL` on Fly (HANDOFF Next steps 7), then one real order and refund
 - [x] Order folder / file names: motor size and a customer code (2026-10-14)
 - [x] Suggested parachute size from the rocket's mass (2026-10-14)
 - [x] Drag handle between the 3D view and the report (2026-10-14)

@@ -250,6 +250,7 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     import app as appmod
     from fastapi.testclient import TestClient as TC
     monkeypatch.setenv("ROCKETGEN_COUPON_CODES", "LAUNCHDAY")
+    monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)  # paid orders off: no coupon is a 402
     monkeypatch.setattr(appmod, "ADMIN_EMAILS", {"owner@example.com"})
     monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
     ship = {"name": "Pat", "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "zip": "98926"}
@@ -291,6 +292,85 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     assert owner.post(f"/api/admin/orders/{oid}/status", json={"status": "lost"}).status_code == 400
     assert kid.get("/api/my/orders").json()["orders"][0]["status"] == "shipped"
     assert owner.get("/admin").status_code == 200
+
+
+def test_paid_order_through_stripe_checkout(monkeypatch):
+    """Without a coupon the order waits for payment and the reply carries a
+    Stripe Checkout URL (priced from shop.json, tagged rocket-builder, with a
+    shipping estimate). A signed checkout.session.completed marks it paid
+    with Stripe's address; other stores' events and bad signatures don't."""
+    import json as _json
+    import app as appmod
+    import orders
+    import shop
+    from fastapi.testclient import TestClient as TC
+    monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_x")
+    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+    monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
+    sent = {}
+
+    def fake_session(order, q, origin):
+        sent.update(order=order, q=q, params=shop.session_params(order, q, origin))
+        return {"id": "cs_test_123", "url": "https://checkout.stripe.com/c/pay/cs_test_123"}
+    monkeypatch.setattr(shop, "create_session", fake_session)
+
+    kid = TC(app)
+    kid.post("/api/auth/signup", json={"email": "payer@example.com", "password": "rocket123", "age_ok": True})
+    built = kid.post("/api/build", json={}).json()
+    q = kid.get("/api/orders/quote", params={"build_id": built["id"], "quantity": 2}).json()
+    assert q["each_cents"] == shop.price_each_cents(built["total_mass_g"]) and q["subtotal_cents"] == 2 * q["each_cents"]
+    assert q["shipping_cents"] > 0 and q["package"]["weight_oz"] > 2 * built["total_mass_g"] / 28.35 and q["paid_enabled"]
+    r = kid.post("/api/orders", json={"design_name": "Zoomer", "params": {}, "quantity": 2, "color": "Blue"})
+    assert r.status_code == 200, r.text
+    d = r.json()
+    assert d["checkout_url"].startswith("https://checkout.stripe.com/") and d["status"] == "awaiting_payment"
+    p = sent["params"]
+    assert p["metadata"]["store"] == "rocket-builder" == p["payment_intent_data"]["metadata"]["store"]
+    assert p["line_items"][0]["price_data"]["unit_amount"] == q["each_cents"] and p["line_items"][0]["quantity"] == 2
+    assert p["shipping_options"][0]["shipping_rate_data"]["fixed_amount"]["amount"] == q["shipping_cents"]
+    assert p["metadata"]["order_id"] == d["id"] and p["metadata"]["weight_oz"] and p["metadata"]["box_in"]
+    assert ("line_items[0][price_data][product_data][metadata][store]", "rocket-builder") in shop._form(p)
+    # Waiting orders stay off the admin list and the PC sync.
+    sync = {"Authorization": "Bearer sync-secret"}
+    assert d["id"] not in [o["id"] for o in kid.get("/api/admin/orders", headers=sync).json()["orders"]]
+
+    def event(kind, store="rocket-builder", status="paid"):
+        return _json.dumps({"type": kind, "data": {"object": {
+            "id": "cs_test_123", "payment_status": status, "payment_intent": "pi_1", "amount_total": 4321,
+            "total_details": {"amount_tax": 321, "amount_shipping": 850},
+            "customer_details": {"email": "payer@example.com", "phone": "+15095550100", "name": "Pat"},
+            "collected_information": {"shipping_details": {"name": "Pat Doe", "address": {
+                "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "postal_code": "98926", "country": "US"}}},
+            "metadata": {"store": store, "order_id": d["id"]}}}}).encode()
+    hook = TC(app)
+    bad = event("checkout.session.completed")
+    assert hook.post("/api/stripe-webhook", content=bad, headers={"stripe-signature": "t=1,v1=nope"}).status_code == 400
+    other = event("checkout.session.completed", store="quiver-design-works")
+    assert hook.post("/api/stripe-webhook", content=other, headers={"stripe-signature": shop.sign_for_tests(other, "whsec_test")}).json() == {"ignored": True}
+    assert orders.get(d["id"])["status"] == "awaiting_payment"
+    ok = event("checkout.session.completed")
+    assert hook.post("/api/stripe-webhook", content=ok, headers={"stripe-signature": shop.sign_for_tests(ok, "whsec_test")}).status_code == 200
+    o = orders.get(d["id"])
+    assert o["status"] == "new" and o["shipping"]["zip"] == "98926" and o["paid"]["total_cents"] == 4321
+    assert "Paid $43.21" in (orders.folder(o) / "ORDER.txt").read_text()
+    assert d["id"] in [x["id"] for x in kid.get("/api/admin/orders", headers=sync).json()["orders"]]
+    # A repeat delivery changes nothing; an expired checkout only affects unpaid orders.
+    assert orders.mark_paid(d["id"], {}) is None and orders.mark_expired(d["id"]) is None
+
+
+def test_shop_pricing_and_webhook_signature():
+    import shop
+    cfg = {**shop.CONFIG, "price": {"baseCents": 1200, "perGramCents": 15, "roundToCents": 50}}
+    assert shop.price_each_cents(45.2, cfg) == 1900  # 1200 + 678 = 1878 -> 1900
+    small = shop.package([{"height_mm": 195, "width_mm": 60, "mass_g": 29}, {"height_mm": 70, "width_mm": 21, "mass_g": 6}], 1)
+    big = shop.package([{"height_mm": 195, "width_mm": 60, "mass_g": 29}, {"height_mm": 70, "width_mm": 21, "mass_g": 6}], 5)
+    assert small["box"]["length"] >= 195 / 25.4 and shop.shipping_cents(big) >= shop.shipping_cents(small)
+    payload = b'{"type":"x"}'
+    assert shop.verify_webhook(payload, shop.sign_for_tests(payload, "s"), "s") == {"type": "x"}
+    with pytest.raises(ValueError):
+        shop.verify_webhook(payload, shop.sign_for_tests(payload, "s", t=1), "s")  # too old
+    with pytest.raises(ValueError):
+        shop.verify_webhook(payload, shop.sign_for_tests(payload, "other"), "s")
 
 
 def test_account_prefs_skip_tutorial():

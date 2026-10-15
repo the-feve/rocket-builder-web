@@ -1,0 +1,33 @@
+{
+  "note": "Printed-rocket prices and shipping. Edit the numbers here; the server reads them on start. Prices are in US cents. See server/shop.py.",
+  "store": "rocket-builder",
+  "currency": "usd",
+  "statementDescriptorSuffix": "ROCKET",
+  "productTaxCode": "txcd_99999999",
+  "price": {
+    "note": "Each printed rocket: base + per gram of plastic (all its printed parts), rounded up to the next 50 cents.",
+    "baseCents": 1200,
+    "perGramCents": 15,
+    "roundToCents": 50
+  },
+  "shipping": {
+    "note": "USPS Ground Advantage, US only. rates: [up to this many ounces, cents], billed on the larger of the real weight and the dimensional weight (boxes over 1728 cubic inches: L x W x H / 166 lb). Estimates; Pirate Ship's real price varies with distance.",
+    "displayName": "USPS Ground Advantage",
+    "taxCode": "txcd_92010001",
+    "countries": ["US"],
+    "minDays": 3,
+    "maxDays": 7,
+    "handlingDays": 7,
+    "paddingOz": 1.5,
+    "rates": [[4, 550], [8, 625], [12, 725], [16, 850], [32, 1050], [48, 1250], [64, 1400], [80, 1550], [160, 2200], [320, 3200]],
+    "boxes": [
+      {"name": "small", "length": 8, "width": 6, "height": 4, "weightOz": 3},
+      {"name": "medium", "length": 10, "width": 8, "height": 4, "weightOz": 4},
+      {"name": "long", "length": 12, "width": 9, "height": 4, "weightOz": 5},
+      {"name": "deep", "length": 12, "width": 10, "height": 6, "weightOz": 6},
+      {"name": "large", "length": 14, "width": 10, "height": 6, "weightOz": 7},
+      {"name": "x-large", "length": 16, "width": 12, "height": 8, "weightOz": 10},
+      {"name": "xx-large", "length": 20, "width": 14, "height": 8, "weightOz": 13}
+    ]
+  }
+}

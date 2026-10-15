@@ -44,6 +44,7 @@ import accounts
 import designs
 import notify
 import orders
+import shop
 import supplies
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -161,7 +162,9 @@ def _report(rocket) -> dict:
     masses = rocket.mass_g()
     parts = [{"name": p.name, "color": PART_COLORS[i % len(PART_COLORS)], "volume_mm3": round(p.volume, 1),
               "mass_g": round(masses[p.name], 1),
-              "height_mm": round(p.local.bounding_box().size.Z, 1)} for i, p in enumerate(rocket.parts)]
+              "height_mm": round(p.local.bounding_box().size.Z, 1),
+              "width_mm": round(max(p.local.bounding_box().size.X, p.local.bounding_box().size.Y), 1)}
+             for i, p in enumerate(rocket.parts)]
     return {
         "body_length_mm": round(rocket.params.body_length, 1),
         "parts": parts,
@@ -578,40 +581,108 @@ class OrderIn(BaseModel):
     params: BuildRequest
     quantity: int = Field(1, ge=1, le=5)
     color: str = Field("Any", max_length=40)
-    shipping: Shipping
+    shipping: Shipping | None = None  # coupon orders; paid orders give it to Stripe
     notes: str = Field("", max_length=1000)
     coupon: str = Field("", max_length=40)
+
+
+def _print_quote(build_id: str, quantity: int) -> dict:
+    b, g = _get(build_id)
+    return shop.quote(g["report"]["parts"], g["report"]["total_mass_g"], quantity)
+
+
+@app.get("/api/orders/quote")
+def order_quote(build_id: str, quantity: int = 1):
+    """Price, box and shipping estimate for printing a built rocket (from
+    shop.json; tax is added by Stripe at checkout)."""
+    if not 1 <= quantity <= 5:
+        raise HTTPException(422, "Quantity must be 1 to 5.")
+    return _print_quote(build_id, quantity)
+
+
+PUBLIC_URL = os.environ.get("ROCKETGEN_PUBLIC_URL", "").rstrip("/")
 
 
 @app.post("/api/orders")
 def place_order(o: OrderIn, request: Request):
     """Order a printed copy of the rocket. Builds it (or reuses the cached
-    build), saves the order folder and tells the owner. Payment isn't built
-    yet, so a valid coupon code is required and the order is free."""
+    build) and saves the order folder. With a valid coupon the order is free
+    and placed now (address from the form). Otherwise it waits for payment:
+    the reply carries a Stripe Checkout URL, and the webhook marks it paid."""
     user = current_user(request)
     if not user:
         raise HTTPException(401, "Sign in (or create an account) to order a printed rocket.")
-    if not orders.coupon_ok(o.coupon):
-        raise HTTPException(402, "Paid printing is coming soon. For now, orders need a coupon code."
-                            if not o.coupon else "That coupon code isn't valid.")
+    free = bool(o.coupon.strip())
+    if free and not orders.coupon_ok(o.coupon):
+        raise HTTPException(402, "That coupon code isn't valid.")
+    if free and not o.shipping:
+        raise HTTPException(422, "Fill in the shipping address.")
+    if not free and not shop.enabled():
+        raise HTTPException(402, "Paid printing isn't switched on yet. For now, orders need a coupon code.")
     _rate_limit(request, "order", ORDERS_PER_DAY, 86400)
     res = build(o.params, request)
     b, g = _get(res["id"])
     if not b["stability"]["ok"]:
         raise HTTPException(409, "This rocket isn't stable yet, so it can't be printed. " + b["stability"]["message"])
+    q = _print_quote(res["id"], o.quantity)
     if g["stls"] is None:
         with _lock:
             g["stls"] = _stls(g["rocket"])
     rocket_zip = _zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"), b.get("field"))
+    pending = {"name": "(given at checkout)", "line1": "", "line2": "", "city": "", "state": "", "zip": "", "phone": ""}
     order = orders.create(user=user, design_name=o.design_name, design_id=o.design_id, params=b["params"],
                           quantity=o.quantity, material=o.params.material, color=o.color,
-                          shipping=o.shipping.model_dump(), notes=o.notes, coupon=o.coupon, price=0.0,
+                          shipping=o.shipping.model_dump() if free else pending, notes=o.notes,
+                          coupon=o.coupon if free else None, price=0.0 if free else q["subtotal_cents"] / 100,
                           rocket_zip=rocket_zip, parts=g["report"]["parts"], stability=b["stability"],
-                          recommended_motor=b["flights"]["recommended"])
-    log.info("order %s from %s", order["name"], user["email"])
-    notify.owner(f"New rocket order {order['name']}: {o.design_name} x{o.quantity}",
-                 orders._sheet(order) + f"\nFiles: {orders.folder(order)}\nOrders page: {request.base_url}admin\n")
-    return {"id": order["id"], "batch": order["batch"], "status": order["status"], "price": order["price"]}
+                          recommended_motor=b["flights"]["recommended"],
+                          status="new" if free else "awaiting_payment", package=q["package"])
+    if free:
+        _order_alert(order, request)
+        return {"id": order["id"], "name": order["name"], "status": order["status"], "price": order["price"]}
+    origin = PUBLIC_URL or str(request.base_url).rstrip("/")
+    try:
+        session = shop.create_session(order, q, origin)
+    except shop.StripeError as ex:
+        log.error("checkout for %s failed: %s", order["name"], ex)
+        orders.mark_expired(order["id"])
+        raise HTTPException(502, "Checkout is unavailable right now. Please try again later.")
+    log.info("order %s awaiting payment (%s)", order["name"], session.get("id"))
+    return {"id": order["id"], "name": order["name"], "status": order["status"], "checkout_url": session["url"]}
+
+
+def _order_alert(order: dict, request: Request) -> None:
+    log.info("order %s from %s", order["name"], order["email"])
+    paid = f" (paid ${order['paid']['total_cents'] / 100:.2f})" if order.get("paid") else " (coupon)"
+    notify.owner(f"New rocket order {order['name']}: {order['design_name']} x{order['quantity']}{paid}",
+                 orders._sheet(order) + f"\nFiles: {orders.folder(order)}\nOrders page: {PUBLIC_URL or request.base_url}/admin\n")
+
+
+@app.post("/api/stripe-webhook")
+async def stripe_webhook(request: Request):
+    """Stripe tells us a checkout finished (paid) or expired. Only sessions
+    tagged metadata.store = rocket-builder are ours; anything else on the
+    shared account gets a 200 and is ignored."""
+    secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    if not secret:
+        raise HTTPException(503, "Webhook not configured.")
+    payload = await request.body()
+    try:
+        event = shop.verify_webhook(payload, request.headers.get("stripe-signature", ""), secret)
+    except ValueError as ex:
+        raise HTTPException(400, str(ex))
+    obj = (event.get("data") or {}).get("object") or {}
+    meta = obj.get("metadata") or {}
+    if meta.get(shop.STORE_KEY) != shop.STORE_ID or not meta.get("order_id"):
+        return {"ignored": True}
+    kind = event.get("type")
+    if kind in ("checkout.session.completed", "checkout.session.async_payment_succeeded") and obj.get("payment_status") == "paid":
+        order = orders.mark_paid(meta["order_id"], obj)
+        if order:
+            _order_alert(order, request)
+    elif kind in ("checkout.session.expired", "checkout.session.async_payment_failed"):
+        orders.mark_expired(meta["order_id"])
+    return {"ok": True}
 
 
 @app.get("/api/my/orders")
@@ -619,7 +690,7 @@ def my_orders(request: Request):
     user = current_user(request)
     if not user:
         raise HTTPException(401, "Sign in to see your orders.")
-    return {"orders": [{k: o[k] for k in ("id", "status", "created_at", "design_name", "quantity", "color", "material")}
+    return {"orders": [{k: o.get(k) for k in ("id", "name", "status", "created_at", "design_name", "quantity", "color", "material", "price")}
                        for o in orders.list_for_user(user["id"])]}
 
 
@@ -637,9 +708,9 @@ class StatusIn(BaseModel):
 
 
 @app.get("/api/admin/orders")
-def admin_orders(request: Request, since: float = 0):
+def admin_orders(request: Request, since: float = 0, unpaid: bool = False):
     _admin(request)
-    return {"orders": orders.list_all(since), "now": time.time()}
+    return {"orders": orders.list_all(since, unpaid), "now": time.time()}
 
 
 @app.get("/api/admin/orders/{order_id}/files.zip")
