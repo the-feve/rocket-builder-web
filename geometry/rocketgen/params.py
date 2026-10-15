@@ -99,18 +99,22 @@ class DesignParams:
 # Printed fits (radial, mm), from the fit-test coupons on a Bambu P1S in PLA
 # (2026-10-16, fit_test/README.md). The settings CSV's fit_slip (0.02 mm) is
 # the CAD value and printed far too tight. Body joints (glued): 0.15 was a
-# little snug and 0.20 a little loose on every size. Nose (slides out at
-# ejection, held by friction): 0.15 on M18-M29; the short M13 nose shoulder
-# needed less clearance for the same grip.
+# little snug and 0.20 a little loose on M18-M29. Nose (slides out at
+# ejection, held by friction): 0.15 on M18-M29. M13's short shoulders (nose
+# under SHORT_NOSE_SHOULDER) need less: joint 0.16 just right, nose 0.12 too
+# tight and 0.15 too loose (round 2), so 0.14 (a loose nose can be taped).
 WEB_FIT_JOINT = 0.18
 WEB_FIT_NOSE = 0.15
-WEB_FIT_NOSE_SHORT = 0.12  # nose shoulders under SHORT_NOSE_SHOULDER mm
+WEB_FIT_JOINT_SHORT = 0.16
+WEB_FIT_NOSE_SHORT = 0.14
 SHORT_NOSE_SHOULDER = 8.0
 
 
 def web_fits(nose_shoulder_len: float) -> tuple[float, float]:
     """(fit_joint, fit_nose) defaults for a nose shoulder this long."""
-    return WEB_FIT_JOINT, WEB_FIT_NOSE_SHORT if nose_shoulder_len < SHORT_NOSE_SHOULDER else WEB_FIT_NOSE
+    if nose_shoulder_len < SHORT_NOSE_SHOULDER:
+        return WEB_FIT_JOINT_SHORT, WEB_FIT_NOSE_SHORT
+    return WEB_FIT_JOINT, WEB_FIT_NOSE
 
 
 @dataclass

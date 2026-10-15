@@ -53,7 +53,7 @@ STATIC = Path(__file__).resolve().parent / "static"
 GENERATOR_VERSION = "0.2.0"  # 0.2.0: printed joint fits and a slimmer motor cap with a casing-wall lip (2026-10-16); changes every part, so cached builds are rebuilt
 
 FIT_NOTE = ("Joint fits are tuned for Bambu Lab X1C / P1S printers in PLA at default settings "
-            "(0.18 mm per side on the glued body joints, 0.15 mm on the nose; 0.12 mm on M13). "
+            "(0.18 mm per side on the glued body joints, 0.15 mm on the nose; 0.16 / 0.14 mm on M13). "
             "Other printers, filaments or settings may need adjusting: lightly sand a shoulder that's too tight, "
             "or wrap tape around the nose shoulder if the nose is too loose. It should slide out easily but not fall out.")
 SCHEMA_VERSION = 1

@@ -402,10 +402,10 @@ def test_score_advice_estimates_match_rebuilds():
 
 def test_separate_nose_and_joint_fits():
     """fit_joint / fit_nose move only their own shoulder; defaults are web_fits
-    (the short M13 nose shoulder gets the tighter nose fit)."""
-    for motor, nose in (("M13", 0.12), ("M18", 0.15), ("M29", 0.15)):
+    (M13's short shoulders get their own fits)."""
+    for motor, joint, nose in (("M13", 0.16, 0.14), ("M18", 0.18, 0.15), ("M29", 0.18, 0.15)):
         d = compute_derived(DesignParams(motor=motor))
-        assert (d.fit_slip, d.fit_nose) == (0.18, nose)
+        assert (d.fit_slip, d.fit_nose) == (joint, nose)
         assert d.nose_shoulder_od == pytest.approx(d.body_id - 2 * nose)
     d = compute_derived(DesignParams(fit_joint=0.1, fit_nose=0.25))
     assert d.shoulder_od == pytest.approx(d.body_id - 0.2)

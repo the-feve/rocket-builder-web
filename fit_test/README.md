@@ -43,7 +43,7 @@ The nose plug is lighter than a real nose cone, so pick the loosest N plug that 
 
 | Size | Printer | Filament | Best J | Best N | Notes |
 |---|---|---|---|---|---|
-| M13 | P1S | PLA | J15–J20 (J20 good slip fit, fine with glue; J15 a little tight but works; J10 needs excessive force; J05 won't go in) | below N15 (N15 slips but is too loose for a cone; N20–N30 all too loose). Nose should feel like J20 | Round 1, 2026-10-16. The shorter nose shoulder feels looser at the same clearance. Round 2: `files/round2/` |
+| M13 | P1S | PLA | **J16** (round 2). Round 1: J15–J20 (J20 good slip fit, fine with glue; J15 a little tight but works; J10 needs excessive force; J05 won't go in) | below N15 (N15 slips but is too loose for a cone; N20–N30 all too loose). Nose should feel like J20 | Round 1, 2026-10-16. The shorter nose shoulder feels looser at the same clearance. Round 2: `files/round2/` |
 | M18 | P1S | PLA | J20 (best, a little more slip); J15 good, would work; J10 / J05 won't go in | between N15 and N20 (N15 a snug bit too tight, N20 a little too loose; N25 / N30 far too loose) | Round 1, 2026-10-16 |
 | M24 | P1S | PLA | between J15 and J20 (J15 a little snug, J20 slips but a little loose; J10 / J05 too tight) | N15 about right (N20 a bit loose; N25 / N30 too loose) | Round 1, 2026-10-16 |
 | M29 | P1S | PLA | between J15 and J20 (J15 correct, J20 a smidge loose; J10 / J05 far too tight) | N15 best (N20–N30 too loose) | Round 1, 2026-10-16 |
@@ -60,4 +60,6 @@ python -m rocketgen.fit_test --sizes M18 --joint 0.2 0.25 0.3 --nose 0.3 0.35 0.
 
 ## Outcome (2026-10-16)
 
-Set as the website defaults in `geometry/rocketgen/params.py` (`web_fits`): **body joints 0.18 mm, nose 0.15 mm, 0.12 mm for a nose shoulder under 8 mm** (M13), plus the 0.5 mm shoulder chamfer. The nose needs less clearance than a joint for the same feel because its shoulder is 30% shorter. Still to check: M13 round 2 (`files/round2/`), the X1C, and one full rocket printed with the new fits.
+Set as the website defaults in `geometry/rocketgen/params.py` (`web_fits`): **body joints 0.18 mm and nose 0.15 mm on M18-M29; M13 (nose shoulder under 8 mm) joint 0.16 mm and nose 0.14 mm**, plus the 0.5 mm shoulder chamfer. Short shoulders need less clearance for the same feel.
+
+M13 round 2 (P1S, PLA): J16 just right; N06-N12 all too tight (with round 1's N15 too loose, 0.14 was chosen). Still to check: the X1C, and the validation plate (`files/validation/`, real parts; its M13 pieces were made with the earlier 0.18 / 0.12).
