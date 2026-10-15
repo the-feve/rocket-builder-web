@@ -414,7 +414,7 @@ def test_fit_test_coupons_seat_without_overlap():
     from rocketgen.geom import meshes, solids_of
 
     d = compute_derived(DesignParams(motor="M13"))
-    items = coupons("M13", joint=(0.05, 0.2), nose=(0.3,))
+    items = coupons("M13", joint=(0.05, 0.2), nose=(0.3,), flip=False)
     sock = items[0].solid
     h = d.shoulder_len + d.wall + 4.0
     for c in items:

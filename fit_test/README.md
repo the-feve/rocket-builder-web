@@ -6,7 +6,7 @@ Short test pieces that copy only the joints of a rocket, so the clearances can b
 
 ## What's on each plate
 
-`files/fit_test_<size>.3mf`: one plate per tube size, 9 separate objects, sized for an X1C / P1S plate.
+`files/fit_test_<size>.3mf`: one plate per tube size (currently committed: M13, M18, M24; make the others with `--sizes M29 BT60`), 9 separate objects, sized for an X1C / P1S plate.
 
 | Size | Body OD / ID (mm) | Used by |
 |---|---|---|
@@ -20,7 +20,7 @@ Short test pieces that copy only the joints of a rocket, so the clearances can b
 - **J05, J10, J15, J20**: body-joint shoulders (full length, glued in the real rocket) at **0.05 / 0.10 / 0.15 / 0.20 mm radial** clearance.
 - **N15, N20, N25, N30**: nose shoulders (30% shorter, must slide out at ejection) at **0.15 / 0.20 / 0.25 / 0.30 mm** radial clearance.
 - Every plug has a **0.5 mm 45° chamfer** on its bottom outer edge. It takes off the elephant foot and helps the plug find the socket. The real parts don't have it yet; it gets switched on together with the chosen fits.
-- Plugs print shoulder-down like the real parts. Their top cap is a short bridge and carries the label.
+- Plugs print **closed end down, cup open upward** (owner's change, 2026-10-15: shoulder-down stood on a thin edge). The label is recessed 0.6 mm into the closed end and reads from below. Because the shoulder now prints at the top, the chamfer acts only as a lead-in; the real parts still print shoulder-down, so judge them with that in mind.
 
 Radial clearance means per side, so the diameter gap is twice the number on the label.
 

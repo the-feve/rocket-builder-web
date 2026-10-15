@@ -5,8 +5,9 @@ plus the 45-degree countersink) and a set of shoulder plugs at different
 radial clearances: "J" plugs use the body-joint shoulder length (glued
 joints), "N" plugs the nose's shorter shoulder (must slide out at ejection).
 Plugs are the real shoulder profile (body.py), with a short band of body
-tube and a capped top carrying the label, printed shoulder-down as the real
-parts are; the socket prints upright, countersink on top, as a segment does.
+tube and a closed end with the label recessed into it, printed closed end
+down (cup open upward); the socket prints upright, countersink on top, as a
+segment does.
 Labels are the clearance in hundredths of a mm: J10 = 0.10 mm radial.
 
     python -m rocketgen.fit_test --out fit_test/out
@@ -23,7 +24,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from build123d import Align, FontStyle, Mesher, Solid, Text, export_stl, extrude
+from build123d import Align, Axis, FontStyle, Mesher, Solid, Text, export_stl, extrude
 
 from .body import shoulder_foot
 from .geom import extrude_y_symmetric, one_solid, revolve
@@ -42,7 +43,7 @@ JOINT_FITS = (0.05, 0.10, 0.15, 0.20)
 NOSE_FITS = (0.15, 0.20, 0.25, 0.30)
 CHAMFER = 0.5  # shoulder lead-in, see DesignParams.shoulder_chamfer
 BAND = 5.0  # body tube above the joint on a plug
-CAP = 1.2  # plug's top cap (bridged)
+CAP = 1.6  # plug's closed end (on the bed), label recessed TEXT_H into it
 TEXT_H = 0.6
 FONT = "FreeSans"
 
@@ -54,10 +55,10 @@ class Coupon:
     footprint: float  # x/y extent on the bed, for layout
 
 
-def _label(text: str, size: float, z: float, x: float = 0.0, y: float = 0.0):
-    """Raised text, TEXT_H tall, standing on z."""
+def _label(text: str, size: float, z: float, x: float = 0.0, y: float = 0.0, h: float = TEXT_H):
+    """Text h tall standing on z (raised on the socket's flag, cut into a plug's end)."""
     t = Text(text, font_size=size, font=FONT, font_style=FontStyle.BOLD, align=(Align.CENTER, Align.CENTER))
-    return extrude(t, TEXT_H).translate((x, y, z))
+    return extrude(t, h).translate((x, y, z))
 
 
 def socket(size: str) -> Coupon:
@@ -78,9 +79,13 @@ def socket(size: str) -> Coupon:
     return Coupon(f"{size}_socket", solid, max(d.body_od, flag_w) + 2 * flag_l)
 
 
-def plug(size: str, fit: float, nose: bool) -> Coupon:
+def plug(size: str, fit: float, nose: bool, flip: bool = True) -> Coupon:
     """Shoulder (the real profile at this clearance) + 45-degree rise + a
-    band of body tube + a capped top with the label."""
+    band of body tube + a closed end with the label recessed into it.
+    Flipped (default) for printing: the closed end flat on the bed, the cup
+    open upward, the label reading from below (owner's request: the
+    shoulder-down orientation stood on a thin edge). flip=False is the
+    seated orientation, shoulder at z = 0."""
     motor, od = SIZES[size]
     d = compute_derived(DesignParams(motor=motor, body_od_override=od, fit_joint=fit, fit_nose=fit,
                                      shoulder_chamfer=CHAMFER))
@@ -91,17 +96,20 @@ def plug(size: str, fit: float, nose: bool) -> Coupon:
     top = sh + rise + BAND
     ro, ri = d.body_od / 2, d.body_id / 2
     # Inside: the shoulder bore, a 45-degree step out to the body bore (prints
-    # without support), then the cap.
+    # without support either way up), then the closed end.
     pts = [(ri_sh, 0), *shoulder_foot(r_sh, CHAMFER), (r_sh, sh), (ro, sh + rise), (ro, top), (0, top),
            (0, top - CAP), (ri, top - CAP), (ri, sh + rise + (ri - ri_sh)), (ri_sh, sh + rise)]
     body = revolve(pts)
     tag = f"{'N' if nose else 'J'}{round(fit * 100):02d}"
-    text = _label(tag, min(4.5, 0.28 * d.body_od), top)
-    return Coupon(f"{size}_{tag}", body.fuse(text).clean(), d.body_od)
+    text = _label(tag, min(4.5, 0.28 * d.body_od), top - TEXT_H, h=TEXT_H + 0.01)
+    solid = body.cut(text).clean()
+    if flip:
+        solid = solid.rotate(Axis.X, 180).translate((0, 0, top))
+    return Coupon(f"{size}_{tag}", solid, d.body_od)
 
 
-def coupons(size: str, joint=JOINT_FITS, nose=NOSE_FITS) -> list[Coupon]:
-    return [socket(size)] + [plug(size, f, False) for f in joint] + [plug(size, f, True) for f in nose]
+def coupons(size: str, joint=JOINT_FITS, nose=NOSE_FITS, flip: bool = True) -> list[Coupon]:
+    return [socket(size)] + [plug(size, f, False, flip) for f in joint] + [plug(size, f, True, flip) for f in nose]
 
 
 def layout(items: list[Coupon], gap: float = 6.0, cols: int = 3) -> list[tuple[Coupon, float, float]]:
