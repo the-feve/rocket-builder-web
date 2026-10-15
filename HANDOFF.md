@@ -1,6 +1,6 @@
 # Handoff
 
-_Last updated 2026-10-15. Read this first, then `TODO.md` (ordering, payment and data to-dos), `README.md` (Status) and `docs/web_platform_spec.md`._
+_Last updated 2026-10-15 (Trebuchet Builder hosting added). Read this first, then `TODO.md` (ordering, payment and data to-dos), `README.md` (Status) and `docs/web_platform_spec.md`._
 
 ## Where things stand
 
@@ -8,6 +8,8 @@ _Last updated 2026-10-15. Read this first, then `TODO.md` (ordering, payment and
 - **Session of 2026-10-14/15 (PRs #23–#29), newest entries below:** heights snap to ones that build (printer step before height), build retry after a restart, big order buttons, score advice outside 1–2 cal, order names with motor + customer code, parachute size, report divider, compare two rockets, launch field size, paid print orders through Stripe (**not switched on yet: Next steps 7**), personal-use file license. Parallel sessions had duplicated work (PR #21 closed unmerged; PR #22 kept); check open PRs and `git branch -r` before starting.
 - **Start here next session:** owner switches on paid orders (Next steps 7: restricted Stripe key, webhook, `ROCKETGEN_PUBLIC_URL` on Fly) and sets real prices / shipping in `server/shop.json`; one real order + refund from a normal browser. Then the open items in `TODO.md` (lawyer look at `server/terms.py`; beta print-and-fly checks).
 - **Live since 2026-10-09: https://rocket-fevergeon.fly.dev** (Fly app `rocket-fevergeon`, region `sjc`, volume `rocket_data` mounted at `/data`). PR #1 is merged; pushes to `main` deploy automatically. Checked after the first deploy: `/healthz`, an M24 build (24.7 s cold, stable 1.13 cal, recommends C11), preview GLB, the STL ZIP, saving a design and its `/d/<id>` share link (test design `WNePTzVr`). The machine auto-suspends after about 7 idle minutes; a cold boot takes about 17 s before uvicorn answers.
+
+- **Trebuchet Builder shares this Fly app (2026-10-15, owner's choice: no second app to pay for):** `server/trebuchet_mount.py` loads the-feve/trebuchet_builder from `trebuchet/` (repo root; `/app/trebuchet` in the image; `TREBUCHET_DIR` overrides) and mounts it at `/trebuchet/`; `HostRouter` sends `trebuchet.*` hosts there too, so trebuchet.quiverdesignworks.net/ is its page once DNS is set up. No checkout = the rocket app runs alone and `/trebuchet/` is a 404. `deploy.yml` checks out its `main` with `TREBUCHET_REPO_TOKEN` (skipped with a warning if the token or branch is missing), also runs on a `repository_dispatch` `trebuchet-updated` from that repo, and checks `/trebuchet/` answers. CI's Docker job builds with an empty `trebuchet/`. Tests: `server/tests/test_trebuchet_mount.py` (the integration test skips without the checkout; run locally with `TREBUCHET_DIR=../trebuchet_builder`). **Owner setup: Next steps 8.**
 
 ### What the designer does now (`server/`, FastAPI + one page with a three.js preview)
 - Form → build → 3D preview (exploded, section) → ZIP of print-oriented STLs + `build_notes.txt` + `design.json`.
@@ -64,6 +66,13 @@ _Last updated 2026-10-15. Read this first, then `TODO.md` (ordering, payment and
    3. `fly secrets set ROCKETGEN_PUBLIC_URL=https://rocket.quiverdesignworks.net -a rocket-fevergeon` (so Stripe sends customers back to the right address).
    4. Check the prices and shipping table in `server/shop.json` (a commit there redeploys). Then place one real order from a normal browser (never inside a Claude cloud session), check it on `/admin` and in quiverdesignworks.net/admin/orders, and refund it in Stripe.
 
+8. **Owner: switch on Trebuchet Builder hosting** (code on branch `claude/vigilant-ramanujan-2e94u8`, PR to merge):
+   1. the-feve/trebuchet_builder needs a `main` branch: its only branch is `claude/vigilant-ramanujan-2e94u8`; rename it to `main` (GitHub → that repo → Settings → Branches / the branch list → rename), or create `main` from it.
+   2. Read token: github.com/settings/personal-access-tokens → *Generate new token* (fine-grained), *Only select repositories* = trebuchet_builder, Repository permissions → Contents: **Read-only**. Save it in **rocket-builder-web** → Settings → Secrets and variables → Actions as `TREBUCHET_REPO_TOKEN`. Don't paste it in chat.
+   3. Optional, redeploy when the trebuchet repo changes: a second fine-grained token for rocket-builder-web with Contents: **Read and write** (GitHub requires that for `repository_dispatch`), saved in **trebuchet_builder**'s secrets as `ROCKET_DEPLOY_TOKEN`. Without it, run this repo's *Deploy to Fly.io* workflow by hand after trebuchet changes.
+   4. Merge the PR here; the deploy checks https://rocket-fevergeon.fly.dev/trebuchet/ answers. It is also at https://rocket.quiverdesignworks.net/trebuchet/.
+   5. Own address: Cloudflare DNS → CNAME `trebuchet` → `rocket-fevergeon.fly.dev` (DNS only, grey cloud, until the certificate issues), then `fly certs add trebuchet.quiverdesignworks.net -a rocket-fevergeon`.
+
 ## Decisions log
 
 - 2026-10-08: Phase 2 server moved here from OS_Rocket_Builder (`claude/phase2-web-prototype`). OS_Rocket_Builder's `web/` folder on that branch is redundant and can be deleted.
@@ -75,6 +84,7 @@ _Last updated 2026-10-15. Read this first, then `TODO.md` (ordering, payment and
 - 2026-10-09: The deploy workflow passes (green) when the token is missing; check that the run actually ran `flyctl deploy`, not just a green tick.
 - 2026-10-09: Saving stays server-side (SQLite on the Fly volume) with per-browser edit keys until accounts arrive; a download/open design-file option is a possible extra (design.json is already in the ZIP).
 - 2026-10-11: Address `rocket.quiverdesignworks.net` instead of `rocket.fevergeon.com`: Quiver Design Works hosts everything paid. The fevergeon-site repo was renamed `the-feve/quiverdesignworks-site`.
+- 2026-10-15: Trebuchet Builder is hosted inside this Fly app (mounted ASGI app + host routing) rather than a second Fly app, to keep running costs at one machine. Its code stays in its own repo and is checked out at deploy time.
 - 2026-10-14: Beginner mode is for young builders (about grades 3–7); the site look matches fevergeon.com / quiverdesignworks.net.
 - 2026-10-09: Invite-only beta via Cloudflare Access rather than building sign-in; real accounts wait for public/paid launch.
 

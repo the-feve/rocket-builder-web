@@ -3,6 +3,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Sent by the-feve/trebuchet_builder after a push to its main branch.
+  repository_dispatch:
+    types: [trebuchet-updated]
 
 concurrency: deploy
 
@@ -11,13 +14,36 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      TREBUCHET_TOKEN: ${{ secrets.TREBUCHET_REPO_TOKEN }}
     steps:
       - name: Skip until the Fly token is set
         if: env.FLY_API_TOKEN == ''
         run: echo "::notice::FLY_API_TOKEN isn't set in the repo secrets yet; not deploying."
       - uses: actions/checkout@v4
         if: env.FLY_API_TOKEN != ''
+      # Trebuchet Builder is hosted in this app (server/trebuchet_mount.py).
+      # Without the token or its main branch, the rocket app deploys on its own.
+      - name: Check out Trebuchet Builder
+        id: treb
+        if: env.FLY_API_TOKEN != '' && env.TREBUCHET_TOKEN != ''
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: the-feve/trebuchet_builder
+          ref: main
+          path: trebuchet
+          token: ${{ secrets.TREBUCHET_REPO_TOKEN }}
+      - name: Without Trebuchet Builder
+        if: env.FLY_API_TOKEN != '' && (env.TREBUCHET_TOKEN == '' || steps.treb.outcome != 'success')
+        run: |
+          echo "::warning::Trebuchet Builder not checked out (TREBUCHET_REPO_TOKEN missing, or no main branch there); deploying the rocket app alone."
+          rm -rf trebuchet && mkdir trebuchet
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: env.FLY_API_TOKEN != ''
       - run: flyctl deploy --remote-only
         if: env.FLY_API_TOKEN != ''
+      - name: Check the trebuchet page
+        if: env.FLY_API_TOKEN != '' && steps.treb.outcome == 'success'
+        run: |
+          for i in $(seq 1 20); do curl -fsS https://rocket-fevergeon.fly.dev/trebuchet/ | grep -q "Trebuchet Builder" && exit 0; sleep 6; done
+          echo "::error::/trebuchet/ isn't answering after the deploy"; exit 1
