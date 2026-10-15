@@ -13,7 +13,7 @@ Labels are the clearance in hundredths of a mm: J10 = 0.10 mm radial.
     python -m rocketgen.fit_test --out fit_test/out
     python -m rocketgen.fit_test --sizes M18 M24 --joint 0.1 0.15 --nose 0.2 0.3
 
-Writes one STL per coupon and one 3MF plate per size (separate objects, laid
+Writes one STL per coupon and one 3MF and one STEP plate per size (separate objects, laid
 out on the bed) for Bambu Studio.
 """
 
@@ -24,7 +24,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from build123d import Align, Axis, FontStyle, Mesher, Solid, Text, export_stl, extrude
+from build123d import Align, Axis, Compound, FontStyle, Mesher, Solid, Text, export_step, export_stl, extrude
 
 from .body import shoulder_foot
 from .geom import extrude_y_symmetric, one_solid, revolve
@@ -146,6 +146,16 @@ def write(size: str, out: Path, joint=JOINT_FITS, nose=NOSE_FITS) -> list[Path]:
         mesher.add_shape(s, linear_deflection=0.01, angular_deflection=0.1)
     p = out / f"fit_test_{size}.3mf"
     mesher.write(str(p))
+    paths.append(p)
+    # STEP too: Bambu Studio imports it as separate objects without the
+    # warning it gives on this 3MF (owner, 2026-10-16).
+    placed = []
+    for c, x, y in layout(items):
+        s = c.solid.translate((x, y, 0))
+        s.label = c.name
+        placed.append(s)
+    p = out / f"fit_test_{size}.step"
+    export_step(Compound(placed, label=f"fit_test_{size}"), p)
     paths.append(p)
     return paths
 
