@@ -295,6 +295,11 @@
   #orderdlg label.stack, #ordersdlg label.stack { display:flex; flex-direction:column; align-items:stretch; text-align:left; gap:4px; margin:6px 0; font-size:13px; font-weight:600; }
   #orderdlg input, #orderdlg select, #orderdlg textarea { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; font-size:16px; font-weight:400; color:var(--ink); background:var(--field); }
   #orderdlg .autherr { color:var(--err); min-height:1em; margin:6px 0 0; }
+  #orderdlg fieldset.ship[hidden] { display:none; }
+  .oquote { margin:8px 0; padding:10px 12px; border-radius:8px; background:var(--card); border:1px solid var(--line); font-size:14px; }
+  .oquote table { font-size:14px; } .oquote td { padding:2px 0; } .oquote td.n { text-align:right; }
+  .oquote tr.tot td { border-top:1px solid var(--line); font-weight:700; padding-top:4px; }
+  .oquote small { display:block; color:var(--muted); font-size:12px; margin-top:4px; }
   #orderdlg menu, #ordersdlg menu { display:flex; flex-direction:row-reverse; gap:8px; margin:12px 0 0; padding:0; }
   #orderdlg menu button, #ordersdlg menu button { flex:none; padding:8px 16px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--ink); }
   #ordergo, #orderclose { background:var(--ink) !important; color:var(--bg) !important; border-color:var(--ink) !important; }
@@ -718,7 +723,8 @@
       <label class="stack">How many <select id="o_qty"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
       <label class="stack">Colour <select id="o_color"><option>Any</option><option>Red</option><option>Orange</option><option>Yellow</option><option>Green</option><option>Blue</option><option>Purple</option><option>White</option><option>Black</option><option>Mixed colours</option></select></label>
     </div>
-    <fieldset class="ship"><legend>Ship to</legend>
+    <div id="o_quote" class="oquote" aria-live="polite">Working out the price…</div>
+    <fieldset class="ship" id="o_ship" hidden><legend>Ship to (coupon orders)</legend>
       <label class="stack">Name <input id="o_shipname" autocomplete="name" required maxlength="100"></label>
       <label class="stack">Address <input id="o_line1" autocomplete="address-line1" required maxlength="120"></label>
       <label class="stack">Apartment, suite (optional) <input id="o_line2" autocomplete="address-line2" maxlength="120"></label>
@@ -730,13 +736,13 @@
       <label class="stack">Phone (optional, for delivery questions) <input id="o_phone" type="tel" autocomplete="tel" maxlength="30"></label>
     </fieldset>
     <label class="stack">Notes (optional) <textarea id="o_notes" rows="2" maxlength="1000" placeholder="Anything we should know"></textarea></label>
-    <label class="stack">Coupon code <input id="o_coupon" maxlength="40" autocapitalize="characters" autocomplete="off"></label>
-    <p class="hint">Paid printing is coming soon. For now, printed rockets need a coupon code and are free.</p>
+    <label class="stack">Coupon code (optional) <input id="o_coupon" maxlength="40" autocapitalize="characters" autocomplete="off"></label>
+    <p class="hint" id="o_payhint">You pay on Stripe's secure checkout page, which asks for the shipping address and adds Washington sales tax where it applies. Card details never reach Rocket Builder.</p>
     <p class="autherr" id="ordererr" role="alert"></p>
-    <menu><button type="submit" id="ordergo">Place order</button><button type="button" id="ordercancel">Cancel</button></menu>
+    <menu><button type="submit" id="ordergo">Continue to payment</button><button type="button" id="ordercancel">Cancel</button></menu>
   </form>
   <div id="orderdone" hidden>
-    <h2>Order placed!</h2>
+    <h2 id="orderdonetitle">Order placed!</h2>
     <p id="orderdonetext"></p>
     <menu><button type="button" id="orderclose">Done</button></menu>
   </div>
@@ -2047,24 +2053,59 @@ function openOrder() {
   document.getElementById('orderform').hidden = false; document.getElementById('orderdone').hidden = true;
   document.getElementById('o_name').value = nameEl.value.trim() || 'My rocket';
   orderErr.textContent = '';
+  orderMode(); loadQuote();
   orderDlg.showModal();
 }
+// Price, box and shipping estimate from the server (shop.json); tax is added by Stripe.
+let quote = null;
+const usd = c => `$${(c / 100).toFixed(2)}`;
+async function loadQuote() {
+  const box = document.getElementById('o_quote'), qty = Number(document.getElementById('o_qty').value);
+  if (!lastReport) { box.textContent = 'Build the rocket first.'; return; }
+  box.textContent = 'Working out the price…';
+  try {
+    const r = await fetch(`/api/orders/quote?build_id=${encodeURIComponent(lastReport.id)}&quantity=${qty}`);
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || 'Press Build again, then order.');
+    quote = await r.json();
+  } catch (err) { quote = null; box.textContent = err.message; return; }
+  const q = quote, b = q.package.box;
+  box.innerHTML = `<table>
+    <tr><td>Printed rocket × ${q.quantity} <small>${usd(q.price_rule.base_cents)} + ${q.price_rule.per_gram_cents}¢ per gram of plastic (${Math.round(lastReport.total_mass_g)} g)</small></td><td class="n">${usd(q.each_cents)} each</td></tr>
+    <tr><td>Rockets</td><td class="n">${usd(q.subtotal_cents)}</td></tr>
+    <tr><td>Shipping estimate, ${esc(q.shipping_name)} <small>${b.length} × ${b.width} × ${b.height} in box, about ${(q.package.weight_oz / 16).toFixed(1)} lb${q.package.oversize ? ' (an oversize rocket: we may contact you about shipping)' : ''}. US only.</small></td><td class="n">${usd(q.shipping_cents)}</td></tr>
+    <tr class="tot"><td>Total before tax</td><td class="n">${usd(q.total_before_tax_cents)}</td></tr></table>
+    <small>Printed and mailed within about ${q.handling_days} business days, then ${q.min_days}–${q.max_days} days in the mail.</small>`;
+  orderMode();
+}
+// With a coupon: free, address typed here. Without: pay on Stripe (if it's switched on).
+function orderMode() {
+  const coupon = !!document.getElementById('o_coupon').value.trim(), paid = !quote || quote.paid_enabled;
+  document.getElementById('o_ship').hidden = !coupon;
+  document.getElementById('o_payhint').hidden = coupon || !paid;
+  document.getElementById('ordergo').textContent = coupon ? 'Place free order' : 'Continue to payment';
+  if (!paid && !coupon) orderErr.textContent = "Paid printing isn't switched on yet. Enter a coupon code to order.";
+  else if (orderErr.textContent.startsWith("Paid printing isn't")) orderErr.textContent = '';
+}
+document.getElementById('o_qty').addEventListener('change', loadQuote);
+document.getElementById('o_coupon').addEventListener('input', orderMode);
 document.addEventListener('click', e => { if (e.target.closest('[data-order]')) openOrder(); });
 document.getElementById('ordercancel').onclick = () => orderDlg.close();
 document.getElementById('orderclose').onclick = () => orderDlg.close();
 document.getElementById('orderform').addEventListener('submit', async e => {
   e.preventDefault();
   const v = id => document.getElementById(id).value.trim();
-  const missing = [['o_shipname', 'name'], ['o_line1', 'address'], ['o_city', 'city'], ['o_state', 'state'], ['o_zip', 'ZIP']].filter(([id]) => !v(id));
-  if (missing.length) { orderErr.textContent = `Please fill in the ${missing.map(m => m[1]).join(', ')}.`; return; }
-  if (!v('o_coupon')) { orderErr.textContent = 'Enter your coupon code. (Paid printing is coming soon.)'; return; }
-  const go = document.getElementById('ordergo'); go.disabled = true; go.textContent = 'Placing order…';
+  const free = !!v('o_coupon');
+  if (free) {
+    const missing = [['o_shipname', 'name'], ['o_line1', 'address'], ['o_city', 'city'], ['o_state', 'state'], ['o_zip', 'ZIP']].filter(([id]) => !v(id));
+    if (missing.length) { orderErr.textContent = `Please fill in the ${missing.map(m => m[1]).join(', ')}.`; return; }
+  } else if (quote && !quote.paid_enabled) { orderMode(); return; }
+  const go = document.getElementById('ordergo'), label = go.textContent; go.disabled = true; go.textContent = free ? 'Placing order…' : 'Opening checkout…';
   orderErr.textContent = '';
   try {
     const r = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
       design_name: v('o_name'), design_id: current?.id || null, params: params(),
       quantity: Number(v('o_qty')), color: v('o_color'), notes: v('o_notes'), coupon: v('o_coupon'),
-      shipping: { name: v('o_shipname'), line1: v('o_line1'), line2: v('o_line2'), city: v('o_city'), state: v('o_state'), zip: v('o_zip'), phone: v('o_phone') },
+      shipping: free ? { name: v('o_shipname'), line1: v('o_line1'), line2: v('o_line2'), city: v('o_city'), state: v('o_state'), zip: v('o_zip'), phone: v('o_phone') } : null,
     }) });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) {
@@ -2072,11 +2113,25 @@ document.getElementById('orderform').addEventListener('submit', async e => {
       if (r.status === 401) { user = null; renderUser(); }
       return;
     }
-    document.getElementById('orderform').hidden = true; document.getElementById('orderdone').hidden = false;
-    document.getElementById('orderdonetext').innerHTML = `Your order number is <b>${esc(d.id)}</b>. We'll print the parts and send them to the address you gave. You can check its progress any time under <b>My orders</b>.`;
+    if (d.checkout_url) { location.href = d.checkout_url; return; }  // pay on Stripe; it comes back to ?order=…&paid=1
+    showOrderDone('Order placed!', `Your order number is <b>${esc(d.id)}</b>. We'll print the parts and send them to the address you gave. You can check its progress any time under <b>My orders</b>.`);
   } catch { orderErr.textContent = 'Could not reach the server; check your connection and try again.'; }
-  finally { go.disabled = false; go.textContent = 'Place order'; }
+  finally { go.disabled = false; go.textContent = label; }
 });
+function showOrderDone(title, html) {
+  document.getElementById('orderform').hidden = true; document.getElementById('orderdone').hidden = false;
+  document.getElementById('orderdonetitle').textContent = title;
+  document.getElementById('orderdonetext').innerHTML = html;
+  if (!orderDlg.open) orderDlg.showModal();
+}
+// Back from Stripe Checkout: ?order=<id>&paid=1 or &cancelled=1.
+(() => {
+  const q = new URLSearchParams(location.search), id = q.get('order');
+  if (!id) return;
+  history.replaceState(null, '', location.pathname);
+  if (q.get('paid')) showOrderDone('Thank you, payment received!', `Your order <b>${esc(id)}</b> is paid. Stripe emails you a receipt. We'll print the parts and mail them to the address you gave at checkout; follow it under <b>My orders</b>.`);
+  else if (q.get('cancelled')) showOrderDone('Checkout cancelled', `Nothing was charged for order <b>${esc(id)}</b>. Build your rocket again and choose <b>Order it printed</b> whenever you're ready.`);
+})();
 const ordersDlg = document.getElementById('ordersdlg');
 document.getElementById('ordersclose').onclick = () => ordersDlg.close();
 document.getElementById('myorders').onclick = async e => {
@@ -2086,7 +2141,7 @@ document.getElementById('myorders').onclick = async e => {
   try {
     const r = await fetch('/api/my/orders'); const d = await r.json();
     if (!r.ok) { box.textContent = d.detail || 'Sign in to see your orders.'; return; }
-    const STATUS = { new: 'Received', printing: 'Printing', shipped: 'Shipped', cancelled: 'Cancelled' };
+    const STATUS = { new: 'Received', printing: 'Printing', shipped: 'Shipped', cancelled: 'Cancelled', awaiting_payment: 'Waiting for payment', expired: 'Not paid' };
     box.innerHTML = d.orders.length
       ? `<table><tr><th>Order</th><th>Rocket</th><th>Placed</th><th>Status</th></tr>${d.orders.map(o => `<tr><td>${esc(o.id)}</td><td>${esc(o.design_name)} × ${o.quantity}</td>
           <td>${new Date(o.created_at * 1000).toLocaleDateString()}</td><td><b>${esc(STATUS[o.status] || o.status)}</b></td></tr>`).join('')}</table>`
