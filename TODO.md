@@ -66,7 +66,8 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] Printer height before rocket height; tutorial button overlap fixed; motor, fins and height in saved names (2026-10-14)
 - [x] Beginner heights (and printer) snap to ones that build; built height matches the chosen one (2026-10-14)
 - [x] Score advice outside the 1-2 cal sweet spot, with predicted scores (2026-10-14)
-- [ ] Compare two rockets side by side (scores, summaries, which is better and why)
+- [x] Compare two rockets side by side (scores, summaries, which is better and why) (2026-10-15)
+- [x] Launch field size with parachute drift (2026-10-15)
 - [ ] Print orders through the quiverdesignworks.net/store checkout (Stripe)
 - [ ] Shipping estimate when ordering
 - [x] Order folder / file names: motor size and a customer code (2026-10-14)

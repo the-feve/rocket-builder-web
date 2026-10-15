@@ -164,6 +164,20 @@ def test_parachute_suggestion():
     assert parachute(400)["size_in"] > parachute(60)["size_in"] and parachute(5000)["size_in"] is None
 
 
+def test_launch_field_size():
+    """The field is the NAR minimum for the recommended motor's class, or
+    longer when the rocket drifts further than that under its parachute in a
+    10 mph breeze; it's in the build notes too."""
+    from rocketgen.flight import FIELD_M, WIND_MS
+    r = client.post("/api/build", json={}).json()
+    f, best = r["field"], next(x for x in r["flights"]["rows"] if x["code"] == r["flights"]["recommended"])
+    assert f["nar_min_m"] == FIELD_M[best["cls"]] and f["motor"] == best["motor"]
+    assert f["drift_m"] == round(best["apogee_m"] / r["parachute"]["descent_ms"] * WIND_MS)
+    assert f["recommended_m"] == max(f["nar_min_m"], -(-f["drift_m"] // 10) * 10)
+    z = zipfile.ZipFile(io.BytesIO(client.get(f"/api/builds/{r['id']}/rocket.zip").content))
+    assert f"Launch field: at least {f['recommended_m']} m" in z.read("build_notes.txt").decode()
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]

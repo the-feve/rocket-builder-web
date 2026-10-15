@@ -36,7 +36,7 @@ from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
-from rocketgen.flight import FIELD_M, heaviest, motors_for, parachute, pick, simulate
+from rocketgen.flight import FIELD_M, field_size, heaviest, motors_for, parachute, pick, simulate
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
 from rocketgen.stability import MAX_FIN_SCALE, Balance, advice, build_stable, recovery_allowance_g
 
@@ -214,7 +214,7 @@ def _chute_text(c: dict) -> str:
 
 
 def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights: dict | None = None,
-         chute: dict | None = None) -> bytes:
+         chute: dict | None = None, field: dict | None = None) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in stls.items():
@@ -228,6 +228,10 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
                   "  Follow the NAR Model Rocket Safety Code."]
         if chute:
             lines += ["", _chute_text(chute)]
+        if field:
+            lines += [f"Launch field: at least {field['recommended_m']} m ({round(field['recommended_m'] * 3.281)} ft) on a side "
+                      f"with a {field['motor']} (NAR minimum {field['nar_min_m']} m; drifts about {field['drift_m']} m "
+                      f"downwind under the parachute from {field['apogee_m']} m in a 10 mph breeze)."]
         if flights:
             lines += ["", f"Motors (target {flights['target_m']:g} m; recommended: {flights['recommended'] or 'none'}):"]
             lines += [f"  {r['motor']}: {r['apogee_m']} m, {r['margin_cal']} cal, "
@@ -389,9 +393,13 @@ def build(req: BuildRequest, request: Request):
     m = motors.get(flights["recommended"]) or motors.get(req.flight_motor) or heaviest(req.motor)
     chute = parachute(bal.printed_mass_g + st["recovery_mass_g"] + m.mass_g - m.prop_g)
     chute["links"] = supplies.parachute_links().get(chute["size_in"], [])
+    best = next((r for r in flights["rows"] if r["code"] == flights["recommended"]), None)
+    field = field_size(best["cls"], best["apogee_m"], chute["descent_ms"]) if best else None
+    if field:
+        field["motor"] = best["motor"]
     build_id = _key(params)
-    _builds[build_id] = {"geo": geo, "params": params, "stability": st, "flights": flights, "parachute": chute}
-    return {"id": build_id, **_geo[geo]["report"], "stability": st, "flights": flights, "parachute": chute}
+    _builds[build_id] = {"geo": geo, "params": params, "stability": st, "flights": flights, "parachute": chute, "field": field}
+    return {"id": build_id, **_geo[geo]["report"], "stability": st, "flights": flights, "parachute": chute, "field": field}
 
 
 def _flights(bal: Balance, motors: list, req: BuildRequest) -> dict:
@@ -434,7 +442,7 @@ def download(build_id: str):
     if g["stls"] is None:
         with _lock:
             g["stls"] = _stls(g["rocket"])
-    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute")), media_type="application/zip",
+    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"), b.get("field")), media_type="application/zip",
                     headers={"Content-Disposition": f'attachment; filename="rocket_{build_id}.zip"'})
 
 
@@ -594,7 +602,7 @@ def place_order(o: OrderIn, request: Request):
     if g["stls"] is None:
         with _lock:
             g["stls"] = _stls(g["rocket"])
-    rocket_zip = _zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"))
+    rocket_zip = _zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"), b.get("field"))
     order = orders.create(user=user, design_name=o.design_name, design_id=o.design_id, params=b["params"],
                           quantity=o.quantity, material=o.params.material, color=o.color,
                           shipping=o.shipping.model_dump(), notes=o.notes, coupon=o.coupon, price=0.0,

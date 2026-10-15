@@ -160,3 +160,18 @@ def parachute(descent_mass_g: float) -> dict:
     return {"descent_mass_g": round(descent_mass_g, 1), "min_diameter_in": round(need_in, 1), "size_in": size,
             "descent_ms": round(descent_rate(descent_mass_g, size), 1) if size else None,
             "streamer_ok": descent_mass_g < 40}
+
+
+WIND_MS = 4.5  # about 10 mph: a typical launch-day breeze (the NAR code's limit is 20 mph)
+
+
+def field_size(motor_cls: str, apogee_m: float, descent_ms: float | None) -> dict:
+    """Launch field for a flight: the NAR Safety Code's minimum side for the
+    motor class, and how far the rocket drifts downwind under its parachute
+    from apogee in a 10 mph breeze (the pad goes near the upwind edge, so
+    the field must be at least that long). Recommended = the larger."""
+    nar = FIELD_M.get(motor_cls, max(FIELD_M.values()))
+    drift = apogee_m / descent_ms * WIND_MS if descent_ms else None
+    rec = max(nar, math.ceil(drift / 10) * 10) if drift else nar
+    return {"nar_min_m": nar, "drift_m": None if drift is None else round(drift), "wind_ms": WIND_MS,
+            "recommended_m": rec, "apogee_m": round(apogee_m), "descent_ms": descent_ms}
