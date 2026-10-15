@@ -329,6 +329,8 @@
   .orderrow .printbtn { background:linear-gradient(135deg, #0a58ca, #3b5bdb); }
   .orderrow .shopbtn { background:linear-gradient(135deg, #b45309, #c2410c); }
   .orderrow .printbtn:hover, .orderrow .shopbtn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+  .orderrow .printbtn.soon { background:#5b6773; cursor:default; }
+  .orderrow .printbtn.soon:hover { filter:none; transform:none; }
   .orderrow .ico { flex:none; font-size:26px; line-height:1; }
   .orderrow small { display:block; margin-top:2px; font:500 13px system-ui, -apple-system, sans-serif; opacity:.9; }
   .motorbuy { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 2px; }
@@ -1735,9 +1737,24 @@ function kidReportHtml(r) {
 function orderRowHtml(ok, kid) {
   const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">🧰</span>
     <span>Order rocket supplies<small>Motors, launch pad, igniters, parachutes</small></span></a>` : '';
-  return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order><span class="ico" aria-hidden="true">🚀</span>
-    <span>${kid ? 'Order it printed for you' : 'Order a printed rocket'}<small>We print it and mail it to you</small></span></button>` : ''}${shop}</div>
+  // Printed rockets are "coming soon" until the owner opens ordering (ROCKETGEN_ORDERING=open);
+  // admin accounts still get the button so the whole flow can be tested.
+  const canOrder = opts.ordering_open || user?.can_order;
+  const print = !ok ? '' : canOrder
+    ? `<button type="button" class="printbtn" data-order><span class="ico" aria-hidden="true">🚀</span>
+    <span>${kid ? 'Order it printed for you' : 'Order a printed rocket'}<small>We print it and mail it to you</small></span></button>`
+    : `<div class="printbtn soon" role="note"><span class="ico" aria-hidden="true">🚀</span>
+    <span>Printed rockets: coming soon<small>For now, download the files and print it yourself</small></span></div>`;
+  return `<div class="orderrow" data-ok="${ok ? 1 : 0}" data-kid="${kid ? 1 : 0}">${print}${shop}</div>
     ${shop ? '<p class="affil">Ordering through my supplies links supports Rocket Builder. As an Amazon Associate, I earn from qualifying purchases.</p>' : ''}`;
+}
+// Signing in or out can change whether this person may order: redraw the rows on screen.
+function refreshOrderRows() {
+  document.querySelectorAll('.orderrow[data-ok]').forEach(row => {
+    const t = document.createElement('div');
+    t.innerHTML = orderRowHtml(row.dataset.ok === '1', row.dataset.kid === '1');
+    row.replaceWith(t.querySelector('.orderrow'));
+  });
 }
 
 function showReport(r) {
@@ -2037,6 +2054,7 @@ function renderUser() {
   acctBtn.title = user ? 'Your account: settings, orders, sign out' : 'Sign in or create an account';
   document.getElementById('acctnote').hidden = !!user;
   document.getElementById('acctlinks').hidden = !user;
+  refreshOrderRows();
 }
 async function afterSignIn(u, created) {
   user = u; renderUser();

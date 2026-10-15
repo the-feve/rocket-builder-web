@@ -135,6 +135,19 @@ ORDERS_PER_DAY = int(os.environ.get("ROCKETGEN_ORDERS_PER_DAY", 10))
 SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "/ordersupplies")
 # Who can see every order: signed-in accounts with these emails, or the PC sync with this token.
 ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get("ROCKETGEN_ADMIN_EMAILS", "").split(",") if e.strip()}
+# Printed-rocket ordering is closed to the public until the owner opens it:
+# `fly secrets set ROCKETGEN_ORDERING=open`. While closed, only admin accounts
+# (ROCKETGEN_ADMIN_EMAILS) can order, coupon or paid, so the whole flow can be
+# tested end to end; everyone else sees "coming soon".
+ORDERING_OPEN = os.environ.get("ROCKETGEN_ORDERING", "closed").strip().lower() == "open"
+
+
+def can_order(user: dict | None) -> bool:
+    return ORDERING_OPEN or bool(user and user["email"] in ADMIN_EMAILS)
+
+
+def user_json(user: dict) -> dict:
+    return {"email": user["email"], "prefs": user["prefs"], "can_order": can_order(user)}
 SYNC_TOKEN = os.environ.get("ROCKETGEN_SYNC_TOKEN", "")
 
 app = FastAPI(title="Rocket Builder")
@@ -257,6 +270,7 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
 def options():
     return {
         "supplies_url": SUPPLIES_URL,
+        "ordering_open": ORDERING_OPEN,  # false: printed rockets show as "coming soon" (admins can still order)
         "motor_links": supplies.motor_links(),  # motor (e.g. "B4-4") -> Amazon packs, for "Get these motors"
         "motors": sorted(load_motors()),
         "fin_shapes": [s.value for s in FinShape],
@@ -523,7 +537,7 @@ def current_user(request: Request) -> dict | None:
 
 
 def _signed_in(user: dict, request: Request) -> JSONResponse:
-    res = JSONResponse({"user": {"email": user["email"], "prefs": user["prefs"]}})
+    res = JSONResponse({"user": user_json(user)})
     https = request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
     res.set_cookie(SESSION_COOKIE, accounts.new_session(user["id"]), max_age=accounts.SESSION_DAYS * 86400,
                    httponly=True, samesite="lax", secure=https, path="/")
@@ -562,7 +576,7 @@ def logout(rb_session: str | None = Cookie(None)):
 @app.get("/api/auth/me")
 def me(request: Request):
     user = current_user(request)
-    return {"user": {"email": user["email"], "prefs": user["prefs"]} if user else None}
+    return {"user": user_json(user) if user else None}
 
 
 class Prefs(BaseModel):
@@ -644,6 +658,8 @@ def place_order(o: OrderIn, request: Request):
     user = current_user(request)
     if not user:
         raise HTTPException(401, "Sign in (or create an account) to order a printed rocket.")
+    if not can_order(user):
+        raise HTTPException(403, "Printed rockets are coming soon. You can download the files and print it yourself now.")
     free = bool(o.coupon.strip())
     if free and not orders.coupon_ok(o.coupon):
         raise HTTPException(402, "That coupon code isn't valid.")
