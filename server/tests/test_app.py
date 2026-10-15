@@ -1,6 +1,7 @@
 """Server tests: a default build, its preview and ZIP, stability, saved designs, friendly errors."""
 
 import io
+import json
 
 import pytest
 import os
@@ -32,7 +33,12 @@ def test_build_preview_zip():
     glb = client.get(f"/api/builds/{body['id']}/preview.glb")
     assert glb.status_code == 200 and glb.content[:4] == b"glTF"
     z = zipfile.ZipFile(io.BytesIO(client.get(f"/api/builds/{body['id']}/rocket.zip").content))
-    assert set(z.namelist()) == {f"{n}.stl" for n in names} | {"build_notes.txt", "design.json"}
+    assert set(z.namelist()) == {f"{n}.stl" for n in names} | {"build_notes.txt", "design.json", "LICENSE.txt"}
+    # Personal-use licence: in the ZIP, at the top of the notes, in design.json and in every STL's header.
+    assert "may NOT" in z.read("LICENSE.txt").decode() and "MakerWorld" in z.read("LICENSE.txt").decode()
+    assert "Personal use only" in z.read("build_notes.txt").decode()[:400] and "license" in json.loads(z.read("design.json"))
+    assert all(z.read(f"{n}.stl")[:80].startswith(b"(c)") and b"Personal use only" in z.read(f"{n}.stl")[:80] for n in names)
+    assert "MakerWorld" in client.get("/terms").text
     assert "Stable" in z.read("build_notes.txt").decode()
     st = body["stability"]
     assert st["ok"] and st["cg_mm"] < st["cp_mm"] < st["length_mm"]

@@ -321,6 +321,7 @@
   .motorbuy .shopbtn { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; color:var(--ink); border:1px solid var(--line); }
   .motorbuy .shopbtn:hover { border-color:var(--accent); color:var(--accent); }
   .affil { font-size:11.5px; color:var(--muted); margin:4px 0 0; }
+  .licnote { flex:1 1 100%; margin:2px 0 0; font-size:11.5px; line-height:1.4; color:var(--muted); }
   .fieldbox .big { font-size:15px; } .fieldbox .big b { font-size:26px; } .fieldbox .big span { color:var(--muted); }
   #acctlinks { flex:1 1 100%; margin:2px 0 0; } #acctlinks[hidden] { display:none; }
   @media (max-width:480px) { #orderdlg .ogrid { grid-template-columns:1fr 1fr; } }
@@ -552,6 +553,7 @@
       <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
       <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs (ZIP)</span></a>
+      <p class="licnote">Files are for your personal use only: please don't share them or upload them to MakerWorld, Printables, Thingiverse or other sites. <a href="/terms" target="_blank" rel="noopener">License</a></p>
     </div>
   </form>
   <div id="splitter" role="separator" aria-orientation="vertical" aria-label="Resize the design panel" tabindex="0" title="Drag to resize; double-click to reset"></div>
@@ -614,7 +616,7 @@
         <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>.</p>
         <div class="supplynote" data-supplies hidden><b>Need to get your own supplies for building and launching?</b> <a href="#" data-supplies-link target="_blank" rel="noopener">Order through my link here to support me!</a>
           <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
-        <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-or">OpenRocket</a></nav>
+        <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-files">Your files</a><a href="#guide-or">OpenRocket</a></nav>
         <ol id="guide-use">
           <li>Choose a <b>mode</b> and the <b>motor size</b> you'll fly (on the left).</li>
           <li>Set the size and shapes, then press <b>Build</b>. The first build of a new design takes 10–30 s; a bar along the top shows progress.</li>
@@ -698,6 +700,8 @@
           <dt>Motor mount and minimum diameter</dt><dd>When the body is wider than the motor, an inner tube (motor mount) holds the motor. A <i>minimum diameter</i> rocket has the motor fitting the body itself, the lightest and fastest layout.</dd>
         </dl>
 
+        <h3 id="guide-files">Your files: personal use only</h3>
+        <p>The STL files, build notes and design file you download are licensed to you to print and fly your own rockets, and to change for your own use. They aren't free to share: please don't upload them, or remixes of them, to MakerWorld, Printables, Thingiverse, Thangs, Cults3D or any other site, and don't sell the files or prints made from them. Share a photo of your rocket and a link to Rocket Builder instead. Every ZIP has the full terms in <code>LICENSE.txt</code>; see also the <a href="/terms" target="_blank" rel="noopener">file license page</a>.</p>
         <h3 id="guide-or">What is OpenRocket, and what should I check?</h3>
         <p><a href="https://openrocket.info" target="_blank" rel="noopener">OpenRocket</a> is a free, open-source model rocket simulator (Windows, Mac, Linux) and the usual hobby tool for checking a design before it flies. This app's numbers are quick estimates (Barrowman stability, a 1-D flight sim), so check your finished rocket there before its first flight, especially a new or unusual design:</p>
         <ol>
@@ -737,6 +741,7 @@
     </fieldset>
     <label class="stack">Notes (optional) <textarea id="o_notes" rows="2" maxlength="1000" placeholder="Anything we should know"></textarea></label>
     <label class="stack">Coupon code (optional) <input id="o_coupon" maxlength="40" autocapitalize="characters" autocomplete="off"></label>
+    <p class="hint">Printed rockets are for your own use, not for resale. The design files stay under the <a href="/terms" target="_blank" rel="noopener">Rocket Builder file license</a>.</p>
     <p class="hint" id="o_payhint">You pay on Stripe's secure checkout page, which asks for the shipping address and adds Washington sales tax where it applies. Card details never reach Rocket Builder.</p>
     <p class="autherr" id="ordererr" role="alert"></p>
     <menu><button type="submit" id="ordergo">Continue to payment</button><button type="button" id="ordercancel">Cancel</button></menu>
@@ -1650,7 +1655,7 @@ function kidReportHtml(r) {
     <div class="kidcard"><h3>How big a launch field?</h3>${fieldHtml(r.field, true)}</div>
     <div class="kidcard"><h3>What's next?</h3>
       <ol class="steps4">
-        <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}.</li>
+        <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}. They're just for you: <a href="/terms" target="_blank" rel="noopener">please don't share them online</a>.</li>
         <li><b>Print</b> each part. Your rocket has ${r.parts.length} parts.</li>
         <li><b>Put it together</b>: see <i>Build notes</i> in Grown-up details.</li>
         <li><b>Fly it</b> with a grown-up, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">safety code</a>.</li>
