@@ -88,7 +88,7 @@ Sample STLs (print orientation, one per part, plus `assembled.stl`): `examples/m
 
 - **Joint fits (2026-10-16):** the FeatureScript's single `fit_slip` (0.02 mm radial) printed far too tight. The website uses `params.web_fits` instead: body joints 0.18 mm radial, nose 0.15 mm (0.12 mm under an 8 mm nose shoulder), and a 0.5 mm 45-degree chamfer on every shoulder's bed edge. From fit-test coupons on a P1S in PLA (`fit_test/README.md`).
 
-- **Motor cap (2026-10-16):** the retention lip is the casing wall − 0.3 mm (`data/motor_casings.csv`, `params.cap_lip`) instead of the FeatureScript's 1/8 in, so it doesn't reach over the nozzle; the cap wall is 1.2 mm (was 1.6) and the grip ribs 0.4 mm (was 0.6) for a more compact cap.
+- **Motor cap (2026-10-16):** the retention lip is the casing wall − 0.3 mm (`data/motor_casings.csv`, `params.cap_lip`) instead of the FeatureScript's 1/8 in, so it doesn't reach over the nozzle; the cap wall is 1.2 mm (was 1.6) and the grip ribs 0.4 mm (was 0.6) for a more compact cap. Thread is right-hand (checked 2026-10-16: the crest climbs p/4 per quarter-turn counter-clockwise from above): the cap tightens clockwise seen from the tail, i.e. counter-clockwise looking down with the nose up. Owner confirmed RH is wanted.
 
 ## Open item: leading-edge root fillet
 
