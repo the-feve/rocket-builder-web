@@ -50,7 +50,12 @@ import terms
 import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
-GENERATOR_VERSION = "0.1.0"
+GENERATOR_VERSION = "0.2.0"  # 0.2.0: printed joint fits (fit test, 2026-10-16); changes every part, so cached builds are rebuilt
+
+FIT_NOTE = ("Joint fits are tuned for Bambu Lab X1C / P1S printers in PLA at default settings "
+            "(0.18 mm per side on the glued body joints, 0.15 mm on the nose; 0.12 mm on M13). "
+            "Other printers, filaments or settings may need adjusting: lightly sand a shoulder that's too tight, "
+            "or wrap tape around the nose shoulder if the nose is too loose. It should slide out easily but not fall out.")
 SCHEMA_VERSION = 1
 MAX_CACHED = 40  # geometry builds kept in memory
 
@@ -224,7 +229,8 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in stls.items():
             z.writestr(f"{name}.stl", data)
-        lines = ["Rocket Builder build notes", "", terms.SHORT, "(See LICENSE.txt in this ZIP.)", "", report["summary"], ""]
+        lines = ["Rocket Builder build notes", "", terms.SHORT, "(See LICENSE.txt in this ZIP.)", "", report["summary"], "",
+                 f"Fit: {FIT_NOTE}", ""]
         lines += [f"Note: {n}" for n in report["notes"]]
         lines += ["", "Stability (from the nose tip, mm):", f"  {stab['message']}",
                   f"  CG {stab['cg_mm']}, CP {stab['cp_mm']}, liftoff mass {stab['liftoff_mass_g']} g "

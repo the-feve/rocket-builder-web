@@ -46,7 +46,7 @@ The nose plug is lighter than a real nose cone, so pick the loosest N plug that 
 | M13 | P1S | PLA | J15–J20 (J20 good slip fit, fine with glue; J15 a little tight but works; J10 needs excessive force; J05 won't go in) | below N15 (N15 slips but is too loose for a cone; N20–N30 all too loose). Nose should feel like J20 | Round 1, 2026-10-16. The shorter nose shoulder feels looser at the same clearance. Round 2: `files/round2/` |
 | M18 | P1S | PLA | J20 (best, a little more slip); J15 good, would work; J10 / J05 won't go in | between N15 and N20 (N15 a snug bit too tight, N20 a little too loose; N25 / N30 far too loose) | Round 1, 2026-10-16 |
 | M24 | P1S | PLA | between J15 and J20 (J15 a little snug, J20 slips but a little loose; J10 / J05 too tight) | N15 about right (N20 a bit loose; N25 / N30 too loose) | Round 1, 2026-10-16 |
-| M29 | | | | | |
+| M29 | P1S | PLA | between J15 and J20 (J15 correct, J20 a smidge loose; J10 / J05 far too tight) | N15 best (N20–N30 too loose) | Round 1, 2026-10-16 |
 | BT60 | | | | | |
 
 If the best plug is at the end of a range (J05 too loose, or J20 / N30 still too tight), regenerate with a wider range, for example:
@@ -58,6 +58,6 @@ python -m rocketgen.fit_test --sizes M18 --joint 0.2 0.25 0.3 --nose 0.3 0.35 0.
 
 (`--out` also writes one STL per coupon to `files/stl/`; those are not committed.)
 
-## After the test
+## Outcome (2026-10-16)
 
-Set the chosen values per size: `DesignParams.fit_joint`, `fit_nose` and `shoulder_chamfer` already exist (website only, default = the old 0.02 mm and no chamfer, so nothing has changed yet). The next step is a rule in `compute_derived`, either a value per tube size or `a + b × body OD` fitted to the results. HANDOFF.md, "Fit test coupons", has the plan.
+Set as the website defaults in `geometry/rocketgen/params.py` (`web_fits`): **body joints 0.18 mm, nose 0.15 mm, 0.12 mm for a nose shoulder under 8 mm** (M13), plus the 0.5 mm shoulder chamfer. The nose needs less clearance than a joint for the same feel because its shoulder is 30% shorter. Still to check: M13 round 2 (`files/round2/`), the X1C, and one full rocket printed with the new fits.

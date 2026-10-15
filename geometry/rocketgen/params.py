@@ -57,14 +57,14 @@ class DesignParams:
     custom_fin_size: bool = False
     fin_scale: float = 1.0  # the website's stability auto-size (standard sizes only); not in the FeatureScript
     wall: float | None = None  # tube, nose and mount wall; None = the settings CSV (1.5 mm). Website only.
-    # Radial clearances, shoulder into socket; None = fit_slip from the settings CSV.
-    # Separate so the glued body joints and the loose nose (it must slide out at
-    # ejection) can differ. Website only; see fit_test.py and geometry/fit_test/.
+    # Radial clearances, shoulder into socket; None = the website's printed-fit
+    # defaults (web_fits). Separate so the glued body joints and the loose nose
+    # (it must slide out at ejection) can differ. Website only; see fit_test.py.
     fit_joint: float | None = None
     fit_nose: float | None = None
     # 45-degree chamfer on the bottom outer edge of every shoulder: takes off
     # the first layers' elephant foot and gives a lead-in. 0 = none (the FeatureScript's).
-    shoulder_chamfer: float = 0.0
+    shoulder_chamfer: float = 0.5
     fin_root_chord: float = 40.0
     fin_span: float = 20.0
     fin_tip_chord: float = 20.0
@@ -87,6 +87,23 @@ class DesignParams:
 
     def with_(self, **kw) -> "DesignParams":
         return replace(self, **kw)
+
+
+# Printed fits (radial, mm), from the fit-test coupons on a Bambu P1S in PLA
+# (2026-10-16, fit_test/README.md). The settings CSV's fit_slip (0.02 mm) is
+# the CAD value and printed far too tight. Body joints (glued): 0.15 was a
+# little snug and 0.20 a little loose on every size. Nose (slides out at
+# ejection, held by friction): 0.15 on M18-M29; the short M13 nose shoulder
+# needed less clearance for the same grip.
+WEB_FIT_JOINT = 0.18
+WEB_FIT_NOSE = 0.15
+WEB_FIT_NOSE_SHORT = 0.12  # nose shoulders under SHORT_NOSE_SHOULDER mm
+SHORT_NOSE_SHOULDER = 8.0
+
+
+def web_fits(nose_shoulder_len: float) -> tuple[float, float]:
+    """(fit_joint, fit_nose) defaults for a nose shoulder this long."""
+    return WEB_FIT_JOINT, WEB_FIT_NOSE_SHORT if nose_shoulder_len < SHORT_NOSE_SHOULDER else WEB_FIT_NOSE
 
 
 @dataclass
@@ -186,8 +203,6 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     mtr_d, mtr_len, mtr_hang = m["mtr_d"], m["mtr_len"], m["mtr_hang"]
     z_margin = settings["z_margin"]
     wall = params.wall if params.wall else settings["wall"]
-    fit_slip = settings["fit_slip"] if params.fit_joint is None else params.fit_joint
-    fit_nose = settings["fit_slip"] if params.fit_nose is None else params.fit_nose
     fit_press = settings["fit_press"]
     mtr_clear = settings["mtr_clear"]
 
@@ -196,12 +211,15 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     body_od = max(min_body_od, params.body_od_override) if params.body_od_override else min_body_od
     body_id = body_od - 2 * wall
     cal = body_od
-    shoulder_od = body_id - 2 * fit_slip
-    nose_shoulder_od = body_id - 2 * fit_nose
     shoulder_len = max(0.75 * cal - 4.0, 10.0)
     # The nose's insert is 30% shorter than a body joint's (owner's request,
     # 2026-10-09: a shorter transition); body-to-body joints keep the full length.
     nose_shoulder_len = max(0.7 * shoulder_len, 7.0)
+    default_joint, default_nose = web_fits(nose_shoulder_len)
+    fit_slip = default_joint if params.fit_joint is None else params.fit_joint
+    fit_nose = default_nose if params.fit_nose is None else params.fit_nose
+    shoulder_od = body_id - 2 * fit_slip
+    nose_shoulder_od = body_id - 2 * fit_nose
     mount_od = bay_id + 2 * wall
 
     fin = fin_dimensions(params, cal)

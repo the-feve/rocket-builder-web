@@ -48,10 +48,12 @@ def test_min_diameter_m18_hand_values():
     assert d.body_od == pytest.approx(d.bay_id + 2 * d.wall) == pytest.approx(21.4)
     assert d.body_id == pytest.approx(18.4)
     assert not d.has_mount
-    assert d.shoulder_od == pytest.approx(18.36)
+    # Printed fits (web_fits): 0.18 mm radial joints, 0.15 mm nose (fit test, 2026-10-16).
+    assert d.shoulder_od == pytest.approx(18.04)
+    assert d.nose_shoulder_od == pytest.approx(18.1)
     assert d.shoulder_len == pytest.approx(0.75 * 21.4 - 4)
-    assert d.joint_rise == pytest.approx(1.52)
-    assert d.inner_taper_rise == pytest.approx((9.2 - (9.18 - 1.5)) / math.tan(math.radians(8)))
+    assert d.joint_rise == pytest.approx(1.68)
+    assert d.inner_taper_rise == pytest.approx((9.2 - (9.02 - 1.5)) / math.tan(math.radians(8)))
     assert d.zmax == 195
 
 
@@ -136,7 +138,8 @@ def test_body_segment_volume_matches_pappus():
     seg_len = 55.0
     sh = d.shoulder_len
     pts = [
-        (d.shoulder_od / 2 - d.wall, 0), (d.shoulder_od / 2, 0), (d.shoulder_od / 2, sh),
+        (d.shoulder_od / 2 - d.wall, 0), (d.shoulder_od / 2 - d.shoulder_chamfer, 0),
+        (d.shoulder_od / 2, d.shoulder_chamfer), (d.shoulder_od / 2, sh),
         (d.body_od / 2, sh + d.joint_rise), (d.body_od / 2, seg_len), (d.body_id / 2, seg_len - d.wall),
         (d.body_id / 2, sh + d.inner_taper_rise), (d.shoulder_od / 2 - d.wall, sh),
     ]
@@ -398,9 +401,12 @@ def test_score_advice_estimates_match_rebuilds():
 
 
 def test_separate_nose_and_joint_fits():
-    """fit_joint / fit_nose move only their own shoulder; defaults stay fit_slip."""
-    base = compute_derived(DesignParams())
-    assert base.nose_shoulder_od == base.shoulder_od and base.nose_joint_rise == base.joint_rise
+    """fit_joint / fit_nose move only their own shoulder; defaults are web_fits
+    (the short M13 nose shoulder gets the tighter nose fit)."""
+    for motor, nose in (("M13", 0.12), ("M18", 0.15), ("M29", 0.15)):
+        d = compute_derived(DesignParams(motor=motor))
+        assert (d.fit_slip, d.fit_nose) == (0.18, nose)
+        assert d.nose_shoulder_od == pytest.approx(d.body_id - 2 * nose)
     d = compute_derived(DesignParams(fit_joint=0.1, fit_nose=0.25))
     assert d.shoulder_od == pytest.approx(d.body_id - 0.2)
     assert d.nose_shoulder_od == pytest.approx(d.body_id - 0.5)
