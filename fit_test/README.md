@@ -6,7 +6,7 @@ Short test pieces that copy only the joints of a rocket, so the clearances can b
 
 ## What's on each plate
 
-`files/fit_test_<size>.3mf`: one plate per tube size (currently committed: M13, M18, M24; make the others with `--sizes M29 BT60`), 9 separate objects, sized for an X1C / P1S plate.
+`files/fit_test_<size>.3mf`: one plate per tube size (currently committed: M13, M18, M24, M29; make BT60 with `--sizes BT60`), 9 separate objects, sized for an X1C / P1S plate.
 
 | Size | Body OD / ID (mm) | Used by |
 |---|---|---|
