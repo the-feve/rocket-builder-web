@@ -28,6 +28,7 @@ from build123d import Align, Axis, Compound, FontStyle, Mesher, Solid, Text, exp
 
 from .body import shoulder_foot
 from .geom import extrude_y_symmetric, one_solid, revolve
+from .thread import threaded_boss, threaded_cap
 from .params import DesignParams, compute_derived
 
 # name -> (motor, body OD override or None). The motor sizes at minimum
@@ -108,6 +109,21 @@ def plug(size: str, fit: float, nose: bool, flip: bool = True) -> Coupon:
     return Coupon(f"{size}_{tag}", solid, d.body_od)
 
 
+def motor_cap_test(motor: str) -> list[Coupon]:
+    """The motor end of an aft part: the threaded boss with a short length of
+    motor bore above it (printed boss end down, as the aft is), and the motor
+    cap (printed face down). Slide a real motor in from the top, screw the cap
+    on, and check the lip covers only the casing."""
+    d = compute_derived(DesignParams(motor=motor))
+    t = d.thread
+    # The boss itself, 8 mm longer above the tail (a fused tube came out invalid on M13).
+    stub = threaded_boss(dict(t, overlap=t["overlap"] + 8.0)).translate((0, 0, -t["z_boss_end"]))
+    cap = threaded_cap(t)
+    cap = cap.translate((0, 0, -cap.bounding_box().min.Z))
+    w = 2 * t["r_cap_max"] + 2
+    return [Coupon(f"{motor}_cap_stub", stub, w), Coupon(f"{motor}_cap", cap, w)]
+
+
 def coupons(size: str, joint=JOINT_FITS, nose=NOSE_FITS, flip: bool = True) -> list[Coupon]:
     return [socket(size)] + [plug(size, f, False, flip) for f in joint] + [plug(size, f, True, flip) for f in nose]
 
@@ -160,13 +176,31 @@ def write(size: str, out: Path, joint=JOINT_FITS, nose=NOSE_FITS) -> list[Path]:
     return paths
 
 
+def write_plate(items: list[Coupon], path: Path) -> Path:
+    """One STEP plate, coupons laid out and named."""
+    placed = []
+    for c, x, y in layout(items, cols=4):
+        s = c.solid.translate((x, y, 0))
+        s.label = c.name
+        placed.append(s)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    export_step(Compound(placed, label=path.stem), path)
+    return path
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sizes", nargs="+", default=list(SIZES), choices=list(SIZES))
     ap.add_argument("--joint", nargs="+", type=float, default=list(JOINT_FITS), help="body-joint radial clearances, mm")
     ap.add_argument("--nose", nargs="+", type=float, default=list(NOSE_FITS), help="nose radial clearances, mm")
     ap.add_argument("--out", type=Path, default=Path("fit_test/out"))
+    ap.add_argument("--motor-caps", nargs="+", metavar="MOTOR",
+                    help="instead: a threaded stub + motor cap for each motor size, on one STEP plate")
     a = ap.parse_args(argv)
+    if a.motor_caps:
+        items = [c for m in a.motor_caps for c in motor_cap_test(m)]
+        print(write_plate(items, a.out / "motor_cap_test.step"))
+        return 0
     for size in a.sizes:
         for p in write(size, a.out, a.joint, a.nose):
             print(p)

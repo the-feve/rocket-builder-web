@@ -1,0 +1,6 @@
+size,casing_wall_mm,source
+M13,0.9,"estimate, Estes 13 mm mini motors; measure a spent casing to confirm"
+M18,1.1,"estimate, Estes 18 mm (A8/B6/C6); measure a spent casing to confirm"
+M24,1.3,"estimate, Estes 24 mm (C11/D12/E9/E12); measure a spent casing to confirm"
+M24L,1.3,"estimate, Estes 24 mm E9/E12; measure a spent casing to confirm"
+M29,1.5,"estimate, Estes 29 mm (E16/F15); measure a spent casing to confirm"

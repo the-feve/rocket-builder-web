@@ -50,7 +50,7 @@ import terms
 import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
-GENERATOR_VERSION = "0.2.0"  # 0.2.0: printed joint fits (fit test, 2026-10-16); changes every part, so cached builds are rebuilt
+GENERATOR_VERSION = "0.2.0"  # 0.2.0: printed joint fits and a slimmer motor cap with a casing-wall lip (2026-10-16); changes every part, so cached builds are rebuilt
 
 FIT_NOTE = ("Joint fits are tuned for Bambu Lab X1C / P1S printers in PLA at default settings "
             "(0.18 mm per side on the glued body joints, 0.15 mm on the nose; 0.12 mm on M13). "

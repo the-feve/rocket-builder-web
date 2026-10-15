@@ -36,6 +36,13 @@ def load_motors() -> dict[str, dict[str, float]]:
         }
 
 
+def load_casing_walls() -> dict[str, float]:
+    """data/motor_casings.csv (website only): the motor casing's wall, which
+    sets how far the motor cap's retention lip reaches in."""
+    with open(DATA_DIR / "motor_casings.csv", newline="") as f:
+        return {row["size"]: float(row["casing_wall_mm"]) for row in csv.DictReader(f)}
+
+
 def load_settings() -> dict[str, float]:
     """data/rocket_global_settings.csv (the VS - Global Settings studio)."""
     with open(DATA_DIR / "rocket_global_settings.csv", newline="") as f:
@@ -139,13 +146,27 @@ class Derived:
     thread: dict = field(default_factory=dict)
 
 
-def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin) -> dict:
-    """threadGeometry: the threaded motor cap and the boss it screws onto."""
+# Motor cap retention lip: covers only the casing's wall, never the nozzle or
+# the exhaust. The motor can sit mtr_clear (0.2 mm) off centre in its bore,
+# so the lip stops LIP_MARGIN short of the casing's inside.
+LIP_MARGIN = 0.3
+LIP_MIN = 0.6
+
+
+def cap_lip(casing_wall: float) -> float:
+    return max(casing_wall - LIP_MARGIN, LIP_MIN)
+
+
+def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin, casing_wall: float | None = None) -> dict:
+    """threadGeometry: the threaded motor cap and the boss it screws onto.
+    casing_wall None = the FeatureScript's 1/8 in lip."""
     p = 2.5 if mtr_d < 21 else 3.0
     h = 0.35 * p
     turns = 3
     thread_clear = 0.25  # radial; fit_slip is far too tight for a printed thread
-    cap_wall = 1.6
+    # Website: 1.2 mm (three 0.4 mm perimeters) and 0.4 mm ribs, for a more
+    # compact cap (owner, 2026-10-16; the FeatureScript has 1.6 and 0.6).
+    cap_wall = 1.2
     cap_face_t = max(1.5, 0.08 * mtr_d)
     gap = 0.5  # boss end to the cap's floor
 
@@ -154,7 +175,7 @@ def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin) -> di
     r_cap_in = r_crest + thread_clear
     r_cap_out = r_cap_in + cap_wall
     rib_r = 0.8
-    rib_out = 0.6
+    rib_out = 0.4
     r_cap_max = r_cap_out + rib_out
 
     # At least 2 mm below the tail (clear of the root fillets), and 1 mm
@@ -187,7 +208,7 @@ def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin) -> di
         "base_chamfer_h": base_chamfer * math.tan(math.radians(60)),
         "top_chamfer": 1.0,
         "top_chamfer_h": 1.0 * math.tan(math.radians(60)),
-        "nose_bore_r": mtr_d / 2 - 3.175,
+        "nose_bore_r": mtr_d / 2 - (3.175 if casing_wall is None else cap_lip(casing_wall)),
         "hang": -z_face,
         "turns": (cap_top - z_boss_end) / p,
         "z_lowest": min(z_face - cap_face_t, fin_lowest_z_within(fin, body_od, wall, 1e6)),
@@ -223,7 +244,8 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     mount_od = bay_id + 2 * wall
 
     fin = fin_dimensions(params, cal)
-    thread = thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin)
+    thread = thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
+                             load_casing_walls().get(params.motor))
     bay_len = mtr_len - thread["hang"]
     zmax = params.print_max_height - z_margin
     stop_depth = mtr_clear + 1.5

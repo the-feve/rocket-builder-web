@@ -60,10 +60,10 @@ def test_min_diameter_m18_hand_values():
 @pytest.mark.parametrize("shape,hang", [
     (FinShape.CLIPPED_DELTA, 10.0),  # HANDOFF: Clipped delta -> hang 10, bay 60
     (FinShape.TRAPEZOID, 10.0),
-    # Swept: HANDOFF's 12.8 predates the grip ribs (r_cap_max +0.6 mm); by
-    # hand with the ribs, the fin's lower edge at u = 4.075 is z = -4.41,
-    # cap top -5.41, face -13.41.
-    (FinShape.SWEPT, 13.41),
+    # Swept: the cap's top sits 1 mm below the fin's lower edge at the cap's
+    # outer radius, so a slimmer cap hangs less. 13.41 with the FeatureScript's
+    # 1.6 mm wall and 0.6 mm ribs; 12.76 with the website's 1.2 / 0.4 (2026-10-16).
+    (FinShape.SWEPT, 12.76),
 ])
 def test_motor_hang_and_bay(shape, hang):
     d = compute_derived(DesignParams(fin_shape=shape))
@@ -435,3 +435,20 @@ def test_fit_test_coupons_seat_without_overlap():
 
         assert vol(seat + 0.01) < 1e-3, c.name
         assert vol(seat - 0.05) > 0.5, c.name
+
+
+def test_motor_cap_lip_covers_only_the_casing():
+    """The cap's lip reaches in casing wall - 0.3 mm (motor_casings.csv), not
+    the FeatureScript's 1/8 in, so it never covers the nozzle."""
+    from rocketgen.fit_test import motor_cap_test
+    from rocketgen.geom import meshes, solids_of
+    from rocketgen.params import cap_lip, load_casing_walls
+
+    walls = load_casing_walls()
+    for motor in ("M13", "M18", "M24", "M29"):
+        d = compute_derived(DesignParams(motor=motor))
+        lip = d.mtr_d / 2 - d.thread["nose_bore_r"]
+        assert lip == pytest.approx(cap_lip(walls[motor])) and 0.6 - 1e-9 <= lip < walls[motor]
+    for c in motor_cap_test("M13"):
+        assert len(solids_of(c.solid)) == 1 and c.solid.is_valid and meshes(c.solid), c.name
+        assert c.solid.bounding_box().min.Z == pytest.approx(0, abs=1e-6)
