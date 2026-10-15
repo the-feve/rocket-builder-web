@@ -39,7 +39,9 @@ def solids_of(shape) -> list[Solid]:
 
 def one_solid(shape, what: str) -> Solid:
     """The FeatureScript unions everything into one body per part; check it."""
-    s = solids_of(shape)
+    # Drop zero-volume slivers: a conical nose's revolve left one at the tip
+    # plug on M13 / M24 (pre-existing, found 2026-10-16), failing the build.
+    s = [x for x in solids_of(shape) if abs(x.volume) > 1e-6]
     if len(s) != 1:
         raise GeometryError(f"{what}: expected 1 solid, got {len(s)}")
     return s[0]

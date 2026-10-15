@@ -26,8 +26,8 @@ from pathlib import Path
 
 from build123d import Align, Axis, Compound, FontStyle, Mesher, Solid, Text, export_step, export_stl, extrude
 
-from .body import shoulder_foot
-from .geom import extrude_y_symmetric, one_solid, revolve
+from .body import body_segment, nose_cone, shoulder_foot
+from .geom import extrude_y_symmetric, intersect, one_solid, revolve
 from .thread import threaded_boss, threaded_cap
 from .params import DesignParams, compute_derived
 
@@ -124,6 +124,22 @@ def motor_cap_test(motor: str) -> list[Coupon]:
     return [Coupon(f"{motor}_cap_stub", stub, w), Coupon(f"{motor}_cap", cap, w)]
 
 
+def validation_parts(motor: str, extra: float = 8.0) -> list[Coupon]:
+    """Short pieces of the real parts with the website's fits, in their real
+    print orientation (shoulder down): two body segments (one's shoulder in
+    the other's socket), the bottom of the nose (shoulder, end cap, tie bar)
+    and the motor cap test. `extra` mm of plain tube above each joint."""
+    d = compute_derived(DesignParams(motor=motor))
+    seg_len = d.shoulder_len + max(d.inner_taper_rise, d.joint_rise) + d.wall + extra
+    seg = body_segment(d, seg_len)
+    nose_h = d.nose_shoulder_len + d.nose_joint_rise + extra
+    nose = nose_cone(d, "conical", 3.0 * d.cal)
+    nose = one_solid(intersect(nose, revolve([(0, -1), (d.body_od, -1), (d.body_od, nose_h), (0, nose_h)])), "nose stub")
+    out = [Coupon(f"{motor}_seg_a", seg, d.body_od + 2), Coupon(f"{motor}_seg_b", seg, d.body_od + 2),
+           Coupon(f"{motor}_nose_stub", nose, d.body_od + 2)]
+    return out + motor_cap_test(motor)
+
+
 def coupons(size: str, joint=JOINT_FITS, nose=NOSE_FITS, flip: bool = True) -> list[Coupon]:
     return [socket(size)] + [plug(size, f, False, flip) for f in joint] + [plug(size, f, True, flip) for f in nose]
 
@@ -176,10 +192,10 @@ def write(size: str, out: Path, joint=JOINT_FITS, nose=NOSE_FITS) -> list[Path]:
     return paths
 
 
-def write_plate(items: list[Coupon], path: Path) -> Path:
+def write_plate(items: list[Coupon], path: Path, cols: int = 5) -> Path:
     """One STEP plate, coupons laid out and named."""
     placed = []
-    for c, x, y in layout(items, cols=4):
+    for c, x, y in layout(items, cols=cols):
         s = c.solid.translate((x, y, 0))
         s.label = c.name
         placed.append(s)
@@ -196,7 +212,13 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, default=Path("fit_test/out"))
     ap.add_argument("--motor-caps", nargs="+", metavar="MOTOR",
                     help="instead: a threaded stub + motor cap for each motor size, on one STEP plate")
+    ap.add_argument("--validate", nargs="+", metavar="MOTOR",
+                    help="instead: short real parts (two segments, nose stub, motor cap + stub) per motor, one STEP plate")
     a = ap.parse_args(argv)
+    if a.validate:
+        items = [c for m in a.validate for c in validation_parts(m)]
+        print(write_plate(items, a.out / "validation.step"))
+        return 0
     if a.motor_caps:
         items = [c for m in a.motor_caps for c in motor_cap_test(m)]
         print(write_plate(items, a.out / "motor_cap_test.step"))

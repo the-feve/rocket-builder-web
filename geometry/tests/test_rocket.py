@@ -452,3 +452,15 @@ def test_motor_cap_lip_covers_only_the_casing():
     for c in motor_cap_test("M13"):
         assert len(solids_of(c.solid)) == 1 and c.solid.is_valid and meshes(c.solid), c.name
         assert c.solid.bounding_box().min.Z == pytest.approx(0, abs=1e-6)
+
+
+@pytest.mark.parametrize("motor", ["M13", "M24"])
+def test_conical_nose_builds(motor):
+    """A conical nose at the default fineness left a zero-volume sliver at the
+    tip plug on M13 / M24 and failed with 'expected 1 solid, got 2'."""
+    from rocketgen.body import nose_cone
+    from rocketgen.geom import meshes
+
+    d = compute_derived(DesignParams(motor=motor))
+    nose = nose_cone(d, "conical", 3.0 * d.cal)
+    assert nose.is_valid and meshes(nose) and nose.volume > 100
