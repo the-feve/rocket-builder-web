@@ -69,6 +69,7 @@ Details: `HANDOFF.md` (Fit test coupons) and `fit_test/README.md`.
 - [ ] **(owner)** Print the M13 round-2 plate and one full rocket with the new fits; X1C check
 - [x] Per-size `fit_joint` / `fit_nose` rule from the results (`params.web_fits`); `shoulder_chamfer` on; pinned test numbers updated
 - [x] Disclaimer on the STL download (build notes + both guides; `FIT_NOTE` in `server/app.py`). Original wording: "Joint fits are tuned for Bambu Lab X1C / P1S at default PLA settings. Other printers or settings may need a light sanding of the shoulders (too tight) or a wrap of tape (too loose)."
+- [ ] Separate Fit Test Builder app: kickoff handoff in `docs/fit_test_app_handoff.md` (2026-10-16)
 - [ ] Admin option "Print test parts for fitment": one size's socket + plugs, a range of sizes, or the joints of a saved rocket (its tube, fits and nose shoulder) without the full parts. `fit_test.coupons()` is the starting point; serve the 3MF from `/api` behind the admin check.
 
 ## Done
