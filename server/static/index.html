@@ -263,7 +263,26 @@
   #namedlg { border:1px solid var(--line); border-radius:8px; padding:14px 16px; color:var(--ink); background:var(--field); min-width:min(320px, 90vw); }
   #namedlg::backdrop, #authdlg::backdrop, #orderdlg::backdrop, #ordersdlg::backdrop { background:rgba(0,0,0,.5); }
   #acctdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(380px, 92vw); }
-  #acctdlg::backdrop { background:rgba(0,0,0,.5); }
+  #acctdlg::backdrop, #cmpdlg::backdrop { background:rgba(0,0,0,.5); }
+  /* Compare two rockets */
+  #cmpdlg { border:1px solid var(--line); border-radius:10px; padding:14px 18px; color:var(--ink); background:var(--panel); width:min(860px, 96vw); max-height:92dvh; }
+  #cmpdlg .cmphead { display:flex; align-items:center; gap:10px; } #cmpdlg h2 { flex:1; font-size:18px; margin:0; }
+  #cmpdlg .cmphead button { flex:none; padding:6px 14px; border:1px solid var(--line); background:transparent; color:var(--ink); }
+  #cmpdlg .cmppick { display:flex; flex-wrap:wrap; gap:8px; align-items:center; grid-template-columns:none; margin:10px 0; font-size:14px; }
+  #cmpdlg .cmppick select { width:auto; min-width:240px; max-width:100%; }
+  .cmptab { width:100%; border-collapse:collapse; font-size:13.5px; margin:6px 0 10px; }
+  .cmptab th, .cmptab td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+  .cmptab thead th { font-size:14px; }
+  .cmptab th[scope=row] { color:var(--muted); font-weight:500; width:28%; }
+  .cmptab td.win { color:var(--ok); font-weight:700; } .cmptab td.win::after { content:" ✓"; }
+  .cmpsum { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .cmpsum > div { border:1px solid var(--line); border-radius:8px; padding:10px 12px; background:var(--card); font-size:13.5px; }
+  .cmpsum h4 { margin:0 0 4px; }
+  .cmpdiff { margin:10px 0 0; padding:10px 12px; border-radius:8px; border-left:4px solid var(--accent); background:var(--card); font-size:14px; }
+  .cmpdiff ul { margin:4px 0 0; padding-left:18px; } .cmpdiff li { margin:3px 0; }
+  .cmpbtn { padding:7px 14px; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--ink); font:600 14px system-ui, -apple-system, sans-serif; cursor:pointer; flex:none; }
+  .cmpbtn:hover { border-color:var(--accent); color:var(--accent); }
+  @media (max-width:640px) { .cmpsum { grid-template-columns:1fr; } .cmptab { font-size:12.5px; } }
   #acctdlg h2 { font-size:17px; margin:0 0 4px; } #acctdlg p { margin:4px 0 8px; font-size:14px; }
   #acctdlg .prefrow { display:flex; gap:8px; align-items:center; font-size:14px; font-weight:600; margin:10px 0 2px; }
   #acctdlg menu { display:flex; justify-content:flex-end; gap:8px; margin:12px 0 0; padding:0; }
@@ -297,6 +316,7 @@
   .motorbuy .shopbtn { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; color:var(--ink); border:1px solid var(--line); }
   .motorbuy .shopbtn:hover { border-color:var(--accent); color:var(--accent); }
   .affil { font-size:11.5px; color:var(--muted); margin:4px 0 0; }
+  .fieldbox .big { font-size:15px; } .fieldbox .big b { font-size:26px; } .fieldbox .big span { color:var(--muted); }
   #acctlinks { flex:1 1 100%; margin:2px 0 0; } #acctlinks[hidden] { display:none; }
   @media (max-width:480px) { #orderdlg .ogrid { grid-template-columns:1fr 1fr; } }
   #authdlg { border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:var(--ink); background:var(--panel); width:min(380px, 92vw); }
@@ -728,6 +748,11 @@
   <p class="hint">On: the site opens straight to the design steps. Off: it starts with the welcome and the tutorial.</p>
   <p><a href="#" id="acctorders">My orders</a></p>
   <menu><button type="button" id="acctclose">Close</button><button type="button" id="acctsignout">Sign out</button></menu>
+</dialog>
+<dialog id="cmpdlg" aria-labelledby="cmptitle">
+  <div class="cmphead"><h2 id="cmptitle">Compare rockets</h2><button type="button" id="cmpclose">Close</button></div>
+  <label class="cmppick">Compare <b id="cmpa"></b> with <select id="cmpsel"></select></label>
+  <div id="cmpout" role="status" aria-live="polite"></div>
 </dialog>
 <dialog id="ordersdlg" aria-labelledby="orderstitle">
   <h2 id="orderstitle">My orders</h2>
@@ -1242,6 +1267,117 @@ const CG_COLOR = 0x3d8bfd, CP_COLOR = 0xff5a5a;  // also used for the report's l
   addEventListener('resize', () => { const w = parseFloat(root.style.getPropertyValue('--formw')); if (w && w > maxW()) set(w, false); });
 })();
 
+// ---------- compare two rockets ----------
+// Every build this visit is kept (newest first) so it can be compared with the
+// one on screen; a saved design from My rockets is built on request.
+const buildHistory = [];
+function rememberBuild(r) {
+  const p = params();
+  const entry = { id: r.id, name: nameEl.value.trim() || 'My rocket', params: p, result: r, at: Date.now() };
+  const i = buildHistory.findIndex(x => x.id === r.id);
+  if (i >= 0) buildHistory.splice(i, 1);
+  buildHistory.unshift(entry);
+  buildHistory.length = Math.min(buildHistory.length, 10);
+}
+const cmpDlg = document.getElementById('cmpdlg'), cmpSel = document.getElementById('cmpsel'), cmpOut = document.getElementById('cmpout');
+const specLine = e => `${e.params.motor} · ${Math.round(e.result.stability.length_mm)} mm · ${LABELS[e.params.fin_shape] || e.params.fin_shape} fins`;
+function openCompare() {
+  const cur = buildHistory[0];
+  if (!cur) return;
+  document.getElementById('cmpa').textContent = `${cur.name} (${specLine(cur)})`;
+  const earlier = buildHistory.slice(1), saved = loadMine();
+  cmpSel.innerHTML = '<option value="">Pick a rocket…</option>' +
+    (earlier.length ? `<optgroup label="Built earlier (instant)">${earlier.map((e, i) => `<option value="h${i + 1}">${esc(e.name)} · ${esc(specLine(e))}</option>`).join('')}</optgroup>` : '') +
+    (saved.length ? `<optgroup label="My rockets (builds it, up to 30 s)">${saved.map(d => `<option value="d${esc(d.id)}">${esc(baseName(d.name))}${d.name !== baseName(d.name) ? ` · ${esc(d.name.slice(baseName(d.name).length + 1).replace(/_/g, ' · '))}` : ''}</option>`).join('')}</optgroup>` : '');
+  cmpOut.innerHTML = earlier.length || saved.length
+    ? '<p class="hint">Pick a rocket to compare. Tip: change something and press Build, then compare the new one with the old one.</p>'
+    : '<p class="hint">Nothing to compare with yet. Change something (the height, fins or motor) and press <b>Build</b>, or save a rocket, then come back here.</p>';
+  if (earlier.length) { cmpSel.value = 'h1'; showCompare(); }
+  cmpDlg.showModal();
+}
+async function showCompare() {
+  const v = cmpSel.value, a = buildHistory[0];
+  if (!v || !a) return;
+  let b;
+  if (v[0] === 'h') b = buildHistory[Number(v.slice(1))];
+  else {
+    cmpOut.innerHTML = '<p>Building that rocket… (10 to 30 seconds)</p>';
+    try {
+      const res = await fetch(`/api/designs/${encodeURIComponent(v.slice(1))}`);
+      if (!res.ok) throw new Hiccup("That saved rocket couldn't be opened.");
+      const d = await res.json();
+      const p = Object.fromEntries(Object.entries({ ...opts.defaults, ...d.params }).filter(([k]) => k in opts.defaults));
+      const out = await postBuild(p);
+      if (!out.res.ok) throw new Error(typeof out.body.detail === 'string' ? out.body.detail : `Build failed (${out.res.status})`);
+      b = { id: out.body.id, name: baseName(d.name), params: p, result: out.body };
+    } catch (err) { cmpOut.innerHTML = `<div class="error"><b>Can't compare.</b> ${esc(err.message)}</div>`; return; }
+    if (cmpSel.value !== v) return;  // picked another one meanwhile
+  }
+  cmpOut.innerHTML = compareHtml(a, b);
+}
+cmpSel.onchange = showCompare;
+document.getElementById('cmpclose').onclick = () => cmpDlg.close();
+document.addEventListener('click', e => { if (e.target.closest('[data-compare]')) openCompare(); });
+function compareHtml(A, B) {
+  const ra = A.result, rb = B.result, sa = ra.stability, sb = rb.stability;
+  const best = r => r.flights.rows.find(x => x.code === r.flights.recommended);
+  const ba = best(ra), bb = best(rb);
+  const off = c => c < 1 ? 1 - c : c > 2 ? c - 2 : 0;  // distance from the 1-2 sweet spot
+  const verdict = st => st.margin_cal < 1 ? 'Too wobbly' : st.margin_cal > 3 ? 'Too stable' : st.margin_cal > 2 ? 'Very stable' : 'Just right';
+  const fins = e => `${LABELS[e.params.fin_shape] || e.params.fin_shape}${e.params.custom_fin_size ? ' (custom)' : ''} × ${e.params.fin_count}`;
+  // [label, valueA, valueB, numA, numB, better: 'low' | 'high' | 'stab' | null]
+  const rows = [
+    ['Motor size', A.params.motor, B.params.motor],
+    ['Height', `${Math.round(sa.length_mm)} mm`, `${Math.round(sb.length_mm)} mm`],
+    ['Body width', `${ra.dimensions['Body OD'].toFixed(1)} mm`, `${rb.dimensions['Body OD'].toFixed(1)} mm`],
+    ['Fins', fins(A), fins(B)],
+    ['Nose', LABELS[A.params.nose_shape] || A.params.nose_shape, LABELS[B.params.nose_shape] || B.params.nose_shape],
+    ['Stability score', `${sa.margin_cal.toFixed(2)} cal · ${verdict(sa)}`, `${sb.margin_cal.toFixed(2)} cal · ${verdict(sb)}`, off(sa.margin_cal), off(sb.margin_cal), 'low'],
+    ['Best motor', ba ? ba.motor : 'none safe', bb ? bb.motor : 'none safe'],
+    ['How high (best motor)', ba ? `${ba.apogee_m} m` : '—', bb ? `${bb.apogee_m} m` : '—', ba?.apogee_m, bb?.apogee_m, 'high'],
+    ['Weight at liftoff', `${Math.round(sa.liftoff_mass_g)} g`, `${Math.round(sb.liftoff_mass_g)} g`],
+    ['Plastic to print', `${ra.total_mass_g} g`, `${rb.total_mass_g} g`, ra.total_mass_g, rb.total_mass_g, 'low'],
+    ['Parts to print', ra.parts.length, rb.parts.length, ra.parts.length, rb.parts.length, 'low'],
+    ['Parachute', ra.parachute?.size_in ? `${ra.parachute.size_in} in` : '—', rb.parachute?.size_in ? `${rb.parachute.size_in} in` : '—'],
+    ['Launch field', ra.field ? `${ra.field.recommended_m} m` : '—', rb.field ? `${rb.field.recommended_m} m` : '—', ra.field?.recommended_m, rb.field?.recommended_m, 'low'],
+  ];
+  const cell = (txt, mine, other, better) => {
+    let win = false;
+    if (better && mine != null && other != null && Math.abs(mine - other) > 1e-6) win = better === 'high' ? mine > other : mine < other;
+    return `<td class="${win ? 'win' : ''}">${esc(txt)}</td>`;
+  };
+  const table = `<table class="cmptab"><thead><tr><th></th><th>${esc(A.name)} <small>(on screen)</small></th><th>${esc(B.name)}</th></tr></thead><tbody>
+    ${rows.map(([k, a, b, na, nb, bt]) => `<tr><th scope="row">${k}</th>${cell(a, na, nb, bt)}${cell(b, nb, na, bt)}</tr>`).join('')}</tbody></table>`;
+  // How they differ, in words.
+  const diff = [], nm = [esc(A.name), esc(B.name)];
+  const oa = off(sa.margin_cal), ob = off(sb.margin_cal);
+  if (Math.abs(oa - ob) > 0.05) {
+    const [w, l, sw, sl] = oa < ob ? [0, 1, sa, sb] : [1, 0, sb, sa];
+    diff.push(`<b>${nm[w]}</b> is closer to the 1–2 sweet spot (${sw.margin_cal.toFixed(2)} vs ${sl.margin_cal.toFixed(2)} cal)` +
+      (sl.margin_cal < 1 ? `; ${nm[l]} could wobble and can't be downloaded yet.` : sl.margin_cal > 3 ? `; ${nm[l]} turns into the wind more.` : '.'));
+  } else diff.push(`Both are about as stable as each other (${sa.margin_cal.toFixed(2)} and ${sb.margin_cal.toFixed(2)} cal).`);
+  if (ba && bb && Math.abs(ba.apogee_m - bb.apogee_m) >= 5) {
+    const [h, l] = ba.apogee_m > bb.apogee_m ? [0, 1] : [1, 0];
+    const hi = [ba, bb][h], lo = [ba, bb][l];
+    diff.push(`<b>${nm[h]}</b> flies about ${hi.apogee_m - lo.apogee_m} m higher with its best motor (${esc(hi.motor)} vs ${esc(lo.motor)}), so it needs a bigger field.`);
+  } else if (ba && !bb) diff.push(`Only <b>${nm[0]}</b> has a motor that flies it safely.`);
+  else if (bb && !ba) diff.push(`Only <b>${nm[1]}</b> has a motor that flies it safely.`);
+  const dm = ra.total_mass_g - rb.total_mass_g;
+  if (Math.abs(dm) >= 3) diff.push(`<b>${nm[dm < 0 ? 0 : 1]}</b> uses about ${Math.abs(Math.round(dm))} g less plastic, so it prints faster and costs less.`);
+  if (ra.parts.length !== rb.parts.length) diff.push(`<b>${nm[ra.parts.length < rb.parts.length ? 0 : 1]}</b> has fewer parts to print and glue (${Math.min(ra.parts.length, rb.parts.length)} vs ${Math.max(ra.parts.length, rb.parts.length)}).`);
+  const why = [];
+  if (A.params.motor !== B.params.motor) why.push('motor size');
+  if (Math.abs(sa.length_mm - sb.length_mm) > 5) why.push(`height (${Math.round(sa.length_mm)} vs ${Math.round(sb.length_mm)} mm)`);
+  if (A.params.fin_shape !== B.params.fin_shape || A.params.fin_count !== B.params.fin_count || A.params.custom_fin_size !== B.params.custom_fin_size) why.push('fins');
+  if (A.params.nose_shape !== B.params.nose_shape) why.push('nose');
+  if (Math.abs(ra.dimensions['Body OD'] - rb.dimensions['Body OD']) > 0.1) why.push('body width');
+  const summary = (e, st) => `<div><h4>${esc(e.name)}</h4><p><b>${st.margin_cal.toFixed(2)} cal, ${verdict(st).toLowerCase()}</b> (checked with a loaded ${esc(st.motor)}).</p>
+    ${st.advice?.items?.length ? `<p class="hint">To improve it: ${esc(st.advice.items[0].text)}</p>` : ''}</div>`;
+  return `${table}<div class="cmpdiff"><b>How they differ</b>${why.length ? ` <span class="hint">(changed: ${why.join(', ')})</span>` : ''}<ul>${diff.map(d => `<li>${d}</li>`).join('')}</ul></div>
+    <div class="cmpsum">${summary(A, sa)}${summary(B, sb)}</div>
+    <p class="hint">Ticks mark the better number in each row: closer to 1–2 cal, higher, lighter, fewer parts, smaller field. Higher isn't always better: it needs a bigger field.</p>`;
+}
+
 // ---------- resizable 3D view / report ----------
 // Drag the handle between the 3D view and the report below it; the report's
 // height is remembered in this browser. Arrow keys nudge; double-click resets.
@@ -1455,6 +1591,22 @@ function chuteHtml(c, kid) {
   return kid ? `<p>Use a ${size}${streamer}${c.size_in ? ' A smaller one lands too hard; a much bigger one drifts far away.' : ''}</p>${buy}`
              : `<li>Parachute: ${c.size_in ? `${c.size_in} in (at least ${c.min_diameter_in} in needed), about ${c.descent_ms} m/s down` : `at least ${Math.round(c.min_diameter_in)} in`} with ${c.descent_mass_g} g after the motor burns (flat chute, Cd 0.75, for ≤ 4.5 m/s).${streamer}</li>`;
 }
+// Launch field (server: flight.field_size): the NAR minimum for the motor class,
+// and how far the rocket drifts under its parachute in a 10 mph breeze.
+function fieldHtml(f, kid) {
+  if (!f) return kid ? '<p>No motor of this size can fly this rocket safely yet, so there is no field size.</p>' : '';
+  const ft = m => Math.round(m * 3.28084), fb = m => (m / 91.44);  // a US football field is 100 yd (91 m)
+  const fbTxt = m => fb(m) < 0.9 ? `about ${Math.round(fb(m) * 10) * 10}% of a football field` : `about ${(Math.round(fb(m) * 2) / 2).toString()} football field${fb(m) >= 1.25 ? 's' : ''}`;
+  const drift = f.drift_m != null && f.drift_m > f.nar_min_m;
+  if (!kid) return `<li>Launch field: ${f.recommended_m} m (${ft(f.recommended_m)} ft) on a side with a ${esc(f.motor)}: NAR minimum ${f.nar_min_m} m${f.drift_m != null ? `; drifts about ${f.drift_m} m downwind under the parachute from ${f.apogee_m} m in a 10 mph breeze` : ''}.</li>`;
+  return `<div class="fieldbox"><div class="big"><b>${f.recommended_m} m</b> <span>(${ft(f.recommended_m)} ft) on each side</span></div>
+    <p>That's ${fbTxt(f.recommended_m)}, for the <b>${esc(f.motor)}</b>. Look for a big open field with short grass, away from trees, buildings, power lines and roads.</p>
+    <ul class="tips">
+      <li>The safety code's smallest field for this motor is <b>${f.nar_min_m} m</b> (${ft(f.nar_min_m)} ft).</li>
+      ${drift ? `<li>Under its parachute the wind carries it: in a 10 mph breeze it drifts about <b>${f.drift_m} m</b> (${ft(f.drift_m)} ft). Put the launch pad near the side the wind comes from, so it lands in the field.</li>
+      <li>On a calm day the smaller size is fine. Don't launch if the wind is over 20 mph.</li>` : ''}
+    </ul></div>`;
+}
 function kidReportHtml(r) {
   const st = r.stability, cal = st.margin_cal, f = r.flights;
   const best = f.rows.find(x => x.code === f.recommended);
@@ -1471,7 +1623,6 @@ function kidReportHtml(r) {
   const flight = best
     ? `<p>Best motor: <b>${esc(best.motor)}</b>. It should fly about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft) high${best.apogee_m >= 9 ? `, as high as a <b>${Math.round(best.apogee_m / 3)}-story building</b>` : ''}!</p>
        <p>The last number in the motor name is the <b>delay</b>: ${best.delay_s} seconds after the motor stops pushing, it pops the nose off so the parachute comes out near the top of the flight.</p>
-       <p>Launch site: a grown-up picks an open field at least <b>${best.field_m} m</b> (${Math.round(best.field_m * FT)} ft) across.</p>
        ${motorBuyHtml(best.motor)}`
     : `<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 2).</p>`;
   return `<div class="kid">
@@ -1490,6 +1641,7 @@ function kidReportHtml(r) {
     </div>
     <div class="kidcard"><h3>How high will it go?</h3>${flight}</div>
     <div class="kidcard"><h3>Which parachute?</h3>${chuteHtml(r.parachute, true)}</div>
+    <div class="kidcard"><h3>How big a launch field?</h3>${fieldHtml(r.field, true)}</div>
     <div class="kidcard"><h3>What's next?</h3>
       <ol class="steps4">
         <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}.</li>
@@ -1498,6 +1650,7 @@ function kidReportHtml(r) {
         <li><b>Fly it</b> with a grown-up, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">safety code</a>.</li>
       </ol>
       <p class="hint">Save your rocket with <b>Save</b> at the top, or share it with <b>Copy link to share</b>.</p>
+      <p><button type="button" class="cmpbtn" data-compare>⚖️ Compare with another rocket</button></p>
       ${orderRowHtml(st.ok, true)}
     </div>
   </div>`;
@@ -1526,7 +1679,7 @@ function showReport(r) {
         An estimate (Barrowman); check your final rocket in <a href="#guide-or" class="orlink">OpenRocket</a>.</small></div>
     </div>
     ${kid ? '' : adviceHtml(st)}
-    ${kid ? '' : `<div style="grid-column:1/-1">${orderRowHtml(st.ok, false)}</div>`}
+    ${kid ? '' : `<div style="grid-column:1/-1">${orderRowHtml(st.ok, false)}<p><button type="button" class="cmpbtn" data-compare>⚖️ Compare with another rocket</button></p></div>`}
     ${pickerHtml(r.flights)}
     <div>
       <h2>Parts · ${r.total_mass_g} g total (${esc(form.elements.material.value)}, solid)</h2>
@@ -1536,7 +1689,7 @@ function showReport(r) {
     </div>
     <div>
       <h2>Build notes</h2>
-      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}
+      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}
       <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
@@ -1587,6 +1740,7 @@ async function runBuild() {
     lastBuild = { length_mm: body.stability.length_mm, body_length_mm: body.body_length_mm };
     setMarkers(body.stability); applyView(false);
     builtOnce = true; lastReport = body;
+    rememberBuild(body);
     if (tutStep) tutEnd(true, '<b>You built your first rocket!</b> Check its stability score. Every step is unlocked now, so try changing things and building again.');
     showReport(body); showGuide(false);
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
