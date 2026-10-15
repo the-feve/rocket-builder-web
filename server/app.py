@@ -27,7 +27,7 @@ from pathlib import Path
 import numpy as np
 import trimesh
 from fastapi import Cookie, FastAPI, Header, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -48,6 +48,7 @@ import orders
 import shop
 import supplies
 import terms
+import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
 GENERATOR_VERSION = "0.1.0"
@@ -881,3 +882,14 @@ def shared(design_id: str):
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+
+# Trebuchet Builder shares this Fly app: /trebuchet/ and trebuchet.* hosts.
+TREBUCHET = trebuchet_mount.load_app()
+if TREBUCHET is not None:
+    @app.get(trebuchet_mount.PREFIX, include_in_schema=False)
+    def trebuchet_slash():
+        return RedirectResponse(trebuchet_mount.PREFIX + "/")
+
+    app.mount(trebuchet_mount.PREFIX, TREBUCHET, name="trebuchet")
+    app.add_middleware(trebuchet_mount.HostRouter)

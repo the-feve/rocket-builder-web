@@ -147,6 +147,10 @@ _PAGE = """<!doctype html>
   header nav { display:flex; gap:18px; font-size:15px; }
   header nav a { color:var(--ink); text-decoration:none; }
   header nav a:hover { text-decoration:underline; text-underline-offset:5px; }
+  header nav.apps { gap:2px; padding:2px; border:1px solid var(--line); border-radius:8px; }
+  header nav.apps a { padding:3px 10px; border-radius:6px; font-weight:600; font-size:14px; }
+  header nav.apps a.cur { background:var(--ink); color:var(--bg); }
+  header nav.apps a:hover { text-decoration:none; }
   main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
   main h1 { font-size:clamp(1.6rem, 6vw, 2.2rem); margin:0 0 .25rem; }
   .lede { font-size:1.1rem; color:var(--muted); margin:.25rem 0 1rem; }
@@ -187,7 +191,7 @@ _PAGE = """<!doctype html>
 </style>
 </head>
 <body>
-<header><div class="brand"><a href="/">Rocket Builder</a></div><nav><a href="/">← Back to the designer</a><a href="https://quiverdesignworks.net">Quiver Design Works</a></nav></header>
+<header><div class="brand"><a href="/">Rocket Builder</a></div><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="/">← Back to the designer</a><a href="https://quiverdesignworks.net">Quiver Design Works</a></nav></header>
 <main>
   <h1>Order rocket supplies</h1>
   <p class="lede">Everything you need to build and fly a rocket from Rocket Builder, apart from the rocket itself: a launch pad, motors, igniters, parachutes, filament, glue and paint. Items marked <b>Start here</b> are what I'd buy first.</p>
