@@ -59,7 +59,7 @@ def main() -> int:
     fetched = 0
     for o in listing["orders"]:
         seen = state["orders"].get(o["id"])
-        target = dest / o["batch"] / o["id"]
+        target = dest / o["batch"] / o.get("name", o["id"])  # RB-…_<motor>_<customer code>
         if seen == o["updated_at"] and target.is_dir():
             continue
         data = get(f"{a.server.rstrip('/')}/api/admin/orders/{o['id']}/files.zip", a.token)

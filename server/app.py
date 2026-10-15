@@ -36,7 +36,7 @@ from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
-from rocketgen.flight import FIELD_M, motors_for, pick, simulate
+from rocketgen.flight import FIELD_M, heaviest, motors_for, parachute, pick, simulate
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
 from rocketgen.stability import MAX_FIN_SCALE, Balance, advice, build_stable, recovery_allowance_g
 
@@ -206,7 +206,15 @@ def _stability(st) -> dict:
             "recovery_mass_g": st.recovery_mass_g, "status": st.status, "ok": st.ok, "message": st.message}
 
 
-def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights: dict | None = None) -> bytes:
+def _chute_text(c: dict) -> str:
+    if c["size_in"]:
+        return (f"Parachute: {c['size_in']} in (at least {c['min_diameter_in']:g} in): about {c['descent_ms']} m/s down "
+                f"with {c['descent_mass_g']:g} g after the motor burns.")
+    return f"Parachute: at least {c['min_diameter_in']:.0f} in for {c['descent_mass_g']:g} g (bigger than the usual hobby sizes)."
+
+
+def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights: dict | None = None,
+         chute: dict | None = None) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in stls.items():
@@ -218,6 +226,8 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
                   f"(motor {stab['motor_mass_g']} g, recovery {stab['recovery_mass_g']} g).",
                   "  Check it in OpenRocket with your actual motor, recovery and paint before flying.",
                   "  Follow the NAR Model Rocket Safety Code."]
+        if chute:
+            lines += ["", _chute_text(chute)]
         if flights:
             lines += ["", f"Motors (target {flights['target_m']:g} m; recommended: {flights['recommended'] or 'none'}):"]
             lines += [f"  {r['motor']}: {r['apogee_m']} m, {r['margin_cal']} cal, "
@@ -374,9 +384,14 @@ def build(req: BuildRequest, request: Request):
     st["advice"] = advice(bal, chk, list(motors.values()), beginner=req.overall_length is not None,
                           motor=motors.get(req.flight_motor), stock_od=stock_od(req.motor, req.wall))
     flights = _flights(bal, list(motors.values()), req)
+    # Parachute for the rocket after the motor has burned: the recommended
+    # motor's empty casing (else the chosen or heaviest motor's).
+    m = motors.get(flights["recommended"]) or motors.get(req.flight_motor) or heaviest(req.motor)
+    chute = parachute(bal.printed_mass_g + st["recovery_mass_g"] + m.mass_g - m.prop_g)
+    chute["links"] = supplies.parachute_links().get(chute["size_in"], [])
     build_id = _key(params)
-    _builds[build_id] = {"geo": geo, "params": params, "stability": st, "flights": flights}
-    return {"id": build_id, **_geo[geo]["report"], "stability": st, "flights": flights}
+    _builds[build_id] = {"geo": geo, "params": params, "stability": st, "flights": flights, "parachute": chute}
+    return {"id": build_id, **_geo[geo]["report"], "stability": st, "flights": flights, "parachute": chute}
 
 
 def _flights(bal: Balance, motors: list, req: BuildRequest) -> dict:
@@ -419,7 +434,7 @@ def download(build_id: str):
     if g["stls"] is None:
         with _lock:
             g["stls"] = _stls(g["rocket"])
-    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"]), media_type="application/zip",
+    return Response(_zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute")), media_type="application/zip",
                     headers={"Content-Disposition": f'attachment; filename="rocket_{build_id}.zip"'})
 
 
@@ -579,14 +594,14 @@ def place_order(o: OrderIn, request: Request):
     if g["stls"] is None:
         with _lock:
             g["stls"] = _stls(g["rocket"])
-    rocket_zip = _zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"])
+    rocket_zip = _zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"))
     order = orders.create(user=user, design_name=o.design_name, design_id=o.design_id, params=b["params"],
                           quantity=o.quantity, material=o.params.material, color=o.color,
                           shipping=o.shipping.model_dump(), notes=o.notes, coupon=o.coupon, price=0.0,
                           rocket_zip=rocket_zip, parts=g["report"]["parts"], stability=b["stability"],
                           recommended_motor=b["flights"]["recommended"])
-    log.info("order %s from %s", order["id"], user["email"])
-    notify.owner(f"New rocket order {order['id']}: {o.design_name} x{o.quantity}",
+    log.info("order %s from %s", order["name"], user["email"])
+    notify.owner(f"New rocket order {order['name']}: {o.design_name} x{o.quantity}",
                  orders._sheet(order) + f"\nFiles: {orders.folder(order)}\nOrders page: {request.base_url}admin\n")
     return {"id": order["id"], "batch": order["batch"], "status": order["status"], "price": order["price"]}
 
@@ -626,7 +641,7 @@ def admin_order_files(order_id: str, request: Request):
     if not order or not orders.folder(order).is_dir():
         raise HTTPException(404, "No such order (or its files are missing).")
     return Response(orders.folder_zip(order), media_type="application/zip",
-                    headers={"Content-Disposition": f'attachment; filename="{order_id}.zip"'})
+                    headers={"Content-Disposition": f'attachment; filename="{order.get("name", order_id)}.zip"'})
 
 
 @app.post("/api/admin/orders/{order_id}/status")

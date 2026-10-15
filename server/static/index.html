@@ -85,7 +85,17 @@
   a.btn { color:var(--ink); background:transparent; border-color:var(--line); }
   a.btn:hover { border-color:var(--accent); color:var(--accent); }
   a.btn.off { pointer-events:none; opacity:.4; }
-  #right { display:grid; grid-template-rows:minmax(0,1fr) auto; min-width:0; min-height:0; }
+  #right { display:grid; grid-template-rows:minmax(0,1fr) 0 auto; min-width:0; min-height:0; }
+  /* Drag handle between the 3D view and the report (wider screens only); a dragged height wins over the default max. */
+  #vsplit { position:relative; z-index:5; height:0; cursor:row-resize; touch-action:none; }
+  #vsplit::before { content:""; position:absolute; left:0; right:0; top:-5px; height:10px; }
+  #vsplit::after { content:""; position:absolute; left:50%; top:-3px; height:6px; width:44px; margin-left:-22px; border-radius:3px;
+    background:var(--line); border:1px solid var(--panel); transition:background .15s; }
+  #vsplit:hover::after, #vsplit.drag::after, #vsplit:focus-visible::after { background:var(--accent); }
+  #vsplit:focus-visible { outline:none; }
+  #vsplit:has(+ #report:empty) { display:none; }
+  #right.sized #report { height:var(--reporth); max-height:none !important; }
+  body.vdragging, body.vdragging * { cursor:row-resize !important; user-select:none !important; }
   /* The canvas is absolutely positioned so it never props its container open:
      the container sets the size and the canvas follows (fixes iOS rotation / resize). */
   #view { position:relative; min-height:0; min-width:0; overflow:hidden; background:linear-gradient(var(--view-top),var(--view-bot));
@@ -351,10 +361,11 @@
     body { height:auto; min-height:100dvh; }
     main { display:flex; flex-direction:column; }
     #right { display:contents; }
-    #splitter { display:none; }
+    #splitter, #vsplit { display:none; }
     #view { order:1; height:52vh; height:52svh; min-height:280px; max-height:620px; flex:none; border-bottom:1px solid var(--line); }
     #form { order:2; overflow:visible; border-right:none; padding-left:calc(14px + var(--safe-l)); padding-right:calc(14px + var(--safe-r)); }
     #report { order:3; grid-template-columns:1fr; max-height:none; overflow:visible; }
+    #right.sized #report { height:auto; }  /* a height dragged on a wider screen doesn't apply here */
     .actions { bottom:0; padding-bottom:calc(8px + var(--safe-b)); z-index:2; }
     label { grid-template-columns:1fr 140px; }
     #status { right:auto; max-width:calc(100% - 24px); top:auto; bottom:10px; }
@@ -674,6 +685,7 @@
         <p>If OpenRocket and this app disagree, trust the one with your measured masses, and adjust fins or nose weight before flying.</p>
       </article>
     </div>
+    <div id="vsplit" role="separator" aria-orientation="horizontal" aria-label="Resize the 3D view and the report" tabindex="0" title="Drag to resize; double-click to reset"></div>
     <div id="report"></div>
   </section>
 </main>
@@ -1230,6 +1242,40 @@ const CG_COLOR = 0x3d8bfd, CP_COLOR = 0xff5a5a;  // also used for the report's l
   addEventListener('resize', () => { const w = parseFloat(root.style.getPropertyValue('--formw')); if (w && w > maxW()) set(w, false); });
 })();
 
+// ---------- resizable 3D view / report ----------
+// Drag the handle between the 3D view and the report below it; the report's
+// height is remembered in this browser. Arrow keys nudge; double-click resets.
+(() => {
+  const split = document.getElementById('vsplit'), right = document.getElementById('right'), root = document.documentElement;
+  const MIN = 80, maxH = () => Math.max(MIN, right.clientHeight - 140);  // keep some 3D view
+  const set = (h, save) => {
+    h = Math.round(Math.min(maxH(), Math.max(MIN, h)));
+    root.style.setProperty('--reporth', `${h}px`); right.classList.add('sized');
+    if (save) { try { localStorage.setItem('reportHeight', String(h)); } catch {} }
+  };
+  const reset = () => { right.classList.remove('sized'); root.style.removeProperty('--reporth'); try { localStorage.removeItem('reportHeight'); } catch {} };
+  try { const h = Number(localStorage.getItem('reportHeight')); if (h) set(h, false); } catch {}
+  split.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    split.setPointerCapture(e.pointerId); split.classList.add('drag'); document.body.classList.add('vdragging');
+    const bottom = right.getBoundingClientRect().bottom;
+    const move = ev => set(bottom - ev.clientY, false);
+    const up = ev => {
+      set(bottom - ev.clientY, true);
+      split.classList.remove('drag'); document.body.classList.remove('vdragging');
+      split.removeEventListener('pointermove', move); split.removeEventListener('pointerup', up); split.removeEventListener('pointercancel', up);
+    };
+    split.addEventListener('pointermove', move); split.addEventListener('pointerup', up); split.addEventListener('pointercancel', up);
+  });
+  split.addEventListener('dblclick', reset);
+  split.addEventListener('keydown', e => {
+    const cur = document.getElementById('report').getBoundingClientRect().height;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); set(cur + (e.key === 'ArrowUp' ? 30 : -30), true); }
+    else if (e.key === 'Home') { e.preventDefault(); reset(); }
+  });
+  addEventListener('resize', () => { const h = parseFloat(root.style.getPropertyValue('--reporth')); if (h && h > maxH()) set(h, false); });
+})();
+
 // ---------- theme ----------
 // No pinned choice = follow the system (as fevergeon.com and quiverdesignworks.net do).
 const themeBtn = document.getElementById('theme');
@@ -1395,6 +1441,20 @@ function adviceHtml(st) {
     <p>${esc(a.intro)}</p><ol>${a.items.map(i => `<li>${esc(i.text)}${chip(i.est_cal)}</li>`).join('')}</ol>
     <p class="hint">Estimates: build again to check. One change at a time makes it easy to see what helped.</p></div>`;
 }
+// Suggested parachute (server: flight.parachute), with a link to it in the supplies list when there is one.
+function chuteHtml(c, kid) {
+  if (!c) return '';
+  const fts = ms => Math.round(ms * 3.28084);
+  const link = (c.links || [])[0];
+  const buy = link ? `<p class="motorbuy"><a class="shopbtn" href="${esc(link.url)}" target="_blank" rel="sponsored noopener">Get a ${c.size_in}" parachute on Amazon ↗</a></p>
+    <p class="affil">As an Amazon Associate, I earn from qualifying purchases.</p>` : '';
+  const size = c.size_in
+    ? `<b>${c.size_in}-inch</b> parachute (${Math.round(c.size_in * 2.54)} cm across). Your rocket weighs about <b>${Math.round(c.descent_mass_g)} g</b> on the way down, so it lands at about <b>${c.descent_ms} m/s</b> (${fts(c.descent_ms)} ft/s), a gentle landing.`
+    : `parachute at least <b>${Math.round(c.min_diameter_in)} inches</b> across (bigger than the usual hobby sizes) for ${Math.round(c.descent_mass_g)} g.`;
+  const streamer = c.streamer_ok ? ' A rocket this light can use a streamer instead: it comes down faster but drifts less.' : '';
+  return kid ? `<p>Use a ${size}${streamer}${c.size_in ? ' A smaller one lands too hard; a much bigger one drifts far away.' : ''}</p>${buy}`
+             : `<li>Parachute: ${c.size_in ? `${c.size_in} in (at least ${c.min_diameter_in} in needed), about ${c.descent_ms} m/s down` : `at least ${Math.round(c.min_diameter_in)} in`} with ${c.descent_mass_g} g after the motor burns (flat chute, Cd 0.75, for ≤ 4.5 m/s).${streamer}</li>`;
+}
 function kidReportHtml(r) {
   const st = r.stability, cal = st.margin_cal, f = r.flights;
   const best = f.rows.find(x => x.code === f.recommended);
@@ -1429,6 +1489,7 @@ function kidReportHtml(r) {
       </ul>
     </div>
     <div class="kidcard"><h3>How high will it go?</h3>${flight}</div>
+    <div class="kidcard"><h3>Which parachute?</h3>${chuteHtml(r.parachute, true)}</div>
     <div class="kidcard"><h3>What's next?</h3>
       <ol class="steps4">
         <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}.</li>
@@ -1475,7 +1536,7 @@ function showReport(r) {
     </div>
     <div>
       <h2>Build notes</h2>
-      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}
+      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}
       <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
