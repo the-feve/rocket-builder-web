@@ -46,6 +46,7 @@ import notify
 import orders
 import shop
 import supplies
+import terms
 
 STATIC = Path(__file__).resolve().parent / "static"
 GENERATOR_VERSION = "0.1.0"
@@ -198,7 +199,7 @@ def _stls(rocket) -> dict[str, bytes]:
         for p in rocket.parts:
             path = Path(tmp) / f"{p.name}.stl"
             export_stl(p.local, path, tolerance=0.01, angular_tolerance=0.1)
-            out[p.name] = path.read_bytes()
+            out[p.name] = terms.stl_with_header(path.read_bytes())  # licence notice in the STL header
     return out
 
 
@@ -222,7 +223,7 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in stls.items():
             z.writestr(f"{name}.stl", data)
-        lines = ["Rocket Builder build notes", "", report["summary"], ""]
+        lines = ["Rocket Builder build notes", "", terms.SHORT, "(See LICENSE.txt in this ZIP.)", "", report["summary"], ""]
         lines += [f"Note: {n}" for n in report["notes"]]
         lines += ["", "Stability (from the nose tip, mm):", f"  {stab['message']}",
                   f"  CG {stab['cg_mm']}, CP {stab['cp_mm']}, liftoff mass {stab['liftoff_mass_g']} g "
@@ -244,8 +245,9 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
         lines += ["", "Key dimensions (mm):"]
         lines += [f"  {k}: {round(v, 2) if isinstance(v, float) else v}" for k, v in report["dimensions"].items()]
         z.writestr("build_notes.txt", "\n".join(lines) + "\n")
+        z.writestr("LICENSE.txt", terms.LICENSE_TEXT)
         z.writestr("design.json", json.dumps({"generatorVersion": GENERATOR_VERSION, "schemaVersion": SCHEMA_VERSION,
-                                              "params": params}, indent=2))
+                                              "license": terms.SHORT, "params": params}, indent=2))
     return buf.getvalue()
 
 
@@ -733,6 +735,29 @@ def admin_order_status(order_id: str, body: StatusIn, request: Request):
     if not order:
         raise HTTPException(404, "No such order.")
     return order
+
+
+@app.get("/terms", response_class=HTMLResponse)
+def terms_page():
+    """The licence for generated files, as a page (linked from the download and order buttons)."""
+    from html import escape
+    return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>File license · Rocket Builder</title>
+<style>
+:root{{color-scheme:light dark;--ink:#1d1d1f;--bg:#fff;--muted:#6e6e73;--line:#d2d2d7;--accent:#0a58ca}}
+@media (prefers-color-scheme:dark){{:root{{--ink:#f5f5f7;--bg:#111113;--muted:#a1a1a6;--line:#38383d;--accent:#6ea8fe}}}}
+body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,sans-serif}}
+main{{max-width:760px;margin:0 auto;padding:24px 16px 48px}} a{{color:var(--accent)}}
+h1{{font-size:26px;margin:8px 0}} .lead{{color:var(--muted)}}
+.box{{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:16px 0}}
+pre{{white-space:pre-wrap;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0}}
+</style></head><body><main>
+<p><a href="/">← Back to Rocket Builder</a></p>
+<h1>Rocket Builder file license</h1>
+<p class="lead">The rockets you design here are yours to print and fly. The files aren't free to share: please don't upload them, or remixes of them, to MakerWorld, Printables, Thingiverse or any other site. Send friends a link to Rocket Builder instead, so they can design their own.</p>
+<div class="box"><pre>{escape(terms.LICENSE_TEXT)}</pre></div>
+<p class="lead">The same text is in LICENSE.txt in every download.</p>
+</main></body></html>""")
 
 
 @app.get("/ordersupplies")

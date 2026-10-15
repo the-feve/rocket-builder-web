@@ -70,6 +70,8 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] Launch field size with parachute drift (2026-10-15)
 - [x] Paid print orders through Stripe Checkout on the shared account, shipped via the store's Pirate Ship CSV (2026-10-15)
 - [x] Shipping estimate from packed weight and box (2026-10-15)
+- [x] Personal-use file license in downloads, STL headers, /terms and by the download/order buttons (2026-10-15)
+- [ ] Owner: have the file license wording (`server/terms.py`) checked by a lawyer before paid launch
 - [ ] Owner: Stripe restricted key + webhook + `ROCKETGEN_PUBLIC_URL` on Fly (HANDOFF Next steps 7), then one real order and refund
 - [x] Order folder / file names: motor size and a customer code (2026-10-14)
 - [x] Suggested parachute size from the rocket's mass (2026-10-14)
