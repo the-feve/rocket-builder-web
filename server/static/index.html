@@ -48,6 +48,12 @@
   header nav a { color:var(--ink); text-decoration:none; }
   header nav a:hover { text-decoration:underline; text-underline-offset:5px; }
   header .units { color:var(--muted); font-size:12px; }
+  /* Switch between the two builders (same control on Trebuchet Builder) */
+  header nav.apps { gap:2px; padding:2px; border:1px solid var(--line); border-radius:8px; }
+  header nav.apps a { padding:3px 10px; border-radius:6px; font-weight:600; font-size:13px; }
+  header nav.apps a.cur { background:var(--ink); color:var(--bg); }
+  header nav.apps a:hover { text-decoration:none; }
+  header nav.apps a:not(.cur):hover { background:var(--card); }
   #acct { margin-left:auto; flex:none; padding:5px 12px; font:600 12px system-ui, -apple-system, sans-serif; color:var(--ink);
     background:transparent; border:1px solid var(--line); border-radius:6px; cursor:pointer; max-width:45vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #acct:hover { border-color:var(--accent); }
@@ -441,7 +447,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><nav><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint">Order Rocket Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint">Order Rocket Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
