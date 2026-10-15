@@ -69,6 +69,8 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] Compare two rockets side by side (scores, summaries, which is better and why) (2026-10-15)
 - [x] Launch field size with parachute drift (2026-10-15)
 - [x] Launch simulator page: liftoff, ejection, parachute drift in a wind the user sets, field size for it (2026-10-15)
+- [x] Launch simulator inside the 3D view (*▶ Watch it launch*), printer picker, Sources and references page, rocket + trebuchet sections on the supplies page (2026-10-15)
+- [ ] Prices on the supplies page once the Amazon Creators/PA API is available (10 qualifying sales in 30 days); not before (Associates policy)
 - [x] Paid print orders through Stripe Checkout on the shared account, shipped via the store's Pirate Ship CSV (2026-10-15)
 - [x] Shipping estimate from packed weight and box (2026-10-15)
 - [x] Personal-use file license in downloads, STL headers, /terms and by the download/order buttons (2026-10-15)

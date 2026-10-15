@@ -454,7 +454,8 @@ def test_order_supplies_page():
     assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
     g = supplies.gear()
     n = sum(len(c["items"]) for c in g["categories"])
-    assert r.text.count(f"tag={g['storeId']}") == n + len(g["starterKit"]["items"])
+    rocket = r.text.split('id="trebuchet"')[0]  # the Trebuchet section follows when it's mounted
+    assert 'id="rocket"' in rocket and rocket.count(f"tag={g['storeId']}") == n + len(g["starterKit"]["items"])
     for k in g["starterKit"]["items"]:  # kit entries must be items on the list
         assert any(it["asin"] == k["asin"] for c in g["categories"] for it in c["items"]), k["asin"]
     links = client.get("/api/options").json()["motor_links"]
@@ -467,3 +468,44 @@ def test_order_supplies_page():
             assert supplies.ASIN.match(it["asin"]) and it["asin"] not in seen and it["name"] and it["note"]
             seen.add(it["asin"])
     assert client.get("/api/options").json()["supplies_url"] == "/ordersupplies"
+
+
+def test_supplies_page_has_a_trebuchet_section(monkeypatch):
+    """With Trebuchet Builder mounted, /ordersupplies gets a Trebuchet section
+    built from its own list (ids prefixed t-), with jump links to both."""
+    import sys
+    import types
+    import supplies
+    fake = types.SimpleNamespace(
+        gear=lambda: {"storeId": "quiverdesig09-20", "categories": [
+            {"id": "filament", "title": "Filament", "intro": "PLA.", "items": [
+                {"name": "PLA 1 kg", "note": "Any colour.", "search": "pla filament 1kg", "pick": True}]}]},
+        amazon_url=lambda it, store: f"https://www.amazon.com/s?k=x&tag={store}", _icon=lambda cid: "<svg></svg>")
+    monkeypatch.setitem(sys.modules, "treb_supplies", fake)
+    html = client.get("/ordersupplies").text
+    assert 'href="#rocket"' in html and 'href="#trebuchet"' in html
+    treb = html.split('id="trebuchet"')[1]
+    assert 'id="t-filament"' in treb and "PLA 1 kg" in treb and "Find on Amazon" in treb
+    monkeypatch.delitem(sys.modules, "treb_supplies")
+    monkeypatch.setattr(supplies, "_treb", lambda: None)
+    assert 'id="trebuchet"' not in client.get("/ordersupplies").text  # rocket only, when it isn't mounted
+
+
+def test_sources_page_and_links():
+    """Sources and References is served and linked from the guide and the
+    report's build notes and the launch simulator."""
+    r = client.get("/sources")
+    assert r.status_code == 200 and "Sources and references" in r.text
+    for ref in ("Barrowman", "thrustcurve.org", "Model Rocket Safety Code", "openrocket.info", "Our choice"):
+        assert ref in r.text
+    page = client.get("/").text
+    assert page.count('href="/sources"') >= 2 and "/sources#launch" in client.get("/launch").text
+
+
+def test_launch_view_in_designer_and_printer_picker():
+    """The designer has the Watch it launch button and the in-view launch panel
+    (launch.html?embed=1), and a printer picker next to the max height."""
+    page = client.get("/").text
+    assert 'id="launchbtn"' in page and 'id="launchpane"' in page and "&embed=1" in page
+    assert 'id="printer_pick"' in page and 'value="256"' in page
+    assert "classList.add('embed')" in client.get("/launch").text
