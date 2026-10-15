@@ -43,7 +43,7 @@ The nose plug is lighter than a real nose cone, so pick the loosest N plug that 
 
 | Size | Printer | Filament | Best J | Best N | Notes |
 |---|---|---|---|---|---|
-| M13 | | | | | |
+| M13 | P1S | PLA | J15–J20 (J20 good slip fit, fine with glue; J15 a little tight but works; J10 needs excessive force; J05 won't go in) | below N15 (N15 slips but is too loose for a cone; N20–N30 all too loose). Nose should feel like J20 | Round 1, 2026-10-16. The shorter nose shoulder feels looser at the same clearance. Round 2: `files/round2/` |
 | M18 | | | | | |
 | M24 | | | | | |
 | M29 | | | | | |
