@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
 <title>Launch Simulator · Rocket Builder</title>
 <script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
+<script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');  // inside the designer's 3D view</script>
 <style>
   :root {
     --bg:#fff; --panel:#fff; --card:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea;
@@ -63,6 +65,11 @@
   @media (prefers-reduced-motion: reduce) { .wind-dash { animation:none !important; } }
   .wind-dash { animation:wind 1.2s linear infinite; }
   @keyframes wind { to { stroke-dashoffset:-24; } }
+  /* Embedded in the designer (index.html #launchpane): no header or intro, tighter edges. */
+  .embed header, .embed #intro { display:none; }
+  .embed main { padding:8px 12px 24px; display:flex; flex-direction:column; }
+  .embed .stage { order:-1; margin-top:0; }  /* the flight first; the controls and numbers below it */
+  .embed .controls { margin-top:10px; }
 </style>
 </head>
 <body>
@@ -96,7 +103,7 @@
       <div id="fieldtxt"></div>
     </div>
   </section>
-  <p class="note">A rough estimate: a two-dimensional flight with steady wind, the rocket turning into the wind off the rod, and the parachute drifting with the breeze. Real wind gusts and changes with height, so leave room to spare.</p>
+  <p class="note">A rough estimate: a two-dimensional flight with steady wind, the rocket turning into the wind off the rod, and the parachute drifting with the breeze. Real wind gusts and changes with height, so leave room to spare. <a href="/sources#launch" target="_blank">How it's worked out</a>.</p>
 </main>
 <script>
 const $ = id => document.getElementById(id);

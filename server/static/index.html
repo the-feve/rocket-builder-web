@@ -112,6 +112,12 @@
   #viewopts { position:absolute; z-index:1; right:12px; top:10px; display:flex; gap:12px; background:var(--chip); border:1px solid var(--line);
     padding:4px 10px; border-radius:6px; font-size:12px; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
   #viewopts label { display:flex; margin:0; gap:5px; align-items:center; }
+  #viewopts { z-index:3; }
+  #viewopts button.go { background:var(--ink); color:var(--bg); border-color:var(--ink); font-weight:600; }
+  /* The launch simulator (launch.html?embed=1) over the 3D view; the scene and report stay as they are. */
+  #launchpane { position:absolute; inset:0; z-index:2; padding-top:46px; background:var(--panel); }
+  #launchpane iframe { width:100%; height:100%; border:0; display:block; background:var(--panel); }
+  #view.launching #status, #view.launching .v3d { display:none; }
   #report { padding:10px 16px calc(10px + var(--safe-b)) 16px; padding-right:calc(16px + var(--safe-r)); background:var(--panel); border-top:1px solid var(--line);
     max-height:32vh; max-height:32dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:6px 24px; }
   #report h2 { font-size:13px; margin:6px 0 4px; }
@@ -457,7 +463,7 @@
 </script>
 </head>
 <body>
-<header><h1>Rocket Builder</h1><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint">Order Rocket Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
+<header><h1>Rocket Builder</h1><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint; trebuchet parts too">Order Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
@@ -500,7 +506,13 @@
     <fieldset><legend>Body</legend>
       <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
       <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. It comes first because it decides which rocket heights will work. If your rocket is taller than the printer, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <label data-tstep="3"><span>Your printer</span> <select id="printer_pick" aria-describedby="printerhint">
+        <option value="">Other / type it below</option>
+        <option value="180">Bambu Lab A1 mini (180 mm)</option><option value="256">Bambu Lab A1, P1S, X1C (256 mm)</option>
+        <option value="180">Prusa MINI+ (180 mm)</option><option value="220">Prusa MK4S (220 mm)</option><option value="270">Prusa CORE One (270 mm)</option>
+        <option value="250">Creality Ender-3 V3 SE, K1 (250 mm)</option><option value="265">Elegoo Neptune 4 Pro (265 mm)</option></select></label>
       <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
+      <p class="hint" id="printerhint" data-tstep="3">Pick your printer to fill in its height, or type the height (the Z size in its specs).</p>
       <div class="step beg" data-tstep="4"><span class="n">4</span>How tall is your rocket?</div>
       <p class="why beg" data-tstep="4">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
       <input type="range" class="slider beg" id="heightslider" data-tstep="4" min="150" max="900" step="10" aria-label="Rocket height">
@@ -578,10 +590,12 @@
       <div id="progress" hidden><div></div></div>
       <div id="status">Set the options and press Build.</div>
       <div id="viewopts">
-        <label><input type="checkbox" id="explode"> Exploded</label>
-        <label><input type="checkbox" id="section"> Section</label>
+        <button type="button" id="launchbtn" class="go" hidden aria-controls="launchpane" aria-expanded="false">▶ Watch it launch</button>
+        <label class="v3d"><input type="checkbox" id="explode"> Exploded</label>
+        <label class="v3d"><input type="checkbox" id="section"> Section</label>
         <button type="button" id="guidebtn" aria-controls="guide" aria-expanded="true">Guide</button>
       </div>
+      <div id="launchpane" hidden><iframe id="launchframe" title="Launch simulator"></iframe></div>
       <article id="kidguide" aria-label="Quick start" hidden>
         <button type="button" class="close" id="kidskip">Skip tutorial</button>
         <h2>Welcome, rocket builder!</h2>
@@ -629,14 +643,14 @@
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
         <button type="button" class="backkid beg" id="backkid">← Quick start</button>
         <h2>How to use Rocket Builder</h2>
-        <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>.</p>
+        <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>. Where the numbers come from: <a href="/sources" target="_blank">Sources and references</a>.</p>
         <div class="supplynote" data-supplies hidden><b>Need to get your own supplies for building and launching?</b> <a href="#" data-supplies-link target="_blank" rel="noopener">Order through my link here to support me!</a>
           <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
-        <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-files">Your files</a><a href="#guide-or">OpenRocket</a></nav>
+        <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-files">Your files</a><a href="#guide-or">OpenRocket</a><a href="/sources" target="_blank">Sources</a></nav>
         <ol id="guide-use">
           <li>Choose a <b>mode</b> and the <b>motor size</b> you'll fly (on the left).</li>
           <li>Set the size and shapes, then press <b>Build</b>. The first build of a new design takes 10–30 s; a bar along the top shows progress.</li>
-          <li>The rocket appears here. Drag to rotate, scroll to zoom. <b>Exploded</b> pulls the parts apart; <b>Section</b> cuts it in half to show the inside.</li>
+          <li>The rocket appears here. Drag to rotate, scroll to zoom. <b>Exploded</b> pulls the parts apart; <b>Section</b> cuts it in half to show the inside. <b>▶ Watch it launch</b> plays its flight right here: liftoff, parachute and drift in the wind you set, and the field it needs; <b>◀ Back to 3D model</b> returns to the same rocket.</li>
           <li>Read the report under the view (explained below), pick a flight motor, then <b>Download STLs (ZIP)</b>.</li>
           <li><b>New rocket</b> / <b>Save</b> keep the design on this site (listed under <i>My rockets</i> in this browser); <b>Copy link</b> shares a read-only copy; <b>Download file</b> saves the settings to your computer and <b>Open file</b> loads them back.</li>
         </ol>
@@ -830,6 +844,7 @@ const reportEl = document.getElementById('report');
 const guideEl = document.getElementById('guide'), kidGuideEl = document.getElementById('kidguide'), guideBtn = document.getElementById('guidebtn');
 let builtOnce = false;
 function showGuide(on, which) {
+  if (on && document.getElementById('launchpane').hidden === false) openLaunch(false);  // the guide replaces the launch panel
   which = which || (document.body.classList.contains('beginner') ? 'kid' : 'full');
   guideEl.hidden = !(on && which === 'full'); kidGuideEl.hidden = !(on && which === 'kid');
   guideBtn.setAttribute('aria-expanded', String(!!on));
@@ -1175,6 +1190,7 @@ function refreshHeights(dir = 0) {
   if (mode !== 'beginner') return heightsReady;
   const ph = form.elements.print_max_height, n = ++hSeq;
   ph.value = Math.min(500, Math.max(50, Math.round(Number(ph.value) || opts.defaults.print_max_height)));
+  syncPrinter();
   const q = new URLSearchParams({ motor: form.elements.motor.value, print_max_height: ph.value,
     fin_shape: form.elements.fin_shape.value, nose_shape: form.elements.nose_shape.value });
   return heightsReady = (async () => {
@@ -1183,7 +1199,7 @@ function refreshHeights(dir = 0) {
     if (n !== hSeq) return;
     if (!r.ranges.length && r.printer_min && Number(ph.value) < r.printer_min) {
       const was = ph.value;
-      ph.value = r.printer_min;
+      ph.value = r.printer_min; syncPrinter();
       await refreshHeights(dir);
       snapNote(`A <b>${was} mm</b> printer is too short for a ${esc(form.elements.motor.value)} rocket, so the printer height moved up to <b>${r.printer_min} mm</b>, the smallest that works.` +
         (hSnapEl.hidden ? '' : ' ' + hSnapEl.innerHTML));
@@ -1204,6 +1220,20 @@ function refreshHeights(dir = 0) {
 hBox.addEventListener('change', () => { const v = Number(hBox.value); snapNote(''); snapHeight(Math.sign(v - hPrev)); });
 hSlider.addEventListener('change', () => { const v = Number(hBox.value); snapNote(''); snapHeight(Math.sign(v - hPrev)); });
 for (const k of ['motor', 'print_max_height', 'fin_shape', 'nose_shape']) form.elements[k].addEventListener('change', () => refreshHeights(0));
+// Printer picker: fills in the printer's max print height (its Z size);
+// typing a height that no listed printer has switches it to "Other".
+const printerPick = document.getElementById('printer_pick');
+function syncPrinter() {
+  const v = String(Math.round(Number(form.elements.print_max_height.value)));
+  if (printerPick.value !== v) printerPick.value = [...printerPick.options].some(o => o.value === v) ? v : '';
+}
+printerPick.addEventListener('change', () => {
+  if (!printerPick.value) { form.elements.print_max_height.focus(); return; }
+  form.elements.print_max_height.value = printerPick.value;
+  form.elements.print_max_height.dispatchEvent(new Event('input', { bubbles: true }));
+  form.elements.print_max_height.dispatchEvent(new Event('change', { bubbles: true }));
+});
+form.elements.print_max_height.addEventListener('input', syncPrinter);
 
 // ---------- "press Build" notice and progress bar ----------
 const dirtyEl = document.getElementById('dirty');
@@ -1239,6 +1269,38 @@ function stopProgress() {
 
 // ---------- viewer ----------
 const view = document.getElementById('view');
+// Launch simulator in the 3D view: launch.html?embed=1 in a panel over the
+// canvas, so going back to the model needs no rebuild. Shown once a build has
+// a safe motor (a field size); the report's links open the same panel.
+const launchBtn = document.getElementById('launchbtn'), launchPane = document.getElementById('launchpane'),
+  launchFrame = document.getElementById('launchframe');
+let launchId = null;
+function setLaunch(r) {
+  launchId = r && r.field && r.id ? r.id : null;
+  launchBtn.hidden = !launchId;
+  if (!launchId) openLaunch(false);
+}
+function openLaunch(on) {
+  on = !!(on && launchId);
+  if (on) {
+    showGuide(false);
+    const src = `/launch?build=${encodeURIComponent(launchId)}&embed=1`;
+    if (launchFrame.getAttribute('src') !== src) launchFrame.src = src;
+  }
+  launchPane.hidden = !on;
+  view.classList.toggle('launching', on);
+  launchBtn.textContent = on ? '◀ Back to 3D model' : '▶ Watch it launch';
+  launchBtn.setAttribute('aria-expanded', on);
+}
+launchBtn.addEventListener('click', () => openLaunch(launchPane.hidden));
+reportEl.addEventListener('click', e => {
+  const a = e.target.closest('a[data-launch]');
+  if (!a || !launchId) return;
+  e.preventDefault();
+  openLaunch(true);
+  if (view.getBoundingClientRect().top < 0) view.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+addEventListener('keydown', e => { if (e.key === 'Escape' && !launchPane.hidden) openLaunch(false); });
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
 // iPhones report 3x; 2x looks the same on a rocket preview and is far lighter on the GPU and battery.
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -1637,7 +1699,7 @@ function fieldHtml(f, kid) {
 // The launch simulator (launch.html): liftoff, parachute and drift in a wind the user sets.
 function launchLink(r, kid) {
   if (!r.field || !r.id) return '';
-  const a = `<a href="/launch?build=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">${kid ? '▶ Watch it launch' : 'Launch simulator'}</a>`;
+  const a = `<a href="/launch?build=${encodeURIComponent(r.id)}" data-launch>${kid ? '▶ Watch it launch' : 'Launch simulator'}</a>`;
   return kid ? `<p>${a}: see it take off, open its parachute and drift, and set the wind to see the field you need.</p>`
              : `<li>${a}: the flight and landing spot in any wind, and the field size for it.</li>`;
 }
@@ -1781,7 +1843,7 @@ function showReport(r) {
     </div>
     <div>
       <h2>Build notes</h2>
-      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}${launchLink(r, false)}
+      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}${launchLink(r, false)}<li>How these numbers are worked out: <a href="/sources" target="_blank">Sources and references</a>.</li>
       <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
@@ -1817,7 +1879,7 @@ async function runBuild() {
   if (!form.reportValidity()) return;
   buildBtn.disabled = true; zipBtn.classList.add('off');
   const t0 = performance.now(), seq = edits;
-  startProgress();
+  startProgress(); openLaunch(false);
   // On a phone the preview sits above the form: bring it into view so the result is seen.
   if (matchMedia('(max-width: 800px)').matches && view.getBoundingClientRect().bottom < 80) view.scrollIntoView({ behavior: 'smooth', block: 'start' });
   try {
@@ -1834,7 +1896,7 @@ async function runBuild() {
     builtOnce = true; lastReport = body;
     rememberBuild(body);
     if (tutStep) tutEnd(true, '<b>You built your first rocket!</b> Check its stability score. Every step is unlocked now, so try changing things and building again.');
-    showReport(body); showGuide(false);
+    showReport(body); showGuide(false); setLaunch(body);
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
     zipBtn.classList.toggle('off', !body.stability.ok);
     zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';

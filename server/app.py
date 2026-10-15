@@ -812,6 +812,12 @@ def order_supplies():
     return HTMLResponse(supplies.page(), headers=PAGE_HEADERS)
 
 
+@app.get("/sources")
+def sources_page():
+    """Sources and References: where each calculation and number comes from."""
+    return FileResponse(STATIC / "sources.html", headers=PAGE_HEADERS)
+
+
 @app.get("/launch")
 def launch_page():
     """The launch simulation: liftoff, parachute, landing, field size (`/launch?build=<id>`)."""

@@ -1,4 +1,7 @@
-"""The "Order Rocket Supplies" page (/ordersupplies): Amazon affiliate links.
+"""The "Order Supplies" page (/ordersupplies): Amazon affiliate links, in a
+Rocket Builder section and, when Trebuchet Builder is mounted in this app
+(trebuchet_mount.py), a Trebuchet Builder section read from its own list
+(treb_supplies.py / treb_gear.json in that repo), so nothing is copied.
 
 The list is server/gear.json (moved here from the fevergeon.com site on
 2026-10-14): categories of items, each with an ASIN, a name, a note and an
@@ -101,9 +104,47 @@ def _starter_kit(store: str) -> str:
                     f'<span class="num">{n}</span><span class="pic">{_icon(cat)}</span>'
                     f'<span class="txt"><strong>{escape(it["name"])}</strong><span class="note">{escape(k["why"])}</span>'
                     f'<span class="cta">View on Amazon ↗</span></span></a></li>')
-    return (f'<section class="kit" id="starter-kit"><h2>{escape(kit["title"])}</h2><p>{escape(kit["intro"])}</p>'
+    return (f'<section class="kit" id="starter-kit"><h3>{escape(kit["title"])}</h3><p>{escape(kit["intro"])}</p>'
             f'<ol class="kitlist">{"".join(rows)}</ol><p class="kitnote">Then browse the full list below for spares, '
             f'bigger parachutes, filament, glue and paint.</p></section>')
+
+
+def _treb():
+    """Trebuchet Builder's supplies module, when it's mounted here (its server/
+    is then on sys.path), else None."""
+    try:
+        import treb_supplies
+        return treb_supplies
+    except Exception:
+        return None
+
+
+def _card(url: str, pic: str, it: dict, cta: str) -> str:
+    return (f'<li><a href="{escape(url)}" target="_blank" rel="sponsored noopener">'
+            f'<span class="pic">{pic}</span><span class="txt">'
+            + ('<span class="tag">Start here</span>' if it.get("pick") else "")
+            + f'<strong>{escape(it["name"])}</strong><span class="note">{escape(it["note"])}</span>'
+            f'<span class="cta">{cta}</span></span></a></li>')
+
+
+def _trebuchet_section() -> str:
+    """The trebuchet's categories (ids prefixed "t-": both lists have a filament one)."""
+    t = _treb()
+    if t is None:
+        return ""
+    g = t.gear()
+    store = g.get("storeId", "")
+    toc = "".join(f'<a href="#t-{escape(c["id"])}">{escape(c["title"])}</a>' for c in g["categories"])
+    secs = []
+    for c in g["categories"]:
+        cards = "".join(_card(t.amazon_url(it, store), (f'<img src="{escape(it["photo"])}" alt="" loading="lazy">' if it.get("photo")
+                              else t._icon(c["id"])), it, f'{"View" if it.get("asin") else "Find"} on Amazon ↗') for it in c["items"])
+        secs.append(f'<section id="t-{escape(c["id"])}"><h3><span class="hicon">{t._icon(c["id"])}</span>{escape(c["title"])}</h3>'
+                    f'<p>{escape(c["intro"])}</p><ul class="items">{cards}</ul></section>')
+    return (f'<section class="builder" id="trebuchet"><h2>Trebuchet Builder</h2><p class="bl">Bearings, bolts, sling cord, '
+            f'counterweight fill and things to throw for a desk trebuchet from '
+            f'<a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a>.</p>'
+            f'<nav class="toc" aria-label="Trebuchet categories">{toc}</nav>{"".join(secs)}</section>')
 
 
 def page() -> str:
@@ -112,18 +153,15 @@ def page() -> str:
     toc = "".join(f'<a href="#{escape(c["id"])}">{escape(c["title"])}</a>' for c in g["categories"])
     sections = []
     for c in g["categories"]:
-        cards = []
-        for it in c["items"]:
-            pic = (f'<img src="{escape(it["photo"])}" alt="" loading="lazy">' if it.get("photo") else _icon(c["id"]))
-            cards.append(
-                f'<li><a href="{escape(amazon_url(it["asin"], store))}" target="_blank" rel="sponsored noopener">'
-                f'<span class="pic">{pic}</span><span class="txt">'
-                + ('<span class="tag">Start here</span>' if it.get("pick") else "")
-                + f'<strong>{escape(it["name"])}</strong><span class="note">{escape(it["note"])}</span>'
-                f'<span class="cta">View on Amazon ↗</span></span></a></li>')
-        sections.append(f'<section id="{escape(c["id"])}"><h2><span class="hicon">{_icon(c["id"])}</span>{escape(c["title"])}</h2>'
-                        f'<p>{escape(c["intro"])}</p><ul class="items">{"".join(cards)}</ul></section>')
-    return _PAGE.replace("{{KIT}}", _starter_kit(store)).replace("{{TOC}}", toc).replace("{{SECTIONS}}", "".join(sections)).replace("{{DISCLOSURE}}", DISCLOSURE)
+        cards = "".join(_card(amazon_url(it["asin"], store), (f'<img src="{escape(it["photo"])}" alt="" loading="lazy">' if it.get("photo")
+                                else _icon(c["id"])), it, "View on Amazon ↗") for it in c["items"])
+        sections.append(f'<section id="{escape(c["id"])}"><h3><span class="hicon">{_icon(c["id"])}</span>{escape(c["title"])}</h3>'
+                        f'<p>{escape(c["intro"])}</p><ul class="items">{cards}</ul></section>')
+    treb = _trebuchet_section()
+    builders = ('<nav class="builders" aria-label="Builders"><a href="#rocket">Rocket Builder</a><a href="#trebuchet">Trebuchet Builder</a></nav>'
+                if treb else "")
+    return (_PAGE.replace("{{BUILDERS}}", builders).replace("{{KIT}}", _starter_kit(store)).replace("{{TOC}}", toc)
+            .replace("{{SECTIONS}}", "".join(sections)).replace("{{TREBUCHET}}", treb).replace("{{DISCLOSURE}}", DISCLOSURE))
 
 
 _PAGE = """<!doctype html>
@@ -131,7 +169,7 @@ _PAGE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Order Rocket Supplies · Rocket Builder</title>
+<title>Order Supplies · Rocket Builder and Trebuchet Builder</title>
 <meta name="description" content="Launch pads, motors, igniters, parachutes, filament, glue and paint for 3D-printed model rockets from Rocket Builder.">
 <style>
   :root { color-scheme:light; --bg:#fff; --card:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#0a58ca; --warn:#9a6700; }
@@ -160,8 +198,15 @@ _PAGE = """<!doctype html>
   .toc a { font-size:.9rem; border:1px solid var(--line); border-radius:999px; padding:3px 12px; text-decoration:none; color:var(--ink); }
   .toc a:hover { border-color:var(--accent); }
   section { scroll-margin-top:12px; margin-top:28px; }
-  h2 { display:flex; align-items:center; gap:10px; font-size:1.3rem; margin:0 0 4px; }
-  h2 .hicon svg { width:30px; height:30px; display:block; color:var(--accent); }
+  h3 { display:flex; align-items:center; gap:10px; font-size:1.3rem; margin:0 0 4px; }
+  .builder { margin-top:36px; padding-top:18px; border-top:3px solid var(--ink); }
+  .builder > h2 { font-size:clamp(1.4rem, 5vw, 1.8rem); margin:0 0 2px; }
+  .builder > .bl { color:var(--muted); margin:0 0 8px; }
+  .builders { display:flex; gap:8px; margin:14px 0 0; }
+  .builders a { flex:1; max-width:240px; text-align:center; padding:10px 14px; border-radius:10px; border:2px solid var(--ink); color:var(--ink);
+    font-weight:700; text-decoration:none; }
+  .builders a:hover { background:var(--ink); color:var(--bg); }
+  h3 .hicon svg { width:30px; height:30px; display:block; color:var(--accent); }
   section > p { margin:0 0 12px; color:var(--muted); }
   .items { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:12px; }
   .items a { display:grid; grid-template-columns:84px 1fr; gap:14px; align-items:start; height:100%; padding:12px; border:1px solid var(--line);
@@ -177,7 +222,7 @@ _PAGE = """<!doctype html>
   .tag { align-self:flex-start; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent);
     border:1px solid var(--accent); border-radius:999px; padding:0 8px; }
   .kit { margin:22px 0 8px; padding:18px 18px 10px; border:2px solid var(--accent); border-radius:12px; }
-  .kit h2 { margin:0 0 2px; }
+  .kit h3 { margin:0 0 2px; }
   .kitlist { list-style:none; padding:0; margin:12px 0 4px; display:grid; gap:10px; }
   .kitlist a { display:grid; grid-template-columns:28px 64px 1fr; gap:12px; align-items:center; padding:10px; border:1px solid var(--line);
     border-radius:10px; color:var(--ink); text-decoration:none; background:var(--bg); transition:border-color .15s; }
@@ -193,13 +238,18 @@ _PAGE = """<!doctype html>
 <body>
 <header><div class="brand"><a href="/">Rocket Builder</a></div><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="/">← Back to the designer</a><a href="https://quiverdesignworks.net">Quiver Design Works</a></nav></header>
 <main>
-  <h1>Order rocket supplies</h1>
-  <p class="lede">Everything you need to build and fly a rocket from Rocket Builder, apart from the rocket itself: a launch pad, motors, igniters, parachutes, filament, glue and paint. Items marked <b>Start here</b> are what I'd buy first.</p>
+  <h1>Order supplies</h1>
+  <p class="lede">Everything you need besides the printed parts, for each builder. Items marked <b>Start here</b> are what I'd buy first.</p>
   <div class="notice"><b>Ordering through these links supports me and Rocket Builder</b>, at no extra cost to you.
     <small>{{DISCLOSURE}} Links open Amazon, where you'll see the current price. Motors are bought and handled by a grown-up.</small></div>
+  {{BUILDERS}}
+  <section class="builder" id="rocket"><h2>Rocket Builder</h2>
+  <p class="bl">A launch pad, motors, igniters, parachutes, filament, glue and paint for a rocket from Rocket Builder.</p>
   {{KIT}}
-  <nav class="toc" aria-label="Categories">{{TOC}}</nav>
+  <nav class="toc" aria-label="Rocket categories">{{TOC}}</nav>
   {{SECTIONS}}
+  </section>
+  {{TREBUCHET}}
 </main>
 <footer>{{DISCLOSURE}} · <a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net">Quiver Design Works</a></footer>
 </body>
