@@ -68,9 +68,9 @@ function render() {
   out.innerHTML = list.map(o => {
     const s = o.shipping, when = new Date(o.created_at * 1000).toLocaleString();
     return `<div class="card">
-      <div><h2>${esc(o.id)}</h2><small>Batch ${esc(o.batch)} · ${esc(when)}</small><br>
+      <div><h2>${esc(o.name || o.id)}</h2><small>Batch ${esc(o.batch)} · ${esc(when)}</small><br>
         <b>${esc(o.design_name)}</b> × ${o.quantity} · ${esc(o.material)}, ${esc(o.color)}</div>
-      <div><small>Customer</small><br>${esc(o.email)}${o.coupon ? `<br><small>Coupon ${esc(o.coupon)}</small>` : ''}</div>
+      <div><small>Customer${o.customer ? ' ' + esc(o.customer) : ''}</small><br>${esc(o.email)}${o.coupon ? `<br><small>Coupon ${esc(o.coupon)}</small>` : ''}</div>
       <div><small>Ship to</small><br>${esc(s.name)}<br>${esc(s.line1)}${s.line2 ? '<br>' + esc(s.line2) : ''}<br>${esc(s.city)}, ${esc(s.state)} ${esc(s.zip)}${s.phone ? '<br>' + esc(s.phone) : ''}</div>
       <div class="actions"><span class="st ${esc(o.status)}">${esc(o.status)}</span>
         <select data-id="${esc(o.id)}" aria-label="Status">${['new', 'printing', 'shipped', 'cancelled'].map(v => `<option ${v === o.status ? 'selected' : ''}>${v}</option>`).join('')}</select>

@@ -1,8 +1,10 @@
 """Print orders: someone signed in asks for a printed copy of their rocket.
 
 Each order gets an id like RB-20261014-001 and belongs to a batch, the day it
-came in (B20261014), so a day's prints can be planned together. Its files go
-to ORDERS_DIR/<batch>/<order id>/:
+came in (B20261014), so a day's prints can be planned together. Its name adds
+the motor size and the customer's code, RB-20261014-001_M18_C7KQ2MX (the code
+is the same for every order from one account). Its files go to
+ORDERS_DIR/<batch>/<order name>/ (orders from before names: <order id>/):
 
     ORDER.txt        the batch sheet: order, customer, shipping, parts to print
     order.json       the same, machine-readable
@@ -19,6 +21,8 @@ Payment isn't built yet: an order needs a valid coupon code
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import io
 import json
 import os
@@ -60,8 +64,17 @@ def coupon_ok(code: str | None) -> bool:
     return bool(code) and code.strip().upper() in coupon_codes()
 
 
+def customer_code(user_id: str) -> str:
+    """A short, stable code for an account (no email in file names): C + 6 characters."""
+    return "C" + base64.b32encode(hashlib.sha256(user_id.encode()).digest()).decode()[:6]
+
+
+def order_name(order_id: str, motor: str, user_id: str) -> str:
+    return f"{order_id}_{motor}_{customer_code(user_id)}"
+
+
 def folder(order: dict) -> Path:
-    return ORDERS_DIR / order["batch"] / order["id"]
+    return ORDERS_DIR / order["batch"] / order.get("name", order["id"])
 
 
 def _public(row) -> dict:
@@ -72,11 +85,11 @@ def _public(row) -> dict:
 def _sheet(o: dict) -> str:
     s = o["shipping"]
     when = datetime.fromtimestamp(o["created_at"], timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    lines = [f"ROCKET BUILDER PRINT ORDER {o['id']}", f"Batch {o['batch']}   Received {when}   Status {o['status']}", "",
+    lines = [f"ROCKET BUILDER PRINT ORDER {o.get('name', o['id'])}", f"Batch {o['batch']}   Received {when}   Status {o['status']}", "",
              f"Rocket: {o['design_name']}" + (f"   (saved design /d/{o['design_id']})" if o.get("design_id") else ""),
              f"Quantity: {o['quantity']}   Filament: {o['material']}   Colour: {o['color']}",
              f"Price: ${o['price']:.2f}" + (f" (coupon {o['coupon']})" if o.get("coupon") else ""), "",
-             "Customer", f"  {o['email']}", "", "Ship to", f"  {s['name']}", f"  {s['line1']}"]
+             "Customer", f"  {o['email']}" + (f"   (customer {o['customer']})" if o.get("customer") else ""), "", "Ship to", f"  {s['name']}", f"  {s['line1']}"]
     if s.get("line2"):
         lines.append(f"  {s['line2']}")
     lines += [f"  {s['city']}, {s['state']} {s['zip']}", f"  {s.get('country') or 'USA'}"]
@@ -107,6 +120,8 @@ def create(*, user: dict, design_name: str, design_id: str | None, params: dict,
         con.execute("BEGIN IMMEDIATE")  # the day's sequence number can't be taken twice
         n = con.execute("SELECT COUNT(*) FROM orders WHERE batch = ?", (f"B{day}",)).fetchone()[0] + 1
         order_id = f"RB-{day}-{n:03d}"
+        data["name"] = order_name(order_id, params.get("motor", "M"), user["id"])
+        data["customer"] = customer_code(user["id"])
         con.execute("INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     (order_id, f"B{day}", user["id"], user["email"], "new", json.dumps(data), now, now))
     order = get(order_id)

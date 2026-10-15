@@ -136,3 +136,27 @@ def pick(flights: list[Flight], target_m: float) -> Flight | None:
     """The safe flight closest to the target altitude (on a log scale)."""
     ok = [f for f in flights if f.ok and f.apogee > 0]
     return min(ok, key=lambda f: abs(math.log(f.apogee / target_m)), default=None)
+
+
+# Recovery: hobby parachutes are sold by flat diameter in inches.
+CHUTE_SIZES_IN = (12, 15, 18, 24, 30, 36)
+CHUTE_CD = 0.75  # a flat plastic or nylon hobby chute, on its flat diameter
+SAFE_DESCENT_MS = 4.5  # about 15 ft/s: lands without damage, doesn't drift far
+AIR_DENSITY = 1.225
+
+
+def descent_rate(mass_g: float, diameter_in: float) -> float:
+    """Steady descent speed (m/s) under a flat chute of this diameter."""
+    area = math.pi * (diameter_in * 0.0254 / 2) ** 2
+    return math.sqrt(2 * mass_g / 1000 * 9.81 / (AIR_DENSITY * CHUTE_CD * area))
+
+
+def parachute(descent_mass_g: float) -> dict:
+    """The smallest standard chute that brings `descent_mass_g` (the rocket
+    after the motor has burned) down at a safe speed, and how fast. Light
+    rockets can use a streamer instead."""
+    need_in = math.sqrt(8 * descent_mass_g / 1000 * 9.81 / (math.pi * AIR_DENSITY * CHUTE_CD * SAFE_DESCENT_MS ** 2)) / 0.0254
+    size = next((s for s in CHUTE_SIZES_IN if s >= need_in), None)
+    return {"descent_mass_g": round(descent_mass_g, 1), "min_diameter_in": round(need_in, 1), "size_in": size,
+            "descent_ms": round(descent_rate(descent_mass_g, size), 1) if size else None,
+            "streamer_ok": descent_mass_g < 40}

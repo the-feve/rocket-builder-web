@@ -150,6 +150,20 @@ def test_score_advice_outside_the_sweet_spot():
     assert 1 <= st["margin_cal"] <= 2 and st["advice"] is None
 
 
+def test_parachute_suggestion():
+    """Every build suggests a standard chute size that lands it at a safe
+    speed, links to it when the supplies list has that size, and says so in
+    the build notes. A heavier rocket needs a bigger chute."""
+    from rocketgen.flight import CHUTE_SIZES_IN, SAFE_DESCENT_MS, parachute
+    r = client.post("/api/build", json={}).json()
+    c = r["parachute"]
+    assert c["size_in"] in CHUTE_SIZES_IN and c["size_in"] >= c["min_diameter_in"] and c["descent_ms"] <= SAFE_DESCENT_MS
+    assert c["links"] and f'{c["size_in"]}"' in c["links"][0]["name"]
+    z = zipfile.ZipFile(io.BytesIO(client.get(f"/api/builds/{r['id']}/rocket.zip").content))
+    assert f"Parachute: {c['size_in']} in" in z.read("build_notes.txt").decode()
+    assert parachute(400)["size_in"] > parachute(60)["size_in"] and parachute(5000)["size_in"] is None
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]
@@ -244,6 +258,9 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     files = {f.name for f in orders.folder(o).iterdir()}
     assert {"ORDER.txt", "order.json", "design.json", "build_notes.txt", "Aft.stl", "Nose.stl"} <= files
     assert "Ellensburg, WA 98926" in (orders.folder(o) / "ORDER.txt").read_text()
+    # Named with the motor size and the customer's code (same code on every order from one account).
+    assert o["name"] == f"{oid}_M18_{o['customer']}" and orders.folder(o).name == o["name"]
+    assert len(o["customer"]) == 7 and o["customer"].startswith("C") and o["email"] not in o["name"]
 
     # Only the owner (signed in) or the PC sync (token) sees all orders.
     assert kid.get("/api/admin/orders").status_code == 403
@@ -253,6 +270,7 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     assert oid in [x["id"] for x in listing["orders"]]
     z = sync.get(f"/api/admin/orders/{oid}/files.zip", headers={"Authorization": "Bearer sync-secret"})
     assert z.status_code == 200 and zipfile.ZipFile(io.BytesIO(z.content)).namelist()
+    assert f'filename="{o["name"]}.zip"' in z.headers["content-disposition"]
     owner = TC(app)
     owner.post("/api/auth/signup", json={"email": "owner@example.com", "password": "rocket123", "age_ok": True})
     assert owner.post(f"/api/admin/orders/{oid}/status", json={"status": "shipped"}).json()["status"] == "shipped"

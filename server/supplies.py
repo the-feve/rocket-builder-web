@@ -76,6 +76,20 @@ def motor_links() -> dict[str, list[dict]]:
     return out
 
 
+def parachute_links() -> dict[int, list[dict]]:
+    """Parachute diameter in inches -> affiliate links, read from the item
+    names (e.g. 'Estes 18" Parachute') in the parachutes category."""
+    g, out = gear(), {}
+    for c in g["categories"]:
+        if "parachute" not in (c.get("id", "") + c.get("title", "")).lower():
+            continue
+        for it in c["items"]:
+            m = re.search(r'(\d+)\s*(?:"|in\b|inch)', it["name"])
+            if m:
+                out.setdefault(int(m.group(1)), []).append({"name": it["name"], "url": amazon_url(it["asin"], g.get("storeId", ""))})
+    return out
+
+
 def _starter_kit(store: str) -> str:
     kit = gear().get("starterKit")
     if not kit:
