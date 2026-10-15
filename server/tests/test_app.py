@@ -259,6 +259,7 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)  # paid orders off: no coupon is a 402
     monkeypatch.setattr(appmod, "ADMIN_EMAILS", {"owner@example.com"})
     monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", True)
     ship = {"name": "Pat", "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "zip": "98926"}
     order = {"design_name": "Zoomer", "params": {}, "quantity": 2, "color": "Red", "shipping": ship, "coupon": "launchday"}
 
@@ -300,6 +301,34 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     assert owner.get("/admin").status_code == 200
 
 
+def test_ordering_closed_to_public_until_opened(monkeypatch):
+    """ROCKETGEN_ORDERING unset: customers get "coming soon", admins can still
+    place (and so test) orders; opening it lets everyone order."""
+    import app as appmod
+    from fastapi.testclient import TestClient as TC
+    monkeypatch.setenv("ROCKETGEN_COUPON_CODES", "LAUNCHDAY")
+    monkeypatch.setattr(appmod, "ADMIN_EMAILS", {"boss@example.com"})
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", False)
+    ship = {"name": "Pat", "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "zip": "98926"}
+    order = {"design_name": "Zoomer", "params": {}, "quantity": 1, "color": "Red", "shipping": ship, "coupon": "LAUNCHDAY"}
+    assert TC(app).get("/api/options").json()["ordering_open"] is False
+
+    customer = TC(app)
+    r = customer.post("/api/auth/signup", json={"email": "fan@example.com", "password": "rocket123", "age_ok": True})
+    assert r.json()["user"]["can_order"] is False
+    r = customer.post("/api/orders", json=order)
+    assert r.status_code == 403 and "coming soon" in r.json()["detail"]
+
+    boss = TC(app)
+    assert boss.post("/api/auth/signup", json={"email": "boss@example.com", "password": "rocket123", "age_ok": True}).json()["user"]["can_order"] is True
+    assert boss.get("/api/auth/me").json()["user"]["can_order"] is True
+    assert boss.post("/api/orders", json=order).status_code == 200
+
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", True)
+    assert customer.get("/api/auth/me").json()["user"]["can_order"] is True
+    assert customer.post("/api/orders", json=order).status_code == 200
+
+
 def test_paid_order_through_stripe_checkout(monkeypatch):
     """Without a coupon the order waits for payment and the reply carries a
     Stripe Checkout URL (priced from shop.json, tagged rocket-builder, with a
@@ -313,6 +342,7 @@ def test_paid_order_through_stripe_checkout(monkeypatch):
     monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_x")
     monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
     monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", True)
     sent = {}
 
     def fake_session(order, q, origin):
