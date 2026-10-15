@@ -1618,6 +1618,13 @@ function fieldHtml(f, kid) {
       <li>On a calm day the smaller size is fine. Don't launch if the wind is over 20 mph.</li>` : ''}
     </ul></div>`;
 }
+// The launch simulator (launch.html): liftoff, parachute and drift in a wind the user sets.
+function launchLink(r, kid) {
+  if (!r.field || !r.id) return '';
+  const a = `<a href="/launch?build=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">${kid ? '▶ Watch it launch' : 'Launch simulator'}</a>`;
+  return kid ? `<p>${a}: see it take off, open its parachute and drift, and set the wind to see the field you need.</p>`
+             : `<li>${a}: the flight and landing spot in any wind, and the field size for it.</li>`;
+}
 function kidReportHtml(r) {
   const st = r.stability, cal = st.margin_cal, f = r.flights;
   const best = f.rows.find(x => x.code === f.recommended);
@@ -1652,7 +1659,7 @@ function kidReportHtml(r) {
     </div>
     <div class="kidcard"><h3>How high will it go?</h3>${flight}</div>
     <div class="kidcard"><h3>Which parachute?</h3>${chuteHtml(r.parachute, true)}</div>
-    <div class="kidcard"><h3>How big a launch field?</h3>${fieldHtml(r.field, true)}</div>
+    <div class="kidcard"><h3>How big a launch field?</h3>${fieldHtml(r.field, true)}${launchLink(r, true)}</div>
     <div class="kidcard"><h3>What's next?</h3>
       <ol class="steps4">
         <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}. They're just for you: <a href="/terms" target="_blank" rel="noopener">please don't share them online</a>.</li>
@@ -1700,7 +1707,7 @@ function showReport(r) {
     </div>
     <div>
       <h2>Build notes</h2>
-      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}
+      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}${launchLink(r, false)}
       <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>

@@ -184,6 +184,32 @@ def test_launch_field_size():
     assert f"Launch field: at least {f['recommended_m']} m" in z.read("build_notes.txt").decode()
 
 
+def test_launch_simulator():
+    """The launch page flies the recommended motor in the wind the user sets:
+    it goes up, opens the chute, lands downwind (further in more wind), and
+    the field covers the landing spot and is never under the NAR minimum."""
+    r = client.post("/api/build", json={}).json()
+    page = client.get("/launch")
+    assert page.status_code == 200 and "Launch simulator" in page.text
+    calm = client.get(f"/api/builds/{r['id']}/launch?wind_mph=0").json()
+    windy = client.get(f"/api/builds/{r['id']}/launch?wind_mph=15").json()
+    assert calm["code"] == r["flights"]["recommended"] and calm["safe"]
+    ev = calm["events"]
+    assert ev["rod"]["t"] < ev["burnout"]["t"] < ev["apogee"]["t"] < ev["landing"]["t"] and ev["eject"]["t"] < ev["landing"]["t"]
+    assert abs(calm["landing_m"]) < 1 and calm["field"]["length_m"] == calm["field"]["nar_min_m"]
+    assert windy["landing_m"] > 20 and windy["apogee_m"] < calm["apogee_m"]  # weathercocks, then drifts
+    f = windy["field"]
+    assert f["length_m"] >= f["pad_from_upwind_m"] + windy["landing_m"] and f["width_m"] == f["nar_min_m"]
+    assert ev["landing"]["speed_ms"] <= r["parachute"]["descent_ms"] + 0.3
+    other = next(m for m in calm["motors"] if m["code"] != calm["code"])
+    alt = client.get(f"/api/builds/{r['id']}/launch?motor={other['code']}&delay={other['delays'][0]}").json()
+    assert alt["code"] == other["code"] and alt["delay_s"] == other["delays"][0]
+    assert client.get(f"/api/builds/{r['id']}/launch?wind_mph=50").status_code == 422
+    assert client.get(f"/api/builds/{r['id']}/launch?delay=99").status_code == 422
+    assert client.get("/api/builds/nope/launch").status_code == 404
+    assert "The NAR Safety Code" in client.get(f"/api/builds/{r['id']}/launch?wind_mph=25").json()["warnings"][-1]
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]

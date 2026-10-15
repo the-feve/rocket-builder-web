@@ -68,6 +68,7 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] Score advice outside the 1-2 cal sweet spot, with predicted scores (2026-10-14)
 - [x] Compare two rockets side by side (scores, summaries, which is better and why) (2026-10-15)
 - [x] Launch field size with parachute drift (2026-10-15)
+- [x] Launch simulator page: liftoff, ejection, parachute drift in a wind the user sets, field size for it (2026-10-15)
 - [x] Paid print orders through Stripe Checkout on the shared account, shipped via the store's Pirate Ship CSV (2026-10-15)
 - [x] Shipping estimate from packed weight and box (2026-10-15)
 - [x] Personal-use file license in downloads, STL headers, /terms and by the download/order buttons (2026-10-15)
