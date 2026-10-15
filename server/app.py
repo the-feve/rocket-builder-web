@@ -36,7 +36,8 @@ from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
-from rocketgen.flight import FIELD_M, field_size, heaviest, motors_for, parachute, pick, simulate
+from rocketgen.flight import (CHUTE_SIZES_IN, FIELD_M, MAX_WIND_MPH, MPH, field_size, heaviest, launch_profile,
+                              motors_for, parachute, pick, simulate)
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
 from rocketgen.stability import MAX_FIN_SCALE, Balance, advice, build_stable, recovery_allowance_g
 
@@ -134,6 +135,19 @@ ORDERS_PER_DAY = int(os.environ.get("ROCKETGEN_ORDERS_PER_DAY", 10))
 SUPPLIES_URL = os.environ.get("ROCKETGEN_SUPPLIES_URL", "/ordersupplies")
 # Who can see every order: signed-in accounts with these emails, or the PC sync with this token.
 ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get("ROCKETGEN_ADMIN_EMAILS", "").split(",") if e.strip()}
+# Printed-rocket ordering is closed to the public until the owner opens it:
+# `fly secrets set ROCKETGEN_ORDERING=open`. While closed, only admin accounts
+# (ROCKETGEN_ADMIN_EMAILS) can order, coupon or paid, so the whole flow can be
+# tested end to end; everyone else sees "coming soon".
+ORDERING_OPEN = os.environ.get("ROCKETGEN_ORDERING", "closed").strip().lower() == "open"
+
+
+def can_order(user: dict | None) -> bool:
+    return ORDERING_OPEN or bool(user and user["email"] in ADMIN_EMAILS)
+
+
+def user_json(user: dict) -> dict:
+    return {"email": user["email"], "prefs": user["prefs"], "can_order": can_order(user)}
 SYNC_TOKEN = os.environ.get("ROCKETGEN_SYNC_TOKEN", "")
 
 app = FastAPI(title="Rocket Builder")
@@ -256,6 +270,7 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
 def options():
     return {
         "supplies_url": SUPPLIES_URL,
+        "ordering_open": ORDERING_OPEN,  # false: printed rockets show as "coming soon" (admins can still order)
         "motor_links": supplies.motor_links(),  # motor (e.g. "B4-4") -> Amazon packs, for "Get these motors"
         "motors": sorted(load_motors()),
         "fin_shapes": [s.value for s in FinShape],
@@ -435,6 +450,34 @@ def _get(build_id: str) -> tuple[dict, dict]:
     return b, _geo[b["geo"]]
 
 
+@app.get("/api/builds/{build_id}/launch")
+def launch(build_id: str, request: Request, wind_mph: float = 10.0, motor: str | None = None, delay: int | None = None):
+    """A simulated flight for the launch page: liftoff, ejection, the
+    parachute ride down in this much wind, and the field it needs."""
+    _rate_limit(request, "launch", 120, 600)
+    if not 0 <= wind_mph <= 30:
+        raise HTTPException(422, "Wind speed must be between 0 and 30 mph.")
+    b, g = _get(build_id)
+    p, bal = b["params"], g["balance"]
+    motors = {m.code: m for m in motors_for(p["motor"])}
+    code = motor or b["flights"]["recommended"] or p.get("flight_motor")
+    m = motors.get(code) if code else None
+    if m is None:
+        raise HTTPException(422, "No motor of this size flies this rocket safely; pick one from the motor list.")
+    if delay is not None and delay not in m.delays:
+        raise HTTPException(422, f"The {m.code} comes with delays of {', '.join(map(str, m.delays))} s.")
+    rec = b["stability"]["recovery_mass_g"]
+    chute = parachute(bal.printed_mass_g + rec + m.mass_g - m.prop_g)
+    out = launch_profile(m, bal.printed_mass_g + rec, bal.body_od, chute["size_in"] or max(CHUTE_SIZES_IN),
+                         wind_mph * MPH, delay, p["drag_cd"], p["launch_rod_m"])
+    row = next((r for r in b["flights"]["rows"] if r["code"] == m.code), None)
+    out.update(wind_mph=wind_mph, max_wind_mph=MAX_WIND_MPH, motors=[
+        {"code": r["code"], "delays": list(motors[r["code"]].delays), "ok": not r["problems"], "problems": r["problems"]}
+        for r in b["flights"]["rows"]], recommended=b["flights"]["recommended"], safe=bool(row and not row["problems"]),
+        problems=row["problems"] if row else [], parachute=chute)
+    return out
+
+
 @app.get("/api/builds/{build_id}/preview.glb")
 def preview(build_id: str):
     return Response(_get(build_id)[1]["glb"], media_type="model/gltf-binary")
@@ -494,7 +537,7 @@ def current_user(request: Request) -> dict | None:
 
 
 def _signed_in(user: dict, request: Request) -> JSONResponse:
-    res = JSONResponse({"user": {"email": user["email"], "prefs": user["prefs"]}})
+    res = JSONResponse({"user": user_json(user)})
     https = request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
     res.set_cookie(SESSION_COOKIE, accounts.new_session(user["id"]), max_age=accounts.SESSION_DAYS * 86400,
                    httponly=True, samesite="lax", secure=https, path="/")
@@ -533,7 +576,7 @@ def logout(rb_session: str | None = Cookie(None)):
 @app.get("/api/auth/me")
 def me(request: Request):
     user = current_user(request)
-    return {"user": {"email": user["email"], "prefs": user["prefs"]} if user else None}
+    return {"user": user_json(user) if user else None}
 
 
 class Prefs(BaseModel):
@@ -615,6 +658,8 @@ def place_order(o: OrderIn, request: Request):
     user = current_user(request)
     if not user:
         raise HTTPException(401, "Sign in (or create an account) to order a printed rocket.")
+    if not can_order(user):
+        raise HTTPException(403, "Printed rockets are coming soon. You can download the files and print it yourself now.")
     free = bool(o.coupon.strip())
     if free and not orders.coupon_ok(o.coupon):
         raise HTTPException(402, "That coupon code isn't valid.")
@@ -765,6 +810,12 @@ pre{{white-space:pre-wrap;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monosp
 def order_supplies():
     """Launch pads, motors, recovery, filament and paint: Amazon affiliate links (server/gear.json)."""
     return HTMLResponse(supplies.page(), headers=PAGE_HEADERS)
+
+
+@app.get("/launch")
+def launch_page():
+    """The launch simulation: liftoff, parachute, landing, field size (`/launch?build=<id>`)."""
+    return FileResponse(STATIC / "launch.html", headers=PAGE_HEADERS)
 
 
 @app.get("/admin")

@@ -184,6 +184,32 @@ def test_launch_field_size():
     assert f"Launch field: at least {f['recommended_m']} m" in z.read("build_notes.txt").decode()
 
 
+def test_launch_simulator():
+    """The launch page flies the recommended motor in the wind the user sets:
+    it goes up, opens the chute, lands downwind (further in more wind), and
+    the field covers the landing spot and is never under the NAR minimum."""
+    r = client.post("/api/build", json={}).json()
+    page = client.get("/launch")
+    assert page.status_code == 200 and "Launch simulator" in page.text
+    calm = client.get(f"/api/builds/{r['id']}/launch?wind_mph=0").json()
+    windy = client.get(f"/api/builds/{r['id']}/launch?wind_mph=15").json()
+    assert calm["code"] == r["flights"]["recommended"] and calm["safe"]
+    ev = calm["events"]
+    assert ev["rod"]["t"] < ev["burnout"]["t"] < ev["apogee"]["t"] < ev["landing"]["t"] and ev["eject"]["t"] < ev["landing"]["t"]
+    assert abs(calm["landing_m"]) < 1 and calm["field"]["length_m"] == calm["field"]["nar_min_m"]
+    assert windy["landing_m"] > 20 and windy["apogee_m"] < calm["apogee_m"]  # weathercocks, then drifts
+    f = windy["field"]
+    assert f["length_m"] >= f["pad_from_upwind_m"] + windy["landing_m"] and f["width_m"] == f["nar_min_m"]
+    assert ev["landing"]["speed_ms"] <= r["parachute"]["descent_ms"] + 0.3
+    other = next(m for m in calm["motors"] if m["code"] != calm["code"])
+    alt = client.get(f"/api/builds/{r['id']}/launch?motor={other['code']}&delay={other['delays'][0]}").json()
+    assert alt["code"] == other["code"] and alt["delay_s"] == other["delays"][0]
+    assert client.get(f"/api/builds/{r['id']}/launch?wind_mph=50").status_code == 422
+    assert client.get(f"/api/builds/{r['id']}/launch?delay=99").status_code == 422
+    assert client.get("/api/builds/nope/launch").status_code == 404
+    assert "The NAR Safety Code" in client.get(f"/api/builds/{r['id']}/launch?wind_mph=25").json()["warnings"][-1]
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]
@@ -259,6 +285,7 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)  # paid orders off: no coupon is a 402
     monkeypatch.setattr(appmod, "ADMIN_EMAILS", {"owner@example.com"})
     monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", True)
     ship = {"name": "Pat", "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "zip": "98926"}
     order = {"design_name": "Zoomer", "params": {}, "quantity": 2, "color": "Red", "shipping": ship, "coupon": "launchday"}
 
@@ -300,6 +327,34 @@ def test_print_order_with_coupon_and_admin(monkeypatch):
     assert owner.get("/admin").status_code == 200
 
 
+def test_ordering_closed_to_public_until_opened(monkeypatch):
+    """ROCKETGEN_ORDERING unset: customers get "coming soon", admins can still
+    place (and so test) orders; opening it lets everyone order."""
+    import app as appmod
+    from fastapi.testclient import TestClient as TC
+    monkeypatch.setenv("ROCKETGEN_COUPON_CODES", "LAUNCHDAY")
+    monkeypatch.setattr(appmod, "ADMIN_EMAILS", {"boss@example.com"})
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", False)
+    ship = {"name": "Pat", "line1": "1 Main St", "city": "Ellensburg", "state": "WA", "zip": "98926"}
+    order = {"design_name": "Zoomer", "params": {}, "quantity": 1, "color": "Red", "shipping": ship, "coupon": "LAUNCHDAY"}
+    assert TC(app).get("/api/options").json()["ordering_open"] is False
+
+    customer = TC(app)
+    r = customer.post("/api/auth/signup", json={"email": "fan@example.com", "password": "rocket123", "age_ok": True})
+    assert r.json()["user"]["can_order"] is False
+    r = customer.post("/api/orders", json=order)
+    assert r.status_code == 403 and "coming soon" in r.json()["detail"]
+
+    boss = TC(app)
+    assert boss.post("/api/auth/signup", json={"email": "boss@example.com", "password": "rocket123", "age_ok": True}).json()["user"]["can_order"] is True
+    assert boss.get("/api/auth/me").json()["user"]["can_order"] is True
+    assert boss.post("/api/orders", json=order).status_code == 200
+
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", True)
+    assert customer.get("/api/auth/me").json()["user"]["can_order"] is True
+    assert customer.post("/api/orders", json=order).status_code == 200
+
+
 def test_paid_order_through_stripe_checkout(monkeypatch):
     """Without a coupon the order waits for payment and the reply carries a
     Stripe Checkout URL (priced from shop.json, tagged rocket-builder, with a
@@ -313,6 +368,7 @@ def test_paid_order_through_stripe_checkout(monkeypatch):
     monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_x")
     monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
     monkeypatch.setattr(appmod, "SYNC_TOKEN", "sync-secret")
+    monkeypatch.setattr(appmod, "ORDERING_OPEN", True)
     sent = {}
 
     def fake_session(order, q, origin):

@@ -182,6 +182,14 @@
     background:linear-gradient(90deg, #e5484d 0 25%, #30a46c 25% 50%, #7cc68f 50% 75%, #f5a524 75% 100%); }
   .meter i { position:absolute; top:-5px; width:4px; height:24px; margin-left:-2px; border-radius:2px; background:var(--ink); box-shadow:0 0 0 2px var(--card); }
   .meter-labels { display:grid; grid-template-columns:repeat(4, 1fr); font-size:11px; color:var(--muted); text-align:center; }
+  /* Beginner flight card: power and launch-speed bars, same look as the stability meter */
+  .bar-title { margin:10px 0 0; font-size:13px; font-weight:600; }
+  .bar-title b { font-variant-numeric:tabular-nums; }
+  .bar-title .good { color:var(--ok); } .bar-title .bad { color:var(--err); }
+  .meter.bar { margin-top:6px; }
+  .meter-labels.n3 { grid-template-columns:1fr 1fr 1fr; }
+  .whynot { margin:6px 0 0; padding-left:18px; font-size:13.5px; line-height:1.45; }
+  .whynot li { margin:4px 0; }
   .tips { margin:6px 0 0; padding-left:18px; font-size:13.5px; line-height:1.45; }
   .tips li { margin:3px 0; }
   /* "How to improve the score": outside the 1-2 cal sweet spot */
@@ -321,6 +329,8 @@
   .orderrow .printbtn { background:linear-gradient(135deg, #0a58ca, #3b5bdb); }
   .orderrow .shopbtn { background:linear-gradient(135deg, #b45309, #c2410c); }
   .orderrow .printbtn:hover, .orderrow .shopbtn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+  .orderrow .printbtn.soon { background:#5b6773; cursor:default; }
+  .orderrow .printbtn.soon:hover { filter:none; transform:none; }
   .orderrow .ico { flex:none; font-size:26px; line-height:1; }
   .orderrow small { display:block; margin-top:2px; font:500 13px system-ui, -apple-system, sans-serif; opacity:.9; }
   .motorbuy { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 2px; }
@@ -634,7 +644,7 @@
 
         <h3 id="guide-modes">Modes</h3>
         <div class="cols">
-          <dl><dt>Beginner</dt><dd>Made for young builders (about grades 3–7): numbered steps, each explaining what it does in plain words. Motor size, your printer's max height, then the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit; slider or typed; heights that can't be split into printable pieces move to the closest one that can), then fin shape (swept, delta or trapezoid) and nose shape picked from pictures. Everything else uses proven defaults, and the fins size themselves so the rocket is stable. The report shows a stability score meter, the best motor and how high it should fly, and next steps; the full numbers are under <i>Grown-up details</i>. The <b>Guide</b> button opens a quick start, which links to this full guide.</dd></dl>
+          <dl><dt>Beginner</dt><dd>Made for young builders (about grades 3–7): numbered steps, each explaining what it does in plain words. Motor size, your printer's max height, then the <b>overall height</b> you want (nose tip to fin tips; the body length is worked out to fit; slider or typed; heights that can't be split into printable pieces move to the closest one that can), then fin shape (swept, delta or trapezoid) and nose shape picked from pictures. Everything else uses proven defaults, and the fins size themselves so the rocket is stable. The report shows a stability score meter, the best motor and how high it should fly, a <b>power</b> bar (motor push ÷ rocket weight, 5× or more passes) and a launch-speed bar (15 m/s or more off the rod), and next steps. When no motor passes it shows the closest motor's bars, why each motor fails in plain words, and the weight that would pass; the full numbers are under <i>Grown-up details</i>. The <b>Guide</b> button opens a quick start, which links to this full guide.</dd></dl>
           <dl><dt>Advanced</dt><dd>Every setting: body length instead of overall height, wall thickness, a body OD offset for a fatter rocket (the actual OD is shown under it), fin count, thickness, fillets and custom fin size, nose fineness, launch lugs, filament, and the flight check (target altitude, which motor to check, recovery mass, drag, launch rod). Switching modes carries the size across.</dd></dl>
         </div>
 
@@ -1624,6 +1634,55 @@ function fieldHtml(f, kid) {
       <li>On a calm day the smaller size is fine. Don't launch if the wind is over 20 mph.</li>` : ''}
     </ul></div>`;
 }
+// The launch simulator (launch.html): liftoff, parachute and drift in a wind the user sets.
+function launchLink(r, kid) {
+  if (!r.field || !r.id) return '';
+  const a = `<a href="/launch?build=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">${kid ? '▶ Watch it launch' : 'Launch simulator'}</a>`;
+  return kid ? `<p>${a}: see it take off, open its parachute and drift, and set the wind to see the field you need.</p>`
+             : `<li>${a}: the flight and landing spot in any wind, and the field size for it.</li>`;
+}
+// Beginner flight card: why a motor can't fly the rocket, in plain words
+// (server: flight.simulate problems; the limits are MIN_* in flight.py).
+const WHY_NOT = {
+  'Too heavy for this motor': 'Too heavy: the motor has to push at least 5 times as hard as the rocket weighs. With less push it climbs slowly and can tip over.',
+  'Slow off the rod': 'Too slow off the launch rod: it needs at least 15 m/s (34 mph) when it leaves the rod, or the fins can\'t steer it yet and the wind can tip it.',
+  'Too low for recovery': 'Too low: it has to get at least 30 m (100 ft) up so the parachute has time to open.',
+  'Unstable': 'Wobbly with this motor: the stability score drops under 1.',
+};
+// A meter like the stability one: value on a 0..max scale over coloured zones.
+function barHtml(v, max, zones, labels, aria) {
+  let at = 0;
+  const grad = zones.map(([to, c]) => { const a = at; at = to / max * 100; return `${c} ${a}% ${at}%`; }).join(', ');
+  const pos = Math.max(0, Math.min(max, v)) / max * 100;
+  return `<div class="meter bar" role="img" aria-label="${esc(aria)}" style="background:linear-gradient(90deg, ${grad})"><i style="left:${pos}%"></i></div>
+    <div class="meter-labels n${labels.length}">${labels.map(l => `<span>${l}</span>`).join('')}</div>`;
+}
+// Power (thrust ÷ weight) and launch speed for one motor, with what they mean.
+function powerHtml(x) {
+  const tw = x.thrust_to_weight, rod = x.rod_speed_ms, twOk = tw >= 5, rodOk = rod >= 15;
+  const RED = '#e5484d', GREEN = '#30a46c', LIGHT = '#7cc68f';
+  // Liftoff weight that would give 5× push with this motor (thrust is fixed, so weight scales).
+  const maxG = Math.floor(x.liftoff_g * tw / 5);
+  const rodTip = rodOk ? '' : `<p>${twOk ? 'Enough push, but' : 'And'} it leaves the rod too slowly for the fins to steer. A lighter rocket helps, or a longer launch rod (Advanced mode) gives it more room to speed up.</p>`;
+  return `<p class="bar-title">Power: the motor pushes <b class="${twOk ? 'good' : 'bad'}">${tw}×</b> the rocket's weight</p>
+    ${barHtml(tw, 15, [[5, RED], [10, GREEN], [15, LIGHT]], ['under 5× too heavy', '5–10× good', '10×+ lots of power'], `Thrust ${tw} times the weight on a scale from 0 to 15`)}
+    <p>${twOk ? `Your rocket weighs about <b>${x.liftoff_g} g</b> with the ${esc(x.motor)} loaded${rodOk ? ', light enough for a quick, straight climb' : ''}.`
+                : `Your rocket weighs about <b>${x.liftoff_g} g</b> with the ${esc(x.motor)} loaded. For 5× it should weigh under <b>${maxG} g</b>.`}</p>
+    <p class="bar-title">Speed leaving the launch rod: <b class="${rodOk ? 'good' : 'bad'}">${rod} m/s</b> (${Math.round(rod * 2.237)} mph)</p>
+    ${barHtml(rod, 30, [[15, RED], [30, GREEN]], ['under 15 too slow', '15+ fast enough'], `Speed off the rod ${rod} metres per second on a scale from 0 to 30`)}${rodTip}`;
+}
+// No motor works: the closest one, why each motor fails, and what to change.
+function noMotorHtml(f) {
+  const close = f.rows.slice().sort((a, b) => a.problems.length - b.problems.length || b.thrust_to_weight - a.thrust_to_weight)[0];
+  if (!close) return '<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 2).</p>';
+  const seen = [...new Set(f.rows.flatMap(x => x.problems))];
+  const heavy = seen.includes('Too heavy for this motor') || seen.includes('Slow off the rod');
+  return `<p>No motor of this size can fly this rocket safely yet. The closest is the <b>${esc(close.motor)}</b>:</p>
+    ${powerHtml(close)}
+    <p class="bar-title">Why the motors don't pass</p>
+    <ul class="whynot">${seen.map(p => `<li>${esc(WHY_NOT[p] || p)} <span class="hint">(${f.rows.filter(x => x.problems.includes(p)).map(x => esc(x.motor)).join(', ')})</span></li>`).join('')}</ul>
+    <p><b>Try:</b> ${heavy ? 'a <b>shorter rocket</b> (step 4) so it weighs less, or a <b>bigger motor size</b> (step 2) for more push.' : 'a bigger motor size (step 2).'} Every row is in the motor picker under Grown-up details.</p>`;
+}
 function kidReportHtml(r) {
   const st = r.stability, cal = st.margin_cal, f = r.flights;
   const best = f.rows.find(x => x.code === f.recommended);
@@ -1640,8 +1699,9 @@ function kidReportHtml(r) {
   const flight = best
     ? `<p>Best motor: <b>${esc(best.motor)}</b>. It should fly about <b>${best.apogee_m} m</b> (${Math.round(best.apogee_m * FT)} ft) high${best.apogee_m >= 9 ? `, as high as a <b>${Math.round(best.apogee_m / 3)}-story building</b>` : ''}!</p>
        <p>The last number in the motor name is the <b>delay</b>: ${best.delay_s} seconds after the motor stops pushing, it pops the nose off so the parachute comes out near the top of the flight.</p>
+       ${powerHtml(best)}
        ${motorBuyHtml(best.motor)}`
-    : `<p>No motor of this size can fly this rocket safely yet. Try a shorter rocket, or a bigger motor size (step 2).</p>`;
+    : noMotorHtml(f);
   return `<div class="kid">
     <div class="kidcard ${st.status === 'unstable' ? 'bad' : ''}">
       <h3>Stability score</h3>
@@ -1658,7 +1718,7 @@ function kidReportHtml(r) {
     </div>
     <div class="kidcard"><h3>How high will it go?</h3>${flight}</div>
     <div class="kidcard"><h3>Which parachute?</h3>${chuteHtml(r.parachute, true)}</div>
-    <div class="kidcard"><h3>How big a launch field?</h3>${fieldHtml(r.field, true)}</div>
+    <div class="kidcard"><h3>How big a launch field?</h3>${fieldHtml(r.field, true)}${launchLink(r, true)}</div>
     <div class="kidcard"><h3>What's next?</h3>
       <ol class="steps4">
         <li><b>Download</b> the files to print${st.ok ? '' : ' (after the score is at least 1)'}. They're just for you: <a href="/terms" target="_blank" rel="noopener">please don't share them online</a>.</li>
@@ -1677,9 +1737,24 @@ function kidReportHtml(r) {
 function orderRowHtml(ok, kid) {
   const shop = opts.supplies_url ? `<a class="shopbtn" href="${esc(opts.supplies_url)}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">🧰</span>
     <span>Order rocket supplies<small>Motors, launch pad, igniters, parachutes</small></span></a>` : '';
-  return `<div class="orderrow">${ok ? `<button type="button" class="printbtn" data-order><span class="ico" aria-hidden="true">🚀</span>
-    <span>${kid ? 'Order it printed for you' : 'Order a printed rocket'}<small>We print it and mail it to you</small></span></button>` : ''}${shop}</div>
+  // Printed rockets are "coming soon" until the owner opens ordering (ROCKETGEN_ORDERING=open);
+  // admin accounts still get the button so the whole flow can be tested.
+  const canOrder = opts.ordering_open || user?.can_order;
+  const print = !ok ? '' : canOrder
+    ? `<button type="button" class="printbtn" data-order><span class="ico" aria-hidden="true">🚀</span>
+    <span>${kid ? 'Order it printed for you' : 'Order a printed rocket'}<small>We print it and mail it to you</small></span></button>`
+    : `<div class="printbtn soon" role="note"><span class="ico" aria-hidden="true">🚀</span>
+    <span>Printed rockets: coming soon<small>For now, download the files and print it yourself</small></span></div>`;
+  return `<div class="orderrow" data-ok="${ok ? 1 : 0}" data-kid="${kid ? 1 : 0}">${print}${shop}</div>
     ${shop ? '<p class="affil">Ordering through my supplies links supports Rocket Builder. As an Amazon Associate, I earn from qualifying purchases.</p>' : ''}`;
+}
+// Signing in or out can change whether this person may order: redraw the rows on screen.
+function refreshOrderRows() {
+  document.querySelectorAll('.orderrow[data-ok]').forEach(row => {
+    const t = document.createElement('div');
+    t.innerHTML = orderRowHtml(row.dataset.ok === '1', row.dataset.kid === '1');
+    row.replaceWith(t.querySelector('.orderrow'));
+  });
 }
 
 function showReport(r) {
@@ -1706,7 +1781,7 @@ function showReport(r) {
     </div>
     <div>
       <h2>Build notes</h2>
-      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}
+      <ul><li>${esc(r.summary)}</li>${r.notes.map(n => `<li>${esc(n)}</li>`).join('')}${chuteHtml(r.parachute, false)}${fieldHtml(r.field, false)}${launchLink(r, false)}
       <li>STLs in the ZIP are in print orientation, resting on z = 0.</li></ul>
       <h2>Key dimensions (mm)</h2>
       <table>${Object.entries(r.dimensions).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>
@@ -1979,6 +2054,7 @@ function renderUser() {
   acctBtn.title = user ? 'Your account: settings, orders, sign out' : 'Sign in or create an account';
   document.getElementById('acctnote').hidden = !!user;
   document.getElementById('acctlinks').hidden = !user;
+  refreshOrderRows();
 }
 async function afterSignIn(u, created) {
   user = u; renderUser();
