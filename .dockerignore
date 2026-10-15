@@ -9,3 +9,8 @@ server/screenshots
 .git
 .github
 fly.toml
+trebuchet/.git
+trebuchet/.github
+trebuchet/geometry/report
+trebuchet/geometry/tests
+trebuchet/server/tests
