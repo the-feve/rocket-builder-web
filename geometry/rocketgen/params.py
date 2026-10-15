@@ -57,6 +57,14 @@ class DesignParams:
     custom_fin_size: bool = False
     fin_scale: float = 1.0  # the website's stability auto-size (standard sizes only); not in the FeatureScript
     wall: float | None = None  # tube, nose and mount wall; None = the settings CSV (1.5 mm). Website only.
+    # Radial clearances, shoulder into socket; None = fit_slip from the settings CSV.
+    # Separate so the glued body joints and the loose nose (it must slide out at
+    # ejection) can differ. Website only; see fit_test.py and geometry/fit_test/.
+    fit_joint: float | None = None
+    fit_nose: float | None = None
+    # 45-degree chamfer on the bottom outer edge of every shoulder: takes off
+    # the first layers' elephant foot and gives a lead-in. 0 = none (the FeatureScript's).
+    shoulder_chamfer: float = 0.0
     fin_root_chord: float = 40.0
     fin_span: float = 20.0
     fin_tip_chord: float = 20.0
@@ -107,6 +115,10 @@ class Derived:
     joint_rise: float
     inner_taper_rise: float
     nose_shoulder_len: float = 0.0
+    fit_nose: float = 0.0
+    nose_shoulder_od: float = 0.0
+    nose_joint_rise: float = 0.0
+    shoulder_chamfer: float = 0.0
     thread: dict = field(default_factory=dict)
 
 
@@ -174,7 +186,8 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     mtr_d, mtr_len, mtr_hang = m["mtr_d"], m["mtr_len"], m["mtr_hang"]
     z_margin = settings["z_margin"]
     wall = params.wall if params.wall else settings["wall"]
-    fit_slip = settings["fit_slip"]
+    fit_slip = settings["fit_slip"] if params.fit_joint is None else params.fit_joint
+    fit_nose = settings["fit_slip"] if params.fit_nose is None else params.fit_nose
     fit_press = settings["fit_press"]
     mtr_clear = settings["mtr_clear"]
 
@@ -184,6 +197,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     body_id = body_od - 2 * wall
     cal = body_od
     shoulder_od = body_id - 2 * fit_slip
+    nose_shoulder_od = body_id - 2 * fit_nose
     shoulder_len = max(0.75 * cal - 4.0, 10.0)
     # The nose's insert is 30% shorter than a body joint's (owner's request,
     # 2026-10-09: a shorter transition); body-to-body joints keep the full length.
@@ -199,6 +213,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     has_mount = (body_id - mount_od) / 2 >= wall
     aft_socket_base = bay_len + block_thickness + ((body_id - bay_id) / 2 if has_mount else 0.0)
     joint_rise = (body_od - shoulder_od) / 2
+    nose_joint_rise = (body_od - nose_shoulder_od) / 2
     inner_taper_rise = (body_id / 2 - (shoulder_od / 2 - wall)) / math.tan(math.radians(8))
 
     return Derived(
@@ -208,5 +223,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
         has_mount=has_mount, bay_len=bay_len, zmax=zmax, stop_depth=stop_depth,
         block_thickness=block_thickness, aft_socket_base=aft_socket_base,
         joint_rise=joint_rise, inner_taper_rise=inner_taper_rise, nose_shoulder_len=nose_shoulder_len, thread=thread,
+        fit_nose=fit_nose, nose_shoulder_od=nose_shoulder_od, nose_joint_rise=nose_joint_rise,
+        shoulder_chamfer=params.shoulder_chamfer,
     )
 

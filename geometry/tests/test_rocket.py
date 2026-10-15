@@ -395,3 +395,37 @@ def test_score_advice_estimates_match_rebuilds():
     ok = Balance(build_rocket(p.with_(body_length=body_length_for(p, 312), fin_scale=1.15)))
     if 1.0 <= ok.check().margin_cal <= 2.0:
         assert advice(ok, ok.check(), motors_for("M18"), beginner=True) is None
+
+
+def test_separate_nose_and_joint_fits():
+    """fit_joint / fit_nose move only their own shoulder; defaults stay fit_slip."""
+    base = compute_derived(DesignParams())
+    assert base.nose_shoulder_od == base.shoulder_od and base.nose_joint_rise == base.joint_rise
+    d = compute_derived(DesignParams(fit_joint=0.1, fit_nose=0.25))
+    assert d.shoulder_od == pytest.approx(d.body_id - 0.2)
+    assert d.nose_shoulder_od == pytest.approx(d.body_id - 0.5)
+    assert d.nose_joint_rise == pytest.approx(d.wall + 0.25)
+
+
+def test_fit_test_coupons_seat_without_overlap():
+    """Every M13 plug is one sound solid, clears the socket when seated on the
+    countersink and touches it 0.05 mm lower (so it seats on the cone)."""
+    from rocketgen.fit_test import coupons
+    from rocketgen.geom import meshes, solids_of
+
+    d = compute_derived(DesignParams(motor="M13"))
+    items = coupons("M13", joint=(0.05, 0.2), nose=(0.3,))
+    sock = items[0].solid
+    h = d.shoulder_len + d.wall + 4.0
+    for c in items:
+        assert len(solids_of(c.solid)) == 1 and c.solid.is_valid and meshes(c.solid), c.name
+    for c in items[1:]:
+        fit = int(c.name[-2:]) / 100
+        sh = d.nose_shoulder_len if "_N" in c.name else d.shoulder_len
+        seat = h - d.wall - fit - sh
+        def vol(z):
+            sec = as_shape(sock.intersect(c.solid.translate((0, 0, z))))
+            return 0.0 if sec is None else sec.volume
+
+        assert vol(seat + 0.01) < 1e-3, c.name
+        assert vol(seat - 0.05) > 0.5, c.name

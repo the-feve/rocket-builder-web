@@ -165,7 +165,7 @@ def plan_rocket(params: DesignParams) -> Plan:
     fwd = plan_forward_lug(params.forward_lug_frac, body_parts, lug) if params.launch_lugs == "two" else None
 
     nose_len = params.nose_fineness * d.cal
-    nose_joint = d.nose_shoulder_len + d.joint_rise
+    nose_joint = d.nose_shoulder_len + d.nose_joint_rise
     if nose_len + nose_joint > d.zmax:
         raise GeometryError("This nose (fineness x caliber + shoulder) is taller than the printer's usable Z height. Lower the nose fineness or raise the printer max height.")
     return Plan(d, seg_lens, joint_len, fin, body_parts, lug, fwd, nose_len, nose_joint)

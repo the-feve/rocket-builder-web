@@ -61,6 +61,15 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [ ] Remove shipping addresses from old shipped orders after N months
 - [ ] **(owner)** Product liability check before charging money (see `docs/web_platform_spec.md`, Legal and safety)
 
+## Fit (joint clearances, 2026-10-15)
+
+Details: `HANDOFF.md` (Fit test coupons) and `fit_test/README.md`.
+
+- [ ] **(owner)** Print `fit_test/files/fit_test_*.3mf` on the X1C and the P1S; fill in the results table in `fit_test/README.md`
+- [ ] Per-size `fit_joint` / `fit_nose` rule from the results; switch on `shoulder_chamfer`; update the pinned test numbers
+- [ ] Disclaimer on the STL download, build notes and print sheet: "Joint fits are tuned for Bambu Lab X1C / P1S at default PLA settings. Other printers or settings may need a light sanding of the shoulders (too tight) or a wrap of tape (too loose)."
+- [ ] Admin option "Print test parts for fitment": one size's socket + plugs, a range of sizes, or the joints of a saved rocket (its tube, fits and nose shoulder) without the full parts. `fit_test.coupons()` is the starting point; serve the 3MF from `/api` behind the admin check.
+
 ## Done
 
 - [x] Printer height before rocket height; tutorial button overlap fixed; motor, fins and height in saved names (2026-10-14)

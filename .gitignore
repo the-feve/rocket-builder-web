@@ -1,2 +1,5 @@
 # Trebuchet Builder checkout (deploy only; see server/trebuchet_mount.py)
 /trebuchet/
+
+# Fit-test STLs (regenerate: python -m rocketgen.fit_test); the 3MF plates are kept
+/fit_test/files/stl/

@@ -21,7 +21,7 @@ def body_segment(d: Derived, seg_len: float) -> Solid:
     inner_sh_r = d.shoulder_od / 2 - d.wall
     return revolve([
         (inner_sh_r, 0),
-        (d.shoulder_od / 2, 0),
+        *shoulder_foot(d.shoulder_od / 2, d.shoulder_chamfer),
         (d.shoulder_od / 2, sh),
         (d.body_od / 2, sh + d.joint_rise),
         (d.body_od / 2, seg_len),
@@ -29,6 +29,15 @@ def body_segment(d: Derived, seg_len: float) -> Solid:
         (d.body_id / 2, sh + d.inner_taper_rise),
         (inner_sh_r, sh),
     ])
+
+
+def shoulder_foot(r: float, chamfer: float) -> list[tuple[float, float]]:
+    """The shoulder's bottom outer corner (on the print bed): square, or a
+    45-degree chamfer that takes off the elephant foot and leads it into the
+    socket."""
+    if chamfer <= 0:
+        return [(r, 0)]
+    return [(r - chamfer, 0), (r, chamfer)]
 
 
 def nose_radius_at(shape: str, x: float, L: float, R: float) -> float:
@@ -64,7 +73,7 @@ def nose_cone(d: Derived, shape: str, nose_len: float) -> Solid:
     L = nose_len
     wall = d.wall
     steps = 16
-    base = sh + d.joint_rise
+    base = sh + d.nose_joint_rise
 
     outer = [(nose_radius_at(shape, L * i / steps, L, R), base + L - L * i / steps) for i in range(steps + 1)]
     outer.reverse()  # base -> tip
@@ -77,8 +86,8 @@ def nose_cone(d: Derived, shape: str, nose_len: float) -> Solid:
     if len(inner) < 2:
         raise GeometryError("This nose is too thin for the current wall thickness. Increase nose fineness or reduce wall.")
     plug_z = inner[0][1]
-    inner_sh_r = d.shoulder_od / 2 - wall
-    pts = [(inner_sh_r, 0), (d.shoulder_od / 2, 0), (d.shoulder_od / 2, sh)]
+    inner_sh_r = d.nose_shoulder_od / 2 - wall
+    pts = [(inner_sh_r, 0), *shoulder_foot(d.nose_shoulder_od / 2, d.shoulder_chamfer), (d.nose_shoulder_od / 2, sh)]
     pts += outer
     pts.append((0, plug_z))
     pts += inner

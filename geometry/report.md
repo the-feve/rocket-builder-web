@@ -86,6 +86,8 @@ Sample STLs (print orientation, one per part, plus `assembled.stl`): `examples/m
 - **Nose insert 30% shorter:** `Derived.nose_shoulder_len = max(0.7 x shoulder_len, 7 mm)` for the nose only; body-to-body joints keep the full shoulder. The anchor section's length (`sec_len`) and the nose placement use it; overall length is unaffected (the tip is still nose_len above the body top).
 - **Shock-cord strap rotated 90 degrees and simplified:** a straight bar across the bore (a chord from wall to wall), standing 2.5 mm off the wall at its middle, so the cord drops in from the open top behind the bar (the FeatureScript's bar runs vertically with the cord threaded sideways). Seen from the axis its underside is a 45-degree pointed arch springing from the wall at both ends, where the bar thins to nothing against the curved wall, with 2 mm of bar above the apex and the apex rounded (1.5 mm, `APEX_FILLET`, a ~2 mm bridge) so it is not a stress riser: it prints upright without supports (`test_anchor_strap_prints_without_supports`). Bar 2 mm thick; cord gap 10-16 mm across (M13-M29); ends run half a wall into the wall.
 
+- **Joint fits (2026-10-15, in progress):** the FeatureScript's single `fit_slip` (0.02 mm radial) printed far too tight. The website can set `fit_joint` and `fit_nose` separately and add a `shoulder_chamfer`; defaults still match the FeatureScript until the fit-test results are in (`fit_test/README.md`).
+
 ## Open item: leading-edge root fillet
 
 After the main root fillet, the fin's sloping leading face caps the fillet ends. Its edge with the tube becomes a chain of split pieces (10 edges for 3 fins). Tried:
