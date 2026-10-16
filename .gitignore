@@ -1,2 +1,4 @@
 # Trebuchet Builder checkout (deploy only; see server/trebuchet_mount.py)
 /trebuchet/
+# Fit Test Builder checkout (deploy only; see server/fit_mount.py)
+/fittest/

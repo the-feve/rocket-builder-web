@@ -3,9 +3,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Sent by the-feve/trebuchet_builder after a push to its main branch.
+  # Sent by the-feve/trebuchet_builder (or 3D_print_test_fitter) after a push to its main branch.
   repository_dispatch:
-    types: [trebuchet-updated]
+    types: [trebuchet-updated, fit-updated]
 
 concurrency: deploy
 
@@ -15,6 +15,9 @@ jobs:
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       TREBUCHET_TOKEN: ${{ secrets.TREBUCHET_REPO_TOKEN }}
+      # A token that can read 3D_print_test_fitter: its own secret, or the
+      # trebuchet one once that fine-grained token also lists this repo.
+      FIT_TOKEN: ${{ secrets.FIT_REPO_TOKEN || secrets.TREBUCHET_REPO_TOKEN }}
     steps:
       - name: Skip until the Fly token is set
         if: env.FLY_API_TOKEN == ''
@@ -38,6 +41,22 @@ jobs:
         run: |
           echo "::warning::Trebuchet Builder not checked out (TREBUCHET_REPO_TOKEN missing, or no main branch there); deploying the rocket app alone."
           rm -rf trebuchet && mkdir trebuchet
+      # Fit Test Builder is hosted here too (server/fit_mount.py), admin-only at first.
+      - name: Check out Fit Test Builder
+        id: fit
+        if: env.FLY_API_TOKEN != '' && env.FIT_TOKEN != ''
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: the-feve/3D_print_test_fitter
+          ref: main
+          path: fittest
+          token: ${{ env.FIT_TOKEN }}
+      - name: Without Fit Test Builder
+        if: env.FLY_API_TOKEN != '' && (env.FIT_TOKEN == '' || steps.fit.outcome != 'success')
+        run: |
+          echo "::warning::Fit Test Builder not checked out (no token that can read 3D_print_test_fitter, or no main branch there); deploying without it."
+          rm -rf fittest && mkdir fittest
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: env.FLY_API_TOKEN != ''
       - run: flyctl deploy --remote-only
@@ -47,3 +66,11 @@ jobs:
         run: |
           for i in $(seq 1 20); do curl -fsS https://rocket-fevergeon.fly.dev/trebuchet/ | grep -q "Trebuchet Builder" && exit 0; sleep 6; done
           echo "::error::/trebuchet/ isn't answering after the deploy"; exit 1
+      - name: Check the fit test page is mounted (404 to visitors until it's opened)
+        if: env.FLY_API_TOKEN != '' && steps.fit.outcome == 'success'
+        run: |
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://rocket-fevergeon.fly.dev/fit)
+            [ "$code" = 307 ] && exit 0; sleep 6
+          done
+          echo "::error::/fit isn't redirecting to /fit/ after the deploy (got $code)"; exit 1

@@ -1,9 +1,11 @@
 # The designer website: rocketgen + the FastAPI server, one container.
 #   docker build -t rocket-builder .
 #   docker run -p 8000:8000 -v rocket-data:/data rocket-builder     # open http://127.0.0.1:8000
-# Trebuchet Builder rides along: the deploy checks out the-feve/trebuchet_builder
-# into trebuchet/ first (server/trebuchet_mount.py). Building by hand without it:
-# `mkdir trebuchet` (the rocket app then runs on its own).
+# Trebuchet Builder and Fit Test Builder ride along: the deploy checks out
+# the-feve/trebuchet_builder into trebuchet/ and the-feve/3D_print_test_fitter
+# into fittest/ first (server/trebuchet_mount.py, server/fit_mount.py).
+# Building by hand without them: `mkdir trebuchet fittest` (the rocket app
+# then runs on its own).
 FROM python:3.12-slim-bookworm
 
 # OpenCascade (via the OCP wheels) needs these shared libraries even headless.
@@ -17,6 +19,7 @@ COPY server/requirements.txt server/
 RUN cd server && pip install --no-cache-dir -r requirements.txt
 COPY server server
 COPY trebuchet trebuchet
+COPY fittest fittest
 
 ENV ROCKETGEN_DB=/data/designs.sqlite3 PORT=8000
 VOLUME /data

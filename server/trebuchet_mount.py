@@ -50,16 +50,22 @@ def load_app():
 
 
 class HostRouter:
-    """ASGI middleware: requests for a trebuchet.* host go to the mounted
-    trebuchet app (so trebuchet.quiverdesignworks.net/ is its page)."""
+    """ASGI middleware: requests for a hosted app's own host (trebuchet.*, and
+    fit.* for Fit Test Builder) go to its mount, so
+    trebuchet.quiverdesignworks.net/ is its page. `routes` maps a host prefix
+    to a mount prefix."""
 
-    def __init__(self, app):
+    def __init__(self, app, routes: dict[str, str] | None = None):
         self.app = app
+        self.routes = routes or {"trebuchet.": PREFIX}
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
             host = dict(scope.get("headers") or []).get(b"host", b"").decode("latin-1")
             path = scope.get("path", "")
-            if host.startswith("trebuchet.") and not (path == PREFIX or path.startswith(PREFIX + "/")):
-                scope = dict(scope, path=PREFIX + path, raw_path=(PREFIX + path).encode())
+            for start, prefix in self.routes.items():
+                if host.startswith(start):
+                    if not (path == prefix or path.startswith(prefix + "/")):
+                        scope = dict(scope, path=prefix + path, raw_path=(prefix + path).encode())
+                    break
         await self.app(scope, receive, send)

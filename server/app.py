@@ -48,6 +48,7 @@ import orders
 import shop
 import supplies
 import terms
+import fit_mount
 import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -914,4 +915,26 @@ if TREBUCHET is not None:
         return RedirectResponse(trebuchet_mount.PREFIX + "/")
 
     app.mount(trebuchet_mount.PREFIX, TREBUCHET, name="trebuchet")
-    app.add_middleware(trebuchet_mount.HostRouter)
+
+# Fit Test Builder too: /fit/ and fit.* hosts. Admin accounts only until the
+# owner opens it (`fly secrets set ROCKETGEN_FIT=open`): it isn't linked anywhere yet.
+FIT_OPEN = os.environ.get("ROCKETGEN_FIT", "").lower() == "open"
+FIT = fit_mount.load_module()
+if FIT is not None:
+    FIT._lock = _lock  # never a rocket and a coupon set building at once
+
+    @FIT.app.middleware("http")
+    async def fit_gate(request: Request, call_next):
+        if not FIT_OPEN:
+            user = current_user(request)
+            if not (user and user["email"] in ADMIN_EMAILS):
+                return JSONResponse({"detail": "Not Found"}, status_code=404)
+        return await call_next(request)
+
+    @app.get(fit_mount.PREFIX, include_in_schema=False)
+    def fit_slash():
+        return RedirectResponse(fit_mount.PREFIX + "/")
+
+    app.mount(fit_mount.PREFIX, FIT.app, name="fit")
+
+app.add_middleware(trebuchet_mount.HostRouter, routes={"trebuchet.": trebuchet_mount.PREFIX, "fit.": fit_mount.PREFIX})
