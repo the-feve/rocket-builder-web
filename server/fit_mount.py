@@ -48,8 +48,12 @@ def load_module():
     try:
         spec = importlib.util.spec_from_file_location("fittest_app", entry)
         mod = importlib.util.module_from_spec(spec)
+        # Registered first: pydantic resolves its postponed annotations
+        # (`from __future__ import annotations`) through sys.modules.
+        sys.modules[spec.name] = mod
         spec.loader.exec_module(mod)
         return mod
     except Exception:
+        sys.modules.pop("fittest_app", None)
         log.exception("Fit Test Builder failed to load; not mounting it.")
         return None
