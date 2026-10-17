@@ -39,15 +39,13 @@ needs_fit = pytest.mark.skipif(rocket.FIT is None, reason="fittest/ not checked 
 
 
 @needs_fit
-def test_fit_is_admin_only_until_opened(monkeypatch):
+def test_fit_served_unlisted_under_prefix_and_host():
     c = TestClient(rocket.app)
     assert c.get("/fit", follow_redirects=False).headers["location"] == "/fit/"
-    assert c.get("/fit/").status_code == 404
-    assert c.get("/", headers={"host": "fit.quiverdesignworks.net"}).status_code == 404
-    assert rocket.FIT._lock is rocket._lock
-    monkeypatch.setattr(rocket, "FIT_OPEN", True)
-    assert "Fit Test Builder" in c.get("/fit/").text
+    r = c.get("/fit/")
+    assert "Fit Test Builder" in r.text and r.headers["x-robots-tag"] == "noindex"
     assert "Fit Test Builder" in c.get("/", headers={"host": "fit.quiverdesignworks.net"}).text
+    assert rocket.FIT._lock is rocket._lock
     assert c.get("/fit/static/vendor/three/build/three.module.js").status_code == 200
     r = c.post("/fit/api/build", json={"shape": "round", "sizes": [8], "clearances": [0.2], "lengths": [6]})
     assert r.status_code == 200 and r.json()["report"]["count"] == 2
@@ -56,8 +54,11 @@ def test_fit_is_admin_only_until_opened(monkeypatch):
 
 
 @needs_fit
-def test_admin_can_open_fit_before_its_opened(monkeypatch):
+def test_admin_only_switch(monkeypatch):
     c = TestClient(rocket.app)
+    monkeypatch.setattr(rocket, "FIT_ADMIN_ONLY", True)
+    assert c.get("/fit/").status_code == 404
+    assert c.get("/", headers={"host": "fit.quiverdesignworks.net"}).status_code == 404
     r = c.post("/api/auth/signup", json={"email": "fit-admin@example.com", "password": "correct horse 42", "age_ok": True})
     assert r.status_code == 200, r.text
     monkeypatch.setattr(rocket, "ADMIN_EMAILS", {"fit-admin@example.com"})

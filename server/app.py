@@ -916,20 +916,23 @@ if TREBUCHET is not None:
 
     app.mount(trebuchet_mount.PREFIX, TREBUCHET, name="trebuchet")
 
-# Fit Test Builder too: /fit/ and fit.* hosts. Admin accounts only until the
-# owner opens it (`fly secrets set ROCKETGEN_FIT=open`): it isn't linked anywhere yet.
-FIT_OPEN = os.environ.get("ROCKETGEN_FIT", "").lower() == "open"
+# Fit Test Builder too: /fit/ and fit.* hosts. Unlisted (owner, 2026-10-16):
+# open to anyone with the address, noindex, linked from nowhere yet.
+# `fly secrets set ROCKETGEN_FIT=admin` limits it to admin accounts.
+FIT_ADMIN_ONLY = os.environ.get("ROCKETGEN_FIT", "").lower() == "admin"
 FIT = fit_mount.load_module()
 if FIT is not None:
     FIT._lock = _lock  # never a rocket and a coupon set building at once
 
     @FIT.app.middleware("http")
     async def fit_gate(request: Request, call_next):
-        if not FIT_OPEN:
+        if FIT_ADMIN_ONLY:
             user = current_user(request)
             if not (user and user["email"] in ADMIN_EMAILS):
                 return JSONResponse({"detail": "Not Found"}, status_code=404)
-        return await call_next(request)
+        res = await call_next(request)
+        res.headers["X-Robots-Tag"] = "noindex"
+        return res
 
     @app.get(fit_mount.PREFIX, include_in_schema=False)
     def fit_slash():

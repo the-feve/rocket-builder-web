@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "::warning::Trebuchet Builder not checked out (TREBUCHET_REPO_TOKEN missing, or no main branch there); deploying the rocket app alone."
           rm -rf trebuchet && mkdir trebuchet
-      # Fit Test Builder is hosted here too (server/fit_mount.py), admin-only at first.
+      # Fit Test Builder is hosted here too (server/fit_mount.py), unlisted at first.
       - name: Check out Fit Test Builder
         id: fit
         if: env.FLY_API_TOKEN != '' && env.FIT_TOKEN != ''
@@ -66,11 +66,8 @@ jobs:
         run: |
           for i in $(seq 1 20); do curl -fsS https://rocket-fevergeon.fly.dev/trebuchet/ | grep -q "Trebuchet Builder" && exit 0; sleep 6; done
           echo "::error::/trebuchet/ isn't answering after the deploy"; exit 1
-      - name: Check the fit test page is mounted (404 to visitors until it's opened)
+      - name: Check the fit test page
         if: env.FLY_API_TOKEN != '' && steps.fit.outcome == 'success'
         run: |
-          for i in $(seq 1 20); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' https://rocket-fevergeon.fly.dev/fit)
-            [ "$code" = 307 ] && exit 0; sleep 6
-          done
-          echo "::error::/fit isn't redirecting to /fit/ after the deploy (got $code)"; exit 1
+          for i in $(seq 1 20); do curl -fsS https://rocket-fevergeon.fly.dev/fit/ | grep -q "Fit Test Builder" && exit 0; sleep 6; done
+          echo "::error::/fit/ isn't answering after the deploy (if ROCKETGEN_FIT=admin is set, that's expected)"; exit 1

@@ -7,9 +7,9 @@ the location. Its only geometry dependency, build123d, is already installed
 for rocketgen; its package `fitgen` is imported from the checkout.
 
 Served at /fit/ on every host, and at / for fit.* hosts (HostRouter). While
-it's being dialled in, only admin accounts can open it (app.py's gate;
-`ROCKETGEN_FIT=open` opens it to everyone). The page uses relative URLs, so
-it works under either.
+it's being dialled in it is unlisted: noindex, linked from nowhere (app.py's
+gate; `ROCKETGEN_FIT=admin` limits it to admin accounts). The page uses
+relative URLs, so it works under either.
 
 It shares this app's build lock, so a rocket and a coupon set never build at
 once on the 1 GB machine.
