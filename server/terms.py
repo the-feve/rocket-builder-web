@@ -56,6 +56,14 @@ Full terms: https://{TERMS_URL}
 """
 
 
+def step_with_header(data: bytes) -> bytes:
+    """A STEP file with the licence notice as a comment after its first line
+    (ISO 10303-21 allows /* comments */ between entities)."""
+    head, sep, rest = data.partition(b"\n")
+    note = SHORT.replace("*/", "* /").encode()
+    return head + sep + b"/* " + note + b" */\n" + rest if sep else data
+
+
 def stl_with_header(data: bytes) -> bytes:
     """A binary STL with the licence notice in its 80-byte header."""
     if len(data) >= 84 and not data[:5].lower() == b"solid":
