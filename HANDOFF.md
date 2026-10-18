@@ -4,6 +4,7 @@ _Last updated 2026-10-18 (guide and tutorial changes; brand kit, curriculum, ass
 
 ## Where things stand
 
+- **Motor cap lip 2.5 mm (2026-10-18):** `params.CAP_LIP`; the nozzle hole is the motor diameter less 5 mm. Kit test prints regenerated (reprint the caps, E).
 - **Secondary pages in the brand (2026-10-18, branch `claude/admiring-maxwell-c5difl`):** `/sources`, `/ordersupplies` (both builders), `/terms` and `/admin` now use the app's look: shared `server/static/brand.css` (tokens, self-hosted fonts, light/dark with the saved `theme`, `.rb-header`, `.rb-tag`, `.rb-step`, `.rb-tip`, `.rb-chips`, `.rb-footer`) and `server/brand.py` (`HEAD` links and `header(page, nav)` with the mark) for the server-rendered pages. The `/terms` HTML moved from `app.py` into `terms.page()`. The static pages copy the header markup by hand. Reuse `brand.css` for new pages.
 - **Lug bore and kit test prints (2026-10-18, branch `claude/admiring-maxwell-c5difl`):** launch lug bore is now 4.0 mm on a 1/8 in rod (`lugs.LUG_BORE_CLEARANCE` = 0.4125 mm per side, was 0.3: the owner's lugs were a little too snug); rod standoff clip unchanged. `docs/kits/test-prints/` has print-ready STLs, `design.json`, the app ZIP, a README and a preview per kit (Starter M18 300 mm, Big M24 360 mm, Mini M13 190 mm), from `tools/make_test_prints.py` (rerun after geometry changes). All three built stable as designed; no adjustments.
 - **Session of 2026-10-18 (PR #39, merged and deployed 2026-10-18):** plan in `docs/expansion_spec_2026-10.md`.

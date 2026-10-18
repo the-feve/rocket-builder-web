@@ -120,3 +120,4 @@ Options for Phase 1:
 ## Not checked against Onshape yet
 
 Nothing is compared with Onshape exports yet (spec §5.2 golden tests). That needs the owner to export STLs and the mass line for the listed configurations.
+- **Motor cap lip 2.5 mm (2026-10-18):** `params.CAP_LIP`: the cap's floor reaches 2.5 mm in from the motor's OD, covering the cardboard casing (owner, from printed tests). The FeatureScript's 1/8 in lip left too small a nozzle hole. Test `test_motor_cap_lip_covers_2_5_mm_of_the_casing`. (The unmerged `claude/epic-einstein-4im4l4` branch tried a casing-wall-only lip of about 1 mm and a slimmer cap; not taken.)
