@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 48" width="960" height="48">
+<title>Rocket Builder fletching band</title>
+<defs><pattern id="rb-fletch-night" width="40" height="48" patternUnits="userSpaceOnUse"><path d="M1 4L17 24L1 44H10L26 24L10 4Z" fill="#F2652B"/><path d="M15 4L31 24L15 44H24L40 24L24 4Z" fill="#F6F1E7"/></pattern></defs>
+<rect width="960" height="48" fill="#12203A"/>
+<rect width="960" height="48" fill="url(#rb-fletch-night)"/>
+</svg>

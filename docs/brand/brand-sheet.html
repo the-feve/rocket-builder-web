@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rocket Builder Brand Sheet</title>
+<link rel="icon" href="logo/rb-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--rb-paper); color: var(--rb-night); font: 15px/1.5 var(--rb-font-body); }
+  .sheet { max-width: 1400px; margin: 0 auto; }
+  header.top { position: relative; padding: 36px 48px 34px; background: var(--rb-night) var(--rb-grid-night); color: var(--rb-paper);
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  header.top img { height: 72px; display: block; }
+  header.top .meta { text-align: right; font: 500 13px/1.6 var(--rb-font-head); color: var(--rb-night-300); letter-spacing: .04em; }
+  header.top .meta b { display: block; color: var(--rb-paper); font-size: 22px; letter-spacing: -.01em; }
+  .band { height: 24px; background: var(--rb-fletch-night) repeat-x left center / 20px 24px; background-color: var(--rb-night); }
+  main { padding: 8px 48px 48px; display: grid; grid-template-columns: repeat(12, 1fr); gap: 0 32px; }
+  section { grid-column: span 12; padding-top: 28px; }
+  .half { grid-column: span 6; }
+  h2 { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; font: 700 13px/1 var(--rb-font-head); text-transform: uppercase;
+    letter-spacing: .12em; color: var(--rb-night); border-bottom: 2px solid var(--rb-night); padding-bottom: 8px; }
+  h2 span { font-variant-numeric: tabular-nums; color: var(--rb-orange-700); }
+  .tiles { display: grid; gap: 14px; }
+  .tile { border-radius: var(--rb-r-md); display: grid; place-items: center; padding: 22px; position: relative; min-height: 150px; }
+  .tile small { position: absolute; left: 12px; bottom: 8px; font: 500 11px var(--rb-font-head); letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+  .on-paper { background: var(--rb-paper-white); border: 1px solid var(--rb-paper-300); }
+  .on-night { background: var(--rb-night) var(--rb-grid-night); color: var(--rb-paper); }
+  .logos { grid-template-columns: 1.1fr 1.1fr 2.4fr 2.4fr; }
+  .logos2 { grid-template-columns: 1.4fr 1.4fr 1fr 2fr; margin-top: 14px; }
+  .fav { display: flex; gap: 18px; align-items: end; }
+  .fav figure { margin: 0; text-align: center; font: 500 11px var(--rb-font-head); color: var(--rb-grey); }
+  .fav img { display: block; margin: 0 auto 6px; }
+  .swatches { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .sw { border-radius: var(--rb-r-md); overflow: hidden; border: 1px solid var(--rb-paper-300); background: var(--rb-paper-white); }
+  .sw .chip { height: 84px; position: relative; }
+  .sw .ramp { display: flex; height: 14px; }
+  .sw .ramp i { flex: 1; }
+  .sw .txt { padding: 9px 11px 11px; }
+  .sw b { font: 700 14px var(--rb-font-head); display: block; }
+  .sw code { font: 500 12px var(--rb-font-num); color: var(--rb-grey); }
+  .sw p { margin: 4px 0 0; font-size: 12px; line-height: 1.35; color: #3b4456; }
+  .type { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: start; }
+  .spec-h { font: 700 64px/1 var(--rb-font-head); letter-spacing: -.02em; margin: 0; }
+  .spec-sub { font: 500 13px var(--rb-font-head); color: var(--rb-grey); letter-spacing: .05em; text-transform: uppercase; margin: 6px 0 18px; }
+  .scale div { display: flex; align-items: baseline; gap: 14px; border-top: 1px solid var(--rb-paper-300); padding: 5px 0; }
+  .scale span { width: 52px; flex: none; font: 500 11px var(--rb-font-num); color: var(--rb-grey); font-variant-numeric: tabular-nums; }
+  .body-spec p { margin: 0 0 10px; }
+  .nums { font: 600 30px var(--rb-font-num); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+  .motifs { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+  .motifs img { width: 100%; display: block; border-radius: var(--rb-r-md); }
+  .motifs .col { display: grid; gap: 14px; align-content: start; }
+  .motifs .fb { height: 24px; border-radius: 4px; }
+  /* UI samples: each panel sets its own theme so the tokens resolve per panel */
+  .ui { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
+  .uipanel { padding: 18px; border-radius: var(--rb-r-lg); background: var(--bg) var(--grid); color: var(--ink); border: 1px solid var(--line); }
+  .uipanel .bar { display: flex; align-items: center; gap: 10px; margin: -18px -18px 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); border-radius: var(--rb-r-lg) var(--rb-r-lg) 0 0; }
+  .uipanel .bar img { height: 40px; }
+  .uipanel .bar .seg { margin-left: auto; display: flex; border: 1px solid var(--line); border-radius: 8px; padding: 2px; font: 600 12px var(--rb-font-body); }
+  .uipanel .bar .seg span { padding: 3px 9px; border-radius: 6px; }
+  .uipanel .bar .seg .cur { background: var(--ink); color: var(--panel); }
+  .uipanel .rb-card { background: var(--panel); }
+  .uipanel h3 { margin: 0 0 2px; font: 700 18px var(--rb-font-head); }
+  .stab { display: flex; align-items: center; gap: 14px; margin: 12px 0 14px; }
+  .meter { position: relative; flex: 1; height: 34px; }
+  .meter .tube { position: absolute; left: 0; right: 0; top: 13px; height: 8px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); }
+  .meter .dot { position: absolute; top: 9px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--panel); }
+  .meter .cg { left: 46%; background: var(--cg); }
+  .meter .cp { left: 66%; background: var(--cp); }
+  .meter .cal { position: absolute; left: calc(46% + 8px); width: 20%; top: 0; height: 9px; border: 1.5px solid var(--muted); border-bottom: 0; }
+  .score { font: 700 26px var(--rb-font-num); font-variant-numeric: tabular-nums; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font: 600 12px var(--rb-font-body); background: var(--okbg); color: var(--ok); }
+  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .msg { margin-top: 12px; padding: 8px 12px; border-radius: var(--rb-r-sm); font-size: 13px; background: var(--warnbg); color: var(--warn); }
+  /* guide sample */
+  .guide { display: grid; grid-template-columns: 1.6fr 1fr; gap: 0; background: var(--rb-paper-white); border: 1px solid var(--rb-paper-300); border-radius: var(--rb-r-md); overflow: hidden; }
+  .guide .hdr { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--rb-night); color: var(--rb-paper); }
+  .guide .hdr .t { font: 700 15px var(--rb-font-head); letter-spacing: .02em; }
+  .guide .hdr .lvl { margin-left: auto; display: flex; gap: 4px; align-items: center; font: 500 12px var(--rb-font-head); color: var(--rb-night-300); }
+  .guide .hdr .lvl i { width: 14px; height: 8px; background: var(--rb-orange); clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%, 40% 50%); }
+  .guide .hdr .lvl i.off { background: var(--rb-night-600); }
+  .guide .draw { padding: 14px 10px 6px 16px; }
+  .guide .draw img { width: 100%; display: block; }
+  .guide .txt { padding: 18px 20px; border-left: 1px solid var(--rb-paper-300); }
+  .guide .txt h4 { display: flex; gap: 12px; align-items: center; margin: 0 0 10px; font: 700 19px/1.2 var(--rb-font-head); }
+  .guide .txt p { margin: 0 0 10px; font-size: 14px; }
+  .safety { display: flex; gap: 10px; padding: 9px 12px; border-left: 4px solid var(--rb-red); background: var(--rb-red-100); font-size: 13px; border-radius: 0 6px 6px 0; }
+  .safety b { color: var(--rb-red-700); }
+  .tip { display: flex; gap: 10px; padding: 9px 12px; border-left: 4px solid var(--rb-sky); background: var(--rb-sky-100); font-size: 13px; border-radius: 0 6px 6px 0; margin-bottom: 8px; }
+  .voice { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .voice div { padding: 14px 16px; border-radius: var(--rb-r-md); background: var(--rb-paper-white); border: 1px solid var(--rb-paper-300); font-size: 14px; }
+  .voice h5 { margin: 0 0 6px; font: 700 12px var(--rb-font-head); letter-spacing: .1em; text-transform: uppercase; }
+  .voice .yes h5 { color: var(--rb-green-700); } .voice .no h5 { color: var(--rb-red-700); }
+  .voice ul { margin: 0; padding-left: 18px; } .voice li { margin: 3px 0; }
+  footer { grid-column: span 12; margin-top: 30px; padding-top: 12px; border-top: 1px solid var(--rb-paper-300); display: flex; justify-content: space-between;
+    font: 500 12px var(--rb-font-head); color: var(--rb-grey); letter-spacing: .04em; }
+  @media (max-width: 900px) {
+    header.top, main { padding-left: 16px; padding-right: 16px; }
+    .half { grid-column: span 12; }
+    .logos, .logos2, .type, .motifs, .ui, .guide, .voice { grid-template-columns: minmax(0,1fr); }
+    .swatches { grid-template-columns: repeat(2, 1fr); }
+    .guide .txt { border-left: 0; border-top: 1px solid var(--rb-paper-300); }
+    .spec-h { font-size: 44px; }
+    .uipanel { min-width: 0; }
+    .uipanel .bar { flex-wrap: wrap; }
+    .uipanel .bar img { height: 32px; }
+    .uipanel .bar .seg { margin-left: 0; }
+    .stab .meter { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+<header class="top">
+  <img src="logo/rb-lockup-horizontal-dark.svg" alt="Rocket Builder by Quiver Design Works">
+  <div class="meta"><b>Brand sheet</b>Fins are fletching · v1 · October 2026</div>
+</header>
+<div class="band" aria-hidden="true"></div>
+
+<main>
+<section>
+  <h2><span>01</span> Logo</h2>
+  <div class="tiles logos">
+    <div class="tile on-paper"><img src="logo/rb-mark-light.svg" width="104" alt=""><small>Mark</small></div>
+    <div class="tile on-night"><img src="logo/rb-mark-dark.svg" width="104" alt=""><small>Mark on Night</small></div>
+    <div class="tile on-paper"><img src="logo/rb-lockup-horizontal-light.svg" height="64" alt=""><small>Horizontal lockup</small></div>
+    <div class="tile on-night"><img src="logo/rb-lockup-horizontal-dark.svg" height="64" alt=""><small>Horizontal on Night</small></div>
+  </div>
+  <div class="tiles logos2">
+    <div class="tile on-paper"><img src="logo/rb-lockup-stacked-light.svg" height="118" alt=""><small>Stacked</small></div>
+    <div class="tile on-night"><img src="logo/rb-lockup-stacked-dark.svg" height="118" alt=""><small>Stacked on Night</small></div>
+    <div class="tile on-paper" style="color:#12203A"><img src="logo/rb-mark-mono.svg" width="80" alt=""><small>One colour</small></div>
+    <div class="tile on-paper">
+      <div class="fav">
+        <figure><img src="logo/rb-favicon.svg" width="16" alt="">16</figure>
+        <figure><img src="logo/rb-favicon.svg" width="32" alt="">32</figure>
+        <figure><img src="logo/rb-favicon.svg" width="64" alt="">64</figure>
+        <figure><img src="logo/rb-favicon-light.svg" width="64" alt="">64 light</figure>
+        <figure><img src="logo/rb-mark-light.svg" width="24" alt="">24 mark</figure>
+      </div><small>Favicon / app icon</small>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span>02</span> Colour</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#12203A"></div><div class="ramp"><i style="background:#0B1526"></i><i style="background:#1B2C4B"></i><i style="background:#263A5E"></i><i style="background:#6B7C9C"></i><i style="background:#A9B4C8"></i><i style="background:#D9DFEA"></i></div><div class="txt"><b>Night</b><code>#12203A</code><p>Ink, outlines, dark theme.</p></div></div>
+    <div class="sw"><div class="chip" style="background:#F6F1E7;border-bottom:1px solid #E2D9C6"></div><div class="ramp"><i style="background:#FFFDF8"></i><i style="background:#F6F1E7"></i><i style="background:#EDE6D8"></i><i style="background:#E2D9C6"></i><i style="background:#CFC3AB"></i></div><div class="txt"><b>Paper</b><code>#F6F1E7</code><p>Page, box stock, light theme.</p></div></div>
+    <div class="sw"><div class="chip" style="background:#F2652B"></div><div class="ramp"><i style="background:#B8471B"></i><i style="background:#F2652B"></i><i style="background:#F8A27E"></i><i style="background:#FDE6DA"></i></div><div class="txt"><b>Launch orange</b><code>#F2652B</code><p>Go: the one main button, fletching, motion arrows.</p></div></div>
+    <div class="sw"><div class="chip" style="background:#3D8BFD"></div><div class="ramp"><i style="background:#1D5BC4"></i><i style="background:#3D8BFD"></i><i style="background:#8BBBFE"></i><i style="background:#DDEAFF"></i></div><div class="txt"><b>Sky blue</b><code>#3D8BFD</code><p>Balance point (CG), links, blueprint, tips.</p></div></div>
+    <div class="sw"><div class="chip" style="background:#E5484D"></div><div class="ramp"><i style="background:#C22E33"></i><i style="background:#E5484D"></i><i style="background:#F19A9C"></i><i style="background:#FCE3E3"></i></div><div class="txt"><b>Signal red</b><code>#E5484D</code><p>Push point (CP), warnings, safety.</p></div></div>
+    <div class="sw"><div class="chip" style="background:#2FB67C"></div><div class="ramp"><i style="background:#17754E"></i><i style="background:#2FB67C"></i><i style="background:#85D7B2"></i><i style="background:#DCF3E8"></i></div><div class="txt"><b>Go green</b><code>#2FB67C</code><p>Stable, OK, done, checked.</p></div></div>
+    <div class="sw"><div class="chip" style="background:#6E6E73"></div><div class="ramp"><i style="background:#3b4456"></i><i style="background:#6E6E73"></i><i style="background:#A1A1A6"></i><i style="background:#E5E5EA"></i></div><div class="txt"><b>Grey</b><code>#6E6E73</code><p>Secondary text, dimension lines.</p></div></div>
+  </div>
+</section>
+
+<section>
+  <h2><span>03</span> Type</h2>
+  <div class="type">
+    <div>
+      <p class="spec-h">Fins are fletching.</p>
+      <p class="spec-sub">Space Grotesk 700 · headings, labels, numbers</p>
+      <div class="scale">
+        <div><span>39 / 3xl</span><b style="font:700 39px/1.1 var(--rb-font-head)">Build it. Fly it.</b></div>
+        <div><span>25 / xl</span><b style="font:700 25px/1.1 var(--rb-font-head)">Step 3 · Fin can</b></div>
+        <div><span>20 / lg</span><b style="font:600 20px/1.2 var(--rb-font-head)">Where is the balance point?</b></div>
+        <div><span>12 / xs</span><b class="rb-label" style="color:var(--rb-grey)">Motor · Body · Fins · Nose · Flight</b></div>
+      </div>
+    </div>
+    <div class="body-spec">
+      <p class="spec-sub" style="margin-top:4px">Inter 400 / 600 · body text</p>
+      <p style="font-size:16px">A rocket is stable when its balance point sits in front of its push point. The fins pull the push point back, the way feathers keep an arrow straight.</p>
+      <p style="font-size:14px;color:var(--rb-grey)">14 px in the app, 11–12 pt in print. Short sentences. One idea per sentence.</p>
+      <p class="spec-sub" style="margin:16px 0 4px">Tabular figures · Space Grotesk</p>
+      <div class="nums">C6-5 · 24 mm · 1.8 cal · 312 m</div>
+      <p style="margin-top:12px"><span class="rb-tag">A</span> <span class="rb-tag">B</span> <span class="rb-tag">C</span> <span class="rb-tag">D1</span>&nbsp; <span class="rb-step">3</span> <span style="font-size:12px;color:var(--rb-grey);margin-left:6px">Part tags and step numbers: chamfered, like the Quiver letters.</span></p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span>04</span> Motifs</h2>
+  <div class="motifs">
+    <img src="patterns/flight-arc-paper.svg" alt="Flight arc motif" style="border:1px solid var(--rb-paper-300)">
+    <div class="col">
+      <img src="patterns/blueprint-grid-night.svg" alt="Blueprint grid on Night" style="height:120px;object-fit:cover">
+      <img src="patterns/blueprint-grid-paper.svg" alt="Blueprint grid on Paper" style="height:72px;object-fit:cover;border:1px solid var(--rb-paper-300)">
+      <div class="fb" style="background:var(--rb-paper) var(--rb-fletch-paper) repeat-x left center / 20px 24px;border:1px solid var(--rb-paper-300)"></div>
+      <div class="fb" style="background:var(--rb-night) var(--rb-fletch-night) repeat-x left center / 20px 24px"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span>05</span> In the app (sample, light and dark)</h2>
+  <div class="ui">
+    <div class="uipanel" data-theme="light" style="--bg:#FBF8F2;--panel:#FFFDF8;--card:#F6F1E7;--ink:#12203A;--muted:#6E6E73;--line:#E2D9C6;--accent:#1D5BC4;--cta:#F2652B;--cta-ink:#12203A;--cg:#3D8BFD;--cp:#E5484D;--ok:#17754E;--okbg:#DCF3E8;--warn:#8A5A00;--warnbg:#FBEFD6;--grid:var(--rb-grid-paper)">
+      <div class="bar"><img src="logo/rb-lockup-horizontal-light.svg" alt=""><div class="seg"><span class="cur">Beginner</span><span>Advanced</span></div></div>
+      <div class="rb-card">
+        <span class="rb-label">Stability</span>
+        <h3>Your rocket will fly straight.</h3>
+        <div class="stab"><div class="meter"><div class="tube"></div><div class="cal"></div><div class="dot cg"></div><div class="dot cp"></div></div><div class="score">1.8<span style="font-size:13px;color:var(--muted)"> cal</span></div></div>
+        <div class="legend"><span><i style="background:var(--cg)"></i>Balance point</span><span><i style="background:var(--cp)"></i>Push point</span><span class="pill">Stable</span></div>
+        <div class="btns" style="margin-top:16px"><button class="rb-btn rb-btn--launch">Build my rocket</button><button class="rb-btn rb-btn--outline">Download STL</button></div>
+        <div class="msg">Check: this motor needs a field at least 150 m across.</div>
+      </div>
+    </div>
+    <div class="uipanel" data-theme="dark" style="--bg:#0B1526;--panel:#12203A;--card:#1B2C4B;--ink:#F6F1E7;--muted:#A9B4C8;--line:#263A5E;--accent:#8BBBFE;--cta:#F2652B;--cta-ink:#12203A;--cg:#3D8BFD;--cp:#E5484D;--ok:#85D7B2;--okbg:#10372B;--warn:#F0B44C;--warnbg:#3A2C0E;--grid:var(--rb-grid-night)">
+      <div class="bar"><img src="logo/rb-lockup-horizontal-dark.svg" alt=""><div class="seg"><span>Beginner</span><span class="cur">Advanced</span></div></div>
+      <div class="rb-card">
+        <span class="rb-label">Stability</span>
+        <h3>Your rocket will fly straight.</h3>
+        <div class="stab"><div class="meter"><div class="tube"></div><div class="cal"></div><div class="dot cg"></div><div class="dot cp"></div></div><div class="score">1.8<span style="font-size:13px;color:var(--muted)"> cal</span></div></div>
+        <div class="legend"><span><i style="background:var(--cg)"></i>Balance point</span><span><i style="background:var(--cp)"></i>Push point</span><span class="pill">Stable</span></div>
+        <div class="btns" style="margin-top:16px"><button class="rb-btn rb-btn--launch">Build my rocket</button><button class="rb-btn rb-btn--outline">Download STL</button></div>
+        <div class="msg">Check: this motor needs a field at least 150 m across.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span>06</span> Guide drawing style</h2>
+  <div class="guide">
+    <div class="hdr"><span class="t">ASSEMBLY · Fin can</span><span class="lvl">Skill level <i></i><i></i><i class="off"></i></span></div>
+    <div class="draw"><img src="illustration/step-sample.svg" alt="Line drawing: slide fin can C onto body tube B, line up the marks"></div>
+    <div class="txt">
+      <h4><span class="rb-step">3</span> Slide the fin can onto the tube.</h4>
+      <p>Push fin can <span class="rb-tag" style="font-size:12px">C</span> onto body tube <span class="rb-tag" style="font-size:12px">B</span>. Line up the two orange marks.</p>
+      <p>It should be snug. Don't force it.</p>
+      <div class="tip"><b style="color:var(--rb-sky-700)">Tip</b><span>Too tight? Sand the tube end lightly, then try again.</span></div>
+      <div class="safety"><b>Safety</b><span>Glue fumes: work by an open window.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span>07</span> Voice</h2>
+  <div class="voice">
+    <div class="yes"><h5>Say it like this</h5><ul>
+      <li>“Your rocket will fly straight.”</li>
+      <li>“Move the fins back a little.”</li>
+      <li>“An adult puts the motor in.”</li>
+      <li>“Stand back 5 m. Count down from 5.”</li></ul></div>
+    <div class="no"><h5>Not like this</h5><ul>
+      <li>“Static margin is within nominal parameters.”</li>
+      <li>“Suboptimal fin geometry detected.”</li>
+      <li>“DANGER!!! Rockets can kill.”</li>
+      <li>“Awesome!!! 🚀🚀🚀”</li></ul></div>
+  </div>
+</section>
+
+<footer><span>Rocket Builder · by Quiver Design Works · rocket.quiverdesignworks.net</span><span>Tokens: docs/brand/tokens.css · Guide: docs/brand/brand.md</span></footer>
+</main>
+</div>
+</body>
+</html>

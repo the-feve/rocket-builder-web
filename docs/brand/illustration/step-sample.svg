@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Space Grotesk, Inter, sans-serif">
+<title>Sample guide drawing: slide the fin can (C) onto the body tube (B)</title>
+<!-- House style for guide drawings (see brand.md, "Illustration"):
+     parts 2 px Night outline on Paper-white fill; detail lines 1 px; hidden edges 1 px dashed 4 3;
+     centre lines 1 px dash-dot in Grey; motion arrows 2.5 px Orange with a filled head;
+     part letters in chamfered Night tags with a 1 px leader ending in a dot;
+     a zoom callout is a circle with a 1 px dashed leader. -->
+<defs>
+  <clipPath id="rb-step-zoom"><circle cx="512" cy="96" r="58"/></clipPath>
+</defs>
+
+<!-- centre line -->
+<path d="M24 130H440" stroke="#6E6E73" stroke-width="1" stroke-dasharray="14 4 2 4"/>
+
+<!-- B: body tube (left), with the motor-mount end showing a thin wall -->
+<g stroke="#12203A" stroke-linejoin="round">
+  <rect x="40" y="110" width="250" height="40" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M276 110V150" stroke-width="1"/>
+  <!-- C: fin can (right), exploded 40 px along the axis -->
+  <path d="M332 106H430V154H332Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M356 106L392 56H424L430 106Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M356 154L392 204H424L430 154Z" fill="#FFFDF8" stroke-width="2"/>
+  <!-- hidden edges: the socket the tube slides into -->
+  <path d="M332 111H378V149H332" fill="none" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- alignment mark on the tube and on the can -->
+  <path d="M262 110V102M346 106V98" stroke="#F2652B" stroke-width="2" stroke-linecap="round"/>
+</g>
+
+<!-- motion arrow: slide C left onto B -->
+<g fill="#F2652B" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round">
+  <path d="M410 232H316" fill="none"/>
+  <path d="M302 232L318 224V240Z" stroke-linejoin="round"/>
+</g>
+
+<!-- part letter tags with leaders -->
+<g stroke="#12203A" stroke-width="1" fill="none">
+  <path d="M150 72V110"/><path d="M462 176L424 176"/>
+</g>
+<circle cx="150" cy="110" r="2.5" fill="#12203A"/>
+<circle cx="424" cy="176" r="2.5" fill="#12203A"/>
+<g fill="#12203A">
+  <path d="M142 46H158L164 52V66L158 72H142L136 66V52Z"/>
+  <path d="M466 164H482L488 170V184L482 190H466L460 184V170Z"/>
+</g>
+<g fill="#F6F1E7" font-size="17" font-weight="700" text-anchor="middle">
+  <text x="150" y="65">B</text><text x="474" y="183">C</text>
+</g>
+
+<!-- zoom callout: line up the marks -->
+<path d="M352 98L458 92" stroke="#12203A" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+<circle cx="352" cy="98" r="9" fill="none" stroke="#12203A" stroke-width="1"/>
+<g clip-path="url(#rb-step-zoom)">
+  <rect x="440" y="30" width="150" height="140" fill="#FFFDF8"/>
+  <!-- B's top edge runs into C's end face; C's wall is thicker, so it steps up -->
+  <path d="M440 122H506V102H600" fill="none" stroke="#12203A" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M506 128H600" fill="none" stroke="#12203A" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- the two alignment marks, in line -->
+  <path d="M498 122V108M514 102V88" stroke="#F2652B" stroke-width="4" stroke-linecap="round"/>
+</g>
+<circle cx="512" cy="96" r="58" fill="none" stroke="#12203A" stroke-width="2"/>
+</svg>
