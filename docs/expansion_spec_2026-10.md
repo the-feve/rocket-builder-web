@@ -52,3 +52,14 @@ Complete kits for local stores, farmers markets and the online store: kit conten
 - [x] C curriculum
 - [x] D assembly guide (owner questions in TODO.md)
 - [x] E kits and packaging (owner decisions in TODO.md)
+
+# Round 4 (2026-10-18): web curriculum, trebuchet split, kit test prints
+
+| # | Stream | Where | Owner |
+|---|---|---|---|
+| F | Curriculum on the web at `/learn` (lessons, worksheets, PDF), linked from the app and quiverdesignworks.net | `server/static/learn/`, `server/app.py` route, `docs/curriculum/tools/` | agent |
+| G | Trebuchet Builder: no Rocket/Trebuchet toggle, its own page with a link back, labelled **beta**, rocket brand styling | the-feve/trebuchet_builder `server/static/` | agent |
+| H | Launch lug bore 4.0 mm for a 1/8 in rod (was 3.8, too snug); test-print sets for the Starter (M18), Big (M24) and Mini (M13) kits | `geometry/rocketgen/lugs.py`, `docs/kits/test-prints/<kit>/` | agent |
+| I | App: header links instead of the toggle, a visible *Test-fit parts* link in both modes (not during the tutorial), curriculum links, save names with size, height, fin count and shape, and nose | `server/static/index.html` | main |
+| J | Brand sheet PDF next to the PNG | `docs/brand/brand-sheet.pdf` | main |
+| K | quiverdesignworks.net: Fit Test Builder in Apps, Trebuchet marked beta, a free home-school curriculum section, new screenshots | the-feve/quiverdesignworks-site | main |

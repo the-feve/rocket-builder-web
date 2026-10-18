@@ -39,11 +39,11 @@ needs_fit = pytest.mark.skipif(rocket.FIT is None, reason="fittest/ not checked 
 
 
 @needs_fit
-def test_fit_served_unlisted_under_prefix_and_host():
+def test_fit_served_under_prefix_and_host():
     c = TestClient(rocket.app)
     assert c.get("/fit", follow_redirects=False).headers["location"] == "/fit/"
     r = c.get("/fit/")
-    assert "Fit Test Builder" in r.text and r.headers["x-robots-tag"] == "noindex"
+    assert "Fit Test Builder" in r.text and "x-robots-tag" not in r.headers  # public since 2026-10-18
     assert "Fit Test Builder" in c.get("/", headers={"host": "fit.quiverdesignworks.net"}).text
     assert rocket.FIT._lock is rocket._lock
     assert c.get("/fit/static/vendor/three/build/three.module.js").status_code == 200
