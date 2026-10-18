@@ -395,3 +395,25 @@ def test_score_advice_estimates_match_rebuilds():
     ok = Balance(build_rocket(p.with_(body_length=body_length_for(p, 312), fin_scale=1.15)))
     if 1.0 <= ok.check().margin_cal <= 2.0:
         assert advice(ok, ok.check(), motors_for("M18"), beginner=True) is None
+
+
+def test_critical_fit_overrides():
+    """The website's Advanced fit boxes: None keeps the computed values; set,
+    they reach the joint, the nose and the motor thread, and the parts build."""
+    from rocketgen.geom import meshes
+    base = compute_derived(DesignParams())
+    assert base.fit_slip == 0.02 and base.thread["thread_clear"] == 0.25 and base.thread["p"] == 2.5
+    r = rocket(joint_clearance=0.18, shoulder_len=15.0, nose_shoulder_len=9.0,
+               thread_clearance=0.35, thread_pitch=3.0, thread_turns=4)
+    d, t = r.derived, r.derived.thread
+    assert d.fit_slip == 0.18 and d.shoulder_od == pytest.approx(d.body_id - 0.36)
+    assert (d.shoulder_len, d.nose_shoulder_len) == (15.0, 9.0)
+    assert t["thread_clear"] == 0.35 and t["p"] == 3.0
+    assert t["cap_top"] - t["z_boss_end"] == pytest.approx(4 * 3.0)
+    assert t["r_cap_in"] == pytest.approx(t["r_crest"] + 0.35)
+    for p in r.parts:
+        assert p.assembled.is_valid and meshes(p.assembled), p.name
+    nose = next(q for q in r.parts if q.name == "Nose")
+    assert nose.local.bounding_box().size.Z == pytest.approx(9.0 + d.joint_rise + r.params.nose_fineness * d.cal, abs=0.05)
+    # A longer body joint alone: the nose follows it (70%).
+    assert compute_derived(DesignParams(shoulder_len=20.0)).nose_shoulder_len == pytest.approx(14.0)

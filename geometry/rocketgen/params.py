@@ -76,6 +76,14 @@ class DesignParams:
     forward_lug_frac: float = 0.5
     # Material
     material: str = "PLA"
+    # Critical fit dimensions (website, Advanced). None = the computed value,
+    # as before. They let a result from a fit-test print be typed in.
+    joint_clearance: float | None = None  # shoulder into socket, radial; None = fit_slip (settings CSV)
+    shoulder_len: float | None = None  # body-to-body joint engagement; None = max(0.75 cal - 4, 10)
+    nose_shoulder_len: float | None = None  # nose joint engagement; None = 70% of the body joint (min 7)
+    thread_clearance: float | None = None  # motor cap thread, radial (crest to cap bore); None = 0.25
+    thread_pitch: float | None = None  # None = 2.5 mm under 21 mm motors, else 3 mm
+    thread_turns: int | None = None  # None = 3
 
     def with_(self, **kw) -> "DesignParams":
         return replace(self, **kw)
@@ -110,12 +118,16 @@ class Derived:
     thread: dict = field(default_factory=dict)
 
 
-def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin) -> dict:
-    """threadGeometry: the threaded motor cap and the boss it screws onto."""
-    p = 2.5 if mtr_d < 21 else 3.0
+def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
+                    pitch=None, turns=None, thread_clear=None) -> dict:
+    """threadGeometry: the threaded motor cap and the boss it screws onto.
+    pitch / turns / thread_clear: the website's Advanced overrides (None =
+    the FeatureScript's values)."""
+    p = pitch or (2.5 if mtr_d < 21 else 3.0)
     h = 0.35 * p
-    turns = 3
-    thread_clear = 0.25  # radial; fit_slip is far too tight for a printed thread
+    turns = turns or 3
+    if thread_clear is None:
+        thread_clear = 0.25  # radial; fit_slip is far too tight for a printed thread
     cap_wall = 1.6
     cap_face_t = max(1.5, 0.08 * mtr_d)
     gap = 0.5  # boss end to the cap's floor
@@ -174,7 +186,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     mtr_d, mtr_len, mtr_hang = m["mtr_d"], m["mtr_len"], m["mtr_hang"]
     z_margin = settings["z_margin"]
     wall = params.wall if params.wall else settings["wall"]
-    fit_slip = settings["fit_slip"]
+    fit_slip = settings["fit_slip"] if params.joint_clearance is None else params.joint_clearance
     fit_press = settings["fit_press"]
     mtr_clear = settings["mtr_clear"]
 
@@ -184,14 +196,15 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     body_id = body_od - 2 * wall
     cal = body_od
     shoulder_od = body_id - 2 * fit_slip
-    shoulder_len = max(0.75 * cal - 4.0, 10.0)
+    shoulder_len = params.shoulder_len or max(0.75 * cal - 4.0, 10.0)
     # The nose's insert is 30% shorter than a body joint's (owner's request,
     # 2026-10-09: a shorter transition); body-to-body joints keep the full length.
-    nose_shoulder_len = max(0.7 * shoulder_len, 7.0)
+    nose_shoulder_len = params.nose_shoulder_len or max(0.7 * shoulder_len, 7.0)
     mount_od = bay_id + 2 * wall
 
     fin = fin_dimensions(params, cal)
-    thread = thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin)
+    thread = thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
+                             params.thread_pitch, params.thread_turns, params.thread_clearance)
     bay_len = mtr_len - thread["hang"]
     zmax = params.print_max_height - z_margin
     stop_depth = mtr_clear + 1.5

@@ -31,11 +31,11 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from build123d import export_stl
+from build123d import export_step, export_stl
 from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape
 from rocketgen.geom import GeometryError
-from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors
+from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors, load_settings
 from rocketgen.flight import (CHUTE_SIZES_IN, FIELD_M, MAX_WIND_MPH, MPH, field_size, heaviest, launch_profile,
                               motors_for, parachute, pick, simulate)
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
@@ -99,6 +99,14 @@ class BuildRequest(BaseModel):
     target_altitude_m: float = Field(150.0, ge=10, le=3000)
     drag_cd: float = Field(0.65, ge=0.2, le=1.5)
     launch_rod_m: float = Field(0.91, ge=0.3, le=3)
+    # Critical fit dimensions (Advanced; blank = Rocket Builder's computed
+    # value). For typing in a result from a fit-test print.
+    joint_clearance: float | None = Field(None, ge=0, le=0.5)
+    shoulder_len: float | None = Field(None, ge=5, le=100)
+    nose_shoulder_len: float | None = Field(None, ge=4, le=100)
+    thread_clearance: float | None = Field(None, ge=0.05, le=1.0)
+    thread_pitch: float | None = Field(None, ge=1.5, le=5)
+    thread_turns: int | None = Field(None, ge=2, le=6)
 
 
 BEGINNER_FINS = ["swept", "delta", "trapezoid"]
@@ -169,7 +177,7 @@ def _rate_limit(request: Request, kind: str, limit: int, window_s: float):
     if len(q) >= limit:
         raise HTTPException(429, "Too many requests from your address; wait a few minutes and try again.")
     q.append(now)
-_geo: OrderedDict[str, dict] = OrderedDict()  # geometry key -> {"rocket", "glb", "report", "stls"}
+_geo: OrderedDict[str, dict] = OrderedDict()  # geometry key -> {"rocket", "glb", "report", "stls", "steps"}
 _builds: dict[str, dict] = {}  # build id -> {"geo", "params", "stability"}
 _lock = threading.Lock()  # one OpenCascade build at a time
 
@@ -219,6 +227,18 @@ def _stls(rocket) -> dict[str, bytes]:
     return out
 
 
+def _steps(rocket) -> dict[str, bytes]:
+    """One STEP per part, in the same print orientation as the STLs (Advanced:
+    for editing in CAD; the STLs are what slicers want)."""
+    out = {}
+    with tempfile.TemporaryDirectory() as tmp:
+        for p in rocket.parts:
+            path = Path(tmp) / f"{p.name}.step"
+            export_step(p.local, path)
+            out[p.name] = terms.step_with_header(path.read_bytes())
+    return out
+
+
 def _stability(st) -> dict:
     return {"cg_mm": round(st.cg, 1), "cp_mm": round(st.cp, 1), "margin_cal": round(st.margin_cal, 2),
             "length_mm": round(st.length, 1), "liftoff_mass_g": round(st.total_mass_g, 1),
@@ -234,11 +254,11 @@ def _chute_text(c: dict) -> str:
 
 
 def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights: dict | None = None,
-         chute: dict | None = None, field: dict | None = None) -> bytes:
+         chute: dict | None = None, field: dict | None = None, ext: str = "stl") -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in stls.items():
-            z.writestr(f"{name}.stl", data)
+            z.writestr(f"{name}.{ext}", data)
         lines = ["Rocket Builder build notes", "", terms.SHORT, "(See LICENSE.txt in this ZIP.)", "", report["summary"], ""]
         lines += [f"Note: {n}" for n in report["notes"]]
         lines += ["", "Stability (from the nose tip, mm):", f"  {stab['message']}",
@@ -256,7 +276,7 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
             lines += ["", f"Motors (target {flights['target_m']:g} m; recommended: {flights['recommended'] or 'none'}):"]
             lines += [f"  {r['motor']}: {r['apogee_m']} m, {r['margin_cal']} cal, "
                       + ("OK" if not r["problems"] else ", ".join(r["problems"])) for r in flights["rows"]]
-        lines += ["", "Parts (STLs are in print orientation, resting on z = 0):"]
+        lines += ["", f"Parts ({ext.upper()}s are in print orientation, resting on z = 0):"]
         lines += [f"  {p['name']}: {p['mass_g']} g, {p['height_mm']} mm tall" for p in report["parts"]]
         lines += ["", "Key dimensions (mm):"]
         lines += [f"  {k}: {round(v, 2) if isinstance(v, float) else v}" for k, v in report["dimensions"].items()]
@@ -281,6 +301,8 @@ def options():
         "defaults": BuildRequest().model_dump(mode="json"),
         "stock_od": {m: round(stock_od(m), 2) for m in load_motors()},  # at the default wall
         "bay_id": {m: round(compute_derived(DesignParams(motor=m)).bay_id, 3) for m in load_motors()},  # stock OD = bay + 2 x wall
+        # What a blank critical-dimension field means (the Advanced placeholders).
+        "fit_defaults": {"joint_clearance": load_settings()["fit_slip"], "thread_clearance": 0.25, "thread_turns": 3},
         # Beginner mode: motor, printer height, overall height, nose shape and
         # one of three standard fin shapes; everything else stays at defaults.
         "beginner": {"fin_shapes": BEGINNER_FINS, "fin_shape": BEGINNER_FINS[2],
@@ -378,7 +400,7 @@ def _geometry(geo_params: dict, req: BuildRequest, request: Request) -> str:
             log.exception("build failed: %s", json.dumps(geo_params, sort_keys=True))
             raise HTTPException(422, f"The geometry engine could not build this design ({type(ex).__name__}). "
                                      "Try slightly different settings.")
-        _geo[key] = {"rocket": rocket, "balance": Balance(rocket), "glb": _glb(rocket), "report": _report(rocket), "stls": None}
+        _geo[key] = {"rocket": rocket, "balance": Balance(rocket), "glb": _glb(rocket), "report": _report(rocket), "stls": None, "steps": None}
         while len(_geo) > MAX_CACHED:
             _geo.popitem(last=False)
         log.info("built %s in %.1f s (fin scale %s)", key, time.monotonic() - t0, rocket.params.fin_scale)
@@ -494,6 +516,20 @@ def download(build_id: str):
             g["stls"] = _stls(g["rocket"])
     return Response(_zip(g["stls"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"), b.get("field")), media_type="application/zip",
                     headers={"Content-Disposition": f'attachment; filename="rocket_{build_id}.zip"'})
+
+
+@app.get("/api/builds/{build_id}/rocket_step.zip")
+def download_step(build_id: str):
+    """The same ZIP with one STEP per part instead of STLs."""
+    b, g = _get(build_id)
+    if not b["stability"]["ok"]:
+        raise HTTPException(409, b["stability"]["message"])
+    if g.get("steps") is None:
+        with _lock:
+            g["steps"] = _steps(g["rocket"])
+    return Response(_zip(g["steps"], g["report"], b["stability"], b["params"], b["flights"], b.get("parachute"), b.get("field"),
+                         ext="step"), media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="rocket_{build_id}_step.zip"'})
 
 
 # ---------- saved designs and share links ----------

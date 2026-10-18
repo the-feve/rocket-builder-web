@@ -343,6 +343,7 @@
   .motorbuy .shopbtn { flex:none; padding:8px 14px; border-radius:6px; font:600 14px system-ui, -apple-system, sans-serif; text-decoration:none; color:var(--ink); border:1px solid var(--line); }
   .motorbuy .shopbtn:hover { border-color:var(--accent); color:var(--accent); }
   .affil { font-size:11.5px; color:var(--muted); margin:4px 0 0; }
+  .fitlink { flex:1 1 100%; font-size:12.5px; }
   .licnote { flex:1 1 100%; margin:2px 0 0; font-size:11.5px; line-height:1.4; color:var(--muted); }
   .fieldbox .big { font-size:15px; } .fieldbox .big b { font-size:26px; } .fieldbox .big span { color:var(--muted); }
   #acctlinks { flex:1 1 100%; margin:2px 0 0; } #acctlinks[hidden] { display:none; }
@@ -526,6 +527,17 @@
       <label class="adv">Body OD offset, mm <input type="number" name="body_od_offset" min="0" max="80" step="0.1"></label>
       <div class="hint adv" id="odout"></div>
     </fieldset>
+    <fieldset class="adv"><legend>Fits and joints</legend>
+      <div class="hint">Critical dimensions for how the printed parts go together. Leave a box empty to use Rocket Builder's value (shown in grey). Type in what your fit-test print liked; clearances are radial (per side).</div>
+      <label>Joint clearance, mm <input type="number" name="joint_clearance" min="0" max="0.5" step="0.01"></label>
+      <label>Body joint length, mm <input type="number" name="shoulder_len" min="5" max="100" step="0.1"></label>
+      <label>Nose joint length, mm <input type="number" name="nose_shoulder_len" min="4" max="100" step="0.1"></label>
+      <div class="hint">How far each shoulder goes into the next segment. Longer joints are stiffer but take height from every segment.</div>
+      <label>Thread clearance, mm <input type="number" name="thread_clearance" min="0.05" max="1" step="0.01"></label>
+      <label>Thread pitch, mm <input type="number" name="thread_pitch" min="1.5" max="5" step="0.1"></label>
+      <label>Thread turns <input type="number" name="thread_turns" min="2" max="6" step="1"></label>
+      <div class="hint">The motor retention cap. More clearance screws on more easily; fewer turns make a shorter cap.</div>
+    </fieldset>
     <fieldset><legend>Fins</legend>
       <div class="step beg" data-tstep="5"><span class="n">5</span>Choose your fins</div>
       <p class="why beg" data-tstep="5">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
@@ -581,6 +593,8 @@
       <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
       <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs (ZIP)</span></a>
+      <a id="stepzip" class="btn off adv" href="#" download title="One STEP file per part, for editing in CAD">Download STEP (ZIP)</a>
+      <a id="fitlink" class="adv fitlink" href="https://fit.quiverdesignworks.net/#rocket" target="_blank" rel="noopener">Generate test fit parts</a>
       <p class="licnote">Files are for your personal use only: please don't share them or upload them to MakerWorld, Printables, Thingiverse or other sites. <a href="/terms" target="_blank" rel="noopener">License</a></p>
     </div>
   </form>
@@ -959,6 +973,13 @@ document.addEventListener('click', e => {
   document.getElementById('view').scrollIntoView({ block: 'nearest' });
 });
 const zipBtn = document.getElementById('zip');
+const stepBtn = document.getElementById('stepzip');
+// Fit Test Builder's Rocket tab, opened with this rocket's motor, wall and body OD offset.
+const fitLink = document.getElementById('fitlink');
+function updateFitLink() {
+  const f = form.elements, q = new URLSearchParams({ motor: f.motor.value, wall: f.wall.value || 1.5, offset: f.body_od_offset.value || 0 });
+  fitLink.href = `https://fit.quiverdesignworks.net/?${q}#rocket`;
+}
 const buildBtn = document.getElementById('build');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -1008,7 +1029,23 @@ async function flightHints() {
 form.elements.motor.addEventListener('change', flightHints);
 form.elements.body_od_offset.addEventListener('change', flightHints);
 // Driven output under the offset: the body OD it gives.
+// The Advanced "Fits and joints" boxes show Rocket Builder's computed value
+// as a placeholder (rocketgen compute_derived / thread_geometry).
+function fitPlaceholders() {
+  const f = form.elements, fd = opts.fit_defaults || {};
+  const od = stockOd() + 2 * (Number(f.body_od_offset.value) || 0);
+  const sh = Math.max(0.75 * od - 4, 10), shUsed = Number(f.shoulder_len.value) || sh;
+  f.joint_clearance.placeholder = fd.joint_clearance ?? 0.02;
+  f.shoulder_len.placeholder = sh.toFixed(1);
+  f.nose_shoulder_len.placeholder = Math.max(0.7 * shUsed, 7).toFixed(1);
+  f.thread_clearance.placeholder = fd.thread_clearance ?? 0.25;
+  f.thread_pitch.placeholder = opts.bay_id[f.motor.value] < 21 ? 2.5 : 3;
+  f.thread_turns.placeholder = fd.thread_turns ?? 3;
+  updateFitLink();
+}
+form.elements.shoulder_len.addEventListener('input', fitPlaceholders);
 function showOd() {
+  fitPlaceholders();
   const off = Number(form.elements.body_od_offset.value) || 0, stock = stockOd();
   document.getElementById('odout').textContent = off > 0
     ? `Body OD ${(stock + 2 * off).toFixed(1)} mm (stock ${stock.toFixed(1)} + 2 × ${off}); a larger OD adds an inner motor mount.`
@@ -1241,7 +1278,7 @@ let edits = 0;  // bumped on every change, so a build that finishes after an edi
 function markDirty(html = 'Settings changed. Press <b>Build</b> to update the 3D model and downloads.') {
   edits++;
   dirtyEl.innerHTML = html; dirtyEl.hidden = false;
-  buildBtn.classList.add('attention'); zipBtn.classList.add('off');
+  buildBtn.classList.add('attention'); zipBtn.classList.add('off'); stepBtn.classList.add('off');
 }
 function markClean() { dirtyEl.hidden = true; buildBtn.classList.remove('attention'); }
 const notDesignBar = e => !e.target.closest('#designbar');
@@ -1877,7 +1914,7 @@ async function postBuild(p) {
 async function runBuild() {
   await heightsReady;  // a height snap still on its way
   if (!form.reportValidity()) return;
-  buildBtn.disabled = true; zipBtn.classList.add('off');
+  buildBtn.disabled = true; zipBtn.classList.add('off'); stepBtn.classList.add('off');
   const t0 = performance.now(), seq = edits;
   startProgress(); openLaunch(false);
   // On a phone the preview sits above the form: bring it into view so the result is seen.
@@ -1900,7 +1937,9 @@ async function runBuild() {
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
     zipBtn.classList.toggle('off', !body.stability.ok);
     zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';
-    if (seq === edits) markClean(); else zipBtn.classList.add('off');
+    stepBtn.href = `/api/builds/${body.id}/rocket_step.zip`;
+    stepBtn.classList.toggle('off', !body.stability.ok);
+    if (seq === edits) markClean(); else { zipBtn.classList.add('off'); stepBtn.classList.add('off'); }
     statusEl.textContent = `Built ${body.parts.length} parts in ${((performance.now() - t0) / 1000).toFixed(1)} s · ${hintText}`;
   } catch (err) {
     stopProgress();

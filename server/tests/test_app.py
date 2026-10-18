@@ -40,6 +40,15 @@ def test_build_preview_zip():
     assert all(z.read(f"{n}.stl")[:80].startswith(b"(c)") and b"Personal use only" in z.read(f"{n}.stl")[:80] for n in names)
     assert "MakerWorld" in client.get("/terms").text
     assert "Stable" in z.read("build_notes.txt").decode()
+    # STEP option (Advanced): one STEP per part, same notes and licence.
+    r = client.get(f"/api/builds/{body['id']}/rocket_step.zip")
+    assert r.status_code == 200 and 'rocket_' in r.headers["content-disposition"] and '_step.zip' in r.headers["content-disposition"]
+    zs = zipfile.ZipFile(io.BytesIO(r.content))
+    assert set(zs.namelist()) == {f"{n}.step" for n in names} | {"build_notes.txt", "design.json", "LICENSE.txt"}
+    for n in names:
+        step = zs.read(f"{n}.step")
+        assert step.startswith(b"ISO-10303-21;") and b"Personal use only" in step[:600] and (b"MANIFOLD_SOLID_BREP" in step or b"BREP_WITH_VOIDS" in step), n  # the hollow nose has voids
+    assert "STEPs are in print orientation" in zs.read("build_notes.txt").decode()
     st = body["stability"]
     assert st["ok"] and st["cg_mm"] < st["cp_mm"] < st["length_mm"]
     # The same design is served from the cache.
@@ -509,3 +518,14 @@ def test_launch_view_in_designer_and_printer_picker():
     assert 'id="launchbtn"' in page and 'id="launchpane"' in page and "&embed=1" in page
     assert 'id="printer_pick"' in page and 'value="256"' in page
     assert "classList.add('embed')" in client.get("/launch").text
+
+
+def test_critical_fit_fields():
+    o = client.get("/api/options").json()
+    assert o["fit_defaults"] == {"joint_clearance": 0.02, "thread_clearance": 0.25, "thread_turns": 3}
+    for k in ("joint_clearance", "shoulder_len", "nose_shoulder_len", "thread_clearance", "thread_pitch", "thread_turns"):
+        assert o["defaults"][k] is None  # blank = Rocket Builder's computed value
+    r = client.post("/api/build", json={"joint_clearance": 0.9})
+    assert r.status_code == 422
+    r = client.post("/api/build", json={"thread_turns": 1})
+    assert r.status_code == 422
