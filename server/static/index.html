@@ -138,6 +138,22 @@
   #dstate { font-weight:600; }
   #dstate.mine { color:var(--ok); } #dstate.shared { color:var(--warn); }
   #designbar button.primary { border-color:var(--accent); }
+  #moderow { display:flex; gap:8px; align-items:stretch; margin:6px 0 2px; }
+  #moderow #modebar { flex:1; margin:0; }
+  #restarttut { flex:none; padding:5px 10px; font:600 12px system-ui, -apple-system, sans-serif; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:6px; cursor:pointer; white-space:nowrap; }
+  #restarttut:hover { border-color:var(--accent); }
+  /* Advanced: an (i) on each section heading opens a detailed description of its settings */
+  #form fieldset { position:relative; }
+  .helpbtn { display:inline-grid; place-items:center; width:18px; height:18px; margin-left:4px; padding:0; vertical-align:-3px; border-radius:50%;
+    border:1px solid var(--line); background:transparent; color:var(--accent); font:700 11px/1 Georgia, serif; text-transform:none; cursor:pointer; }
+  .helpbtn:hover, .helpbtn[aria-expanded=true] { border-color:var(--accent); background:var(--accent); color:var(--accent-ink); }
+  .helppop { position:absolute; z-index:6; left:0; right:0; top:22px; max-height:min(70vh, 520px); overflow-y:auto; padding:12px 14px 10px;
+    border:1px solid var(--line); border-radius:10px; background:var(--panel); box-shadow:0 10px 30px rgba(0,0,0,.18); font-size:13px; line-height:1.45; }
+  .helppop[hidden] { display:none; }
+  .helppop h4 { margin:0 26px 6px 0; font-size:14px; }
+  .helppop dl { margin:0; } .helppop dt { font-weight:600; margin-top:8px; } .helppop dd { margin:2px 0 0; color:var(--muted); }
+  .helppop p { margin:6px 0 0; color:var(--muted); }
+  .helppop .x { position:absolute; top:8px; right:8px; width:24px; height:24px; padding:0; border:1px solid var(--line); border-radius:6px; background:transparent; color:var(--ink); font-size:14px; line-height:1; cursor:pointer; }
   #modebar { display:flex; margin:6px 0 2px; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
   #modebar button { flex:1; padding:5px 8px; border:0; border-radius:0; font:600 12px system-ui; color:var(--muted); background:transparent; }
   #modebar button[aria-pressed=true] { color:var(--accent-ink); background:var(--accent); }
@@ -217,7 +233,11 @@
   @media (max-width:1100px) { details.grownup[open] > .full { grid-template-columns:1fr; } }
 
   /* Guided tutorial: one Beginner step at a time; everything else greyed out and inert */
-  #form.tut [data-tstep]:not(.tcur), #form.tut .tlock { opacity:.28; filter:grayscale(1); pointer-events:none; user-select:none; transition:opacity .2s; }
+  #form.tut [data-tstep]:not(.tcur), #form.tut .tlock { opacity:.14; filter:grayscale(1); pointer-events:none; user-select:none; transition:opacity .2s; }
+  /* Less to read: steps that aren't current show only their numbered heading. */
+  #form.tut .why[data-tstep]:not(.tcur), #form.tut .hint[data-tstep]:not(.tcur), #form.tut .conv[data-tstep]:not(.tcur),
+  #form.tut .snapmsg[data-tstep]:not(.tcur) { display:none; }
+  #form.tut .step[data-tstep]:not(.tcur) { opacity:.3; }
   #form.tut .tcur { position:relative; }
   /* No pinned Build bar during the tutorial: on step 7 it slid over the Back / Finish row under it. */
   #form.tut .actions { position:static; border-top:0; padding-bottom:0; }
@@ -228,7 +248,7 @@
   .snapmsg { margin:2px 0 6px; padding:6px 9px; border-radius:6px; border-left:3px solid var(--warn); background:var(--card); font-size:13px; }
   .snapmsg[hidden] { display:none; }
   #form.tut .step.tcur { margin-top:18px; }
-  #form.tut .step { scroll-margin-top:96px; }
+  #form.tut .step { scroll-margin-top:120px; }
   #tutbar { position:sticky; top:0; z-index:3; display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 -14px 6px; padding:10px 14px;
     background:var(--card); border-bottom:1px solid var(--line); font-size:14px; }
   #tutbar[hidden] { display:none; }
@@ -265,6 +285,15 @@
   #kidguide .kidpref { display:flex; gap:8px; align-items:center; margin-top:8px; } #kidguide .kidpref[hidden] { display:none; }
   #kidguide .ghost { background:transparent; color:var(--ink); border-color:var(--line); }
   #kidguide svg { width:100%; max-width:460px; height:auto; display:block; color:var(--ink); margin:6px 0; }
+  #kidguide details.moreinfo { margin-top:16px; border:1px solid var(--line); border-radius:8px; padding:0 12px; background:var(--card); }
+  #kidguide details.moreinfo > summary { cursor:pointer; padding:10px 0; font-weight:700; font-size:14.5px; }
+  #kidguide details.moreinfo[open] { padding-bottom:10px; }
+  #kidguide details.moreinfo h3:first-of-type { margin-top:4px; }
+  table.sizing { width:100%; border-collapse:collapse; margin:6px 0; font-size:13px; font-variant-numeric:tabular-nums; }
+  table.sizing th, table.sizing td { text-align:left; vertical-align:top; padding:5px 8px 5px 0; border-bottom:1px solid var(--line); }
+  table.sizing th { font-size:12px; color:var(--muted); font-weight:600; }
+  table.sizing td:first-child { font-weight:700; white-space:nowrap; }
+  .sizenote { font-size:12px; color:var(--muted); }
   .supplynote { margin-top:12px; padding:12px 14px; border-radius:8px; border-left:4px solid var(--accent); background:var(--card); font-size:14px; }
   .supplynote[hidden] { display:none; }
   .supplynote a { font-weight:700; }
@@ -490,23 +519,26 @@
       <div id="acctnote" class="hint"><a href="#" data-signin>Sign in or create an account</a> to keep your rockets and open them on any device.</div>
       <div id="acctlinks" class="hint" hidden><a href="#" id="myorders">My orders</a></div>
     </div>
-    <div id="modebar" role="group" aria-label="Mode">
-      <button type="button" data-mode="beginner" aria-pressed="true">Beginner</button>
-      <button type="button" data-mode="advanced" aria-pressed="false">Advanced</button>
+    <div id="moderow">
+      <div id="modebar" role="group" aria-label="Mode">
+        <button type="button" data-mode="beginner" aria-pressed="true">Beginner</button>
+        <button type="button" data-mode="advanced" aria-pressed="false">Advanced</button>
+      </div>
+      <button type="button" id="restarttut" title="Walk through the Beginner steps one at a time">↻ Restart tutorial</button>
     </div>
     <div id="modehint"></div>
     <div class="step beg" data-tstep="1"><span class="n">1</span>Make an account <span class="tag">grown-ups</span></div>
-    <p class="why beg" data-tstep="1">An account <b>keeps your rockets safe</b>, so you can open them on any device, and lets a grown-up order a printed rocket. It's free. No account? You can still save rockets in this browser and add an account later.</p>
+    <p class="why beg" data-tstep="1">A free account <b>keeps your rockets safe</b> on any device. No account? You can still save in this browser.</p>
     <div class="acctstep beg" data-tstep="1" id="acctstep"></div>
     <fieldset><legend>Motor</legend>
       <div class="step beg" data-tstep="2"><span class="n">2</span>Pick a motor size</div>
-      <p class="why beg" data-tstep="2">The <b>motor</b> is the part that pushes your rocket into the sky. You buy motors at a hobby store and slide one into the back of your rocket. The number is how wide the motor is, in millimeters. <a href="#guide-motors" class="more" data-guide>More about motors</a></p>
+      <p class="why beg" data-tstep="2">The <b>motor</b> pushes your rocket into the sky. The number is how wide it is, in mm. <a href="#guide-sizing" class="more" data-guide>Which size?</a></p>
       <label data-tstep="2">Motor size <select name="motor"></select></label>
       <p class="why beg" id="motorwhy" data-tstep="2"></p>
     </fieldset>
     <fieldset><legend>Body</legend>
       <div class="step beg" data-tstep="3"><span class="n">3</span>How tall can your 3D printer print?</div>
-      <p class="why beg" data-tstep="3">Ask a grown-up or look it up for your printer; <b>about 200 mm is common</b>. It comes first because it decides which rocket heights will work. If your rocket is taller than the printer, Rocket Builder splits the body into pieces that twist together, so each piece fits.</p>
+      <p class="why beg" data-tstep="3">Ask a grown-up. <b>About 200 mm is common.</b> Tall rockets are split into pieces that twist together.</p>
       <label data-tstep="3"><span>Your printer</span> <select id="printer_pick" aria-describedby="printerhint">
         <option value="">Other / type it below</option>
         <option value="180">Bambu Lab A1 mini (180 mm)</option><option value="256">Bambu Lab A1, P1S, X1C (256 mm)</option>
@@ -515,11 +547,11 @@
       <label data-tstep="3"><span>Printer max height<span class="beg">, mm</span></span> <input type="number" name="print_max_height" min="50" max="500" step="1"></label>
       <p class="hint" id="printerhint" data-tstep="3">Pick your printer to fill in its height, or type the height (the Z size in its specs).</p>
       <div class="step beg" data-tstep="4"><span class="n">4</span>How tall is your rocket?</div>
-      <p class="why beg" data-tstep="4">Measured from the tip of the nose to the bottom of the fins. <b>Taller rockets fly straighter</b>, but they're heavier and take longer to print. Slide to change it.</p>
+      <p class="why beg" data-tstep="4">Nose tip to fin bottom. <b>Taller rockets fly straighter</b> but take longer to print.</p>
       <input type="range" class="slider beg" id="heightslider" data-tstep="4" min="150" max="900" step="10" aria-label="Rocket height">
       <label class="beg" data-tstep="4">Height, mm <input type="number" name="overall_length" min="80" max="2500" step="1" required></label>
       <div class="conv beg" id="heightconv" data-tstep="4"></div>
-      <p class="hint beg heightnote" id="heightnote" data-tstep="4">Not every height works: each body piece has to fit your printer, and the bottom piece needs room for the motor and the fins, so a big motor needs a taller rocket. If you pick a height that can't be built, it moves to the closest one that can.<span id="heightrange"></span></p>
+      <p class="hint beg heightnote" id="heightnote" data-tstep="4">If a height can't be built, it moves to the closest one that can.<span id="heightrange"></span></p>
       <p class="snapmsg beg" id="heightsnap" data-tstep="4" role="status" aria-live="polite" hidden></p>
       <label class="adv">Body length <input type="number" name="body_length" min="50" max="2000" step="1"></label>
       <label class="adv">Wall thickness, mm <input type="number" name="wall" min="0.8" max="3" step="0.1"></label>
@@ -540,7 +572,7 @@
     </fieldset>
     <fieldset><legend>Fins</legend>
       <div class="step beg" data-tstep="5"><span class="n">5</span>Choose your fins</div>
-      <p class="why beg" data-tstep="5">Fins work like the feathers on an arrow: they <b>keep the rocket pointing straight</b>. In Beginner mode they grow by themselves until your rocket is stable. <a href="#guide-stab" class="more" data-guide>Why fins matter</a></p>
+      <p class="why beg" data-tstep="5">Like feathers on an arrow, fins <b>keep it flying straight</b>. They grow by themselves until it's stable.</p>
       <div class="choices beg" id="finpick" data-tstep="5" role="group" aria-label="Fin shape"></div>
       <p class="why beg choice-why" id="finwhy" data-tstep="5"></p>
       <label class="advshow">Shape <select name="fin_shape"></select></label>
@@ -559,7 +591,7 @@
     </fieldset>
     <fieldset><legend>Nose</legend>
       <div class="step beg" data-tstep="6"><span class="n">6</span>Choose a nose cone</div>
-      <p class="why beg" data-tstep="6">The nose cone is the pointy top. It <b>helps the rocket slice through the air</b>, and it pops off at the top of the flight so the parachute can come out. <a href="#guide-parts" class="more" data-guide>More about parts</a></p>
+      <p class="why beg" data-tstep="6">The nose <b>slices through the air</b>, then pops off so the parachute can come out.</p>
       <div class="choices beg" id="nosepick" data-tstep="6" role="group" aria-label="Nose shape"></div>
       <p class="why beg choice-why" id="nosewhy" data-tstep="6"></p>
       <label class="advshow">Shape <select name="nose_shape"></select></label>
@@ -588,7 +620,7 @@
       </details>
     </fieldset>
     <div class="step beg" data-tstep="7"><span class="n">7</span>Build it and check the stability score</div>
-    <p class="why beg" data-tstep="7">Press <b>Build my rocket</b>. In 10 to 30 seconds your rocket appears in 3D with a <b>stability score in "cal"</b> that tells you if it will fly straight. 1 to 2 cal is just right. <a href="#" class="more" data-kidguide>How the score works</a></p>
+    <p class="why beg" data-tstep="7">Press <b>Build my rocket</b>. Your rocket appears with a <b>score in "cal"</b>. 1 to 2 is just right! <a href="#" class="more" data-kidguide>How the score works</a></p>
     <div class="actions" data-tstep="7">
       <div id="dirty" role="status">Press <b>Build</b> to make the 3D model and downloads.</div>
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
@@ -618,12 +650,61 @@
           <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
         <h3>How it works</h3>
         <ol class="steps4">
-          <li><b>Design it.</b> A grown-up can make a free account first. Then pick a motor, your printer's size, how tall, the fins and the nose. Each step tells you what it does.</li>
+          <li><b>Design it.</b> Pick a motor, a height, fins and a nose. Each step explains itself.</li>
           <li><b>Build and check.</b> Press <i>Build my rocket</i>. It appears here with a stability score.</li>
           <li><b>Print it.</b> Download the files and print the parts on a 3D printer.</li>
           <li><b>Fly it!</b> Add a motor and parachute and launch it with a grown-up.</li>
         </ol>
-        <h3>The stability score (cal): will it fly straight?</h3>
+        <div class="safety"><b>Safety first:</b> a grown-up handles and launches the motors, in a big open field, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">model rocket safety code</a>.</div>
+        <div class="btns">
+          <button type="button" class="go" id="kidstart">Start designing</button>
+          <button type="button" class="ghost" id="kidskip2">Skip tutorial</button>
+          <button type="button" class="ghost" id="kidadv">Go to Advanced</button>
+          <button type="button" class="ghost" id="kidfull">Read the full guide</button>
+        </div>
+        <p class="hint" id="kidreplay" hidden>You've done the tutorial before. <a href="#" id="replaytut">Replay it</a></p>
+        <label class="hint kidpref" id="kidprefrow" hidden><input type="checkbox" id="kidskippref"> Skip the tutorial when I'm signed in (you can change this under your account)</label>
+        <details class="moreinfo" id="kidmore">
+          <summary>More on rocket sizing and rating systems</summary>
+          <h3 id="kid-letters">Motor letters: how big is the push?</h3>
+          <p>Every motor has a code like <b>C6-5</b>. The <b>letter</b> is the total push. Each letter is about <b>twice as strong</b> as the one before, so a C pushes about twice as much as a B. The <b>6</b> is how hard it pushes, and the <b>5</b> is the seconds before the parachute pops out.</p>
+          <table class="sizing">
+            <thead><tr><th>Letter</th><th>How high it goes*</th><th>Field you need</th></tr></thead>
+            <tbody>
+              <tr><td>¼A, ½A</td><td>15–60 m (50–200 ft)</td><td>15 m (50 ft): a big backyard</td></tr>
+              <tr><td>A</td><td>60–150 m (200–500 ft)</td><td>30 m (100 ft): a basketball court</td></tr>
+              <tr><td>B</td><td>120–200 m (400–650 ft)</td><td>60 m (200 ft): a soccer field's width</td></tr>
+              <tr><td>C</td><td>150–300 m (500–1,000 ft)</td><td>120 m (400 ft): longer than a soccer field</td></tr>
+              <tr><td>D</td><td>250–350 m (800–1,150 ft)</td><td>150 m (500 ft)</td></tr>
+              <tr><td>E</td><td>300–550 m (1,000–1,800 ft)</td><td>300 m (1,000 ft): a big farm field</td></tr>
+              <tr><td>F</td><td>500–750 m (1,600–2,500 ft)</td><td>300 m (1,000 ft)</td></tr>
+            </tbody>
+          </table>
+          <p class="sizenote">*Rough heights for rockets made here, from Rocket Builder's flight check. Lighter rockets go higher. The field is the safety code's smallest size (its shortest side). On a windy day the parachute drifts further, so bigger is better: <i>Watch it launch</i> shows how far yours drifts.</p>
+          <h3 id="kid-sizes">Motor sizes: how wide?</h3>
+          <table class="sizing">
+            <thead><tr><th>Size</th><th>Motors</th><th>Good for</th></tr></thead>
+            <tbody>
+              <tr><td>M13</td><td>¼A, ½A, A</td><td>Small, light rockets and short flights. A school field or park.</td></tr>
+              <tr><td>M18</td><td>½A, A, B, C</td><td>The most common motors in stores. <b>Best for a first rocket.</b></td></tr>
+              <tr><td>M24</td><td>C, D</td><td>Bigger rockets and higher flights. A big field.</td></tr>
+              <tr><td>M24L</td><td>E</td><td>Long 24 mm motors: very high flights. A very big field.</td></tr>
+              <tr><td>M29</td><td>E, F</td><td>Big rockets for experienced flyers.</td></tr>
+            </tbody>
+          </table>
+          <h3>Picking a size</h3>
+          <ol class="tips">
+            <li><b>Start with your field.</b> Find the biggest letter whose field fits where you'll launch.</li>
+            <li><b>Pick the motor size</b> that uses that letter. Not sure? Choose <b>M18</b>.</li>
+            <li><b>First flight:</b> use a smaller letter than the biggest that fits, and watch how high it goes.</li>
+          </ol>
+          <h3>The other scores in your report</h3>
+          <ul class="tips">
+            <li><b>Power:</b> the motor's push ÷ the rocket's weight. <b>5× or more</b> passes, so it leaves the pad fast.</li>
+            <li><b>Launch speed:</b> how fast it leaves the launch rod. <b>15 m/s or more</b> passes, so the fins can steer.</li>
+            <li><b>Parachute:</b> the size that brings it down gently (about 4.5 m/s).</li>
+          </ul>
+        <h3 id="kid-score">The stability score (cal): will it fly straight?</h3>
         <svg viewBox="0 0 460 120" role="img" aria-label="A rocket lying on its side with the nose on the left. A blue dot, the balance point, is in front of a red dot, the push point, by about one and a half body widths.">
           <path d="M14 60 Q48 38 96 38 L360 38 L360 82 L96 82 Q48 82 14 60 Z" fill="none" stroke="currentColor" stroke-width="2"/>
           <path d="M306 38 L360 10 L384 10 L360 38 M306 82 L360 110 L384 110 L360 82" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -643,15 +724,7 @@
           <li>The score is checked with the <b>heaviest motor</b> of your size loaded, because the motor is heavy and sits at the back.</li>
           <li>Try it for real: balance your finished rocket (with a motor in) on one finger. That's the blue dot!</li>
         </ul>
-        <div class="safety"><b>Safety first:</b> rocket motors are handled and launched by a grown-up, in a big open field, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">model rocket safety code</a>.</div>
-        <div class="btns">
-          <button type="button" class="go" id="kidstart">Start designing</button>
-          <button type="button" class="ghost" id="kidskip2">Skip tutorial</button>
-          <button type="button" class="ghost" id="kidadv">Go to Advanced</button>
-          <button type="button" class="ghost" id="kidfull">Read the full guide</button>
-        </div>
-        <p class="hint" id="kidreplay" hidden>You've done the tutorial before. <a href="#" id="replaytut">Replay it</a></p>
-        <label class="hint kidpref" id="kidprefrow" hidden><input type="checkbox" id="kidskippref"> Skip the tutorial when I'm signed in (you can change this under your account)</label>
+        </details>
       </article>
       <article id="guide" aria-label="User guide">
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
@@ -660,7 +733,7 @@
         <p>Design a 3D-printable model rocket for a standard motor, check that it's stable and flies well, then download STL files ready to print. New to model rockets? Start with <a href="#guide-terms">Key terms</a>. Where the numbers come from: <a href="/sources" target="_blank">Sources and references</a>.</p>
         <div class="supplynote" data-supplies hidden><b>Need to get your own supplies for building and launching?</b> <a href="#" data-supplies-link target="_blank" rel="noopener">Order through my link here to support me!</a>
           <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
-        <nav><a href="#guide-use">Using the app</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-files">Your files</a><a href="#guide-or">OpenRocket</a><a href="/sources" target="_blank">Sources</a></nav>
+        <nav><a href="#guide-use">Using the app</a><a href="#guide-sizing">Sizing a rocket</a><a href="#guide-modes">Modes</a><a href="#guide-report">The report</a><a href="#guide-terms">Key terms</a><a href="#guide-files">Your files</a><a href="#guide-or">OpenRocket</a><a href="/sources" target="_blank">Sources</a></nav>
         <ol id="guide-use">
           <li>Choose a <b>mode</b> and the <b>motor size</b> you'll fly (on the left).</li>
           <li>Set the size and shapes, then press <b>Build</b>. The first build of a new design takes 10–30 s; a bar along the top shows progress.</li>
@@ -669,6 +742,29 @@
           <li><b>New rocket</b> / <b>Save</b> keep the design on this site (listed under <i>My rockets</i> in this browser); <b>Copy link</b> shares a read-only copy; <b>Download file</b> saves the settings to your computer and <b>Open file</b> loads them back.</li>
         </ol>
         <p>Changing any setting shows <i>Press Build</i>: the model and downloads only update when you build again.</p>
+
+        <h3 id="guide-sizing">Sizing a rocket: motor classes, sizes and fields</h3>
+        <p>Start from the field you can use, then pick the motor class it allows, then a motor size that offers that class. The altitudes below are typical for rockets made here (printed parts are heavier than cardboard kits), from the app's flight check at usual printed masses; your report gives the number for your design. Field sizes are the NAR Model Rocket Safety Code minimums (the shortest side of the field); the app also works out the parachute drift in a 10 mph breeze and recommends the larger of the two.</p>
+        <table class="sizing">
+          <thead><tr><th>Class</th><th>Total impulse</th><th>Sizes here</th><th>Typical apogee</th><th>Min. field</th></tr></thead>
+          <tbody>
+            <tr><td>¼A, ½A</td><td>up to 1.25 N·s</td><td>M13, M18</td><td>15–60 m (50–200 ft)</td><td>15 m (50 ft)</td></tr>
+            <tr><td>A</td><td>1.26–2.5 N·s</td><td>M13, M18</td><td>60–150 m (200–500 ft)</td><td>30 m (100 ft)</td></tr>
+            <tr><td>B</td><td>2.51–5 N·s</td><td>M18</td><td>120–200 m (400–650 ft)</td><td>60 m (200 ft)</td></tr>
+            <tr><td>C</td><td>5.01–10 N·s</td><td>M18, M24</td><td>150–300 m (500–1,000 ft)</td><td>120 m (400 ft)</td></tr>
+            <tr><td>D</td><td>10.01–20 N·s</td><td>M24</td><td>250–350 m (800–1,150 ft)</td><td>150 m (500 ft)</td></tr>
+            <tr><td>E</td><td>20.01–40 N·s</td><td>M24L, M29</td><td>300–550 m (1,000–1,800 ft)</td><td>300 m (1,000 ft)</td></tr>
+            <tr><td>F</td><td>40.01–80 N·s</td><td>M29</td><td>500–750 m (1,600–2,500 ft)</td><td>300 m (1,000 ft)</td></tr>
+          </tbody>
+        </table>
+        <dl>
+          <dt>M13 (13 mm, "mini")</dt><dd>¼A3, ½A3, A3, A10. The smallest and lightest rockets; low flights that suit a school field or park. The light motors leave little margin for a heavy print, so keep these rockets short and thin-walled.</dd>
+          <dt>M18 (18 mm, "standard")</dt><dd>½A6, A8, B4, B6, C5, C6: the motors most hobby and craft stores stock. The best size for a first rocket: an A or B for a small field, a C once you have room.</dd>
+          <dt>M24 (24 mm)</dt><dd>C11, D12. Heavier rockets and higher flights. The C11 suits a heavy rocket on a smaller field; the D12 needs at least 150 m.</dd>
+          <dt>M24L (24 mm, long)</dt><dd>E9, E12. Long motors, so the motor bay and the bottom section are longer. Very high flights: plan on a 300 m field and a club launch.</dd>
+          <dt>M29 (29 mm)</dt><dd>E16, F15. Big, heavy rockets for experienced flyers; a 300 m field, and check local rules (some fields and states treat F motors differently).</dd>
+          <dt>Rules of thumb</dt><dd>Thrust-to-weight at least 5:1 and at least 15 m/s off the rod (the report checks both). Fly the first flight on a smaller motor than the biggest your field allows. Heavier rockets need more push: if no motor passes, shorten the rocket, thin the wall or step up a size.</dd>
+        </dl>
 
         <h3 id="guide-modes">Modes</h3>
         <div class="cols">
@@ -954,6 +1050,8 @@ document.getElementById('kidstart').onclick = () => {
   } else tutStart();
 };
 document.getElementById('tutstartbtn').onclick = () => tutStart();
+// "Restart tutorial" next to the mode switch: back to Beginner, step 1, from anywhere.
+document.getElementById('restarttut').onclick = () => { tutDoneEl.hidden = true; tutStart(); };
 document.getElementById('replaytut').onclick = e => { e.preventDefault(); tutStart(); };
 document.getElementById('kidreplay').hidden = !tutDone();
 function openFull(anchor) {
@@ -968,7 +1066,12 @@ document.addEventListener('click', e => {
   const a = e.target.closest('a[data-guide], a[data-kidguide]');
   if (!a) return;
   e.preventDefault();
-  if (a.hasAttribute('data-kidguide')) showGuide(true, 'kid'); else openFull(a.getAttribute('href').slice(1));
+  if (a.hasAttribute('data-kidguide')) {
+    // "How the score works": the explainer lives in the quick start's collapsed sizing section.
+    showGuide(true, 'kid');
+    document.getElementById('kidmore').open = true;
+    document.getElementById('kid-score').scrollIntoView({ block: 'start' });
+  } else openFull(a.getAttribute('href').slice(1));
   if (matchMedia('(max-width: 800px)').matches) return;  // the sheet covers the screen already
   document.getElementById('view').scrollIntoView({ block: 'nearest' });
 });
@@ -1119,6 +1222,75 @@ function switchMode(m) {
 }
 document.querySelectorAll('#modebar button').forEach(b => b.onclick = () => switchMode(b.dataset.mode));
 
+// ---------- Advanced: what each setting does ----------
+// An (i) on each section heading opens a detailed description of its settings.
+const HELP = {
+  Motor: ['Motor', `<dl>
+    <dt>Motor size</dt><dd>The diameter of motor the rocket is built around: M13 (13 mm mini), M18 (18 mm standard), M24 (24 mm), M24L (long 24 mm) and M29 (29 mm). It sets the motor bay's inside diameter and length, the stock body diameter (bay + 2 × wall), the twist-on motor cap and its thread, and which motors the flight check simulates. A printed rocket only takes motors of the size it was built for.</dd>
+    <dt>How it affects the rest</dt><dd>Standard fins are sized so the rocket is stable with the <b>heaviest</b> motor of this size loaded (the worst case), so changing size can grow or shrink the fins. Bigger sizes need taller bottom sections (motor + fins), so the shortest buildable rocket grows too.</dd></dl>
+    <p>Which size and class to pick for your field: <a href="#guide-sizing" data-guide>Sizing a rocket</a>.</p>`],
+  Body: ['Body', `<dl>
+    <dt>Printer max height</dt><dd>The tallest part your printer can make (its Z size). The body is split into as many sections as needed so each one, with its joint shoulder, fits under this height.</dd>
+    <dt>Body length</dt><dd>The length of the body tube, from the base of the nose cone to the tail. The nose sits on top of it, so the overall length is body length + nose length (shown in the report). Beginner mode sets the overall height instead and works this out.</dd>
+    <dt>Wall thickness</dt><dd>The wall of the body tubes, nose cone and motor mount. Thicker is stronger and stiffer but heavier, which lowers the flight and needs more motor. Use a multiple of your nozzle width (1.2, 1.6 or 2.0 mm for a 0.4 mm nozzle) so the slicer prints whole perimeters.</dd>
+    <dt>Body OD offset</dt><dd>Makes the rocket fatter: each 1 mm of offset adds 2 mm to the outside diameter. At 0 the motor fits the body itself (minimum diameter: lightest and fastest). With an offset, an inner motor mount holds the motor. A fatter body has more room for the parachute but more drag and weight.</dd></dl>`],
+  'Fits and joints': ['Fits and joints', `<p>How tightly the printed parts go together. Leave a box empty to use Rocket Builder's value (shown in grey). Print the test parts from <i>Generate test fit parts</i> first, then type in the values your printer liked.</p><dl>
+    <dt>Joint clearance</dt><dd>The gap, per side, between a shoulder and the tube it slides into. More clearance slides in more easily; too much is loose and wobbly.</dd>
+    <dt>Body joint length</dt><dd>How far each body-to-body shoulder goes into the next section. Longer joints are stiffer and straighter but take height from every section.</dd>
+    <dt>Nose joint length</dt><dd>How far the nose's shoulder goes into the body. Shorter lets the ejection charge push the nose off more easily; too short and it can fall off or tilt.</dd>
+    <dt>Thread clearance</dt><dd>The gap in the motor cap's thread. More screws on more easily; too much and the cap can work loose.</dd>
+    <dt>Thread pitch</dt><dd>The distance between thread turns. Coarser threads print more reliably; finer ones hold with less height.</dd>
+    <dt>Thread turns</dt><dd>How many turns the motor cap screws on. Fewer make a shorter, lighter cap; more hold more firmly.</dd></dl>`],
+  Fins: ['Fins', `<dl>
+    <dt>Shape</dt><dd>The fin outline: clipped delta, trapezoid, swept, delta or rectangular. Swept fins look fast but their tips stick out past the tail and can snap on landing; trapezoid and clipped delta are the toughest.</dd>
+    <dt>Count</dt><dd>3, 4 or 5 fins. Three is lightest with the least drag; more fins give more stability for the same fin size, so each one can be smaller.</dd>
+    <dt>Thickness</dt><dd>Thicker fins are stiffer (less flutter at speed) and survive landings better, but add weight and drag.</dd>
+    <dt>Root fillet</dt><dd>The rounded blend where the fin meets the body, along its root. A bigger fillet makes a much stronger joint, so fins don't snap off on landing.</dd>
+    <dt>Leading-edge root fillet</dt><dd>A smaller blend at the front end of the root, where the fin's leading edge meets the body. Cosmetic: if it can't be built it's left sharp, and the build notes say so.</dd>
+    <dt>Tip radius</dt><dd>Rounds the outer corners of the fin, so they don't chip or catch.</dd>
+    <dt>Custom fin size</dt><dd>Off: fins use a standard size that grows automatically until the rocket is stable with the heaviest motor. On: you set the root chord (length along the body), span (how far it sticks out), tip chord (length of the outer edge) and sweep (how far back the tip's front edge sits), and they're used exactly as typed. Check the stability score: under 1 cal, downloads are blocked.</dd></dl>`],
+  Nose: ['Nose', `<dl>
+    <dt>Shape</dt><dd>Tangent ogive (the classic smooth point), conical (simple and light), elliptical (round and blunt, strong), parabolic (a rounded point) and Von Kármán (lowest drag at high speed). At model-rocket speeds the difference in drag is small; blunter shapes are tougher and easier to print.</dd>
+    <dt>Fineness (length ÷ OD)</dt><dd>How long and pointed the nose is: 3 means three body diameters long. Longer noses are pointier and put a little more weight up front (good for stability) but take longer to print and add height.</dd></dl>`],
+  'Launch lugs': ['Launch lugs', `<dl>
+    <dt>Lugs</dt><dd>The rings that slide over the launch rod and guide the rocket until it's fast enough for the fins to steer. <i>Aft + forward</i> (two lugs) guides best; <i>Aft only</i> is fine for short rockets; <i>None</i> if you'll use a rail or tower.</dd>
+    <dt>Rod diameter</dt><dd>Your launch pad's rod. Most small pads use 1/8 inch (3.175 mm); bigger pads 3/16 inch (4.76 mm) or 1/4 inch (6.35 mm). The lug's hole is made a little larger.</dd>
+    <dt>Rod standoff part</dt><dd>A separate clip that snaps on the rod and holds the rocket up off the pad, so the motor cap and nozzle clear the blast deflector.</dd>
+    <dt>Pad clearance</dt><dd>How far the rocket's lowest point sits above the blast deflector, set by the standoff's height.</dd>
+    <dt>Forward lug position</dt><dd>Where the second lug sits along the body, as a fraction of the body tube's length from the tail (0.5 is halfway up). Further apart guides straighter.</dd></dl>`],
+  Material: ['Material', `<dl>
+    <dt>Filament</dt><dd>Used for the weight estimate (each plastic has its own density: PLA 1.24, PETG 1.27, ASA 1.07 g/cm³), which feeds the stability and flight checks. PLA is easiest to print and stiff. PETG is tougher and less brittle in the cold. ASA is lightest here and stands up to sun and heat. Parts are weighed as solid plastic; real prints with infill are usually lighter, so weigh yours.</dd></dl>`],
+  'Flight (stability check)': ['Flight', `<dl>
+    <dt>Target altitude</dt><dd>How high you'd like to fly. The motor picker highlights the passing motor that comes closest.</dd>
+    <dt>Check with motor</dt><dd>Which motor is loaded for the stability score. The default is the heaviest of the size (the worst case: the motor's weight sits at the back). Pick the one you'll fly to see its real margin.</dd>
+    <dt>Recovery mass</dt><dd>The parachute, shock cord and wadding, in grams. Blank uses an allowance for a parachute and cord that fit this body. Weigh yours for the most accurate numbers.</dd>
+    <dt>Drag coefficient</dt><dd>How slippery the whole rocket is (Cd). 0.5–0.75 is typical; the app uses 0.65. Lower means higher flights. OpenRocket can estimate it for your design.</dd>
+    <dt>Launch rod</dt><dd>The length of your rod (or rail) in metres; 0.91 m (3 ft) is common. A longer rod gives a higher speed leaving it.</dd></dl>`],
+};
+const helpPop = document.createElement('div');
+helpPop.className = 'helppop'; helpPop.hidden = true; helpPop.setAttribute('role', 'dialog');
+let helpFor = null;
+function closeHelp() { if (helpFor) helpFor.setAttribute('aria-expanded', 'false'); helpFor = null; helpPop.hidden = true; }
+for (const lg of form.querySelectorAll('fieldset > legend')) {
+  const h = HELP[lg.textContent.trim()];
+  if (!h) continue;
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'helpbtn'; b.textContent = 'i';
+  b.setAttribute('aria-label', `What the ${h[0]} settings do`); b.title = 'What do these settings do?';
+  b.setAttribute('aria-expanded', 'false');
+  b.onclick = e => {
+    e.stopPropagation();
+    if (helpFor === b) return closeHelp();
+    closeHelp();
+    helpPop.innerHTML = `<button type="button" class="x" aria-label="Close">×</button><h4>${h[0]}</h4>${h[1]}`;
+    helpPop.querySelector('.x').onclick = closeHelp;
+    helpPop.setAttribute('aria-label', `${h[0]} settings`);
+    lg.after(helpPop); helpPop.hidden = false; helpFor = b; b.setAttribute('aria-expanded', 'true');
+  };
+  lg.append(b);
+}
+document.addEventListener('click', e => { if (helpFor && !helpPop.contains(e.target)) closeHelp(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && helpFor) { const b = helpFor; closeHelp(); b.focus(); } });
 // ---------- Beginner: picture choices and plain-language help ----------
 const FIN_INFO = {
   trapezoid: ['Trapezoid', 'A classic, strong shape. A great first rocket.'],
