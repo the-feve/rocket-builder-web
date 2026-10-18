@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rocket Builder Assembly Guide</title>
+<meta name="description" content="How to put together, rig, prepare and fly a 3D-printed rocket made with Rocket Builder by Quiver Design Works.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../brand/tokens.css">
+<style>
+  /* Fallbacks in case ../brand/tokens.css isn't next to this file. */
+  :root {
+    --night: var(--rb-night, #12203A); --paper: var(--rb-paper, #F6F1E7); --white: var(--rb-paper-white, #FFFDF8);
+    --orange: var(--rb-orange, #F2652B); --sky: var(--rb-sky, #3D8BFD); --red: var(--rb-red, #E5484D);
+    --green: var(--rb-green, #2FB67C); --grey: var(--rb-grey, #6E6E73);
+    --line: var(--rb-paper-300, #E2D9C6); --card: var(--rb-paper-200, #EDE6D8);
+    --sky-100: var(--rb-sky-100, #DDEAFF); --sky-700: var(--rb-sky-700, #1D5BC4);
+    --red-100: var(--rb-red-100, #FCE3E3); --red-700: var(--rb-red-700, #C22E33);
+    --amber-100: var(--rb-amber-100, #FBEFD6); --amber-700: var(--rb-amber-700, #8A5A00);
+    --green-100: var(--rb-green-100, #DCF3E8); --green-700: var(--rb-green-700, #17754E);
+    --head: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --chamfer: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+  }
+  @page { size: Letter; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #8a8f99; color: var(--night); }
+  body { font: 10pt/1.42 var(--body); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 8.5in; height: 11in; margin: 0.25in auto; background: var(--white); position: relative; overflow: hidden;
+          padding: 0.45in 0.5in 0.55in; display: flex; flex-direction: column; gap: 9pt; break-after: page; }
+  .page:last-child { break-after: auto; }
+  @media print { html, body { background: none; } .page { margin: 0; box-shadow: none; } }
+  @media screen and (max-width: 8.6in) {
+    .page { width: 100%; height: auto; min-height: 0; margin: 0 0 12px; padding: 16px; }
+  }
+  h1, h2, h3, h4 { font-family: var(--head); margin: 0; line-height: 1.12; letter-spacing: -0.01em; }
+  h2 { font-size: 16pt; }
+  h3 { font-size: 11.5pt; }
+  p { margin: 0 0 4pt; }
+  ul, ol { margin: 0; padding-left: 1.2em; }
+  li { margin: 0 0 2pt; }
+  b { font-weight: 650; }
+  .num { font-family: var(--head); font-variant-numeric: tabular-nums; }
+
+  /* Header band */
+  .band { background: var(--night); color: var(--paper); margin: -0.45in -0.5in 0; padding: 14pt 0.5in 12pt;
+          display: flex; align-items: center; gap: 16pt; }
+  .band img.lockup { height: 40pt; }
+  .band .title { flex: 1; }
+  .band .title .kicker { font: 600 7.5pt/1 var(--head); letter-spacing: .15em; text-transform: uppercase; color: var(--rb-night-300, #A9B4C8); }
+  .band .title h1 { font-size: 24pt; color: var(--paper); margin-top: 3pt; }
+  .band .meta { text-align: right; font: 600 8pt/1.4 var(--head); letter-spacing: .06em; text-transform: uppercase; color: var(--rb-night-300, #A9B4C8); }
+  .band .meta b { color: var(--paper); font-weight: 700; }
+  .chev { display: inline-flex; gap: 2px; vertical-align: -3px; margin-left: 4pt; }
+  .chev svg { width: 13px; height: 14px; }
+  .fletch { height: 9px; margin: 0 -0.5in; background: var(--rb-fletch-paper) repeat-x left center / 8px 9px; }
+  .band.slim { padding: 8pt 0.5in; }
+  .band.slim h1 { font-size: 15pt; margin: 0; }
+  .band.slim img.mark { height: 22pt; }
+  .keep { background: var(--orange); color: var(--night); font: 700 9pt/1 var(--head); letter-spacing: .12em; text-transform: uppercase;
+          text-align: center; padding: 6pt; margin: 0 -0.5in; }
+
+  /* Footer */
+  .foot { position: absolute; left: 0.5in; right: 0.5in; bottom: 0.25in; display: flex; justify-content: space-between;
+          font: 500 7.5pt/1 var(--head); color: var(--grey); letter-spacing: .04em; border-top: 1px solid var(--line); padding-top: 5pt; }
+
+  /* Layout helpers */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt 18pt; }
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10pt 14pt; }
+  .span2 { grid-column: span 2; }
+  .sec { font: 700 8pt/1 var(--head); letter-spacing: .12em; text-transform: uppercase; color: var(--grey);
+         border-bottom: 1.5px solid var(--night); padding-bottom: 3pt; margin-bottom: 5pt; display: flex; justify-content: space-between; }
+  .sec span { color: var(--orange); }
+
+  /* Steps */
+  .step { display: grid; grid-template-columns: auto 1fr; gap: 3pt 8pt; align-content: start; break-inside: avoid; }
+  .step .n { display: inline-grid; place-items: center; width: 24pt; height: 24pt; background: var(--orange); color: var(--night);
+             font: 700 13pt/1 var(--head); clip-path: var(--chamfer); }
+  .step h3 { align-self: center; }
+  .step .body { grid-column: 1 / -1; }
+  .step .body p, .step .body li { font-size: 9.5pt; }
+  .adult { display: inline-block; font: 700 6.5pt/1 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--white);
+           background: var(--red-700); padding: 2.5pt 4pt; border-radius: 3px; margin-left: 5pt; vertical-align: 2px; }
+
+  /* Figures with part tags (positions from images/callouts.js) */
+  figure { margin: 0; position: relative; }
+  figure img { display: block; width: 100%; height: auto; }
+  figure svg.ov { position: absolute; overflow: visible; pointer-events: none; }
+  figure figcaption { font-size: 8pt; color: var(--grey); margin-top: 2pt; }
+
+  /* Callouts */
+  .call { border-left: 4px solid; padding: 5pt 8pt; border-radius: 0 4px 4px 0; font-size: 9pt; break-inside: avoid; }
+  .call .lab { font: 700 7.5pt/1 var(--head); letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 2pt; }
+  .call.tip { background: var(--sky-100); border-color: var(--sky); } .call.tip .lab { color: var(--sky-700); }
+  .call.safety { background: var(--red-100); border-color: var(--red); } .call.safety .lab { color: var(--red-700); }
+  .call.check { background: var(--amber-100); border-color: var(--rb-amber-300, #F0B44C); } .call.check .lab { color: var(--amber-700); }
+  .call.ok { background: var(--green-100); border-color: var(--green); } .call.ok .lab { color: var(--green-700); }
+
+  /* Supplies icon row */
+  .icons { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6pt; }
+  .icon { text-align: center; font-size: 7.5pt; line-height: 1.2; }
+  .icon .box { aspect-ratio: 1; border: 1.5px solid var(--night); display: grid; place-items: center; margin-bottom: 3pt; background: var(--white); }
+  .icon .box svg { width: 70%; height: 70%; }
+  .icon.adult-only .box { border-color: var(--red-700); }
+  .icon small { color: var(--grey); display: block; }
+
+  /* Parts list */
+  table { border-collapse: collapse; width: 100%; font-size: 8.8pt; }
+  td, th { text-align: left; vertical-align: top; padding: 3pt 5pt; border-bottom: 1px solid var(--line); }
+  th { font: 700 7.5pt/1.2 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--grey); }
+  .tag { display: inline-grid; place-items: center; min-width: 17pt; height: 16pt; padding: 0 3pt; background: var(--night); color: var(--paper);
+         font: 700 9pt/1 var(--head); clip-path: var(--chamfer); }
+  .tag.o { background: var(--orange); color: var(--night); }
+
+  /* Checklist */
+  .checks { list-style: none; padding: 0; }
+  .checks li { display: grid; align-items: start; grid-template-columns: 11pt 1fr; gap: 5pt; margin-bottom: 3pt; font-size: 9.2pt; }
+  .checks li::before { content: ""; width: 9pt; height: 9pt; border: 1.5px solid var(--night); margin-top: 2pt; }
+
+  /* Fill-in */
+  .fill { display: grid; grid-template-columns: auto 1fr; gap: 7pt 8pt; align-items: end; font-size: 9pt; }
+  .fill span.l { font: 600 8pt/1 var(--head); text-transform: uppercase; letter-spacing: .06em; color: var(--grey); }
+  .fill i { display: block; border-bottom: 1px solid var(--night); height: 13pt; }
+  .log td { height: 17pt; }
+  .card { background: var(--paper); border-radius: 8px; padding: 9pt 11pt; }
+  .field td.c, .field th.c { text-align: center; }
+  .muted { color: var(--grey); }
+  .small { font-size: 8.4pt; }
+</style>
+</head>
+<body>
+
+<!-- Icons used in the supplies row: 32 x 32, 2 px Night line, orange for what gets used up. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-sand" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round"><path d="M5 9h22v14H5z"/></g><g fill="#12203A"><circle cx="9" cy="13" r="1"/><circle cx="14" cy="16" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="23" cy="18" r="1"/><circle cx="11" cy="19" r="1"/><circle cx="17" cy="20" r="1"/></g></symbol>
+    <symbol id="i-knife" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 26l12-12"/><path d="M16 14l5-5 7-1-2 6-5 5z"/><path d="M14 16l3 3"/></g></symbol>
+    <symbol id="i-glue" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round"><path d="M11 14h10v13H11z"/><path d="M13 14v-3h6v3"/><path d="M15 11l1-6 1 6"/></g><path d="M16 1.5c1.2 1.6 1.6 2.4 1.6 3a1.6 1.6 0 01-3.2 0c0-.6.4-1.4 1.6-3z" fill="#F2652B"/><path d="M13 19h6" stroke="#F2652B" stroke-width="2"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round"><path d="M3 20L20 3l9 9-17 17z"/><path d="M8 15l3 3M12 11l2 2M15 8l3 3M19 4l2 2" stroke-linecap="round"/></g></symbol>
+    <symbol id="i-pencil" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round"><path d="M6 26l2-7 15-15 5 5-15 15z"/><path d="M8 19l5 5M20 7l5 5"/></g></symbol>
+    <symbol id="i-scissors" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="24" r="4"/><circle cx="23" cy="24" r="4"/><path d="M11.5 21L24 4M20.5 21L8 4"/></g></symbol>
+    <symbol id="i-tape" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round"><circle cx="14" cy="16" r="10"/><circle cx="14" cy="16" r="4.5"/><path d="M24 16h5v5h-6"/></g></symbol>
+    <symbol id="i-wire" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 28c6-2 8-8 10-14s4-9 8-9a4 4 0 010 8c-3 0-4-3-3-5"/></g></symbol>
+    <symbol id="i-talc" viewBox="0 0 32 32"><g fill="none" stroke="#12203A" stroke-width="2" stroke-linejoin="round"><path d="M9 11h14v17H9z"/><path d="M12 11V7h8v4"/><path d="M13 4h6"/></g><g fill="#F2652B"><circle cx="13" cy="18" r="1.2"/><circle cx="18" cy="21" r="1.2"/><circle cx="16" cy="16" r="1.2"/></g></symbol>
+    <symbol id="i-chev" viewBox="0 0 13 14"><path d="M1 1l6 6-6 6h4l6-6-6-6z"/></symbol>
+  </defs>
+</svg>
+
+<!-- ======================= PAGE 1: cover ======================= -->
+<section class="page">
+  <header class="band">
+    <img class="lockup" src="../brand/logo/rb-lockup-horizontal-dark.svg" alt="Rocket Builder by Quiver Design Works">
+    <div class="title">
+      <div class="kicker">After printing: build, rig and fly</div>
+      <h1>Assembly guide</h1>
+    </div>
+    <div class="meta">
+      Skill level <b>2</b>
+      <span class="chev"><svg fill="#F2652B"><use href="#i-chev"/></svg><svg fill="#F2652B"><use href="#i-chev"/></svg><svg fill="#3A4E74"><use href="#i-chev"/></svg></span><br>
+      Ages 10+ with an adult<br>
+      Kit no. <b>________</b>
+    </div>
+  </header>
+  <div class="fletch"></div>
+  <div class="keep">Keep these instructions for future reference</div>
+
+  <div style="display:grid; grid-template-columns: 1fr 0.9in; gap: 14pt; flex: 1; min-height: 0;">
+    <div style="display:flex; flex-direction:column; gap: 7pt;">
+      <div>
+        <h2>You printed a rocket. Now let's fly it!</h2>
+        <p>This guide is for rockets made with <b>Rocket Builder</b> (rocket.quiverdesignworks.net). It shows what to do after the parts come off the printer: put them together, tie on the parachute, add a motor and launch.</p>
+        <p>Read each step all the way through before you start it. Work with a grown-up. Steps marked <span class="adult" style="margin:0">Adult step</span> are for the grown-up only.</p>
+        <p class="small muted">The drawings show two sizes of rocket: an 18 mm (M18) rocket with one body piece, and a taller 24 mm (M24) one with two. Yours may have more or fewer body pieces. Drawings are not to scale.</p>
+      </div>
+
+      <div>
+        <div class="sec">What you need <span>Not in the box: motor, igniter, launch pad and controller</span></div>
+        <div class="icons">
+          <div class="icon"><div class="box"><svg><use href="#i-sand"/></svg></div>Fine sandpaper<small>220–400 grit</small></div>
+          <div class="icon adult-only"><div class="box"><svg><use href="#i-knife"/></svg></div>Hobby knife<small>adults only</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-glue"/></svg></div>Super glue (CA)<small>body joints only</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-ruler"/></svg></div>Ruler<small>in mm</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-pencil"/></svg></div>Pencil<small>to mark the balance point</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-scissors"/></svg></div>Scissors<small>cord, wadding</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-tape"/></svg></div>Masking tape<small>fit fixes</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-wire"/></svg></div>Stiff wire<small>or a floss threader</small></div>
+          <div class="icon"><div class="box"><svg><use href="#i-talc"/></svg></div>Talc powder<small>optional, for the chute</small></div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div>
+          <div class="sec">What happens in a flight</div>
+          <ol class="small">
+            <li>The igniter lights the motor. The rocket slides up the launch rod.</li>
+            <li>The motor burns out. The rocket coasts up to the top of its flight.</li>
+            <li>The motor's <b>ejection charge</b> puffs gas up the body. It pushes the wadding, the parachute and the nose out of the top.</li>
+            <li>The nose stays tied to the body by the <b>shock cord</b>. The parachute opens. Everything floats down together.</li>
+          </ol>
+        </div>
+        <div>
+          <div class="sec">How the parts hold together</div>
+          <ul class="small">
+            <li><b>Fins</b> are printed on the aft section. No fin gluing!</li>
+            <li><b>Body pieces</b> slide together on short shoulders. You glue these joints so they stay shut.</li>
+            <li><b>The nose</b> slides in too, but is <b>never glued</b>. It must pop off.</li>
+            <li><b>The motor</b> pushes against a ring at the top of its tube. The <b>motor cap</b> screws onto the tail and holds it in.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="call safety"><span class="lab">Safety first</span>
+        Model rocket motors and igniters are handled by an adult. Fly only in a big open field, with a launch pad and an electric launch controller, and follow the National Association of Rocketry (NAR) Model Rocket Safety Code (summary on page 7).</div>
+
+      <div>
+        <div class="sec">Steps at a glance</div>
+        <div class="cols3 small">
+          <div><span class="tag o">1–4</span> <b>Build</b> <span class="muted">p. 3</span><br>Clean up, test-fit, glue the body, tie the cord to the strap.</div>
+          <div><span class="tag o">5–8</span> <b>Recovery</b> <span class="muted">p. 4–5</span><br>Cord to the nose, parachute on, fold, pack.</div>
+          <div><span class="tag o">9–12</span> <b>Motor and pad</b> <span class="muted">p. 5–6</span><br>Adult steps: motor, cap, igniter, launch.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:auto">
+        <div class="sec" style="border-color: var(--night)">My rocket <span>fill this in</span></div>
+        <div class="cols" style="gap:7pt 18pt">
+          <div class="fill"><span class="l">Name</span><i></i><span class="l">Builder</span><i></i><span class="l">Motor size</span><i></i></div>
+          <div class="fill"><span class="l">Best motor</span><i></i><span class="l">Parachute</span><i></i><span class="l">Balance point</span><i></i></div>
+        </div>
+        <p class="small muted" style="margin-top:5pt">Copy these from your rocket's report in Rocket Builder or from <i>build_notes.txt</i> in your download. The balance point is the CG, in mm from the nose tip.</p>
+      </div>
+    </div>
+    <figure style="align-self: stretch; display:flex; align-items:center"><img src="images/hero.png" alt="An assembled Rocket Builder rocket" style="max-height: 7.6in; width:auto; margin:auto"></figure>
+  </div>
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>1</span></div>
+</section>
+
+<!-- ======================= PAGE 2: parts ======================= -->
+<section class="page">
+  <header class="band slim"><img class="mark" src="../brand/logo/rb-mark-dark.svg" alt=""><h1>Parts layout</h1></header>
+  <p>Lay out your parts and check them off. Each part has a letter. The steps use the same letters.</p>
+
+  <div>
+    <div class="sec">Printed parts <span>A–F</span></div>
+    <figure style="margin-top:16pt" data-img="layout" data-tags='{"A":[0,-34],"B":[0,-34],"C":[0,-34],"D":[0,-30],"E":[0,-34],"F":[0,-30]}'>
+      <img src="images/layout.png" alt="Exploded view of all the printed parts: nose, anchor section, body section, aft section with fins, motor cap and rod standoff">
+    </figure>
+  </div>
+
+  <table>
+    <tr><th style="width:26pt"></th><th style="width:30%">Part</th><th>What it does</th><th style="width:34pt">✓</th></tr>
+    <tr><td><span class="tag">A</span></td><td><b>Nose cone</b></td><td>Points the way. A short shoulder slides into the body. Inside the bottom is a little <b>tie bar</b> for the shock cord.</td><td>☐</td></tr>
+    <tr><td><span class="tag">B</span></td><td><b>Anchor section</b></td><td>The short body piece under the nose. A <b>strap</b> (a bar across the inside) holds the shock cord.</td><td>☐</td></tr>
+    <tr><td><span class="tag">C</span></td><td><b>Body section</b> <span class="muted">(C1, C2… or none)</span></td><td>Tall rockets are split into pieces that fit your printer. Short rockets have no C: B fits straight onto D.</td><td>☐</td></tr>
+    <tr><td><span class="tag">D</span></td><td><b>Aft section</b></td><td>The tail, with the fins, the launch lug(s) and the motor tube. The thread at the bottom is for the cap.</td><td>☐</td></tr>
+    <tr><td><span class="tag">E</span></td><td><b>Motor cap</b></td><td>Screws onto the tail and holds the motor in. The hole lets the motor's flame out.</td><td>☐</td></tr>
+    <tr><td><span class="tag">F</span></td><td><b>Rod standoff</b></td><td>A clip for the launch rod. It stays on the pad and holds the rocket up off the blast plate.</td><td>☐</td></tr>
+  </table>
+
+  <div>
+    <div class="sec">You add <span>G–L</span></div>
+    <figure style="margin:10pt 0 12pt" data-img="supplies" data-tags='{"G":[0,-26],"H":[-60,0],"I":[0,-30],"J":[0,48],"K":[0,-22],"L":[0,-30]}'>
+      <img src="images/supplies.png" alt="Shock cord, parachute, wadding, motor, igniter and igniter plug">
+    </figure>
+  </div>
+  <table>
+    <tr><td style="width:26pt"><span class="tag o">G</span></td><td style="width:30%"><b>Shock cord</b></td><td>Thin, strong cord, about 2–3 times as long as the rocket. It must fit the 2.5 mm slot behind the strap: Kevlar or braided cord up to about 2 mm thick.</td></tr>
+    <tr><td><span class="tag o">H</span></td><td><b>Parachute</b> (or streamer)</td><td>Use the size your Rocket Builder report suggests (“Which parachute?”). Very light rockets can use a streamer.</td></tr>
+    <tr><td><span class="tag o">I</span></td><td><b>Recovery wadding</b></td><td>Flame-resistant tissue. It keeps the hot ejection gas off the parachute. Use new wadding every flight.</td></tr>
+    <tr><td><span class="tag o">J</span></td><td><b>Motor</b> <span class="adult">Adult</span></td><td>A certified model rocket motor of your rocket's size (M13, M18, M24 or M29) and length. Use the motor your report recommends.</td></tr>
+    <tr><td style="white-space:nowrap"><span class="tag o">K</span> <span class="tag o">L</span></td><td><b>Igniter and plug</b> <span class="adult">Adult</span></td><td>Come with the motors. The plug holds the igniter in the nozzle.</td></tr>
+  </table>
+  <div class="call tip"><span class="lab">Tip</span>Not sure which motor or parachute? Open your rocket in Rocket Builder. The report shows the best motor, how high it goes, the parachute size and the launch field it needs.</div>
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>2</span></div>
+</section>
+
+<!-- ======================= PAGE 3: build ======================= -->
+<section class="page">
+  <header class="band slim"><img class="mark" src="../brand/logo/rb-mark-dark.svg" alt=""><h1>Build the rocket</h1></header>
+
+  <div class="cols">
+    <div class="step">
+      <span class="n">1</span><h3>Clean up the prints</h3>
+      <div class="body">
+        <ul>
+          <li>Pull off any brim, strings and blobs.</li>
+          <li>The edge that sat on the print bed can bulge out a little. Sand that lip off the <b>shoulders</b> (the narrow ends) and the start of the <b>tail thread</b>.</li>
+          <li>Look for cracks, gaps between layers or thin spots, especially where the fins meet the tube. Don't fly a cracked part. Print it again.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="step">
+      <span class="n">2</span><h3>Test-fit every joint (no glue yet)</h3>
+      <div class="body">
+        <figure data-img="joint" data-tags='{"shoulder":["Shoulder",-30,-40],"socket":["Socket",34,-40]}' style="max-width: 2.6in; margin: 14pt auto 4pt">
+          <img src="images/joint.png" alt="A body section's shoulder sliding into the socket at the top of the aft section">
+        </figure>
+        <p>Push each shoulder into the next part with a little twist. It should go all the way in, snug, with no gap at the seam. Too tight? Sand the shoulder lightly and try again.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">3</span><h3>Glue the body joints, with the launch lugs in line</h3>
+    <div class="body">
+      <figure data-img="join" data-tags='{"j1":["Glue",0,-34],"j2":["Glue",0,-34],"rod":["Launch rod",-6,-30]}' style="margin: 18pt 0 4pt">
+        <img src="images/join.png" alt="The aft, body and anchor sections pulled apart a little, with a launch rod slid through both launch lugs">
+      </figure>
+      <div class="cols" style="margin-top:6pt">
+        <ul>
+          <li>Put a <b>thin ring of super glue</b> round the shoulder of C, near its step, and push it into D. Twist it a little so the glue spreads.</li>
+          <li>If C or B has a launch lug, slide a launch rod through all the lugs while the glue sets, so they line up.</li>
+          <li>Glue B onto C (or onto D if you have no C) the same way.</li>
+        </ul>
+        <div class="call safety"><span class="lab">Do not glue</span>the nose (A) or the motor cap (E). The nose must pop off in flight, and the cap comes off after every flight. Keep glue out of the slot behind the strap inside B.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">4</span><h3>Tie the shock cord to the strap</h3>
+    <div class="body" style="display:grid; grid-template-columns: 1.75in 1fr; gap: 16pt; align-items:start">
+      <figure data-img="anchor_cord" data-tags='{"bar":["Strap",34,26],"knot":["Knot",-42,-10],"free":["To the nose",52,8]}'>
+        <img src="images/anchor_cord.png" alt="Cut-away view of the anchor section: the cord goes down behind the strap, under it, back up in front and is knotted onto itself">
+      </figure>
+      <div>
+        <ol>
+          <li>Look into the top of B. The strap is a flat bar across one side, with a narrow slot behind it.</li>
+          <li>Push one end of the cord <b>down the slot behind the bar</b>. A bent wire helps. Pull the end out under the bar.</li>
+          <li>Bring it up <b>in front of the bar</b>. Tie it round the long part of the cord with two overhand knots, close to the bar.</li>
+          <li>Tug hard. The knot must not slip.</li>
+        </ol>
+        <div class="call tip" style="margin-top:6pt"><span class="lab">Tip</span>This is easier before B is glued on: you can reach in from both ends. The cut-away drawing has the front of B taken away so you can see the strap.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>3</span></div>
+</section>
+
+<!-- ======================= PAGE 4: recovery ======================= -->
+<section class="page">
+  <header class="band slim"><img class="mark" src="../brand/logo/rb-mark-dark.svg" alt=""><h1>Rig the recovery system</h1></header>
+  <p>The recovery system is the cord, the parachute and the wadding. It brings your rocket down gently, all in one piece.</p>
+
+  <div class="step">
+    <span class="n">5</span><h3>Tie the other end of the cord to the nose</h3>
+    <div class="body" style="display:grid; grid-template-columns: 1.6in 1fr; gap: 16pt; align-items:start">
+      <figure data-img="nose_cord" data-tags='{"bar":["Tie bar",-44,-26],"knot":["Knot",44,14]}'>
+        <img src="images/nose_cord.png" alt="Cut-away view of the nose shoulder: the cord loops over the small tie bar in the dome and is knotted below">
+      </figure>
+      <ol>
+        <li>Turn the nose (A) over. A small <b>tie bar</b> crosses the little dome in the bottom of its shoulder.</li>
+        <li>Thread the cord's free end under the bar, round it and back out. A bent wire helps here too.</li>
+        <li>Tie it round the cord with two overhand knots.</li>
+        <li>Tug hard on the nose and the body. Nothing should slip.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1.85in 1fr; gap: 16pt; flex:1; min-height:0">
+    <figure data-img="recovery" data-tags='{"nose":["A",26,0],"chute":["H",0,-26],"loop":["Loop",-34,26],"strap":["B",30,26],"cord":["G",24,0]}'>
+      <img src="images/recovery.png" alt="The nose pulled off the body: the cord runs from the strap in the anchor section up to the nose, with the parachute tied to a loop in the cord">
+      <figcaption>How it hangs together in the air. Not to scale.</figcaption>
+    </figure>
+    <div style="display:flex; flex-direction:column; gap: 12pt;">
+      <div class="step">
+        <span class="n">6</span><h3>Tie the parachute to the cord</h3>
+        <div class="body">
+          <ul>
+            <li>About a third of the way from the nose, tie a small <b>loop knot</b> in the cord.</li>
+            <li>Gather the parachute's lines. Push their ends through the loop. Then pass the whole parachute through the lines' own loop and pull snug. (Or clip on a small snap swivel.)</li>
+            <li>Now the nose, the parachute and the body all stay together.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <span class="n">7</span><h3>Fold and roll the parachute</h3>
+        <div class="body">
+          <figure data-img="chute_fold" data-num="1" data-tags='{"f1":["1",0,-14],"f2":["2",0,-30],"f3":["3",0,-30]}' style="margin-top: 22pt">
+            <img src="images/chute_fold.png" alt="Parachute flat with lines pulled together, folded into a narrow wedge, then rolled with the lines wrapped round it">
+          </figure>
+          <ol style="margin-top: 6pt">
+            <li>Lay it flat. Pull the lines straight and together.</li>
+            <li>Fold it in half, then in half again, into a thin wedge. Lay the lines along it.</li>
+            <li>Roll it up loosely from the top and wrap the lines round the roll.</li>
+          </ol>
+          <div class="call tip" style="margin-top:6pt"><span class="lab">Tip</span>Do steps 7 and 8 before every flight. A pinch of talc keeps a plastic parachute from sticking on cold days. Use the size your Rocket Builder report suggests.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>4</span></div>
+</section>
+
+<!-- ======================= PAGE 5: pack + motor ======================= -->
+<section class="page">
+  <header class="band slim"><img class="mark" src="../brand/logo/rb-mark-dark.svg" alt=""><h1>Pack it and load the motor</h1></header>
+
+  <div class="step">
+    <span class="n">8</span><h3>Pack it: wadding, parachute, cord, nose</h3>
+    <div class="body">
+      <figure data-img="pack" data-tags='{"wad":["I",0,34],"chute":["H",0,34],"cord":["G",0,34],"strap":["B",0,-34],"nose":["A",0,-34]}' style="margin: 22pt 0 22pt">
+        <img src="images/pack.png" alt="Cut-away view of a packed rocket: motor at the tail, wadding above it, the rolled parachute, the cord folded on top, and the nose going on">
+      </figure>
+      <div class="cols">
+        <ol>
+          <li>Loosely crumple 3–4 squares of wadding (more for wide rockets). Push them down from the top until they sit on the ring at the top of the motor tube. Don't pack them hard.</li>
+          <li>Slide in the rolled parachute. Fold the cord in a zig-zag on top.</li>
+          <li>Push the nose on. Don't trap the cord or lines in the joint.</li>
+        </ol>
+        <div class="call check"><span class="lab">Check the nose fit</span>Hold the rocket nose-down and shake gently: the nose should stay on. A gentle pull should take it off. Too loose? One wrap of masking tape on the nose's shoulder. Too tight? Sand the shoulder.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="call safety"><span class="lab">Adult steps 9–12</span>A grown-up handles the motor and igniter. Use only certified model rocket motors, as they come. Never cut, drill, heat or change a motor. Keep motors and igniters away from heat and sparks until launch time.</div>
+
+  <div class="step">
+    <span class="n">9</span><h3>Slide the motor into the tail <span class="adult">Adult step</span></h3>
+    <div class="body">
+      <figure data-img="motor_in" data-tags='{"stop":["Stop ring",30,-34],"motor":["J",0,-36],"cap":["E",0,-36],"thread":["Thread",-30,34]}' style="margin: 18pt 0 16pt">
+        <img src="images/motor_in.png" alt="Cut-away view of the tail: the motor slides in, nozzle end last, until it touches the stop ring; the motor cap waits behind it">
+      </figure>
+      <div class="cols">
+        <ul>
+          <li>Check the size: an 18 mm motor for an M18 rocket, and so on.</li>
+          <li>Slide it in <b>nozzle end last</b>, so the nozzle points out of the tail.</li>
+          <li>Push it all the way, until it stops against the ring at the top of the motor tube. That ring takes the motor's push.</li>
+        </ul>
+        <div class="call tip"><span class="lab">Too tight?</span>Never force a motor. Look for print strings inside the tube and sand them off. A full-length motor sticks out past the tail by about the height of the thread.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>5</span></div>
+</section>
+
+<!-- ======================= PAGE 6: pad ======================= -->
+<section class="page">
+  <header class="band slim"><img class="mark" src="../brand/logo/rb-mark-dark.svg" alt=""><h1>Cap, igniter and launch pad</h1></header>
+
+  <div class="cols">
+    <div class="step">
+      <span class="n">10</span><h3>Screw on the motor cap <span class="adult">Adult step</span></h3>
+      <div class="body">
+        <figure data-img="cap_on" data-tags='{"cap":["E",-34,10]}' style="max-width: 1.5in; margin: 0 auto 4pt">
+          <img src="images/cap_on.png" alt="The motor cap being screwed onto the threaded tail">
+        </figure>
+        <ul>
+          <li>Turn the cap onto the thread, clockwise as you look at the tail. Start it straight so it doesn't cross-thread.</li>
+          <li><b>Finger tight</b> is enough. The cap's floor rests on the end of the motor, so the motor can't be pushed out of the back when the ejection charge fires.</li>
+          <li>Never glue or tape the cap on.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="step">
+      <span class="n">11</span><h3>Put in the igniter <span class="adult">Adult step</span></h3>
+      <div class="body" style="display:grid; grid-template-columns: 1.3in 1fr; gap: 12pt; align-items: start">
+        <figure data-img="igniter" data-tags='{"charge":["Ejection",40,0],"delay":["Delay",34,0],"prop":["Fuel",32,0],"tip":["Tip",30,-4],"plug":["L",-26,0],"leads":["K",-16,16]}' style="margin-right: 20pt">
+          <img src="images/igniter.png" alt="A motor cut in half: the igniter tip sits against the propellant inside the nozzle, held by the plug; the two leads are bent apart">
+        </figure>
+        <ol>
+          <li>Do this at the pad, with the safety key out of the controller.</li>
+          <li>Push the igniter (K) through the cap's hole into the nozzle, <b>all the way</b>, until it touches the fuel.</li>
+          <li>Hold it there and push in the plug (L).</li>
+          <li>Bend the two leads apart so they can't touch.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">12</span><h3>Set up on the pad</h3>
+    <div class="body" style="display:grid; grid-template-columns: 2.05in 1fr; gap: 16pt; align-items:start">
+      <figure data-img="pad" data-tags='{"standoff":["F",-30,0],"lug":["Lug",36,-14],"rod":["Rod",-30,10],"deflector":["Blast plate",-40,-14]}'>
+        <img src="images/pad.png" alt="The rocket on the launch rod: the rod standoff clips onto the rod, stands on the blast plate, and the rocket's aft lug rests on top of it">
+      </figure>
+      <ol>
+        <li>Snap the rod standoff (F) onto the rod, opening away from the rocket. Slide it down to the blast plate.</li>
+        <li>Slide the rocket down the rod by its lugs until the bottom lug rests on the standoff. The tail is now clear of the plate, with room for the clips.</li>
+        <li>Clip one controller clip to each igniter lead. Clips must not touch each other, the rod or the plate.</li>
+        <li>The rod points straight up (within 30°). Everyone steps back. Key in. Count down: <b>5, 4, 3, 2, 1, launch!</b></li>
+      </ol>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec">Preflight checklist <span>every flight</span></div>
+    <div class="cols">
+      <ul class="checks">
+        <li><span>No cracks. Fins solid. Body joints glued all the way round.</span></li>
+        <li><span>Cord tied tight at the strap and the nose. Parachute tied to the loop.</span></li>
+        <li><span>New wadding, then the rolled parachute, then the cord. Nose snug, but it comes off.</span></li>
+        <li><span>Right motor, pushed all the way in. Cap on, finger tight.</span></li>
+        <li><span><b>Balance test:</b> with the motor in, the rocket balances on your finger at the balance point from your report, or nearer the nose. Mark that point with pencil. If it balances behind the mark (nearer the tail), don't fly.</span></li>
+      </ul>
+      <ul class="checks">
+        <li><span>The field is big enough (page 7). Wind under 20 mph. No low clouds or aircraft.</span></li>
+        <li><span>Launch rod 1/8 in (3.2 mm) unless you changed it in Advanced. Blast plate on. Standoff on the rod.</span></li>
+        <li><span>Dry grass and anything that burns cleared from around the pad.</span></li>
+        <li><span>The adult in charge keeps the safety key. Everyone at least 15 ft back (30 ft for motors bigger than D).</span></li>
+        <li><span>Everyone watching. Count down out loud.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="call safety"><span class="lab">If it doesn't launch (misfire)</span>Take out the safety key. Wait 60 seconds before anyone walks to the rocket. Then check the igniter, or put in a new one.</div>
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>6</span></div>
+</section>
+
+<!-- ======================= PAGE 7: safety, troubleshooting, log ======================= -->
+<section class="page">
+  <header class="band slim"><img class="mark" src="../brand/logo/rb-mark-dark.svg" alt=""><h1>Fly safely</h1></header>
+
+  <div class="cols">
+    <div>
+      <div class="sec">Safety code, in short <span>NAR</span></div>
+      <ul class="small">
+        <li><b>Grown-ups handle motors and igniters.</b> Only certified, factory-made motors, used as the maker says.</li>
+        <li><b>Electric launch only:</b> a launch controller with a safety key and a switch that springs back to off.</li>
+        <li><b>Misfire?</b> Key out, then wait 60 seconds before anyone goes to the rocket.</li>
+        <li><b>Launch pad:</b> a rod or rail with a blast plate, within 30° of straight up. Cap the rod's tip when you're not launching.</li>
+        <li><b>Size limits:</b> at most 1500 g at liftoff and 320 N·s of total motor impulse.</li>
+        <li><b>Where:</b> outdoors, in an open field, away from buildings, power lines, roads and dry brush. Never launch at targets, into clouds, near aircraft, or with anything that burns as a payload.</li>
+        <li><b>Recovery:</b> always a parachute or streamer, with flame-resistant wadding. Never climb trees or power poles to get a rocket back.</li>
+      </ul>
+      <p class="small muted">This is a summary. Read the full code at nar.org/ModelRocketSafetyCode.</p>
+    </div>
+    <div>
+      <div class="sec">Launch field size <span>NAR minimum, each side</span></div>
+      <table class="field small">
+        <tr><th>Motor class</th><th class="c">Feet</th><th class="c">Metres</th></tr>
+        <tr><td>1/4A, 1/2A</td><td class="c num">50</td><td class="c num">15</td></tr>
+        <tr><td>A</td><td class="c num">100</td><td class="c num">30</td></tr>
+        <tr><td>B</td><td class="c num">200</td><td class="c num">60</td></tr>
+        <tr><td>C</td><td class="c num">400</td><td class="c num">120</td></tr>
+        <tr><td>D</td><td class="c num">500</td><td class="c num">150</td></tr>
+        <tr><td>E, F</td><td class="c num">1000</td><td class="c num">300</td></tr>
+      </table>
+      <p class="small muted" style="margin-top:3pt">On a breezy day a rocket can drift further than this. Your Rocket Builder report gives the size your rocket needs (“How big a launch field?”). Put the pad near the upwind edge.</p>
+      <div class="sec" style="margin-top:8pt">After the flight</div>
+      <ul class="small">
+        <li>Let the motor cool. Unscrew the cap. Push the used motor out from the front with a dowel.</li>
+        <li>Shake out the burnt wadding. Wipe soot off the cap and thread.</li>
+        <li>Check the cord, knots, parachute and joints. Reprint a cracked cap or part.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec">Troubleshooting</div>
+    <table class="small">
+      <tr><th style="width:31%">Problem</th><th>Try this</th></tr>
+      <tr><td>A shoulder or the nose is too tight</td><td>Sand off the bulge at its bottom edge (it printed on the bed), then sand lightly all round. Test often.</td></tr>
+      <tr><td>The nose falls off too easily</td><td>One wrap of masking tape round the nose's shoulder. Add more only if needed.</td></tr>
+      <tr><td>The cord won't go behind the strap</td><td>Use thinner cord (up to about 2 mm). Lead it with a bent wire or a floss threader. Clear print strings out of the slot.</td></tr>
+      <tr><td>The motor won't go in</td><td>Is it the right size? Clear strings from the motor tube. Never force it.</td></tr>
+      <tr><td>The cap won't screw on</td><td>Is the motor all the way in? Clean the first turn of the thread. Start the cap straight.</td></tr>
+      <tr><td>The motor didn't light</td><td>Key out, wait 60 s. Check the igniter tip touches the fuel and the clips are clean. Try a new igniter.</td></tr>
+      <tr><td>The parachute didn't open, or melted</td><td>More wadding. Roll the parachute looser. Check the motor's delay (the last number) matches your report.</td></tr>
+      <tr><td>The rocket wobbled or looped</td><td>Do the balance test. Check the score and motor in Rocket Builder. Don't fly again until it's fixed.</td></tr>
+      <tr><td>The body came apart at a joint</td><td>That joint wasn't glued all the way round. Clean it and glue it again.</td></tr>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:auto">
+    <div class="sec">Flight log</div>
+    <table class="log small">
+      <tr><th style="width:14%">Date</th><th style="width:14%">Motor</th><th style="width:18%">Weather</th><th>How it flew / notes</th></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>Rocket Builder by Quiver Design Works · Assembly guide</span><span>rocket.quiverdesignworks.net</span><span>7</span></div>
+</section>
+
+
+<script src="images/callouts.js"></script>
+<script>
+// Part tags and labels over the renders. Each figure names its image (data-img)
+// and its tags: {pointName: [dx, dy]} draws the point's own name as a part
+// letter; {pointName: ["Text", dx, dy]} draws that text. dx/dy are CSS px from
+// the point to the tag. Points come from images/callouts.js (tools/render.mjs).
+(function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  function draw(fig) {
+    const c = (window.CALLOUTS || {})[fig.dataset.img];
+    const img = fig.querySelector('img');
+    if (!c || !img) return;
+    fig.querySelector('svg.ov')?.remove();
+    const W = img.clientWidth, H = img.clientHeight;
+    if (!W || !H) return;
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'ov');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.style.left = img.offsetLeft + 'px'; svg.style.top = img.offsetTop + 'px';
+    svg.style.width = W + 'px'; svg.style.height = H + 'px';
+    const tags = JSON.parse(fig.dataset.tags || '{}');
+    for (const [key, spec] of Object.entries(tags)) {
+      const p = c.points[key];
+      if (!p) continue;
+      const [text, dx, dy] = typeof spec[0] === 'string' ? spec : [key, spec[0], spec[1]];
+      const x = p[0] * W, y = p[1] * H, tx = x + dx, ty = y + dy;
+      const letter = text.length <= 2;
+      const fs = letter ? 10.5 : 8.6;
+      const th = letter ? 17 : 15;
+      const tw = letter ? Math.max(18, text.length * 9 + 8) : text.length * fs * 0.56 + 12;
+      const g = document.createElementNS(NS, 'g');
+      const line = document.createElementNS(NS, 'path');
+      line.setAttribute('d', `M${x} ${y}L${tx} ${ty}`);
+      line.setAttribute('stroke', '#12203A'); line.setAttribute('stroke-width', '1');
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('r', 2.5); dot.setAttribute('fill', '#12203A');
+      const x0 = tx - tw / 2, y0 = ty - th / 2, k = 4;
+      const tag = document.createElementNS(NS, 'path');
+      tag.setAttribute('d', `M${x0 + k} ${y0}H${x0 + tw - k}L${x0 + tw} ${y0 + k}V${y0 + th - k}L${x0 + tw - k} ${y0 + th}H${x0 + k}L${x0} ${y0 + th - k}V${y0 + k}Z`);
+      const num = fig.dataset.num && /^\d+$/.test(text);
+      tag.setAttribute('fill', num ? '#F2652B' : '#12203A');
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', tx); t.setAttribute('y', ty + fs * 0.36);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('fill', num ? '#12203A' : '#F6F1E7');
+      t.setAttribute('style', `font: 700 ${fs}px "Space Grotesk", sans-serif`);
+      t.textContent = text;
+      g.append(line, dot, tag, t);
+      svg.append(g);
+    }
+    fig.append(svg);
+  }
+  function all() { document.querySelectorAll('figure[data-img]').forEach(draw); }
+  window.addEventListener('load', all);
+  window.addEventListener('resize', all);
+  window.addEventListener('beforeprint', all);
+  if (document.fonts) document.fonts.ready.then(all);
+})();
+</script>
+</body>
+</html>
