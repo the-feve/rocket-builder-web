@@ -56,7 +56,7 @@ def anchor_strap_geometry(d: Derived) -> dict:
         "z_out_bot": z_spring,
         "z_out_top": z_out_top,
         # Strap, then the gap, then the nose's shoulder + chamfer.
-        "sec_len": z_out_top + gap + d.nose_shoulder_len + d.joint_rise,
+        "sec_len": z_out_top + gap + d.nose_shoulder_len + d.nose_joint_rise,
     }
 
 

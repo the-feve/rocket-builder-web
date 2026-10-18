@@ -13,6 +13,14 @@ from .geom import GeometryError, Z_AXIS, arc3, extrude_y_symmetric, one_solid, r
 from .params import Derived, shock_cord
 
 
+def shoulder_foot(r: float, chamfer: float) -> list[tuple[float, float]]:
+    """The shoulder's outer bed edge: a 45-degree chamfer so the first
+    layer's squish (elephant's foot) doesn't make the joint bind."""
+    if chamfer <= 0:
+        return [(r, 0)]
+    return [(r - chamfer, 0), (r, chamfer)]
+
+
 def body_segment(d: Derived, seg_len: float) -> Solid:
     """Open tube, shoulder on the bottom. Outer wall chamfers out at 45
     degrees above the shoulder; inner wall tapers out at 8 degrees; the top
@@ -21,7 +29,7 @@ def body_segment(d: Derived, seg_len: float) -> Solid:
     inner_sh_r = d.shoulder_od / 2 - d.wall
     return revolve([
         (inner_sh_r, 0),
-        (d.shoulder_od / 2, 0),
+        *shoulder_foot(d.shoulder_od / 2, d.shoulder_chamfer),
         (d.shoulder_od / 2, sh),
         (d.body_od / 2, sh + d.joint_rise),
         (d.body_od / 2, seg_len),
@@ -59,7 +67,7 @@ def nose_recess(d: Derived) -> tuple[float, float]:
     left 0.7 mm over the bar on M13). A shoulder too narrow for that (a
     thick wall on a small motor) gets the widest opening it can hold, and
     build.py says so in the notes."""
-    inner_sh_r = d.shoulder_od / 2 - d.wall
+    inner_sh_r = d.nose_shoulder_od / 2 - d.wall
     pass_d = shock_cord(d.mtr_d)["pass_d"]
     rd = max(min(0.8 * inner_sh_r, inner_sh_r - 1.8), 1.0 + pass_d)
     rd = min(rd, inner_sh_r - 0.5)
@@ -82,7 +90,7 @@ def nose_cone(d: Derived, shape: str, nose_len: float) -> Solid:
     L = nose_len
     wall = d.wall
     steps = 16
-    base = sh + d.joint_rise
+    base = sh + d.nose_joint_rise
 
     outer = [(nose_radius_at(shape, L * i / steps, L, R), base + L - L * i / steps) for i in range(steps + 1)]
     outer.reverse()  # base -> tip
@@ -95,8 +103,8 @@ def nose_cone(d: Derived, shape: str, nose_len: float) -> Solid:
     if len(inner) < 2:
         raise GeometryError("This nose is too thin for the current wall thickness. Increase nose fineness or reduce wall.")
     plug_z = inner[0][1]
-    inner_sh_r = d.shoulder_od / 2 - wall
-    pts = [(inner_sh_r, 0), (d.shoulder_od / 2, 0), (d.shoulder_od / 2, sh)]
+    inner_sh_r = d.nose_shoulder_od / 2 - wall
+    pts = [(inner_sh_r, 0), *shoulder_foot(d.nose_shoulder_od / 2, d.shoulder_chamfer), (d.nose_shoulder_od / 2, sh)]
     pts += outer
     pts.append((0, plug_z))
     pts += inner

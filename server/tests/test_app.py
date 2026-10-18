@@ -540,8 +540,10 @@ def test_launch_view_in_designer_and_printer_picker():
 
 def test_critical_fit_fields():
     o = client.get("/api/options").json()
-    assert o["fit_defaults"] == {"joint_clearance": 0.02, "thread_clearance": 0.25, "thread_turns": 3}
-    for k in ("joint_clearance", "shoulder_len", "nose_shoulder_len", "thread_clearance", "thread_pitch", "thread_turns"):
+    assert o["fit_defaults"] == {"joint_clearance": 0.18, "nose_clearance": 0.15, "joint_clearance_short": 0.16,
+                                 "nose_clearance_short": 0.14, "short_nose_shoulder": 8.0,
+                                 "thread_clearance": 0.25, "thread_turns": 3}
+    for k in ("joint_clearance", "nose_clearance", "shoulder_len", "nose_shoulder_len", "thread_clearance", "thread_pitch", "thread_turns"):
         assert o["defaults"][k] is None  # blank = Rocket Builder's computed value
     r = client.post("/api/build", json={"joint_clearance": 0.9})
     assert r.status_code == 422

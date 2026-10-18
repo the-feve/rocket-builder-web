@@ -35,7 +35,8 @@ from build123d import export_step, export_stl
 from rocketgen.export import PART_COLORS
 from rocketgen.fins import FinShape, fin_dimensions
 from rocketgen.geom import GeometryError
-from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors, load_settings
+from rocketgen.params import (LUG_OPTIONS, MATERIALS, NOSE_SHAPES, SHORT_NOSE_SHOULDER, WEB_FIT_JOINT, WEB_FIT_JOINT_SHORT,
+                             WEB_FIT_NOSE, WEB_FIT_NOSE_SHORT, DesignParams, compute_derived, load_motors)
 from rocketgen.flight import (CHUTE_SIZES_IN, FIELD_M, MAX_WIND_MPH, MPH, field_size, heaviest, launch_profile,
                               motors_for, parachute, pick, simulate)
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
@@ -52,7 +53,7 @@ import fit_mount
 import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
-GENERATOR_VERSION = "0.1.0"
+GENERATOR_VERSION = "0.2.0"
 SCHEMA_VERSION = 1
 MAX_CACHED = 40  # geometry builds kept in memory
 
@@ -102,6 +103,7 @@ class BuildRequest(BaseModel):
     # Critical fit dimensions (Advanced; blank = Rocket Builder's computed
     # value). For typing in a result from a fit-test print.
     joint_clearance: float | None = Field(None, ge=0, le=0.5)
+    nose_clearance: float | None = Field(None, ge=0, le=0.5)
     shoulder_len: float | None = Field(None, ge=5, le=100)
     nose_shoulder_len: float | None = Field(None, ge=4, le=100)
     thread_clearance: float | None = Field(None, ge=0.05, le=1.0)
@@ -304,7 +306,10 @@ def options():
         "stock_od": {m: round(stock_od(m), 2) for m in load_motors()},  # at the default wall
         "bay_id": {m: round(compute_derived(DesignParams(motor=m)).bay_id, 3) for m in load_motors()},  # stock OD = bay + 2 x wall
         # What a blank critical-dimension field means (the Advanced placeholders).
-        "fit_defaults": {"joint_clearance": load_settings()["fit_slip"], "thread_clearance": 0.25, "thread_turns": 3},
+        # Clearances from the fit-test prints; short nose shoulders (M13) get the short pair.
+        "fit_defaults": {"joint_clearance": WEB_FIT_JOINT, "nose_clearance": WEB_FIT_NOSE,
+                         "joint_clearance_short": WEB_FIT_JOINT_SHORT, "nose_clearance_short": WEB_FIT_NOSE_SHORT,
+                         "short_nose_shoulder": SHORT_NOSE_SHOULDER, "thread_clearance": 0.25, "thread_turns": 3},
         # Beginner mode: motor, printer height, overall height, nose shape and
         # one of three standard fin shapes; everything else stays at defaults.
         "beginner": {"fin_shapes": BEGINNER_FINS, "fin_shape": BEGINNER_FINS[2],

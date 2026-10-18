@@ -87,7 +87,7 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 
 - [x] ~~**(owner)** Body joints~~ (2026-10-18: medium CA such as Starbond Medium, adult only; guide updated). Was: glue them (the guide says thin CA) so the aft section can't separate at ejection, or tape / push-fit? Which glue for PETG and ASA?
 - [x] ~~**(owner)** Shock cord for kits~~ (2026-10-18: braided elastic, 1/8 in on M13/M18, 1/4 in on M24/M29; strap and nose recess resized). Was: the slot behind the anchor strap is ~2.5 mm deep, so the guide says Kevlar or braided cord up to 2 mm, 2–3× the rocket's length. Confirm type and length.
-- [ ] **(owner)** Nose fit (0.02 mm clearance): guide says sand if tight, a wrap of tape if loose. Confirm.
+- [ ] **(owner)** Nose fit: now 0.15 mm radial (0.14 on M13) from the fit tests, was 0.02. Reprint the kit test prints and confirm body joints and nose; type better values into Advanced → Fits and joints if needed.
 - [ ] **(owner)** Shorter motors than the bay length rattle: add motor spacers to the guide?
 - [ ] **(owner)** Placeholders in the guide and packaging: skill level, age grade, kit numbers, QR codes, UPC (GS1, about $30 per product).
 - [x] ~~**(owner)** Kit age grade~~ (2026-10-18: 12+ confirmed; curriculum under 12 is paper only). Was: the packaging says "Ages 12+" to stay a general-use product. Marketing kits to younger kids (Beginner mode, the curriculum) could make them children's products (CPSIA testing, certificate, tracking labels). Confirm with a professional; see `docs/kits/README.md`.
