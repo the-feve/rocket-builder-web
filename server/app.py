@@ -33,7 +33,7 @@ from pydantic import BaseModel, Field
 
 from build123d import export_step, export_stl
 from rocketgen.export import PART_COLORS
-from rocketgen.fins import FinShape
+from rocketgen.fins import FinShape, fin_dimensions
 from rocketgen.geom import GeometryError
 from rocketgen.params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, compute_derived, load_motors, load_settings
 from rocketgen.flight import (CHUTE_SIZES_IN, FIELD_M, MAX_WIND_MPH, MPH, field_size, heaviest, launch_profile,
@@ -497,8 +497,17 @@ def launch(build_id: str, request: Request, wind_mph: float = 10.0, motor: str |
     out.update(wind_mph=wind_mph, max_wind_mph=MAX_WIND_MPH, motors=[
         {"code": r["code"], "delays": list(motors[r["code"]].delays), "ok": not r["problems"], "problems": r["problems"]}
         for r in b["flights"]["rows"]], recommended=b["flights"]["recommended"], safe=bool(row and not row["problems"]),
-        problems=row["problems"] if row else [], parachute=chute)
+        problems=row["problems"] if row else [], parachute=chute, shape=_shape(bal))
     return out
+
+
+def _shape(bal: Balance) -> dict:
+    """Side-view proportions for the launch page's drawing (mm): overall length,
+    body diameter, nose length, fin planform and count."""
+    q, fin = bal.params, fin_dimensions(bal.params, bal.cal)
+    return {"length_mm": round(bal.length, 1), "od_mm": round(bal.body_od, 1),
+            "nose_mm": round(q.nose_fineness * bal.cal, 1), "nose_shape": q.nose_shape, "fin_count": q.fin_count,
+            "fin": {k: round(getattr(fin, k), 1) for k in ("root", "span", "tip", "sweep")}}
 
 
 @app.get("/api/builds/{build_id}/preview.glb")

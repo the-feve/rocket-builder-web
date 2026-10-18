@@ -5,7 +5,7 @@ _2026-10-18, stream E of `docs/expansion_spec_2026-10.md`. Proposal for selling 
 **Read this first (the short version)**
 
 - **Lineup:** Starter kit (18 mm, tuck box) **$29.99**, Big kit (24 mm, mailing tube) **$39.99**, Mini kit (13 mm, bag with header card) **$16.99**, Classroom 6-pack (6 Starter rockets) **$99**. Wholesale at half of retail; the classroom pack is sold direct only.
-- **Parts and packaging cost per kit:** about $2.00 (Mini), $4.80 (Starter) and $7.90 (Big). Adding the owner's time at $20/h brings it to about $5.35, $11.50 and $15.20.
+- **Parts and packaging cost per kit:** about $1.85 (Mini), $4.55 (Starter) and $7.65 (Big). Adding the owner's time at $20/h brings it to about $5.15, $11.25 and $15.00.
 - **Safest compliance route:** label and market every kit **"Ages 12+, adults handle motors and launching"**. Sell it as a hobby and STEM kit for teens, adults and families, never as a kid's toy. That keeps it a general-use product, not a CPSIA children's product, so no lab testing and no Children's Product Certificate. This conflicts with the app's Beginner mode (grades 3–7) and the curriculum (grades 5–8); see **Compliance** below. A lawyer should confirm it before the first sale.
 - **Two things the generator found:** A8-3 motors are **too weak** for the printed 18 mm Starter rocket, and only the **A10-3T** works for the 13 mm Mini. Both rockets are heavier than paper Estes rockets. Recommend B6-4, B4-6 and C6-7 for the Starter; the app's own supply page suggests "start low with an A", so update that too.
 - **Packaging files:** `packaging/`. Each format has a dieline SVG, print-ready artwork (HTML) and PNG previews. They use the brand kit in `docs/brand/`.
@@ -65,10 +65,10 @@ Four products. The Starter is the hero product: 18 mm motors are the easiest to 
 
 | Kit | Who it's for | Packaging | Retail | Wholesale (50 %) | Parts + packaging | + labour ($20/h) | Margin direct* | Margin wholesale |
 |---|---|---|---|---|---|---|---|---|
-| **Mini** (13 mm, A10-3T) | impulse buy, small fields, market | 4 × 12 in bag + header card | **$16.99** | $8.50 | $2.02 | $5.35 (10 min) | $11.05 (65 %) | $3.15 (37 %) |
-| **Starter** (18 mm, B6-4 / B4-6 / C6-7) | first rocket, gift, stores | tuck-end box 2.5 × 2.5 × 8.75 in | **$29.99** | $15.00 | $4.80 | $11.47 (20 min) | $17.59 (59 %) | $3.53 (24 %) |
-| **Big** (24 mm, C11-5 / D12-7) | step up, older teens and adults | 4 × 12 in kraft tube ("the quiver") | **$39.99** | $20.00 | $7.86 | $15.19 (22 min) | $23.61 (59 %) | $4.81 (24 %) |
-| **Classroom 6-pack** (6 Starters, bagged, teacher sheet) | teachers, home-school co-ops, scout leaders (adults) | one shipping carton | **$99** ($16.50 each) | direct only | $23.30 | $55.30 (96 min) | $40.53 (41 %) | n/a |
+| **Mini** (13 mm, A10-3T) | impulse buy, small fields, market | 4 × 12 in bag + header card | **$16.99** | $8.50 | $1.84 | $5.17 (10 min) | $11.23 (66 %) | $3.33 (39 %) |
+| **Starter** (18 mm, B6-4 / B4-6 / C6-7) | first rocket, gift, stores | tuck-end box 2.5 × 2.5 × 8.75 in | **$29.99** | $15.00 | $4.56 | $11.23 (20 min) | $17.83 (59 %) | $3.77 (25 %) |
+| **Big** (24 mm, C11-5 / D12-7) | step up, older teens and adults | 4 × 12 in kraft tube ("the quiver") | **$39.99** | $20.00 | $7.66 | $14.99 (22 min) | $23.81 (60 %) | $5.01 (25 %) |
+| **Classroom 6-pack** (6 Starters, bagged, teacher sheet) | teachers, home-school co-ops, scout leaders (adults) | one shipping carton | **$99** ($16.50 each) | direct only | $21.86 | $53.86 (96 min) | $41.97 (42 %) | n/a |
 
 \* Direct margin after card fees (Square or Stripe, about 2.6–2.9 % + 15–30¢). Online orders also pay the store's flat $8 US shipping (`store.json`), which roughly covers USPS Ground Advantage for these weights.
 
@@ -76,7 +76,7 @@ Why these prices:
 
 - **Comparable kits:** Estes Alpha III $19.99–24.99 (bulk-pack single $12.29), Estes Big Daddy (24 mm) $34.99–40.10, Quest Skill 1 kits $13.99–21.49, Estes Mosquito (13 mm) $10.99, Alpha III 12-pack $144.99 ($12.08 a rocket). Ours are printed, pre-coloured, need no paint, and come with a free design app, so they sit a little above Estes, like a premium E2X-style kit.
 - **Same price logic as printed-rocket orders:** `server/shop.json` prices a one-off print at $12 + 15¢/g, so the Starter's parts alone would be $19.00 and the Big's $23.00. Each kit adds about $10–17 for the recovery parts, box and instructions, which keeps kits and print orders consistent. The Mini is set at $16.99 so it isn't cheaper than its own print order ($15.50).
-- **Wholesale is thin with labour counted** (about $3.50–4.80 a kit). It's still worth it for reach, but only with batch production (10+ kits per session) and the tube and box bought in quantity. Consignment at 65–70 % to the maker is better if a shop agrees.
+- **Wholesale is thin with labour counted** (about $3.30–5.00 a kit). It's still worth it for reach, but only with batch production (10+ kits per session) and the tube and box bought in quantity. Consignment at 65–70 % to the maker is better if a shop agrees.
 
 ## Bill of materials per kit
 
@@ -86,14 +86,14 @@ Unit costs at about 25–100 kits. Filament $20/kg PLA (`gear.json` lists Sunlu 
 |---|---|---|---|---|
 | Printed parts A, B, D, E, F (+15 %) | 26.8 g · $0.54 | 50.6 g · $1.01 | 81.2 g · $1.62 | generator mass |
 | Printer time | ~1.5 h · $0.38 | ~3 h · $0.75 | ~5 h · $1.25 | assumption |
-| G Kevlar shock cord (braided, ~100 lb, about $0.10/ft) | 3 ft · $0.30 | 4 ft · $0.40 | 5 ft · $0.50 | heat-proof; ties through the anchor strap, as the assembly guide draws it |
+| G shock cord: braided flat elastic, 1/8 in (3 mm) for 13 and 18 mm, 1/4 in (6 mm) for 24 mm (sewing-supply elastic, roughly $0.03–0.06/ft by the roll) | 1/8 in, 3 ft · $0.12 | 1/8 in, 4 ft · $0.16 | 1/4 in, 5 ft · $0.30 | ties through the anchor strap, as the assembly guide draws it; the generator's cord slots are being sized for these widths. Not heat-proof: the wadding protects it, and it's a cheap spare |
 | H recovery | streamer · $0.05 | 12 in chute · $0.30 | 15 in chute · $0.35 | homemade chutes: 1 mil plastic, nylon line, hole reinforcements (store-bought 12 in: $5.49 retail) |
 | I wadding (Estes 2274, 75 sheets ≈ $7) | 3 · $0.27 | 4 · $0.36 | 6 · $0.54 | Estes kits leave this out; including a starter amount makes it "complete" |
 | Waterproof decal sheet (inkjet vinyl, $13–17 per 25 sheets, 4–6 kits a sheet) | $0.15 | $0.20 | $0.25 | printed at home |
 | Quick-start card (QR to the full assembly guide) | 1 sheet B&W · $0.10 | 2 sheets colour · $0.40 | $0.40 | the full guide is stream D (`docs/assembly`) |
 | Small zip bag for small parts (2 × 3 in) | $0.03 | $0.03 | $0.03 | |
 | Package | bag + header card · $0.20 | tuck box + tissue + glue · $1.35 | tube + wrap · $2.92 | see the suppliers table |
-| **Total, parts and packaging** | **$2.02** | **$4.80** | **$7.86** | |
+| **Total, parts and packaging** | **$1.84** | **$4.56** | **$7.66** | |
 | Owner's time (print removal, QC, chute, packing) | 10 min | 20 min | 22 min | batches of 10 |
 
 **Not included, on purpose** (the same as Estes): motors, igniters, launch pad and controller, and **glue**. Cyanoacrylate glue carries its own hazard-labelling rules, and motors and igniters are regulated and best bought by an adult from a hobby store.
@@ -178,7 +178,7 @@ Start with **10 Starter kits** (the hero), then 10 Minis for the market. About 3
 
 1. **Freeze the design.** In Rocket Builder (Beginner: M18, printer 256 mm, height 300 mm, trapezoid fins), build, save the design file and the STLs. Keep them with the kit SKU (`RB-KIT-M18`).
 2. **Test-fly** two prints on B6-4, B4-6 and C6-7. Weigh the parts, check the app's altitude, delay and parachute, and update the box numbers if they changed.
-3. **Order supplies** (about $85 up front, most of it lasting 25–75 kits): braided Kevlar cord 100 ft (~$10), 1 mil plastic drop cloth (~$5), nylon line (~$5), hole reinforcement labels (~$3), Estes wadding 75 sheets (~$7), inkjet vinyl decal sheets (~$14), 65–110 lb cover cardstock (~$15), ULINE 12 × 3 × 3 in boxes ×25 (~$18), 2 × 3 in zip bags ×100 (~$5). Optional: GS1 barcode ($30).
+3. **Order supplies** (about $85 up front, most of it lasting 25–75 kits): 1/8 in braided flat elastic, about 50–100 yd (~$8–12; plus a roll of 1/4 in for the Big kit), 1 mil plastic drop cloth (~$5), nylon line (~$5), hole reinforcement labels (~$3), Estes wadding 75 sheets (~$7), inkjet vinyl decal sheets (~$14), 65–110 lb cover cardstock (~$15), ULINE 12 × 3 × 3 in boxes ×25 (~$18), 2 × 3 in zip bags ×100 (~$5). Optional: GS1 barcode ($30).
 4. **Print the parts** for 10 rockets: full plates of the same part, PLA, one colour per batch. Number the batch.
 5. **Make 10 parachutes** from a 12 in hexagon template (cut 10 at once from stacked plastic), with six lines and reinforcements. About 6 minutes each. Cut 10 × 4 ft of cord, count out 4 wadding sheets per kit, and print and trim the decals.
 6. **Print the quick-start cards** (stream D's assembly guide, first page or two, with the QR code).
@@ -208,7 +208,7 @@ Weights: Mini ≈ 42 g with bag and card (1.5 oz, listed as 2), Starter ≈ 97 g
     "slug": "rocket-builder-starter-kit",
     "name": "Rocket Builder Starter kit (18 mm)",
     "seoDescription": "3D-printed model rocket kit for 18 mm B and C motors. Pre-printed parts, no painting. Ages 12+. Motors not included.",
-    "description": "<p>A 30 cm (11.8 in) model rocket, 3D-printed in Ellensburg, WA, and designed with <a href=\"https://rocket.quiverdesignworks.net/\">Rocket Builder</a>. Pre-printed parts and no painting: about an hour to build.</p><p><strong>In the box:</strong> nose cone, anchor section, fin can with motor mount, screw-on motor cap, launch-lug standoff, 4 ft Kevlar shock cord, 12 in parachute, 4 sheets of recovery wadding, waterproof decals and a quick-start card. The full step-by-step guide is online.</p><p><strong>Flies on 18 mm motors:</strong> B6-4 (first flight), B4-6, C6-7; up to about 355 m (1,160 ft).</p><p><strong>You also need:</strong> motors, igniters, a launch pad with a 1/8 in rod and an electric launch controller, and super glue. <strong>Motors not included.</strong></p><p>Ages 12+. Adults handle motors and launching. Follow the NAR Model Rocket Safety Code. WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
+    "description": "<p>A 30 cm (11.8 in) model rocket, 3D-printed in Ellensburg, WA, and designed with <a href=\"https://rocket.quiverdesignworks.net/\">Rocket Builder</a>. Pre-printed parts and no painting: about an hour to build.</p><p><strong>In the box:</strong> nose cone, anchor section, fin can with motor mount, screw-on motor cap, launch-lug standoff, 4 ft of 1/8 in braided elastic shock cord, 12 in parachute, 4 sheets of recovery wadding, waterproof decals and a quick-start card. The full step-by-step guide is online.</p><p><strong>Flies on 18 mm motors:</strong> B6-4 (first flight), B4-6, C6-7; up to about 355 m (1,160 ft).</p><p><strong>You also need:</strong> motors, igniters, a launch pad with a 1/8 in rod and an electric launch controller, and super glue. <strong>Motors not included.</strong></p><p>Ages 12+. Adults handle motors and launching. Follow the NAR Model Rocket Safety Code. WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
     "fulfillment": "self",
     "images": ["/images/kits/starter-1.jpg", "/images/kits/starter-2.jpg", "/images/kits/starter-built.jpg"],
     "variants": [
@@ -221,7 +221,7 @@ Weights: Mini ≈ 42 g with bag and card (1.5 oz, listed as 2), Starter ≈ 97 g
     "slug": "rocket-builder-big-kit",
     "name": "Rocket Builder Big kit (24 mm)",
     "seoDescription": "3D-printed model rocket kit for 24 mm C and D motors, packed in a kraft tube. Ages 12+. Motors not included.",
-    "description": "<p>A 36 cm (14 in) model rocket for D motors, 3D-printed in Ellensburg, WA, and packed in its own quiver (a 4 x 12 in kraft tube).</p><p><strong>In the tube:</strong> nose cone, anchor section, fin can with motor mount, screw-on motor cap, launch-lug standoff, 5 ft Kevlar shock cord, 15 in parachute, 6 sheets of recovery wadding, waterproof decals and a quick-start card.</p><p><strong>Flies on 24 mm motors:</strong> C11-5 (first flight), D12-7; up to about 420 m (1,370 ft). Needs a field at least 150 m (500 ft) across for D motors.</p><p><strong>Motors not included.</strong> You also need igniters, a launch pad with a 1/8 in rod, a launch controller and super glue.</p><p>Ages 12+. Adults handle motors and launching. WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
+    "description": "<p>A 36 cm (14 in) model rocket for D motors, 3D-printed in Ellensburg, WA, and packed in its own quiver (a 4 x 12 in kraft tube).</p><p><strong>In the tube:</strong> nose cone, anchor section, fin can with motor mount, screw-on motor cap, launch-lug standoff, 5 ft of 1/4 in braided elastic shock cord, 15 in parachute, 6 sheets of recovery wadding, waterproof decals and a quick-start card.</p><p><strong>Flies on 24 mm motors:</strong> C11-5 (first flight), D12-7; up to about 420 m (1,370 ft). Needs a field at least 150 m (500 ft) across for D motors.</p><p><strong>Motors not included.</strong> You also need igniters, a launch pad with a 1/8 in rod, a launch controller and super glue.</p><p>Ages 12+. Adults handle motors and launching. WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
     "fulfillment": "self",
     "images": ["/images/kits/big-1.jpg", "/images/kits/big-built.jpg"],
     "variants": [
@@ -234,7 +234,7 @@ Weights: Mini ≈ 42 g with bag and card (1.5 oz, listed as 2), Starter ≈ 97 g
     "slug": "rocket-builder-mini-kit",
     "name": "Rocket Builder Mini kit (13 mm)",
     "seoDescription": "Small 3D-printed model rocket kit for 13 mm A10-3T motors. Flies in a 30 m field. Ages 12+. Motors not included.",
-    "description": "<p>A 19 cm (7.5 in) mini rocket, 3D-printed in Ellensburg, WA. Flies about 110 m (365 ft) on an A10-3T and needs only a 30 m (100 ft) field.</p><p><strong>In the bag:</strong> nose cone, anchor section, fin can, motor cap, launch-lug standoff, 3 ft Kevlar cord, streamer, 3 sheets of wadding, decals and a quick-start card.</p><p><strong>Motors not included</strong> (13 mm A10-3T). Ages 12+. Adults handle motors and launching. WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
+    "description": "<p>A 19 cm (7.5 in) mini rocket, 3D-printed in Ellensburg, WA. Flies about 110 m (365 ft) on an A10-3T and needs only a 30 m (100 ft) field.</p><p><strong>In the bag:</strong> nose cone, anchor section, fin can, motor cap, launch-lug standoff, 3 ft of 1/8 in elastic shock cord, streamer, 3 sheets of wadding, decals and a quick-start card.</p><p><strong>Motors not included</strong> (13 mm A10-3T). Ages 12+. Adults handle motors and launching. WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
     "fulfillment": "self",
     "images": ["/images/kits/mini-1.jpg"],
     "variants": [
@@ -247,7 +247,7 @@ Weights: Mini ≈ 42 g with bag and card (1.5 oz, listed as 2), Starter ≈ 97 g
     "slug": "rocket-builder-classroom-6-pack",
     "name": "Rocket Builder classroom 6-pack (18 mm)",
     "seoDescription": "Six 3D-printed Starter rocket kits for a class or club, with a teacher sheet. For ages 12+ with an adult leader. Motors not included.",
-    "description": "<p>Six Starter rockets (18 mm), each bagged with its parts, Kevlar cord, 12 in parachute and wadding, plus a teacher sheet linking to the free Rocket Builder lessons. For middle- and high-school groups (ages 12+) led by an adult who handles all motors and launching.</p><p><strong>Motors not included.</strong> Flies on B6-4, B4-6 and C6-7.</p><p>WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
+    "description": "<p>Six Starter rockets (18 mm), each bagged with its parts, elastic shock cord, 12 in parachute and wadding, plus a teacher sheet linking to the free Rocket Builder lessons. For middle- and high-school groups (ages 12+) led by an adult who handles all motors and launching.</p><p><strong>Motors not included.</strong> Flies on B6-4, B4-6 and C6-7.</p><p>WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs.</p>",
     "fulfillment": "self",
     "images": ["/images/kits/classroom-1.jpg"],
     "variants": [
@@ -279,6 +279,8 @@ Store notes: the store charges flat US shipping ($8) and $25 international (`sto
 
 ### The safest simple route
 
+**Decision (owner, 2026-10-18): all kits are labelled "Ages 12+".** The points below assume it; the open question for the professional is only how the kits are marketed next to the app's Beginner mode and the curriculum.
+
 1. **Age grade every kit "Ages 12+".** Put "Adults handle motors and launching" or "Launching requires adult supervision" beside it. Market the kits as a hobby and STEM product for teens, adults, families, makers and educators, not as a toy for kids. No cartoon characters, no "for kids", no grade levels under 7 in kit copy or photos. (The Estes convention of "10+ with adult supervision under 12" is used by a large company that can test; we stay at 12+.)
 2. **Add the standard small-parts warning anyway:** "WARNING: CHOKING HAZARD – Small parts. Not for children under 3 yrs." It isn't legally required for a 12+ general-use product (see below), but it's free and expected by stores.
 3. **Mark a batch number, month, maker and city** on every package ("Quiver Design Works LLC, Ellensburg, WA, USA · Batch … · Made 11/2026"). That is what a CPSIA tracking label needs. It costs nothing, helps with any recall, and is already on the artwork.
@@ -295,7 +297,7 @@ Store notes: the store charges flat US shipping ($8) and $25 international (`sto
 | **Small-parts rules** (16 CFR 1501 and 1500.19/.20) | Small parts are **banned** in products for children under 3. Products for ages 3–6 with small parts need the choking-hazard warning. A 12+ general-use kit needs neither. | Add the warning voluntarily (as Estes does on some kits). Parts E and F and the cap are small parts. | High |
 | **Motors** | Model rocket motors are exempt from the "banned hazardous substance" rules under 16 CFR 1500.85(a)(8), with conditions. NAR code: certified, commercially made motors only. | We don't sell motors; the package says "Motors not included" and names the motors. | High |
 | **Model rocket definition** (NFPA 1122, NAR code) | Up to 1,500 g at liftoff and up to 125 g of propellant; no metal body parts or fins. NAR code: stand 15 ft back for D motors and smaller, wait 60 s after a misfire with the key out, rod within 30° of vertical, wind under 20 mph, site sizes A 100 ft, B 200 ft, C 400 ft, D 500 ft. | Our largest kit is 71 g of PLA plus a 44 g D12, well inside. The box and tube text follow these numbers. | High |
-| **Country of origin** | US law doesn't require a "Made in USA" label on domestic goods. If you *claim* it unqualified on a label, the product must be "all or virtually all" made in the US (FTC Made in USA Labeling Rule, 16 CFR 323). Filament, parachute plastic and Kevlar are likely imported. | Use "Designed and 3D-printed in Ellensburg, WA, USA", no "Made in USA". | Medium. _Confirm_ the wording |
+| **Country of origin** | US law doesn't require a "Made in USA" label on domestic goods. If you *claim* it unqualified on a label, the product must be "all or virtually all" made in the US (FTC Made in USA Labeling Rule, 16 CFR 323). Filament, parachute plastic and elastic are likely imported. | Use "Designed and 3D-printed in Ellensburg, WA, USA", no "Made in USA". | Medium. _Confirm_ the wording |
 | **Washington State** | A WA business licence with a UBI and sales-tax collection apply to retail sales, including at markets (a free temporary certificate exists for up to two events a year, per a third-party guide). The WA Children's Safe Products Act (RCW 70.240, WAC 173-334) asks makers of *children's* products to report chemicals of concern, another reason to stay general use. The WA fireworks rules (WAC 212-17-015) exclude model rockets and motors, and we don't sell motors anyway. Ellensburg may need a city endorsement on the state licence. | The LLC presumably has a UBI already: add the market's location for tax reporting, collect sales tax at the market (Kittitas County / Ellensburg rate), check the city endorsement. | Medium. _Confirm_ with WA DOR / the city |
 | **Insurance** | Markets and stores often ask for general and product liability insurance with a certificate. | Get quotes for an LLC policy covering products sold; it also covers the printed-rocket orders. | – |
 | **Online to California** | Prop 65 warnings: businesses with fewer than 10 employees are exempt. | Nothing to add now. | High |
