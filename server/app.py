@@ -156,7 +156,9 @@ def can_order(user: dict | None) -> bool:
 
 
 def user_json(user: dict) -> dict:
-    return {"email": user["email"], "prefs": user["prefs"], "can_order": can_order(user)}
+    # is_admin: the page shows this owner links to the order desk (quiverdesignworks.net) and /admin.
+    return {"email": user["email"], "prefs": user["prefs"], "can_order": can_order(user),
+            "is_admin": user["email"] in ADMIN_EMAILS}
 SYNC_TOKEN = os.environ.get("ROCKETGEN_SYNC_TOKEN", "")
 
 app = FastAPI(title="Rocket Builder")

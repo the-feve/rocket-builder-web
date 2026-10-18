@@ -1,5 +1,7 @@
 # Rocket Builder kits: lineup, costs, packaging and research
 
+> **Review the packaging as PDFs** (GitHub shows HTML as code): [tuck box](packaging/tuck-box-starter.pdf), [header card](packaging/header-card.pdf), [tube wrap](packaging/tube-wrap-big.pdf), and their dielines (`packaging/*-dieline.pdf`). Print at 100% / actual size. All docs: [../README.md](../README.md).
+
 _2026-10-18, stream E of `docs/expansion_spec_2026-10.md`. Proposal for selling complete 3D-printed model rocket kits (motors not included) in local stores, at farmers markets and in the online store (quiverdesignworks.net/store/). Nothing here changes the app, the shop or the store; the online product entries at the end are a draft._
 
 **Read this first (the short version)**
