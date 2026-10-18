@@ -8,7 +8,7 @@ Matthew (accounts, keys, decisions); the rest is code. Details of what's built a
 
 Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or git):
 
-- [ ] **(owner)** `ROCKETGEN_ADMIN_EMAILS`: the owner's account email(s) for `/admin`; then create that account on the site
+- [x] **(owner)** `ROCKETGEN_ADMIN_EMAILS`: set and working (2026-10-18; the Owner row shows in the app)
 - [ ] **(owner)** `ROCKETGEN_COUPON_CODES`: comma-separated codes that make an order free (needed for any order until payment exists)
 - [ ] **(owner)** `ROCKETGEN_SYNC_TOKEN`: long random string; the same value as `ROCKET_SYNC_TOKEN` on the PC
 - [ ] **(owner)** PC sync: `tools/README.md` (save the token with `setx`, test `sync_orders.py`, add the Task Scheduler task)

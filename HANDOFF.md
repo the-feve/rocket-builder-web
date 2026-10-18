@@ -1,6 +1,17 @@
 # Handoff
 
-_Last updated 2026-10-18 (guide and tutorial changes; brand kit, curriculum, assembly guide and kit packaging in docs/)._ Read this first, then `TODO.md` (ordering, payment and data to-dos), `README.md` (Status) and `docs/web_platform_spec.md`._
+_Last updated 2026-10-18, end of the long 2026-10-18 session (PRs #39–#43, all merged and live)._ Read this first, then `TODO.md` (ordering, payment and data to-dos), `README.md` (Status) and `docs/web_platform_spec.md`._
+
+## Next session, start here (2026-10-18)
+
+- **Everything from 2026-10-18 is merged and live** (PRs #39–#43 here; trebuchet_builder #3, 3D_print_test_fitter #1, quiverdesignworks-site #7, fevergeon-site #5). No open PRs.
+- **Owner admin works:** `ROCKETGEN_ADMIN_EMAILS` = the owner's sign-in email (confirmed: the Owner row shows in the account window).
+- **Owner to do:**
+  - Print and test the three kits from `docs/kits/test-prints/` (reprint caps E after the 2.5 mm lip change), check fits with Fit Test Builder, report back.
+  - Delete merged branches on GitHub (sessions can't delete branches; the proxy returns 403). Safe: here `claude/quirky-ride-1xaiif`, `claude/vigilant-ramanujan-2e94u8`, `claude/inspiring-mayer-m1ipwo`; every `claude/…` branch in fevergeon-site and 3D_print_test_fitter; in quiverdesignworks-site all but `desk-builder` and `happy-mccarthy-m3330g`; in trebuchet_builder `admiring-maxwell-c5difl` and `vigilant-ramanujan-2e94u8`. Turn on *Automatically delete head branches* in each repo.
+  - Kept, with unmerged work: here `claude/epic-einstein-4im4l4` (fit-test results incl. M13 round-2 fits joint 0.16 / nose 0.14, test plates, an unused casing-wall cap lip: bring the fit data into main, then delete); quiverdesignworks-site `desk-builder` (desk generator) and `happy-mccarthy-m3330g` (Pearl's Store); trebuchet_builder `trusting-babbage-seog9z` (kit redesign) and `lucid-tesla-89zpzp` (old, probably superseded).
+  - Still open from before: `docs/kits` decisions (age 12+ marketing, GS1/QR placeholders, insurance), the kit test flights, and the ordering switch (`ROCKETGEN_ORDERING`) when ready to sell.
+- **Where things are:** review PDFs index `docs/README.md`; plan `docs/expansion_spec_2026-10.md`; lessons `/learn/` (built by `docs/curriculum/tools/build_site.py`); kit prints `docs/kits/test-prints/tools/make_test_prints.py`; the order desk is quiverdesignworks.net/admin/orders (linked from the app for the owner).
 
 ## Where things stand
 
