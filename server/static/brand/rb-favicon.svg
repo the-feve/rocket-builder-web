@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="t">
+<title id="t">Rocket Builder</title>
+<defs><mask id="rb-fav-dark" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-15 6L0 -9L15 6V15.5L0 0.5L-15 15.5Z" fill="none" stroke="#000" stroke-width="3.2" stroke-linejoin="round"/></mask></defs>
+<rect width="32" height="32" rx="7" fill="#12203A"/>
+<g transform="translate(16.00 16.00) scale(0.548145) translate(-1.24 1.24) rotate(45)"><path d="M0 -34C5.4 -29 8 -23 8 -15V2H-8V-15C-8 -23 -5.4 -29 0 -34Z" fill="#F6F1E7" mask="url(#rb-fav-dark)"/><path d="M-15 6L0 -9L15 6V15.5L0 0.5L-15 15.5Z" fill="#F2652B"/></g>
+</svg>
