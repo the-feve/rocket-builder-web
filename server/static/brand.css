@@ -1,0 +1,100 @@
+/* Rocket Builder brand: shared styles for the secondary pages (/sources, /ordersupplies,
+   /terms, /admin). Same tokens and look as the app (index.html) and the launch simulator;
+   the full guide is docs/brand/brand.md, the source tokens docs/brand/tokens.css.
+   Light/dark follows the system; localStorage "theme" (set by the app's header button)
+   pins one through data-theme on <html>. Page-specific CSS stays in each page. */
+
+/* Self-hosted (OFL, static/fonts/LICENSE-*.txt): same on every device, no third-party request. */
+@font-face { font-family:"Inter"; src:url(/static/fonts/inter.woff2) format("woff2"); font-weight:100 900; font-style:normal; font-display:swap; }
+@font-face { font-family:"Space Grotesk"; src:url(/static/fonts/space-grotesk.woff2) format("woff2"); font-weight:300 700; font-style:normal; font-display:swap; }
+
+:root {
+  /* Core colours: Night, Paper, Launch orange (the one main action), Sky (balance point, links),
+     Signal red (push point, stop), Go green (stable, OK), Grey (secondary). */
+  --rb-night:#12203A; --rb-paper:#F6F1E7; --rb-orange:#F2652B; --rb-sky:#3D8BFD; --rb-red:#E5484D; --rb-green:#2FB67C; --rb-grey:#6E6E73;
+  --rb-night-950:#0B1526; --rb-night-800:#1B2C4B; --rb-night-700:#263A5E; --rb-night-600:#3A4E74; --rb-night-300:#A9B4C8;
+  --rb-paper-white:#FFFDF8; --rb-paper-200:#EDE6D8; --rb-paper-300:#E2D9C6;
+  --rb-orange-700:#B8471B; --rb-sky-700:#1D5BC4; --rb-sky-300:#8BBBFE; --rb-sky-100:#E3EEFF;
+  --rb-red-700:#C22E33; --rb-red-300:#F19A9C; --rb-red-100:#FCE3E3;
+  --rb-green-700:#17754E; --rb-green-300:#85D7B2; --rb-amber-700:#8A5A00; --rb-amber-300:#F0B44C;
+  --font-head:"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --chamfer:polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+
+  color-scheme: light;
+  --bg:#FBF8F2; --panel:#FFFDF8; --card:#F6F1E7; --ink:#12203A; --muted:#6E6E73; --line:#E8E0CF; --rowline:#F0EADD;
+  --field:#FFFDF8; --accent:#1D5BC4; --accent-ink:#fff; --err:#C22E33; --errbg:#FCE3E3; --errline:#F19A9C;
+  --ok:#17754E; --okbg:#DCF3E8; --warn:#8A5A00; --warnbg:#FBEFD6;
+  --tipbg:var(--rb-sky-100); --tip:var(--rb-sky-700);
+  --cta:var(--rb-orange); --cta-ink:var(--rb-night);
+  --hover:rgba(18,32,58,.06); --shadow:0 12px 32px rgba(18,32,58,.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme=light]) {
+    color-scheme: dark;
+    --bg:#0B1526; --panel:#12203A; --card:#1B2C4B; --ink:#F6F1E7; --muted:#A9B4C8; --line:#263A5E; --rowline:#1B2C4B;
+    --field:#1B2C4B; --accent:#8BBBFE; --accent-ink:#12203A; --err:#F19A9C; --errbg:#3B1A22; --errline:#6B2C33;
+    --ok:#85D7B2; --okbg:#10372B; --warn:#F0B44C; --warnbg:#3A2C0E;
+    --tipbg:#14284A; --tip:var(--rb-sky-300);
+    --hover:rgba(246,241,231,.07); --shadow:0 14px 36px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme=dark] {
+  color-scheme: dark;
+  --bg:#0B1526; --panel:#12203A; --card:#1B2C4B; --ink:#F6F1E7; --muted:#A9B4C8; --line:#263A5E; --rowline:#1B2C4B;
+  --field:#1B2C4B; --accent:#8BBBFE; --accent-ink:#12203A; --err:#F19A9C; --errbg:#3B1A22; --errline:#6B2C33;
+  --ok:#85D7B2; --okbg:#10372B; --warn:#F0B44C; --warnbg:#3A2C0E;
+  --tipbg:#14284A; --tip:var(--rb-sky-300);
+  --hover:rgba(246,241,231,.07); --shadow:0 14px 36px rgba(0,0,0,.45);
+}
+
+/* ---------- base ---------- */
+* { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body { margin:0; font:16px/1.55 var(--font-body); color:var(--ink); background:var(--bg); -webkit-tap-highlight-color:transparent; }
+a { color:var(--accent); text-underline-offset:2px; }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+h1, h2, h3, h4 { font-family:var(--font-head); letter-spacing:-.01em; line-height:1.2; }
+h1 { font-weight:700; font-size:clamp(1.6rem, 5.5vw, 2.15rem); margin:0 0 .35rem; }
+h2 { font-weight:700; font-size:1.3rem; margin:0 0 6px; }
+h3 { font-weight:600; font-size:1.15rem; margin:0 0 4px; }
+code { font:.88em var(--font-mono); background:var(--card); padding:1px 5px; border-radius:4px; }
+.lede { font-size:1.08rem; color:var(--muted); margin:.25rem 0 1rem; max-width:62ch; }
+.rb-num { font-family:var(--font-head); font-variant-numeric:tabular-nums; }
+
+/* ---------- header: the mark, "Rocket Builder" with the page name, links home ---------- */
+.rb-header { display:flex; align-items:center; flex-wrap:wrap; gap:6px 18px; min-height:56px;
+  padding:calc(8px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
+  border-bottom:1px solid var(--line); background:var(--panel); }
+.rb-brand { display:flex; align-items:center; gap:9px; margin-right:auto; color:var(--ink); text-decoration:none; min-width:0; }
+.rb-brand svg { width:30px; height:30px; flex:none; display:block; }
+.rb-brand span { display:flex; flex-direction:column; font:700 1.12rem/1.05 var(--font-head); letter-spacing:-.01em; white-space:nowrap; }
+.rb-brand small { font:600 10px/1.2 var(--font-head); letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+.rb-nav { display:flex; align-items:center; gap:4px 16px; flex-wrap:wrap; font-size:13.5px; }
+.rb-nav a { color:var(--muted); text-decoration:none; }
+.rb-nav a:hover { color:var(--ink); text-decoration:underline; text-underline-offset:5px; }
+@media (max-width:520px) { .rb-header { gap:4px 12px; } .rb-nav .long { display:none; } }
+
+/* ---------- content ---------- */
+.rb-main { max-width:860px; margin:0 auto; padding:28px 16px 64px; }
+.rb-footer { border-top:1px solid var(--line); color:var(--muted); font-size:.88rem; padding:20px 16px calc(28px + env(safe-area-inset-bottom, 0px)); text-align:center; }
+.rb-footer a { color:var(--muted); }
+.rb-footer a:hover { color:var(--ink); }
+
+/* Section labels: Space Grotesk 600, small, uppercase, tracked. */
+.rb-label { font:600 12px/1.4 var(--font-head); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+/* Chamfered tag (part letters, small badges). */
+.rb-tag { display:inline-block; padding:2px 7px; font:700 10.5px/1.3 var(--font-head); letter-spacing:.08em; text-transform:uppercase;
+  color:var(--panel); background:var(--ink); clip-path:var(--chamfer); vertical-align:1px; }
+.rb-tag.outline { color:var(--muted); background:none; box-shadow:inset 0 0 0 1px var(--line); }
+/* Step number: chamfered orange tag, Night number. */
+.rb-step { display:inline-grid; place-items:center; width:28px; height:28px; flex:none; font:700 14px/1 var(--font-head);
+  color:var(--rb-night); background:var(--rb-orange); clip-path:var(--chamfer); }
+/* Callouts: Tip (sky) and Safety (red), as in the printed guide. */
+.rb-tip, .rb-safety { padding:12px 14px; margin:14px 0; border-left:4px solid var(--rb-sky); background:var(--tipbg); border-radius:0 8px 8px 0; }
+.rb-safety { border-left-color:var(--rb-red); background:var(--errbg); }
+/* Jump links: small outline chips. */
+.rb-chips { display:flex; flex-wrap:wrap; gap:6px 8px; margin:14px 0 6px; }
+.rb-chips a { font-size:.88rem; font-weight:500; padding:4px 12px; border:1px solid var(--line); border-radius:8px; color:var(--ink); text-decoration:none; background:var(--panel); }
+.rb-chips a:hover { border-color:var(--accent); color:var(--accent); }

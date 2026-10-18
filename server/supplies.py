@@ -23,6 +23,8 @@ from functools import lru_cache
 from html import escape
 from pathlib import Path
 
+import brand
+
 GEAR = Path(__file__).resolve().parent / "gear.json"
 ASIN = re.compile(r"^[A-Z0-9]{10}$")
 DISCLOSURE = "As an Amazon Associate, I earn from qualifying purchases."
@@ -101,7 +103,7 @@ def _starter_kit(store: str) -> str:
     for n, k in enumerate(kit["items"], 1):
         cat, it = items[k["asin"]]
         rows.append(f'<li><a href="{escape(amazon_url(k["asin"], store))}" target="_blank" rel="sponsored noopener">'
-                    f'<span class="num">{n}</span><span class="pic">{_icon(cat)}</span>'
+                    f'<span class="num rb-step">{n}</span><span class="pic">{_icon(cat)}</span>'
                     f'<span class="txt"><strong>{escape(it["name"])}</strong><span class="note">{escape(k["why"])}</span>'
                     f'<span class="cta">View on Amazon ↗</span></span></a></li>')
     return (f'<section class="kit" id="starter-kit"><h3>{escape(kit["title"])}</h3><p>{escape(kit["intro"])}</p>'
@@ -122,7 +124,7 @@ def _treb():
 def _card(url: str, pic: str, it: dict, cta: str) -> str:
     return (f'<li><a href="{escape(url)}" target="_blank" rel="sponsored noopener">'
             f'<span class="pic">{pic}</span><span class="txt">'
-            + ('<span class="tag">Start here</span>' if it.get("pick") else "")
+            + ('<span class="tag rb-tag">Start here</span>' if it.get("pick") else "")
             + f'<strong>{escape(it["name"])}</strong><span class="note">{escape(it["note"])}</span>'
             f'<span class="cta">{cta}</span></span></a></li>')
 
@@ -144,7 +146,7 @@ def _trebuchet_section() -> str:
     return (f'<section class="builder" id="trebuchet"><h2>Trebuchet Builder</h2><p class="bl">Bearings, bolts, sling cord, '
             f'counterweight fill and things to throw for a desk trebuchet from '
             f'<a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a>.</p>'
-            f'<nav class="toc" aria-label="Trebuchet categories">{toc}</nav>{"".join(secs)}</section>')
+            f'<nav class="toc rb-chips" aria-label="Trebuchet categories">{toc}</nav>{"".join(secs)}</section>')
 
 
 def page() -> str:
@@ -160,98 +162,84 @@ def page() -> str:
     treb = _trebuchet_section()
     builders = ('<nav class="builders" aria-label="Builders"><a href="#rocket">Rocket Builder</a><a href="#trebuchet">Trebuchet Builder</a></nav>'
                 if treb else "")
-    return (_PAGE.replace("{{BUILDERS}}", builders).replace("{{KIT}}", _starter_kit(store)).replace("{{TOC}}", toc)
+    # No Rocket/Trebuchet toggle in the header (owner, 2026-10-18): the section buttons below jump between them.
+    return (_PAGE.replace("{{HEAD}}", brand.HEAD).replace("{{HEADER}}", brand.header("Order supplies"))
+            .replace("{{BUILDERS}}", builders).replace("{{KIT}}", _starter_kit(store)).replace("{{TOC}}", toc)
             .replace("{{SECTIONS}}", "".join(sections)).replace("{{TREBUCHET}}", treb).replace("{{DISCLOSURE}}", DISCLOSURE))
 
 
 _PAGE = """<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{{HEAD}}
 <title>Order Supplies · Rocket Builder and Trebuchet Builder</title>
 <meta name="description" content="Launch pads, motors, igniters, parachutes, filament, glue and paint for 3D-printed model rockets from Rocket Builder.">
 <style>
-  :root { color-scheme:light; --bg:#fff; --card:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#0a58ca; --warn:#9a6700; }
-  @media (prefers-color-scheme: dark) { :root { color-scheme:dark; --bg:#111113; --card:#1c1c1f; --ink:#f2f2f4; --muted:#a1a1a6; --line:#2c2c30; --accent:#6ea8fe; --warn:#e3b341; } }
-  * { box-sizing:border-box; }
-  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
-  body { margin:0; font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
-  a { color:var(--accent); }
-  header { display:flex; align-items:center; flex-wrap:wrap; gap:6px 18px; min-height:52px;
-    padding:calc(8px + env(safe-area-inset-top, 0px)) 16px 8px; border-bottom:1px solid var(--line); }
-  header .brand { font-size:1.15rem; font-weight:700; letter-spacing:.02em; }
-  header .brand a { color:var(--ink); text-decoration:none; }
-  header nav { display:flex; gap:18px; font-size:15px; }
-  header nav a { color:var(--ink); text-decoration:none; }
-  header nav a:hover { text-decoration:underline; text-underline-offset:5px; }
-  header nav.apps { gap:2px; padding:2px; border:1px solid var(--line); border-radius:8px; }
-  header nav.apps a { padding:3px 10px; border-radius:6px; font-weight:600; font-size:14px; }
-  header nav.apps a.cur { background:var(--ink); color:var(--bg); }
-  header nav.apps a:hover { text-decoration:none; }
-  main { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
-  main h1 { font-size:clamp(1.6rem, 6vw, 2.2rem); margin:0 0 .25rem; }
-  .lede { font-size:1.1rem; color:var(--muted); margin:.25rem 0 1rem; }
-  .notice { background:var(--card); border-left:4px solid var(--accent); border-radius:6px; padding:12px 14px; margin:12px 0; }
-  .notice small { display:block; color:var(--muted); margin-top:4px; }
-  .toc { display:flex; flex-wrap:wrap; gap:6px 8px; margin:18px 0 8px; }
-  .toc a { font-size:.9rem; border:1px solid var(--line); border-radius:999px; padding:3px 12px; text-decoration:none; color:var(--ink); }
-  .toc a:hover { border-color:var(--accent); }
-  section { scroll-margin-top:12px; margin-top:28px; }
-  h3 { display:flex; align-items:center; gap:10px; font-size:1.3rem; margin:0 0 4px; }
-  .builder { margin-top:36px; padding-top:18px; border-top:3px solid var(--ink); }
-  .builder > h2 { font-size:clamp(1.4rem, 5vw, 1.8rem); margin:0 0 2px; }
+  /* Page styles; the brand (tokens, fonts, header) is in /static/brand.css. */
+  html { scroll-behavior:smooth; }
+  .rb-main { max-width:1000px; }
+  /* Rocket Builder / Trebuchet Builder switch in the header: Night pill for this one. */
+  .rb-header nav.apps { display:flex; gap:2px; padding:3px; border-radius:10px; background:var(--card); }
+  .rb-header nav.apps a { padding:4px 10px; border-radius:7px; font:600 12.5px/1.3 var(--font-body); color:var(--muted); text-decoration:none; white-space:nowrap; }
+  .rb-header nav.apps a:hover { color:var(--ink); }
+  .rb-header nav.apps a.cur { background:var(--ink); color:var(--panel); }
+  .notice small { display:block; color:var(--muted); margin-top:4px; font-size:.9rem; }
+  section { scroll-margin-top:12px; margin-top:30px; }
+  h3 { display:flex; align-items:center; gap:10px; font-size:1.25rem; margin:0 0 4px; }
+  h3 .hicon svg { width:30px; height:30px; display:block; color:var(--ink); }
+  section > p { margin:0 0 12px; color:var(--muted); max-width:70ch; }
+  .builders { display:flex; gap:8px; margin:16px 0 0; }
+  .builders a { flex:1; max-width:240px; text-align:center; padding:10px 14px; border-radius:10px; border:1.5px solid var(--ink); color:var(--ink);
+    font:700 15px/1.2 var(--font-head); text-decoration:none; }
+  .builders a:hover { background:var(--ink); color:var(--panel); }
+  .builder { margin-top:40px; padding-top:18px; border-top:2px solid var(--ink); }
+  .builder > h2 { font-size:clamp(1.4rem, 5vw, 1.75rem); margin:0 0 2px; }
   .builder > .bl { color:var(--muted); margin:0 0 8px; }
-  .builders { display:flex; gap:8px; margin:14px 0 0; }
-  .builders a { flex:1; max-width:240px; text-align:center; padding:10px 14px; border-radius:10px; border:2px solid var(--ink); color:var(--ink);
-    font-weight:700; text-decoration:none; }
-  .builders a:hover { background:var(--ink); color:var(--bg); }
-  h3 .hicon svg { width:30px; height:30px; display:block; color:var(--accent); }
-  section > p { margin:0 0 12px; color:var(--muted); }
   .items { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:12px; }
   .items a { display:grid; grid-template-columns:84px 1fr; gap:14px; align-items:start; height:100%; padding:12px; border:1px solid var(--line);
-    border-radius:10px; color:var(--ink); text-decoration:none; transition:border-color .15s, transform .15s; }
+    border-radius:10px; background:var(--panel); color:var(--ink); text-decoration:none; transition:border-color .15s, transform .15s; }
   .items a:hover { border-color:var(--accent); transform:translateY(-1px); }
-  .pic { display:grid; place-items:center; width:84px; height:84px; border-radius:8px; background:var(--card); overflow:hidden; color:var(--muted); }
+  .pic { display:grid; place-items:center; width:84px; height:84px; border-radius:8px; background:var(--card); overflow:hidden; color:var(--ink); }
   .pic svg { width:52px; height:52px; }
   .pic img { width:100%; height:100%; object-fit:cover; }
   .txt { display:flex; flex-direction:column; gap:4px; min-width:0; }
-  .txt strong { font-size:.98rem; line-height:1.35; }
-  .note { color:var(--muted); font-size:.92rem; line-height:1.45; }
-  .cta { color:var(--accent); font-size:.9rem; font-weight:600; margin-top:2px; }
-  .tag { align-self:flex-start; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent);
-    border:1px solid var(--accent); border-radius:999px; padding:0 8px; }
-  .kit { margin:22px 0 8px; padding:18px 18px 10px; border:2px solid var(--accent); border-radius:12px; }
+  .txt strong { font:600 1rem/1.3 var(--font-head); }
+  .note { color:var(--muted); font-size:.9rem; line-height:1.45; }
+  .cta { color:var(--accent); font-size:.88rem; font-weight:600; margin-top:2px; }
+  .tag { align-self:flex-start; }
+  .kit { margin:22px 0 8px; padding:18px 18px 10px; border:1px solid var(--line); border-radius:12px; background:var(--card); }
   .kit h3 { margin:0 0 2px; }
+  .kit > p { margin:0 0 4px; }
   .kitlist { list-style:none; padding:0; margin:12px 0 4px; display:grid; gap:10px; }
   .kitlist a { display:grid; grid-template-columns:28px 64px 1fr; gap:12px; align-items:center; padding:10px; border:1px solid var(--line);
-    border-radius:10px; color:var(--ink); text-decoration:none; background:var(--bg); transition:border-color .15s; }
+    border-radius:10px; color:var(--ink); text-decoration:none; background:var(--panel); transition:border-color .15s; }
   .kitlist a:hover { border-color:var(--accent); }
-  .kitlist .num { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--ink); color:var(--bg); font-weight:700; font-size:.9rem; }
+  .kitlist .num { width:28px; height:28px; }
   .kitlist .pic { width:64px; height:64px; } .kitlist .pic svg { width:40px; height:40px; }
   .kitnote { color:var(--muted); font-size:.9rem; }
-  footer { border-top:1px solid var(--line); color:var(--muted); font-size:.9rem; padding:20px 16px 32px; text-align:center; }
-  @media (max-width:480px) { .kitlist a { grid-template-columns:24px 48px 1fr; } .kitlist .pic { width:48px; height:48px; } .kitlist .pic svg { width:32px; height:32px; }
-    .items a { grid-template-columns:64px 1fr; } .pic { width:64px; height:64px; } .pic svg { width:40px; height:40px; } }
+  @media (max-width:480px) { .kitlist a { grid-template-columns:24px 48px 1fr; } .kitlist .num { width:24px; height:24px; font-size:12.5px; }
+    .kitlist .pic { width:48px; height:48px; } .kitlist .pic svg { width:32px; height:32px; }
+    .items a { grid-template-columns:64px 1fr; } .pic { width:64px; height:64px; } .pic svg { width:40px; height:40px; }
+    .rb-header nav.apps { order:3; } }
 </style>
 </head>
 <body>
-<header><div class="brand"><a href="/">Rocket Builder</a></div><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="/">← Back to the designer</a><a href="https://quiverdesignworks.net">Quiver Design Works</a></nav></header>
-<main>
+{{HEADER}}
+<main class="rb-main">
   <h1>Order supplies</h1>
   <p class="lede">Everything you need besides the printed parts, for each builder. Items marked <b>Start here</b> are what I'd buy first.</p>
-  <div class="notice"><b>Ordering through these links supports me and Rocket Builder</b>, at no extra cost to you.
+  <div class="notice rb-tip"><b>Ordering through these links supports me and Rocket Builder</b>, at no extra cost to you.
     <small>{{DISCLOSURE}} Links open Amazon, where you'll see the current price. Motors are bought and handled by a grown-up.</small></div>
   {{BUILDERS}}
   <section class="builder" id="rocket"><h2>Rocket Builder</h2>
   <p class="bl">A launch pad, motors, igniters, parachutes, filament, glue and paint for a rocket from Rocket Builder.</p>
   {{KIT}}
-  <nav class="toc" aria-label="Rocket categories">{{TOC}}</nav>
+  <nav class="toc rb-chips" aria-label="Rocket categories">{{TOC}}</nav>
   {{SECTIONS}}
   </section>
   {{TREBUCHET}}
 </main>
-<footer>{{DISCLOSURE}} · <a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net">Quiver Design Works</a></footer>
+<footer class="rb-footer">{{DISCLOSURE}} · <a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net">Quiver Design Works</a></footer>
 </body>
 </html>
 """

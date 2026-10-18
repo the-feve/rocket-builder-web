@@ -2,48 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFDF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12203A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/static/brand/rb-favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/rb-favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/rb-apple-touch-icon-180.png">
+<link rel="preload" href="/static/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/brand.css">
+<script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <title>Sources and References · Rocket Builder</title>
 <meta name="description" content="Where Rocket Builder's stability, motor, flight, parachute and launch-field numbers come from.">
-<script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
-  :root { --bg:#fff; --card:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#0a58ca; color-scheme:light; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme=light]) { --bg:#111113; --card:#1c1c1f; --ink:#f2f2f4; --muted:#a1a1a6; --line:#2c2c30; --accent:#6ea8fe; color-scheme:dark; }
-  }
-  :root[data-theme=dark] { --bg:#111113; --card:#1c1c1f; --ink:#f2f2f4; --muted:#a1a1a6; --line:#2c2c30; --accent:#6ea8fe; color-scheme:dark; }
-  * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
-  a { color:var(--accent); }
-  header { display:flex; align-items:center; gap:12px; padding:10px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--line); }
-  header b { flex:1; }
-  main { max-width:820px; margin:0 auto; padding:20px 16px 56px; }
-  h1 { font-size:clamp(1.5rem, 5vw, 2rem); margin:0 0 .3rem; }
-  .lede { color:var(--muted); margin:0 0 1rem; }
-  nav.toc { display:flex; flex-wrap:wrap; gap:6px 8px; margin:12px 0 4px; }
-  nav.toc a { font-size:.9rem; border:1px solid var(--line); border-radius:999px; padding:3px 12px; text-decoration:none; color:var(--ink); }
-  section { margin-top:28px; scroll-margin-top:12px; }
-  h2 { font-size:1.2rem; margin:0 0 6px; }
+  /* Page styles; the brand (tokens, fonts, header) is in /static/brand.css. */
+  section { margin-top:34px; scroll-margin-top:12px; }
+  section h2 { padding-bottom:6px; border-bottom:1px solid var(--line); }
   dl { margin:0; }
-  dt { font-weight:600; margin-top:12px; }
-  dd { margin:2px 0 0; color:var(--ink); }
-  .src { display:block; font-size:.92rem; color:var(--muted); margin-top:3px; }
-  .ours { display:inline-block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);
-    border:1px solid var(--line); border-radius:999px; padding:0 7px; margin-left:4px; vertical-align:1px; }
-  .note { background:var(--card); border-radius:8px; padding:12px 14px; margin:14px 0; }
-  code { font:.9em ui-monospace, Menlo, monospace; background:var(--card); padding:0 4px; border-radius:3px; }
+  dt { font:600 1.02rem/1.35 var(--font-head); margin-top:16px; }
+  dd { margin:4px 0 0; color:var(--ink); }
+  .src { display:block; font-size:.9rem; color:var(--muted); margin-top:4px; }
+  .ours { margin-left:4px; }
 </style>
 </head>
 <body>
-<header><b>Rocket Builder</b><a href="/">← Back to the designer</a></header>
-<main>
+<header class="rb-header"><a class="rb-brand" href="/" title="Rocket Builder: start page"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-hdr-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-hdr-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><span>Rocket Builder<small>Sources</small></span></a><nav class="rb-nav" aria-label="Site"><a href="/">← Back to Rocket Builder</a><a class="long" href="https://quiverdesignworks.net/">Quiver Design Works</a></nav></header>
+<main class="rb-main">
   <h1>Sources and references</h1>
   <p class="lede">Where the numbers in Rocket Builder come from: the published methods and data it uses, and the choices we made ourselves.</p>
-  <div class="note">Items marked <span class="ours">Our choice</span> are engineering assumptions or rules of thumb picked for this tool, not taken from a published standard. All results are estimates for planning; check a design in <a href="https://openrocket.info/">OpenRocket</a> and follow the safety code when you fly.</div>
-  <nav class="toc" aria-label="Sections"><a href="#stability">Stability</a><a href="#motors">Motors</a><a href="#flight">Flight</a><a href="#recovery">Parachute</a><a href="#field">Launch field and wind</a><a href="#launch">Launch simulator</a><a href="#parts">Parts and mass</a><a href="#tools">Tools</a></nav>
+  <div class="note rb-tip">Items marked <span class="ours rb-tag outline">Our choice</span> are engineering assumptions or rules of thumb picked for this tool, not taken from a published standard. All results are estimates for planning; check a design in <a href="https://openrocket.info/">OpenRocket</a> and follow the safety code when you fly.</div>
+  <nav class="toc rb-chips" aria-label="Sections"><a href="#stability">Stability</a><a href="#motors">Motors</a><a href="#flight">Flight</a><a href="#recovery">Parachute</a><a href="#field">Launch field and wind</a><a href="#launch">Launch simulator</a><a href="#parts">Parts and mass</a><a href="#tools">Tools</a></nav>
 
   <section id="stability">
     <h2>Stability</h2>
@@ -54,10 +42,10 @@
       <dt>Center of gravity (CG)</dt>
       <dd>From each printed part's own volume and centroid (from the 3D model), plus the loaded motor and an allowance for the parachute and shock cord. Measured from the nose tip, as OpenRocket reports it.
         <span class="src">NASA Glenn, <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/rocket-center-of-gravity/">Rocket Center of Gravity</a>.</span></dd>
-      <dt>Stability margin in calibers; 1 caliber minimum, 1–2 the sweet spot, over 3 over-stable <span class="ours">Our choice</span></dt>
+      <dt>Stability margin in calibers; 1 caliber minimum, 1–2 the sweet spot, over 3 over-stable <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>Margin = (CP − CG) ÷ body diameter. A minimum of 1 caliber is the common hobby rule of thumb; the zones on the score meter are our guidance. The check uses the heaviest motor that fits the bay (the least stable case) unless you pick one.
         <span class="src">Why CG must be ahead of CP: NASA Glenn, <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/rocket-stability/">Rocket Stability</a>.</span></dd>
-      <dt>Fins that grow until the rocket is stable <span class="ours">Our choice</span></dt>
+      <dt>Fins that grow until the rocket is stable <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>Standard fins are scaled (span and sweep) up to 2.5× until the margin reaches about 1.15 calibers with the heaviest motor.</dd>
     </dl>
   </section>
@@ -68,7 +56,7 @@
       <dt>Motor data</dt>
       <dd>Total impulse, average and peak thrust, burn time, propellant and loaded mass, and delays for Estes motors of each size.
         <span class="src"><a href="https://www.thrustcurve.org/">ThrustCurve.org</a> motor database; motors by <a href="https://estesrockets.com/">Estes Industries</a>. Stored in <code>geometry/rocketgen/data/web_motors.csv</code>.</span></dd>
-      <dt>Thrust curve shape <span class="ours">Our choice</span></dt>
+      <dt>Thrust curve shape <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>A quick rise to the peak thrust in the first 5% of the burn, a fall to a steady level by 25%, then steady to burnout, with the steady level set so the area equals the total impulse (flat thrust when no peak is listed).</dd>
     </dl>
   </section>
@@ -79,9 +67,9 @@
       <dt>Altitude: a one-dimensional flight simulation</dt>
       <dd>Thrust, weight (falling as propellant burns) and air drag, stepped every 2 ms until the rocket stops climbing.
         <span class="src">Drag: NASA Glenn, <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/">The Drag Equation</a>. Air density 1.225 kg/m³ (standard sea level): NASA Glenn, <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/earth-atmosphere-equation-metric/">Earth Atmosphere Model</a>.</span></dd>
-      <dt>Drag coefficient 0.65 <span class="ours">Our choice</span></dt>
+      <dt>Drag coefficient 0.65 <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>A typical value for a small model rocket; you can change it in Advanced mode. OpenRocket works it out from the shape if you want a closer number.</dd>
-      <dt>Safety checks: 5× thrust-to-weight, 15 m/s off the launch rod, 30 m minimum altitude <span class="ours">Our choice</span></dt>
+      <dt>Safety checks: 5× thrust-to-weight, 15 m/s off the launch rod, 30 m minimum altitude <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>Common hobby rules of thumb, set on the cautious side: enough push for a straight climb, fast enough off the rod for the fins to steer, and high enough for the parachute to open.</dd>
       <dt>Ejection delay</dt>
       <dd>The motor's listed delay closest to the simulated coast time (burnout to the top), so the parachute comes out near the highest point.</dd>
@@ -94,7 +82,7 @@
       <dt>Descent speed</dt>
       <dd>Steady descent where drag on the canopy equals the rocket's weight (the drag equation solved for speed).
         <span class="src">NASA Glenn, <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/">The Drag Equation</a>.</span></dd>
-      <dt>Flat chute drag coefficient 0.75, a 4.5 m/s (about 15 ft/s) landing, standard 12–36 inch sizes <span class="ours">Our choice</span></dt>
+      <dt>Flat chute drag coefficient 0.75, a 4.5 m/s (about 15 ft/s) landing, standard 12–36 inch sizes <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>The smallest standard size that lands the rocket (with the empty motor casing) at 4.5 m/s or slower. A streamer is suggested under 40 g.</dd>
     </dl>
   </section>
@@ -105,7 +93,7 @@
       <dt>Minimum field size by motor class; no launches in winds over 20 mph</dt>
       <dd>1/4A–1/2A: 50 ft (15 m) · A: 100 ft (30 m) · B: 200 ft (60 m) · C: 400 ft (120 m) · D: 500 ft (150 m) · E–F: 1,000 ft (300 m), on the field's shortest side.
         <span class="src">National Association of Rocketry, <a href="https://www.nar.org/safety-information/model-rocket-safety-code/">Model Rocket Safety Code</a>, Launch Site Dimensions table.</span></dd>
-      <dt>Parachute drift and the recommended field <span class="ours">Our choice</span></dt>
+      <dt>Parachute drift and the recommended field <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>The report assumes a 10 mph breeze and drift = height ÷ descent speed × wind speed; the field is the larger of the safety-code size and that drift.</dd>
     </dl>
   </section>
@@ -113,9 +101,9 @@
   <section id="launch">
     <h2>Launch simulator</h2>
     <dl>
-      <dt>Two-dimensional flight in a steady wind <span class="ours">Our choice</span></dt>
+      <dt>Two-dimensional flight in a steady wind <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>The same thrust, mass and drag as the altitude simulation, in two dimensions with the wind along the ground. Off the rod the rocket points into its own airflow (a stable rocket turns into the wind, called weathercocking); the parachute opens over half a second at burnout + delay and drifts with the wind. The field covers the landing spot with 25% extra for gusts, and is never smaller than the safety-code size.</dd>
-      <dt>Unsafe designs: wobble and tumble <span class="ours">Our choice</span></dt>
+      <dt>Unsafe designs: wobble and tumble <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>So the simulator can show why a design isn't safe, a rocket under 1 caliber of stability gets a simple pitch model instead of pointing straight into its airflow: the fins' restoring push grows with the margin and the square of the airspeed, with light damping, and a small nudge as it leaves the rod. Under 1 cal it wobbles off course; under 0 cal (push point ahead of the balance point) it tumbles, and side-on to the air its drag is many times higher, so it barely climbs. The numbers are tuned to look right, not measured: treat these flights as examples of what goes wrong, not predictions. A safe landing is taken as under 10 m/s.</dd>
     </dl>
   </section>
@@ -123,9 +111,9 @@
   <section id="parts">
     <h2>Parts and mass</h2>
     <dl>
-      <dt>Filament densities: PLA 1.24, PETG 1.27, ASA 1.07 g/cm³ <span class="ours">Our choice</span></dt>
+      <dt>Filament densities: PLA 1.24, PETG 1.27, ASA 1.07 g/cm³ <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>Typical values from filament makers' data sheets. Masses assume solid parts, so real prints with less infill weigh a little less.</dd>
-      <dt>Recovery allowance <span class="ours">Our choice</span></dt>
+      <dt>Recovery allowance <span class="ours rb-tag outline">Our choice</span></dt>
       <dd>Parachute or streamer, shroud lines and shock cord: 0.3 g per mm of body diameter (about 6 g at 18 mm).</dd>
       <dt>Rocket geometry</dt>
       <dd>Body sizes, motor mounts, couplers and fin shapes come from OS_Rocket_Builder, our Onshape FeatureScript rocket generator that Rocket Builder was ported from.</dd>
@@ -141,5 +129,6 @@
     </dl>
   </section>
 </main>
+<footer class="rb-footer"><a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net/">Quiver Design Works</a></footer>
 </body>
 </html>

@@ -575,3 +575,11 @@ def test_learn_unknown_pages_404():
     for page in ("day-11", "day-1", "index", "learn.css", "..%2Fapp.py", "..%2F..%2Fapp.py", "worksheets.pdf.html"):
         assert client.get(f"/learn/{page}").status_code == 404, page
     assert client.get("/learn/../app.py").status_code == 404
+
+
+def test_secondary_pages_use_the_brand():
+    """/sources, /ordersupplies, /terms and /admin share static/brand.css and the branded header."""
+    assert client.get("/static/brand.css").status_code == 200
+    for path in ("/sources", "/ordersupplies", "/terms", "/admin"):
+        html = client.get(path).text
+        assert '/static/brand.css' in html and 'class="rb-header"' in html and "Quiver Design Works" in html, path
