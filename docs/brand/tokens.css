@@ -1,0 +1,181 @@
+/* Rocket Builder by Quiver Design Works: design tokens
+   ---------------------------------------------------------------------------------
+   Drop-in file. Nothing here styles elements by itself except the opt-in .rb-* helper
+   classes at the bottom. The core seven hex values are fixed (docs/expansion_spec_2026-10.md);
+   tints and shades are derived from them.
+
+   Fonts (free, Google Fonts):
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+   Theme: follows the system setting; <html data-theme="light|dark"> overrides it,
+   the same convention as server/static/index.html. */
+
+:root {
+  /* ---- Core (fixed) -------------------------------------------------------- */
+  --rb-night:  #12203A;  /* ink, text, line drawings, dark backgrounds */
+  --rb-paper:  #F6F1E7;  /* page, packaging stock */
+  --rb-orange: #F2652B;  /* launch: the one call to action, the fletching */
+  --rb-sky:    #3D8BFD;  /* balance point (CG), links, blueprint lines */
+  --rb-red:    #E5484D;  /* push point (CP), warnings, errors */
+  --rb-green:  #2FB67C;  /* stable, OK, done */
+  --rb-grey:   #6E6E73;  /* secondary text (4.5:1 on Paper) */
+
+  /* ---- Night ramp (backgrounds and lines in dark theme, tints in light) ---- */
+  --rb-night-950: #0B1526;
+  --rb-night-900: #12203A;
+  --rb-night-800: #1B2C4B;
+  --rb-night-700: #263A5E;
+  --rb-night-600: #3A4E74;
+  --rb-night-400: #6B7C9C;
+  --rb-night-300: #A9B4C8;  /* "Mist": secondary text on Night (7.8:1) */
+  --rb-night-100: #D9DFEA;
+  --rb-night-50:  #EEF1F6;
+
+  /* ---- Paper ramp ---------------------------------------------------------- */
+  --rb-paper-white: #FFFDF8; /* fields, cards that need to lift off Paper */
+  --rb-paper-200:   #EDE6D8; /* card on Paper */
+  --rb-paper-300:   #E2D9C6; /* rules and borders on Paper */
+  --rb-paper-400:   #CFC3AB; /* stronger border, disabled */
+
+  /* ---- Signal colours: 700 = text-safe on Paper/white (>= 4.5:1),
+          300 = text-safe on Night, 100 = soft fill behind a light-theme message -- */
+  --rb-orange-700: #B8471B;  --rb-orange-300: #F8A27E;  --rb-orange-100: #FDE6DA;
+  --rb-sky-700:    #1D5BC4;  --rb-sky-300:    #8BBBFE;  --rb-sky-100:    #DDEAFF;
+  --rb-red-700:    #C22E33;  --rb-red-300:    #F19A9C;  --rb-red-100:    #FCE3E3;
+  --rb-green-700:  #17754E;  --rb-green-300:  #85D7B2;  --rb-green-100:  #DCF3E8;
+  /* Supporting amber for "check this" (not a core colour; keeps orange meaning "go") */
+  --rb-amber-700:  #8A5A00;  --rb-amber-300:  #F0B44C;  --rb-amber-100:  #FBEFD6;
+
+  /* ---- Type ---------------------------------------------------------------- */
+  --rb-font-head: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --rb-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rb-font-num:  "Space Grotesk", ui-monospace, monospace; /* add font-variant-numeric: tabular-nums */
+  /* Scale: 1.25 (major third) from 16 px. App UI sits at 14 px body. */
+  --rb-fs-xs:  0.75rem;   /* 12  labels, legends, part codes */
+  --rb-fs-sm:  0.875rem;  /* 14  app body, captions */
+  --rb-fs-md:  1rem;      /* 16  print/web body */
+  --rb-fs-lg:  1.25rem;   /* 20  section heads */
+  --rb-fs-xl:  1.5625rem; /* 25  page heads */
+  --rb-fs-2xl: 1.953rem;  /* 31  */
+  --rb-fs-3xl: 2.441rem;  /* 39  hero, packaging */
+  --rb-fs-4xl: 3.052rem;  /* 49  */
+  --rb-lh-tight: 1.1;   /* headings */
+  --rb-lh-body:  1.5;
+  --rb-track-label: 0.08em; /* UPPERCASE labels, "BY QUIVER DESIGN WORKS" uses 0.15em */
+
+  /* ---- Shape --------------------------------------------------------------- */
+  --rb-r-xs: 3px;
+  --rb-r-sm: 6px;    /* inputs, small buttons (matches the app today) */
+  --rb-r-md: 10px;   /* buttons, cards */
+  --rb-r-lg: 16px;   /* panels, dialogs */
+  --rb-r-pill: 999px;
+  /* Chamfered corners: the Quiver lettering is cut at 45 degrees. Use on part-letter tags,
+     step numbers and badges, not on every box. */
+  --rb-chamfer: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px),
+                calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+
+  /* ---- Line drawing (guides, curriculum, packaging) ----------------------- */
+  --rb-stroke-part:   2px;   /* outline of a part (at print size, 0.75 pt) */
+  --rb-stroke-detail: 1px;   /* inner edges, threads, shock cord */
+  --rb-stroke-hidden: 1px;   /* hidden edges: dashed 4 3 */
+  --rb-stroke-arrow:  2px;   /* motion arrows: Orange */
+  --rb-space-1: 4px; --rb-space-2: 8px; --rb-space-3: 12px; --rb-space-4: 16px;
+  --rb-space-5: 24px; --rb-space-6: 32px; --rb-space-7: 48px;
+
+  /* ---- Motifs (CSS-ready SVG) --------------------------------------------- */
+  /* Blueprint grid: 8 px minor, 40 px major. Two versions; the theme picks one below. */
+  --rb-grid-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M8.5 0V40M16.5 0V40M24.5 0V40M32.5 0V40M0 8.5H40M0 16.5H40M0 24.5H40M0 32.5H40' stroke='%233D8BFD' stroke-opacity='.13'/%3E%3Cpath d='M.5 0V40M0 .5H40' stroke='%233D8BFD' stroke-opacity='.32'/%3E%3C/svg%3E");
+  --rb-grid-night: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M8.5 0V40M16.5 0V40M24.5 0V40M32.5 0V40M0 8.5H40M0 16.5H40M0 24.5H40M0 32.5H40' stroke='%23F6F1E7' stroke-opacity='.05'/%3E%3Cpath d='M.5 0V40M0 .5H40' stroke='%23F6F1E7' stroke-opacity='.13'/%3E%3C/svg%3E");
+  /* Flight arc: a dashed parabola, pad bottom-left, apogee near the right. Stretches to fit
+     (preserveAspectRatio none, non-scaling stroke). Colour is baked in, so two versions. */
+  --rb-arc-night: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cpath d='M2 98Q160 -30 398 30' fill='none' stroke='%2312203A' stroke-width='2' stroke-dasharray='8 7' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --rb-arc-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cpath d='M2 98Q160 -30 398 30' fill='none' stroke='%23F6F1E7' stroke-width='2' stroke-dasharray='8 7' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  /* Fletching band: orange + ink chevron pairs, 40 px repeat, 24 px tall. */
+  --rb-fletch-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 40 48'%3E%3Cpath d='M1 4L17 24L1 44H10L26 24L10 4Z' fill='%23F2652B'/%3E%3Cpath d='M15 4L31 24L15 44H24L40 24L24 4Z' fill='%2312203A'/%3E%3C/svg%3E");
+  --rb-fletch-night: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 40 48'%3E%3Cpath d='M1 4L17 24L1 44H10L26 24L10 4Z' fill='%23F2652B'/%3E%3Cpath d='M15 4L31 24L15 44H24L40 24L24 4Z' fill='%23F6F1E7'/%3E%3C/svg%3E");
+}
+
+/* ---- Theme mappings: same names as the app (server/static/index.html) ------- */
+:root {
+  color-scheme: light;
+  --bg: #FBF8F2;                    /* a whisper lighter than Paper, so cards can sit on it */
+  --panel: var(--rb-paper-white);
+  --card: var(--rb-paper);
+  --ink: var(--rb-night);
+  --muted: var(--rb-grey);
+  --line: var(--rb-paper-300);
+  --rowline: var(--rb-paper-200);
+  --field: var(--rb-paper-white);
+  --accent: var(--rb-sky-700);      /* links, focus rings, selected */
+  --accent-ink: #FFFFFF;
+  --cta: var(--rb-orange);          /* the launch button: one per screen */
+  --cta-ink: var(--rb-night);       /* Night on Orange = 5.2:1; white on Orange fails */
+  --cg: var(--rb-sky);              /* balance-point dot */
+  --cp: var(--rb-red);              /* push-point dot */
+  --ok: var(--rb-green-700);
+  --okbg: var(--rb-green-100);
+  --warn: var(--rb-amber-700);
+  --warnbg: var(--rb-amber-100);
+  --err: var(--rb-red-700);
+  --errbg: var(--rb-red-100);
+  --errline: var(--rb-red-300);
+  --view-top: var(--rb-paper);
+  --view-bot: var(--rb-paper-200);
+  --chip: rgba(255, 253, 248, .9);
+  --grid: var(--rb-grid-paper);
+  --arc: var(--rb-arc-night);
+  --fletch: var(--rb-fletch-paper);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: var(--rb-night-950); --panel: var(--rb-night); --card: var(--rb-night-800);
+    --ink: var(--rb-paper); --muted: var(--rb-night-300); --line: var(--rb-night-700); --rowline: var(--rb-night-800);
+    --field: var(--rb-night-800); --accent: var(--rb-sky-300); --accent-ink: var(--rb-night);
+    --cta: var(--rb-orange); --cta-ink: var(--rb-night); --cg: var(--rb-sky); --cp: var(--rb-red);
+    --ok: var(--rb-green-300); --okbg: #10372B; --warn: var(--rb-amber-300); --warnbg: #3A2C0E;
+    --err: var(--rb-red-300); --errbg: #3B1A22; --errline: #6B2C33;
+    --view-top: var(--rb-night-800); --view-bot: var(--rb-night-950); --chip: rgba(18, 32, 58, .9);
+    --grid: var(--rb-grid-night); --arc: var(--rb-arc-paper); --fletch: var(--rb-fletch-night);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: var(--rb-night-950); --panel: var(--rb-night); --card: var(--rb-night-800);
+  --ink: var(--rb-paper); --muted: var(--rb-night-300); --line: var(--rb-night-700); --rowline: var(--rb-night-800);
+  --field: var(--rb-night-800); --accent: var(--rb-sky-300); --accent-ink: var(--rb-night);
+  --cta: var(--rb-orange); --cta-ink: var(--rb-night); --cg: var(--rb-sky); --cp: var(--rb-red);
+  --ok: var(--rb-green-300); --okbg: #10372B; --warn: var(--rb-amber-300); --warnbg: #3A2C0E;
+  --err: var(--rb-red-300); --errbg: #3B1A22; --errline: #6B2C33;
+  --view-top: var(--rb-night-800); --view-bot: var(--rb-night-950); --chip: rgba(18, 32, 58, .9);
+  --grid: var(--rb-grid-night); --arc: var(--rb-arc-paper); --fletch: var(--rb-fletch-night);
+}
+
+/* ---- Opt-in helpers ------------------------------------------------------------ */
+.rb-grid    { background-color: var(--bg); background-image: var(--grid); background-position: -1px -1px; }
+.rb-arc     { display: block; height: 56px; background: var(--arc) no-repeat center / 100% 100%; }
+.rb-fletch  { display: block; height: 24px; background: var(--fletch) repeat-x left center / 20px 24px; }
+.rb-head    { font-family: var(--rb-font-head); font-weight: 700; line-height: var(--rb-lh-tight); letter-spacing: -0.01em; }
+.rb-label   { font-family: var(--rb-font-head); font-weight: 600; font-size: var(--rb-fs-xs);
+              text-transform: uppercase; letter-spacing: var(--rb-track-label); color: var(--muted); }
+.rb-num     { font-family: var(--rb-font-num); font-variant-numeric: tabular-nums; }
+/* Part letter tag (A, B, C ...) and step number, chamfered like the Quiver letters */
+.rb-tag     { display: inline-grid; place-items: center; min-width: 1.75em; height: 1.75em; padding: 0 .35em;
+              font: 700 var(--rb-fs-sm)/1 var(--rb-font-head); color: var(--rb-paper); background: var(--rb-night);
+              clip-path: var(--rb-chamfer); }
+.rb-step    { display: inline-grid; place-items: center; width: 2.25em; height: 2.25em;
+              font: 700 var(--rb-fs-lg)/1 var(--rb-font-head); color: var(--rb-night); background: var(--rb-orange);
+              clip-path: var(--rb-chamfer); }
+/* Buttons: one Launch (orange) per screen; everything else is ink or outline. */
+.rb-btn     { display: inline-flex; align-items: center; justify-content: center; gap: .5em; padding: .6em 1.1em;
+              font: 600 var(--rb-fs-sm)/1.2 var(--rb-font-body); border-radius: var(--rb-r-md); border: 1.5px solid transparent;
+              cursor: pointer; text-decoration: none; }
+.rb-btn--launch  { background: var(--cta); color: var(--cta-ink); box-shadow: inset 0 -3px 0 rgba(18, 32, 58, .18); }
+.rb-btn--launch:hover { filter: brightness(1.05); }
+.rb-btn--ink     { background: var(--ink); color: var(--bg); }
+.rb-btn--outline { background: transparent; color: var(--ink); border-color: var(--line); }
+.rb-btn--outline:hover { border-color: var(--accent); color: var(--accent); }
+.rb-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rb-card    { background: var(--card); border: 1px solid var(--line); border-radius: var(--rb-r-lg); padding: var(--rb-space-4); }

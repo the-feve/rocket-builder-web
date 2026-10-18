@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+<title>Rocket Builder blueprint grid tile</title>
+<rect width="40" height="40" fill="#F6F1E7"/>
+<path d="M8.5 0V40M0 8.5H40M16.5 0V40M0 16.5H40M24.5 0V40M0 24.5H40M32.5 0V40M0 32.5H40" stroke="rgba(61,139,253,.14)" stroke-width="1"/>
+<path d="M.5 0V40M0 .5H40" stroke="rgba(61,139,253,.38)" stroke-width="1"/>
+</svg>

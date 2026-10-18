@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+<title>Rocket Builder flight arc</title>
+<rect width="1200" height="400" fill="#12203A"/>
+<g fill="none" stroke-linecap="round"><path d="M120 340Q166.2 280.0 212.3 233.8" stroke="#F2652B" stroke-width="4" stroke-dasharray="2 10"/><path d="M212.3 233.8Q366.2 80.0 520 80" stroke="#F6F1E7" stroke-width="3" stroke-dasharray="14 12"/><path d="M520 80C720 80 930 120 1000 214" stroke="#F6F1E7" stroke-width="3" stroke-dasharray="1 10"/></g>
+<g fill="#8BBBFE"><path transform="translate(250 90) scale(1)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/><path transform="translate(640 40) scale(0.7)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/><path transform="translate(820 170) scale(1.1)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/><path transform="translate(1080 70) scale(0.8)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/><path transform="translate(150 170) scale(0.6)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/><path transform="translate(1140 230) scale(0.6)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/><path transform="translate(420 180) scale(0.5)" d="M0 -7L1.6 -1.6L7 0L1.6 1.6L0 7L-1.6 1.6L-7 0L-1.6 -1.6Z"/></g>
+<g fill="none" stroke="#F6F1E7" stroke-width="2"><path d="M520 58V70"/></g>
+<text x="520" y="50" fill="#F6F1E7" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="700" letter-spacing="2" text-anchor="middle">APOGEE</text>
+<g fill="#12203A" stroke="#F6F1E7" stroke-width="2.5"><circle cx="160" cy="364" r="8"/><circle cx="84" cy="362" r="10"/><circle cx="140" cy="358" r="13"/><circle cx="106" cy="354" r="16"/></g>
+<path d="M50 372H190" stroke="#F6F1E7" stroke-width="3" stroke-linecap="round"/>
+<g transform="translate(1000 250)" fill="none" stroke="#F6F1E7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M-26 0C-26 -18 -12 -28 0 -28C12 -28 26 -18 26 0C20 -5 13 -5 8.6 0C4 -5 -4 -5 -8.6 0C-13 -5 -20 -5 -26 0Z" fill="#F2652B"/><path d="M-26 0L0 34L26 0M-8.6 0L0 34L8.6 0"/><path d="M-3 34H3V48H-3Z" fill="#F6F1E7"/></g>
+<g transform="translate(230.3 215.8) rotate(45) scale(1.6)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="#F6F1E7"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B" stroke="#12203A" stroke-width="2.4" paint-order="stroke"/></g>
+</svg>

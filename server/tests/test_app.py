@@ -206,6 +206,8 @@ def test_launch_simulator():
     ev = calm["events"]
     assert ev["rod"]["t"] < ev["burnout"]["t"] < ev["apogee"]["t"] < ev["landing"]["t"] and ev["eject"]["t"] < ev["landing"]["t"]
     assert abs(calm["landing_m"]) < 1 and calm["field"]["length_m"] == calm["field"]["nar_min_m"]
+    sh = calm["shape"]  # side-view proportions for the page's drawing
+    assert sh["length_mm"] > sh["nose_mm"] > sh["od_mm"] > 0 and sh["fin"]["root"] > 0 and sh["fin_count"] == 3
     assert windy["landing_m"] > 20 and windy["apogee_m"] < calm["apogee_m"]  # weathercocks, then drifts
     f = windy["field"]
     assert f["length_m"] >= f["pad_from_upwind_m"] + windy["landing_m"] and f["width_m"] == f["nar_min_m"]

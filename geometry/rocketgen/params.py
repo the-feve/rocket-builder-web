@@ -20,6 +20,27 @@ NOSE_SHAPES = ("tangent_ogive", "conical", "elliptical", "parabolic", "von_karma
 LUG_OPTIONS = ("two", "aft_only", "none")
 MATERIALS = {"PETG": 1.27, "ASA": 1.07, "PLA": 1.24}  # g/cm3
 
+# The shock cord the printed attachment points are sized for (owner,
+# 2026-10-18: braided elastic, as in hobby kits; Kevlar won't be offered).
+# Flat braided elastic is 1/8 in wide on 13/18 mm rockets and 1/4 in on
+# 24/29 mm ones, about 1 mm thick (the 1/4 in a little more); round 1/8 in
+# elastic (about 3.2 mm) is just as common at every size. Keyed by the motor
+# diameter so a fatter body (body OD offset) keeps its motor's cord.
+SHOCK_CORDS = (  # (motor diameter up to, mm): cord, mm
+    (21.0, {"flat_w": 3.2, "flat_t": 1.0, "round_d": 3.2}),
+    (999.0, {"flat_w": 6.4, "flat_t": 1.2, "round_d": 3.2}),
+)
+CORD_PRINT_MARGIN = 0.4  # printed slots come out a little small, and elastic is fuzzy
+
+
+def shock_cord(mtr_d: float) -> dict:
+    """The cord for a motor size, and `pass_d`: the clear gap a cord pass
+    needs (one round cord, or flat cord doubled back on itself, plus the
+    print margin). The anchor strap's slot and the nose tie bar's room are
+    both this deep."""
+    cord = next(c for dmax, c in SHOCK_CORDS if mtr_d <= dmax)
+    return {**cord, "pass_d": max(cord["round_d"], 2 * cord["flat_t"]) + CORD_PRINT_MARGIN}
+
 
 def _mm(text: str) -> float:
     value, unit = text.split()

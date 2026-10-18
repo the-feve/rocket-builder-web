@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kit dieline viewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #fff; }
+  #sheet { display: inline-block; background: #fff; }
+  #sheet img { display: block; }
+</style>
+</head>
+<body>
+<!-- Shows one dieline SVG at its real size: dieline.html?f=tuck-box-starter-dieline.svg -->
+<div id="sheet"><img id="svg" alt="Dieline"></div>
+<script>
+  const f = new URLSearchParams(location.search).get('f') || 'tuck-box-starter-dieline.svg';
+  document.getElementById('svg').src = f.replace(/[^\w.-]/g, '');
+</script>
+</body>
+</html>

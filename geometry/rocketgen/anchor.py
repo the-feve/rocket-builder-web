@@ -26,12 +26,15 @@ from build123d import Face, Solid, Vector, Wire
 from .geom import cylinder, intersect, one_solid, rotated_z, try_fillet
 
 APEX_FILLET = 1.5  # radius of the round at the arch's peak
-from .params import Derived
+from .params import Derived, shock_cord
 
 
 def anchor_strap_geometry(d: Derived) -> dict:
     ri = d.body_id / 2
-    hole_depth = 2.5  # cord gap between the bar and the wall, at the middle
+    # Cord gap between the bar and the wall, at the middle: deep enough for a
+    # round 1/8 in elastic or a flat one doubled back (params.SHOCK_CORDS);
+    # it was 2.5 mm, sized for thin Kevlar, which elastic won't go through.
+    hole_depth = shock_cord(d.mtr_d)["pass_d"]
     t = 2.0  # bar thickness: five 0.4 mm perimeters
     above_apex = 2.0  # bar height above the arch's apex
     gap = 2.0  # clear space between the strap and the nose's shoulder

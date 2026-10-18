@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480">
+<title>Rocket Builder blueprint panel</title>
+<defs><pattern id="rb-grid-night" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M8.5 0V40M0 8.5H40M16.5 0V40M0 16.5H40M24.5 0V40M0 24.5H40M32.5 0V40M0 32.5H40" stroke="rgba(246,241,231,.06)" stroke-width="1"/><path d="M.5 0V40M0 .5H40" stroke="rgba(246,241,231,.16)" stroke-width="1"/></pattern></defs>
+<rect width="800" height="480" fill="#12203A"/>
+<rect width="800" height="480" fill="url(#rb-grid-night)"/>
+<g fill="none" stroke="#8BBBFE" stroke-width="1.5"><path d="M30 40H50M40 30V50"/><circle cx="40" cy="40" r="5"/><path d="M750 40H770M760 30V50"/><circle cx="760" cy="40" r="5"/><path d="M30 440H50M40 430V450"/><circle cx="40" cy="440" r="5"/><path d="M750 440H770M760 430V450"/><circle cx="760" cy="440" r="5"/></g>
+<g fill="none" stroke="#8BBBFE" stroke-width="1.5"><rect x="560" y="380" width="180" height="44"/><path d="M560 402H740M650 402V424"/></g>
+</svg>
