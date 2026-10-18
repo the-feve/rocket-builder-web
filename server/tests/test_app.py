@@ -583,3 +583,18 @@ def test_secondary_pages_use_the_brand():
     for path in ("/sources", "/ordersupplies", "/terms", "/admin"):
         html = client.get(path).text
         assert '/static/brand.css' in html and 'class="rb-header"' in html and "Quiver Design Works" in html, path
+
+
+def test_me_says_whether_the_account_is_the_owner(monkeypatch):
+    """/api/auth/me carries is_admin, so the page shows the owner the order-desk links."""
+    import app as rocket
+    page = client.get("/").text
+    assert 'data-admin hidden' in page and "quiverdesignworks.net/admin/orders" in page
+    c = TestClient(rocket.app)
+    import uuid
+    email = f"owner-{uuid.uuid4().hex[:8]}@example.com"
+    assert c.post("/api/auth/signup", json={"email": email, "password": "rocket123", "age_ok": True}).status_code == 200
+    assert c.get("/api/auth/me").json()["user"]["is_admin"] is False
+    monkeypatch.setattr(rocket, "ADMIN_EMAILS", {email})
+    assert c.get("/api/auth/me").json()["user"]["is_admin"] is True
+
