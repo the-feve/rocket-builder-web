@@ -47,8 +47,8 @@ Complete kits for local stores, farmers markets and the online store: kit conten
 
 ## Status
 
-- [ ] A app changes
-- [ ] B brand kit
-- [ ] C curriculum
-- [ ] D assembly guide
-- [ ] E kits and packaging
+- [x] A app changes (2026-10-18)
+- [x] B brand kit (not applied to the app yet)
+- [x] C curriculum
+- [x] D assembly guide (owner questions in TODO.md)
+- [x] E kits and packaging (owner decisions in TODO.md)

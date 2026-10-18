@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="11.0in" height="17.0in" viewBox="0 0 1100.0 1700.0">
+<title>Rocket Builder Starter kit · reverse tuck-end box</title>
+<style>text{font-family:"Space Grotesk","Inter",Arial,sans-serif}</style>
+<polygon points="68.8,1550.0 68.8,1585.2 96.1,1612.5 303.9,1612.5 331.2,1585.2 331.2,1550.0 337.5,1550.0 337.5,1371.7 355.8,1390.0 544.2,1390.0 581.0,1353.2 586.3,1300.0 813.7,1300.0 819.0,1353.2 855.8,1390.0 1044.2,1390.0 1081.0,1353.2 1087.5,1288.1 1087.5,411.9 1081.0,346.8 1044.2,310.0 855.8,310.0 837.5,328.3 837.5,150.0 831.2,150.0 831.2,114.8 803.9,87.5 596.1,87.5 568.8,114.8 568.8,150.0 562.5,150.0 562.5,328.3 544.2,310.0 355.8,310.0 319.0,346.8 313.7,400.0 72.0,400.0 12.5,429.8 12.5,1270.2 62.5,1295.2 62.5,1550.0 68.8,1550.0" fill="none" stroke="#2FB67C" stroke-width="0.9" stroke-dasharray="2 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<polygon points="75.0,412.5 325.0,412.5 331.0,352.5 361.0,322.5 539.0,322.5 569.0,352.5 575.0,412.5 575.0,162.5 581.2,162.5 581.2,120.0 601.2,100.0 798.8,100.0 818.8,120.0 818.8,162.5 825.0,162.5 825.0,412.5 831.0,352.5 861.0,322.5 1039.0,322.5 1069.0,352.5 1075.0,412.5 1075.0,1287.5 1069.0,1347.5 1039.0,1377.5 861.0,1377.5 831.0,1347.5 825.0,1287.5 575.0,1287.5 575.0,1287.5 569.0,1347.5 539.0,1377.5 361.0,1377.5 331.0,1347.5 325.0,1287.5 325.0,1537.5 318.8,1537.5 318.8,1580.0 298.8,1600.0 101.2,1600.0 81.2,1580.0 81.2,1537.5 75.0,1537.5 75.0,1287.5 25.0,1262.5 25.0,437.5" fill="none" stroke="#E6007E" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<path d="M75.0 412.5L75.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M325.0 412.5L325.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M575.0 412.5L575.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M825.0 412.5L825.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M325.0 412.5L575.0 412.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M575.0 412.5L825.0 412.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M825.0 412.5L1075.0 412.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M581.2 162.5L818.8 162.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M75.0 1287.5L325.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M325.0 1287.5L575.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M825.0 1287.5L1075.0 1287.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M81.2 1537.5L318.8 1537.5" fill="none" stroke="#00A0E3" stroke-width="1.0" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<polygon points="87.5,425.0 312.5,425.0 312.5,1275.0 87.5,1275.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<polygon points="337.5,425.0 562.5,425.0 562.5,1275.0 337.5,1275.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<polygon points="587.5,425.0 812.5,425.0 812.5,1275.0 587.5,1275.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<polygon points="837.5,425.0 1062.5,425.0 1062.5,1275.0 837.5,1275.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<text x="200.0" y="392.5" font-size="11.0" text-anchor="middle" font-weight="600" fill="#6E6E73">FRONT panel below</text>
+<text x="700.0" y="1317.5" font-size="11.0" text-anchor="middle" font-weight="600" fill="#6E6E73">BACK panel above (steps)</text>
+<text x="700.0" y="135.2" font-size="9.0" text-anchor="middle" font-weight="500" fill="#6E6E73">tuck flap · TOP LID below (art upside down)</text>
+<text x="200.0" y="1572.8" font-size="9.0" text-anchor="middle" font-weight="500" fill="#6E6E73">tuck flap · BOTTOM LID above</text>
+<text x="54.0" y="850.0" font-size="11.0" text-anchor="middle" font-weight="600" fill="#6E6E73" transform="rotate(-90 54.0 850.0)">GLUE FLAP</text>
+<text x="450.0" y="367.5" font-size="9.0" text-anchor="middle" font-weight="500" fill="#6E6E73">dust flap · SIDE 1 (contents) below</text>
+<text x="450.0" y="1336.5" font-size="9.0" text-anchor="middle" font-weight="500" fill="#6E6E73">dust flap</text>
+<text x="950.0" y="367.5" font-size="9.0" text-anchor="middle" font-weight="500" fill="#6E6E73">dust flap · SIDE 2 (labels) below</text>
+<text x="950.0" y="1336.5" font-size="9.0" text-anchor="middle" font-weight="500" fill="#6E6E73">dust flap</text>
+<text x="30.0" y="38.0" font-size="16.0" text-anchor="start" font-weight="700" fill="#12203A">Rocket Builder Starter kit · reverse tuck-end box</text>
+<text x="30.0" y="60.0" font-size="11.0" text-anchor="start" font-weight="500" fill="#6E6E73">Inside 2.5 x 2.5 x 8.75 in. Flat 10.50 x 15.00 in. Sheet 11 x 17 in. 16-18 pt (about 80-100 lb cover) card. Glue the flap inside side 2.</text>
+<path d="M30.0 1665.0L70.0 1665.0" fill="none" stroke="#E6007E" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="78.0" y="1669.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Cut</text>
+<path d="M165.0 1665.0L205.0 1665.0" fill="none" stroke="#00A0E3" stroke-width="1.4" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="213.0" y="1669.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Fold</text>
+<path d="M300.0 1665.0L340.0 1665.0" fill="none" stroke="#2FB67C" stroke-width="1.4" stroke-dasharray="2 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="348.0" y="1669.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Bleed 1/8 in</text>
+<path d="M435.0 1665.0L475.0 1665.0" fill="none" stroke="#9A9AA0" stroke-width="1.4" stroke-dasharray="1 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="483.0" y="1669.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Safe area</text>
+</svg>

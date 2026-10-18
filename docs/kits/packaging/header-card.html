@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini kit header card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* Print file: two fold-over header cards on US Letter, for the Mini kit in a 4 x 12 in
+     poly bag. Geometry = tools/dielines.py CARD (cards 4 x 7 in at x 0.25 and 4.25,
+     y 2.0; fold at y 5.5; the back prints upside down above the fold). No bleed: art
+     stays 1/8 in inside the cut, so a home inkjet or laser and a paper trimmer work.
+     ?ivory=1 drops the Paper tint, for printing on ivory/cream cardstock.
+     ?dieline=1 shows the cut, fold and slot lines. Print at 100 % ("Actual size"). */
+  @page { size: 8.5in 11in; margin: 0; }
+  #sheet { width: 8.5in; height: 11in; background: #fff; }
+  .card { position: absolute; top: 2in; width: 4in; height: 7in; }
+  #c1 { left: .25in; } #c2 { left: 4.25in; }
+  .half { position: absolute; left: 0; width: 4in; height: 3.5in; background: var(--rb-paper); overflow: hidden; display: flex; flex-direction: column; }
+  body.ivory .half { background: transparent; }
+  .front { top: 3.5in; }
+  .back { top: 0; transform: rotate(180deg); }
+  .band { height: .62in; flex: none; margin: 0 .1in; position: relative; }
+  .front .band { margin-top: 0; } .back .band { margin-top: 0; }
+  .body { flex: 1; padding: .08in .16in .3in; display: flex; flex-direction: column; min-height: 0; }
+  .row { display: flex; gap: .12in; }
+  .k-title { font-size: 19pt; }
+  .k-body { font-size: 6.6pt; }
+  .k-list li { margin-bottom: .022in; }
+  .k-tag { min-width: .13in; height: .125in; font-size: 5.8pt; }
+  .band .note { position: absolute; right: .1in; bottom: .07in; font: 600 5.5pt/1 var(--rb-font-head); letter-spacing: .08em; color: var(--rb-night-300); text-transform: uppercase; }
+  .band .note.l { left: .1in; right: auto; }
+  .mini-steps { font: 400 6.2pt/1.45 var(--rb-font-body); }
+  .mini-steps b { font: 700 6.2pt/1 var(--rb-font-head); color: var(--rb-orange-700); }
+</style>
+</head>
+<body>
+<div id="sheet"></div>
+<template id="card">
+  <!-- BACK: upside down on the sheet, reads the right way up once folded -->
+  <section class="half back">
+    <div class="band k-band"><span class="note l">Mini kit · 13 mm</span><span class="note">quiverdesignworks.net</span></div>
+    <div class="body">
+      <div class="row" style="flex:1">
+        <div style="flex:1.05">
+          <h2 class="k-h" style="font-size:8pt; margin-bottom:.04in">In the bag</h2>
+          <ul class="k-list k-body">
+            <li><span class="k-tag">A</span>Nose cone</li>
+            <li><span class="k-tag">B</span>Anchor section</li>
+            <li><span class="k-tag">D</span>Fin can, motor mount</li>
+            <li><span class="k-tag">E</span>Motor cap</li>
+            <li><span class="k-tag">F</span>Lug standoff (1/8 in rod)</li>
+            <li><span class="k-tag">G</span>Kevlar cord, 3 ft</li>
+            <li><span class="k-tag">H</span>Streamer</li>
+            <li><span class="k-tag">I</span>Wadding, 3 sheets</li>
+            <li style="padding-left:.17in">Decals, quick-start card</li>
+          </ul>
+        </div>
+        <div style="flex:1">
+          <h2 class="k-h" style="font-size:8pt; margin-bottom:.04in">You also need</h2>
+          <div class="k-body" style="margin-bottom:.06in">13 mm A10-3T motors, igniters, a launch pad (1/8 in rod) and controller, super glue. A field 30 m (100 ft) across.</div>
+          <div class="mini-steps" style="display:grid; grid-template-columns:1fr 1fr; column-gap:.06in"><span><b>1</b> Check the fit</span><span><b>4</b> Glue on F</span><span><b>2</b> Tie the cord</span><span><b>5</b> Adult: motor</span><span><b>3</b> Add streamer</span><span><b>6</b> Pack, launch</span></div>
+          <div class="row" style="gap:.07in; margin-top:.06in; align-items:center">
+            <div class="k-qr" style="width:.62in; height:.62in; flex:none"><div><b style="font-size:8pt">QR</b>guide</div></div>
+            <div class="k-small" style="color:var(--rb-night)">Steps with pictures: rocket.quiverdesignworks.net</div>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="align-items:flex-end; margin-top:.05in">
+        <div style="flex:1">
+          <div class="k-warn" style="font-size:5.9pt; padding:.03in .05in"><b>WARNING: CHOKING HAZARD</b> – Small parts. Not for children under 3 yrs.</div>
+          <div class="k-small" style="margin-top:.03in; font-size:5.2pt; line-height:1.25; color:var(--rb-night)">Ages 12+. Launch with adult supervision, following the NAR Model Rocket Safety Code. Certified motors only, installed by an adult. Quiver Design Works LLC · Ellensburg, WA, USA · Printed parts: PLA · Batch RB-M-_____ · __/20__</div>
+        </div>
+        <div class="k-upc" style="width:.95in; height:.5in; flex:none; font-size:5pt"><div class="bars"></div>UPC placeholder</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRONT -->
+  <section class="half front">
+    <div class="band k-band"><span class="note l">Rocket Builder</span><span class="note">Mini kit · 13 mm</span></div>
+    <div class="body">
+      <div class="row" style="align-items:center; justify-content:space-between; margin-bottom:.02in">
+        <img src="../../brand/logo/rb-lockup-horizontal-light.svg" alt="Rocket Builder by Quiver Design Works" style="height:.36in">
+      </div>
+      <div class="row" style="flex:1; min-height:0">
+        <div style="flex:1.15; display:flex; flex-direction:column">
+          <div class="k-label" style="margin-top:.02in">Mini kit · 13 mm</div>
+          <h1 class="k-title" style="margin:.03in 0 .02in">Mini rocket</h1>
+          <div class="k-body" style="margin-bottom:.05in">3D-printed model rocket kit. Pre-printed parts, no paint.</div>
+          <div class="k-skill" style="margin-bottom:.06in"><i></i><i class="off"></i><i class="off"></i><span style="margin-left:.03in">Skill 1 · 45 min</span></div>
+          <div class="row" style="gap:.06in; align-items:center"><span class="k-label" style="color:var(--rb-night)">Flies on</span><span class="k-motor first">A10-3T</span></div>
+          <div class="k-small" style="margin:.03in 0 .05in">About 110 m / 365 ft. Small field: 30 m / 100 ft.</div>
+          <div><span class="k-pill">Motors not included</span></div>
+        </div>
+        <div class="k-hero" data-kit="mini" data-scene="wide" style="flex:1; margin-right:-.08in"></div>
+      </div>
+      <div class="k-body" style="font-weight:600; margin-top:.04in">Ages 12+ · Adults handle motors and launching.</div>
+    </div>
+  </section>
+</template>
+<script>
+  const sheet = document.getElementById('sheet');
+  for (const id of ['c1', 'c2']) {
+    const d = document.createElement('div');
+    d.className = 'card'; d.id = id;
+    d.appendChild(document.getElementById('card').content.cloneNode(true));
+    sheet.appendChild(d);
+  }
+  const img = document.createElement('img');
+  img.className = 'dieline'; img.src = 'header-card-dieline.svg'; img.alt = '';
+  img.style.cssText = 'width:8.5in;height:11in';
+  sheet.appendChild(img);
+  if (new URLSearchParams(location.search).get('ivory')) document.body.classList.add('ivory');
+</script>
+<script src="kit.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* Shared print styles for the Rocket Builder kit packaging.
+   Sizes are in inches so the artwork lines up with the dielines (tools/dielines.py).
+   Colours, fonts and helpers come from docs/brand/tokens.css. */
+
+@import url("../../brand/tokens.css");
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: #d9d9de; font-family: var(--rb-font-body); color: var(--rb-night); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#sheet { position: relative; background: var(--rb-paper); overflow: hidden; margin: 0 auto; }
+.abs { position: absolute; }
+.dieline { position: absolute; left: 0; top: 0; pointer-events: none; display: none; z-index: 50; }
+body.show-dieline .dieline { display: block; }
+@media print { body { background: none; } #sheet { margin: 0; } .dieline { display: none !important; } }
+
+/* Type for small print panels (pt sizes) */
+.k-label { font: 600 6.5pt/1.2 var(--rb-font-head); letter-spacing: .08em; text-transform: uppercase; color: var(--rb-orange-700); }
+.k-label.mist { color: var(--rb-night-300); }
+.k-title { font: 700 21pt/1.0 var(--rb-font-head); letter-spacing: -.01em; margin: 0; }
+.k-h { font: 700 10pt/1.15 var(--rb-font-head); margin: 0 0 .05in; }
+.k-body { font: 400 7pt/1.35 var(--rb-font-body); }
+.k-small { font: 400 5.8pt/1.3 var(--rb-font-body); color: var(--rb-grey); }
+.k-num { font-family: var(--rb-font-num); font-variant-numeric: tabular-nums; font-weight: 600; }
+.k-body p { margin: 0 0 .04in; }
+
+.k-band { background: var(--rb-night); color: var(--rb-paper); background-image: var(--rb-grid-night); }
+.k-fletch { background: var(--rb-fletch-paper) repeat-x left center / .2in .24in; height: .24in; }
+.k-fletch.on-night { background-image: var(--rb-fletch-night); }
+
+/* Skill level: three chevrons, the first n lit */
+.k-skill { display: flex; align-items: center; gap: .05in; font: 600 6.5pt/1 var(--rb-font-head); letter-spacing: .06em; text-transform: uppercase; }
+.k-skill i { display: inline-block; width: .11in; height: .13in; background: var(--rb-orange);
+  clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%, 55% 50%); }
+.k-skill i.off { background: var(--rb-paper-400); }
+.k-band .k-skill i.off { background: var(--rb-night-600); }
+
+/* "Motors not included" and age pills */
+.k-pill { display: inline-block; font: 700 6.6pt/1 var(--rb-font-head); letter-spacing: .06em; text-transform: uppercase;
+  padding: .045in .08in; border-radius: 999px; background: var(--rb-night); color: var(--rb-paper); white-space: nowrap; }
+.k-pill.outline { background: transparent; color: var(--rb-night); box-shadow: inset 0 0 0 1.2px var(--rb-night); }
+
+/* Motor chips */
+.k-motors { display: flex; flex-wrap: wrap; gap: .04in; }
+.k-motor { font: 700 9pt/1 var(--rb-font-num); font-variant-numeric: tabular-nums; padding: .04in .06in; border-radius: 4px;
+  background: var(--rb-paper-white); box-shadow: inset 0 0 0 1px var(--rb-paper-400); }
+.k-motor.first { box-shadow: inset 0 0 0 1.5px var(--rb-orange); }
+
+/* Part tags (same letters as the assembly guide) and step numbers */
+.k-tag { display: inline-grid; place-items: center; min-width: .15in; height: .14in; padding: 0 .025in; margin-right: .04in;
+  font: 700 6.4pt/1 var(--rb-font-head); color: var(--rb-paper); background: var(--rb-night); clip-path: var(--rb-chamfer); vertical-align: -.02in; }
+.k-step { display: inline-grid; place-items: center; width: .2in; height: .2in; flex: none;
+  font: 700 8pt/1 var(--rb-font-head); color: var(--rb-night); background: var(--rb-orange); clip-path: var(--rb-chamfer); }
+.k-list { list-style: none; margin: 0; padding: 0; }
+.k-list li { margin: 0 0 .035in; }
+.k-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: .07in; }
+.k-steps li { display: flex; gap: .07in; align-items: flex-start; }
+.k-steps b { font-family: var(--rb-font-head); }
+
+/* Callouts */
+.k-safety { background: var(--rb-red-100); border-left: 3px solid var(--rb-red); padding: .05in .07in; }
+.k-safety .lab { font: 700 6.5pt/1.2 var(--rb-font-head); color: var(--rb-red-700); text-transform: uppercase; letter-spacing: .06em; }
+.k-tip { background: var(--rb-sky-100); border-left: 3px solid var(--rb-sky); padding: .05in .07in; }
+.k-tip .lab { font: 700 6.5pt/1.2 var(--rb-font-head); color: var(--rb-sky-700); text-transform: uppercase; letter-spacing: .06em; }
+.k-warn { border: 1.2px solid var(--rb-night); padding: .045in .06in; font: 600 6.4pt/1.3 var(--rb-font-body); }
+.k-warn b { font-family: var(--rb-font-head); }
+
+/* Placeholders the owner swaps for real codes */
+.k-qr { display: grid; place-items: center; text-align: center; border: 1.2px dashed var(--rb-night); background: var(--rb-paper-white);
+  font: 600 6pt/1.2 var(--rb-font-head); color: var(--rb-grey); }
+.k-qr b { display: block; font-size: 11pt; color: var(--rb-night); }
+.k-upc { display: grid; place-items: center; text-align: center; background: #fff; border: 1px solid var(--rb-paper-400);
+  font: 600 5.8pt/1.2 var(--rb-font-head); color: var(--rb-grey); }
+.k-upc .bars { width: 80%; height: 55%; background: repeating-linear-gradient(90deg, var(--rb-paper-300) 0 1px, transparent 1px 3px, var(--rb-paper-300) 3px 5px, transparent 5px 6px); }
+
+.k-spec { width: 100%; border-collapse: collapse; font: 400 6.6pt/1.3 var(--rb-font-body); }
+.k-spec td { padding: .018in 0; border-bottom: .6px solid var(--rb-paper-300); vertical-align: top; }
+.k-spec td:last-child { text-align: right; font-family: var(--rb-font-num); font-variant-numeric: tabular-nums; font-weight: 600; }
+.k-hero svg { display: block; width: 100%; height: 100%; }
+.k-steps .k-tag { margin: 0 .015in; }
+.k-check li { padding-left: .16in; position: relative; }
+.k-check li::before { content: ""; position: absolute; left: 0; top: .02in; width: .085in; height: .085in; border: 1.1px solid var(--rb-night); border-radius: 1.5px; }

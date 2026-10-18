@@ -82,3 +82,16 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] Print-order portal with coupon codes; order folders with batch sheet; `/admin`; PC sync script (2026-10-14)
 - [x] Accounts (email + password), saved rockets per account, skip-tutorial setting (2026-10-14)
 - [x] Order Rocket Supplies page at /ordersupplies (Amazon affiliate list, drawings per item), linked from the header, the score and the welcome (2026-10-14)
+
+## Assembly guide, kits and brand (2026-10-18, owner decisions)
+
+- [ ] **(owner)** Body joints: glue them (the guide says thin CA) so the aft section can't separate at ejection, or tape / push-fit? Which glue for PETG and ASA?
+- [ ] **(owner)** Shock cord for kits: the slot behind the anchor strap is ~2.5 mm deep, so the guide says Kevlar or braided cord up to 2 mm, 2–3× the rocket's length. Confirm type and length.
+- [ ] **(owner)** Nose fit (0.02 mm clearance): guide says sand if tight, a wrap of tape if loose. Confirm.
+- [ ] **(owner)** Shorter motors than the bay length rattle: add motor spacers to the guide?
+- [ ] **(owner)** Placeholders in the guide and packaging: skill level, age grade, kit numbers, QR codes, UPC (GS1, about $30 per product).
+- [ ] **(owner)** Kit age grade: the packaging says "Ages 12+" to stay a general-use product. Marketing kits to younger kids (Beginner mode, the curriculum) could make them children's products (CPSIA testing, certificate, tracking labels). Confirm with a professional; see `docs/kits/README.md`.
+- [ ] **(owner)** Test-fly the three kit designs and weigh real prints before printing boxes (packaging numbers come from solid-PLA estimates).
+- [ ] **(owner)** Apply the brand to the app (`docs/brand/brand.md` → *How to apply this to the app*)?
+- [ ] Leading-edge root fillet still doesn't build on the kit designs (known; `geometry/report.md`).
+

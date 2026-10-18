@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17.0in" height="11.0in" viewBox="0 0 1700.0 1100.0">
+<title>Rocket Builder Big kit · mailing-tube wrap label</title>
+<style>text{font-family:"Space Grotesk","Inter",Arial,sans-serif}</style>
+<polygon points="159.0,62.5 159.0,1037.5 1541.0,1037.5 1541.0,62.5 159.0,62.5" fill="none" stroke="#2FB67C" stroke-width="0.9" stroke-dasharray="2 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<polygon points="171.5,75.0 1528.5,75.0 1528.5,1025.0 171.5,1025.0" fill="none" stroke="#E6007E" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<path d="M607.2 85.0L607.2 1015.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<path d="M1042.8 85.0L1042.8 1015.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<polygon points="1478.5,75.0 1528.5,75.0 1528.5,1025.0 1478.5,1025.0" fill="#6E6E7314" stroke="#6E6E73" stroke-width="0.8" stroke-dasharray="3 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<text x="389.4" y="1055.0" font-size="13.0" text-anchor="middle" font-weight="600" fill="#6E6E73">FACE 1 · front</text>
+<text x="825.0" y="1055.0" font-size="13.0" text-anchor="middle" font-weight="600" fill="#6E6E73">FACE 2 · contents</text>
+<text x="1260.6" y="1055.0" font-size="13.0" text-anchor="middle" font-weight="600" fill="#6E6E73">FACE 3 · steps + labels</text>
+<text x="1503.5" y="550.0" font-size="11.0" text-anchor="middle" font-weight="600" fill="#6E6E73" transform="rotate(-90 1503.5 550.0)">OVERLAP · glue, no art</text>
+<polygon points="196.5,100.0 1453.5,100.0 1453.5,1000.0 196.5,1000.0" fill="none" stroke="#9A9AA0" stroke-width="0.8" stroke-dasharray="1 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+<text x="30.0" y="38.0" font-size="16.0" text-anchor="start" font-weight="700" fill="#12203A">Rocket Builder Big kit · mailing-tube wrap label</text>
+<text x="30.0" y="60.0" font-size="11.0" text-anchor="start" font-weight="500" fill="#6E6E73">Wrap 13.57 x 9.5 in for a 4 in ID x 12 in kraft tube (4.16 in outside, circumference 13.07 in). Print on 11 x 17 in paper or full-sheet label stock; wrap face 1 first, glue the overlap.</text>
+<path d="M30.0 1070.0L70.0 1070.0" fill="none" stroke="#E6007E" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="78.0" y="1074.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Cut</text>
+<path d="M165.0 1070.0L205.0 1070.0" fill="none" stroke="#00A0E3" stroke-width="1.4" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="213.0" y="1074.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Fold</text>
+<path d="M300.0 1070.0L340.0 1070.0" fill="none" stroke="#2FB67C" stroke-width="1.4" stroke-dasharray="2 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="348.0" y="1074.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Bleed 1/8 in</text>
+<path d="M435.0 1070.0L475.0 1070.0" fill="none" stroke="#9A9AA0" stroke-width="1.4" stroke-dasharray="1 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+<text x="483.0" y="1074.0" font-size="10.0" text-anchor="start" font-weight="500" fill="#6E6E73">Safe area</text>
+</svg>

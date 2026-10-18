@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Starter kit box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* Print file for the Starter kit's reverse tuck-end box: 11 x 17 in sheet, one side,
+     full colour, 16-18 pt card. Geometry = tools/dielines.py BOX (ox 0.25, oy 1.0;
+     panels 2.5 in wide, body 8.75 in tall from y 4.125). Open with ?dieline=1 to check
+     the art against the cut and fold lines; print without it. */
+  @page { size: 11in 17in; margin: 0; }
+  #sheet { width: 11in; height: 17in; }
+  .panel { position: absolute; top: 4.125in; width: 2.5in; height: 8.75in; display: flex; flex-direction: column; }
+  #front { left: .75in; } #side1 { left: 3.25in; } #back { left: 5.75in; } #side2 { left: 8.25in; }
+  .wrapband { position: absolute; left: .25in; width: 10.5in; top: 4.0in; height: 1.175in; }
+  .wrapfletch { position: absolute; left: .25in; width: 10.5in; top: 12.635in; height: .365in; background-color: var(--rb-paper);
+    background-position: left top; background-size: .2in .24in; }
+  .head { height: 1.05in; flex: none; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--rb-paper); position: relative; z-index: 2; }
+  .inner { padding: .14in .16in .32in; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  #lid { position: absolute; left: 5.75in; top: 1.5in; width: 2.5in; height: 2.625in; }
+  #lid .mark { position: absolute; left: .7in; top: .75in; width: 1.1in; transform: rotate(180deg); }
+  #botlid { position: absolute; left: .75in; top: 12.875in; width: 2.5in; height: 2.5in; padding: .25in .2in; }
+  #wrapback { position: absolute; left: 3.25in; top: 4.125in; width: 7.5in; height: 8.75in; }
+  .bandtitle { font: 700 15pt/1 var(--rb-font-head); color: var(--rb-paper); margin: .06in 0 0; }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+<div id="sheet">
+  <div class="wrapband k-band"></div>
+  <div class="wrapfletch k-fletch"></div>
+
+  <!-- TOP LID (seen from above when closed, so it prints upside down here) -->
+  <div id="lid" class="k-band"><img class="mark" src="../../brand/logo/rb-mark-dark.svg" alt=""></div>
+
+  <!-- FRONT -->
+  <section class="panel" id="front">
+    <div class="head"><img src="../../brand/logo/rb-lockup-stacked-dark.svg" alt="Rocket Builder by Quiver Design Works" style="width:1.6in"></div>
+    <div class="inner">
+      <div class="k-label">Starter kit · 18 mm</div>
+      <h1 class="k-title" style="margin:.05in 0 .04in">Starter<br>rocket</h1>
+      <div class="k-body" style="margin-bottom:.07in">A 3D-printed model rocket kit. Pre-printed parts, no painting.</div>
+      <div class="k-skill"><i></i><i class="off"></i><i class="off"></i><span style="margin-left:.03in">Skill 1 · about 1 hour</span></div>
+      <div class="k-hero" data-kit="starter" style="flex:1; margin:.06in -.08in .04in; min-height:2.6in"></div>
+      <div class="k-label" style="color:var(--rb-night)">Flies on 18 mm motors</div>
+      <div class="k-motors" style="margin:.05in 0 .04in"><span class="k-motor first">B6-4</span><span class="k-motor">B4-6</span><span class="k-motor">C6-7</span></div>
+      <div class="k-small" style="margin-bottom:.07in">First flight: B6-4 (orange). Up to 355 m / 1,160 ft on a <span style="white-space:nowrap">C6-7</span>.</div>
+      <div><span class="k-pill">Motors not included</span></div>
+      <div class="k-body" style="margin-top:.07in; font-weight:600">Ages 12+ · Adults handle motors and launching.</div>
+    </div>
+  </section>
+
+  <!-- SIDE 1: contents, what you need, specs -->
+  <section class="panel" id="side1">
+    <div class="head" style="align-items:flex-start; padding:0 .16in">
+      <div class="k-label mist">Starter kit · 18 mm</div>
+      <div class="bandtitle">What's in the box</div>
+    </div>
+    <div class="inner k-body">
+      <ul class="k-list">
+        <li><span class="k-tag">A</span>Nose cone</li>
+        <li><span class="k-tag">B</span>Anchor section (cord strap inside)</li>
+        <li><span class="k-tag">D</span>Fin can with motor mount</li>
+        <li><span class="k-tag">E</span>Screw-on motor cap</li>
+        <li><span class="k-tag">F</span>Launch-lug standoff (1/8 in rod)</li>
+        <li><span class="k-tag">G</span>Kevlar shock cord, 4 ft</li>
+        <li><span class="k-tag">H</span>12 in parachute</li>
+        <li><span class="k-tag">I</span>Recovery wadding, 4 sheets</li>
+        <li style="padding-left:.19in">Waterproof decal sheet</li>
+        <li style="padding-left:.19in">Quick-start card</li>
+      </ul>
+      <div class="k-small" style="margin:.02in 0 .1in">Parts A–F are 3D-printed PLA, made in Ellensburg, WA. Letters match the assembly guide.</div>
+      <h2 class="k-h">You also need</h2>
+      <ul class="k-list">
+        <li>18 mm motors: B6-4, B4-6 or C6-7</li>
+        <li>Igniters and igniter plugs</li>
+        <li>Launch pad with a 1/8 in (3 mm) rod</li>
+        <li>Electric launch controller</li>
+        <li>Super glue, scissors</li>
+        <li>An open field (see side panel)</li>
+      </ul>
+      <div class="k-small" style="margin:.02in 0 .1in">Supply list: rocket.quiverdesignworks.net/ordersupplies</div>
+      <h2 class="k-h">The rocket</h2>
+      <table class="k-spec">
+        <tr><td>Height</td><td>300 mm · 11.8 in</td></tr>
+        <tr><td>Body diameter</td><td>21 mm</td></tr>
+        <tr><td>Weight, no motor</td><td>44 g · 1.6 oz</td></tr>
+        <tr><td>Stability</td><td>1.1 cal</td></tr>
+        <tr><td>B6-4</td><td>140 m · 465 ft</td></tr>
+        <tr><td>B4-6</td><td>175 m · 580 ft</td></tr>
+        <tr><td>C6-7</td><td>355 m · 1,160 ft</td></tr>
+      </table>
+      <div class="k-small" style="margin-top:.04in">Heights are estimates from Rocket Builder's flight model.</div>
+    </div>
+  </section>
+
+  <!-- BACK: steps at a glance, safety, QR -->
+  <section class="panel" id="back">
+    <div class="head" style="align-items:flex-start; padding:0 .16in">
+      <div class="k-label mist">Steps at a glance</div>
+      <div class="bandtitle">Build it. Fly it.</div>
+    </div>
+    <div class="inner k-body">
+      <ol class="k-steps">
+        <li><span class="k-step">1</span><div><b>Check the fit.</b> Slide <span class="k-tag">A</span><span class="k-tag">B</span><span class="k-tag">D</span> together. Snug, not forced.</div></li>
+        <li><span class="k-step">2</span><div><b>Tie the cord.</b> <span class="k-tag">G</span> through the strap in <span class="k-tag">B</span>, the other end to the nose <span class="k-tag">A</span>.</div></li>
+        <li><span class="k-step">3</span><div><b>Add the parachute.</b> Tie <span class="k-tag">H</span> to the loop in the cord.</div></li>
+        <li><span class="k-step">4</span><div><b>Finish.</b> Glue <span class="k-tag">F</span> beside a fin. Add the decals.</div></li>
+        <li><span class="k-step">5</span><div><b>Motor in.</b> An adult puts in the motor and screws on cap <span class="k-tag">E</span>.</div></li>
+        <li><span class="k-step">6</span><div><b>Pack and launch.</b> Wadding <span class="k-tag">I</span>, parachute, cord, nose on. Count down from 5.</div></li>
+      </ol>
+      <div class="k-safety" style="margin-top:.12in">
+        <div class="lab">Safety</div>
+        Follow the NAR Model Rocket Safety Code. Launch outdoors in an open field, away from people, trees and power lines, in winds under 20 mph. Use a launch rod and an electric controller with a safety key. Stand back 5 m (15 ft). Never lean over the rocket. If a motor doesn't fire, pull the safety key and wait 60 seconds before going to the rocket.
+      </div>
+      <h2 class="k-h" style="margin-top:.14in">Preflight checklist</h2>
+      <ul class="k-list k-check">
+        <li>Cord tied at both ends, knots tight</li>
+        <li>Wadding in first, parachute packed loosely</li>
+        <li>Motor cap <span class="k-tag">E</span> screwed on all the way</li>
+        <li>Igniter tip touches the motor's propellant</li>
+        <li>Safety key out until everyone is back</li>
+        <li>Sky clear, wind under 20 mph, no dry grass</li>
+      </ul>
+      <div style="flex:1"></div>
+      <div style="display:flex; gap:.1in; align-items:center">
+        <div class="k-qr" style="width:.95in; height:.95in"><div><b>QR</b>step-by-step guide</div></div>
+        <div class="k-small" style="color:var(--rb-night)"><b style="font-family:var(--rb-font-head)">Full guide with pictures</b><br>Scan, or go to rocket.quiverdesignworks.net and open the guide.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIDE 2: design your own, warnings, maker, tracking, barcode -->
+  <section class="panel" id="side2">
+    <div class="head" style="align-items:flex-start; padding:0 .16in">
+      <div class="k-label mist">Free online</div>
+      <div class="bandtitle">Make it yours</div>
+    </div>
+    <div class="inner k-body">
+      <p>This rocket was designed with <b>Rocket Builder</b>, a free web app. Change the height, fins and nose, check that it flies straight, and print your own.</p>
+      <p style="font:600 8pt/1.2 var(--rb-font-head); color:var(--rb-sky-700); margin:.02in 0 .1in">rocket.quiverdesignworks.net</p>
+      <div class="k-tip" style="margin-bottom:.12in"><div class="lab">Fins are fletching</div>The fins keep the push point behind the balance point, like the feathers on an arrow. That's why it flies straight.</div>
+      <div class="k-warn"><b>WARNING: CHOKING HAZARD</b> – Small parts. Not for children under 3 yrs.</div>
+      <p class="k-small" style="margin:.08in 0 0; color:var(--rb-night)">For ages 12 and up. Launching needs adult supervision. Read all instructions before you fly. Use only certified model rocket motors, installed by an adult.</p>
+      <h2 class="k-h" style="margin-top:.14in">Where to fly</h2>
+      <table class="k-spec">
+        <tr><td>B motors</td><td>60 m · 200 ft field</td></tr>
+        <tr><td>C motors</td><td>120 m · 400 ft field</td></tr>
+      </table>
+      <div class="k-small" style="margin-top:.04in">Smallest side of the field, from the NAR Model Rocket Safety Code. Check local rules and get the landowner's OK.</div>
+      <div style="flex:1"></div>
+      <div class="k-small" style="color:var(--rb-night); margin-bottom:.08in">
+        <b style="font-family:var(--rb-font-head)">Quiver Design Works LLC</b><br>
+        Ellensburg, Washington, USA · quiverdesignworks.net<br>
+        Designed and 3D-printed in Ellensburg, WA.<br>
+        Printed parts: PLA plastic.
+      </div>
+      <div class="k-small" style="border-top:.6px solid var(--rb-paper-400); padding-top:.05in; margin-bottom:.08in">
+        Batch <span class="k-num" style="color:var(--rb-night)">RB-S-______</span> · Made <span class="k-num" style="color:var(--rb-night)">__ / 20__</span><br>Kit RB-KIT-M18
+      </div>
+      <div class="k-upc" style="width:1.45in; height:.85in"><div class="bars"></div>UPC-A placeholder (GS1)</div>
+    </div>
+  </section>
+
+  <div id="wrapback"></div>
+
+  <!-- BOTTOM LID -->
+  <div id="botlid" class="k-small center">
+    <img src="../../brand/logo/rb-mark-light.svg" alt="" style="width:.55in; display:block; margin:.15in auto .1in">
+    Rocket Builder Starter kit · 18 mm<br>Quiver Design Works LLC · Ellensburg, WA
+  </div>
+
+  <img class="dieline" src="tuck-box-starter-dieline.svg" style="width:11in; height:17in" alt="">
+</div>
+<script src="kit.js"></script>
+</body>
+</html>

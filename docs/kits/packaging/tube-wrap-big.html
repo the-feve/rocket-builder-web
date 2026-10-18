@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big kit tube wrap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* Print file: wrap label for the Big kit's 4 in x 12 in kraft mailing tube (the "quiver").
+     17 x 11 in sheet (tabloid, landscape). Geometry = tools/dielines.py TUBE: label
+     13.57 x 9.5 in at (1.715, 0.75); three faces of 4.356 in, then a 0.5 in glue
+     overlap with no art. ?dieline=1 shows the cut lines. */
+  @page { size: 17in 11in; margin: 0; }
+  #sheet { width: 17in; height: 11in; background: #fff; }
+  #label { position: absolute; left: calc(1.715in - .125in); top: calc(.75in - .125in); width: calc(13.569in + .25in); height: calc(9.5in + .25in); background: var(--rb-paper); }
+  .band { position: absolute; left: calc(1.715in - .125in); top: calc(.75in - .125in); width: calc(13.069in + .125in); height: calc(1.35in + .125in); }
+  .fletch { position: absolute; left: calc(1.715in - .125in); top: calc(.75in + 9.5in - .3in); width: calc(13.069in + .125in); height: calc(.3in + .125in); background-position: left top; background-size: .24in .29in; }
+  .face { position: absolute; top: .75in; width: 4.356in; height: 9.5in; display: flex; flex-direction: column; }
+  #face1 { left: 1.715in; } #face2 { left: 6.071in; } #face3 { left: 10.427in; }
+  .head { height: 1.35in; flex: none; display: flex; flex-direction: column; justify-content: center; padding: 0 .3in; color: var(--rb-paper); position: relative; }
+  .inner { padding: .2in .3in .5in; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .bandtitle { font: 700 20pt/1 var(--rb-font-head); color: var(--rb-paper); margin: .06in 0 0; }
+  .k-body { font-size: 8.4pt; }
+  .k-h { font-size: 12pt; }
+  .k-small { font-size: 6.8pt; }
+  .k-spec { font-size: 8pt; }
+  .k-title { font-size: 34pt; }
+  .k-tag { min-width: .17in; height: .16in; font-size: 7pt; }
+  .k-step { width: .24in; height: .24in; font-size: 9.5pt; }
+  .k-label { font-size: 7.5pt; }
+  .k-pill { font-size: 8pt; }
+  .k-motor { font-size: 11pt; }
+  .k-skill { font-size: 7.5pt; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .2in; }
+</style>
+</head>
+<body>
+<div id="sheet">
+  <div id="label"></div>
+  <div class="band k-band"></div>
+  <div class="fletch k-fletch"></div>
+
+  <!-- FACE 1: front -->
+  <section class="face" id="face1">
+    <div class="head" style="align-items:center"><img src="../../brand/logo/rb-lockup-horizontal-dark.svg" alt="Rocket Builder by Quiver Design Works" style="width:3.3in"></div>
+    <div class="inner">
+      <div class="k-label">Big kit · 24 mm</div>
+      <h1 class="k-title" style="margin:.06in 0 .05in">Big rocket</h1>
+      <div class="k-body" style="margin-bottom:.1in">A 3D-printed model rocket kit for D motors. Pre-printed parts, no painting. Comes in its own quiver.</div>
+      <div class="k-skill"><i></i><i></i><i class="off"></i><span style="margin-left:.04in">Skill 2 · about 1½ hours</span></div>
+      <div class="row" style="display:flex; flex:1; min-height:0; gap:.15in; margin-top:.1in">
+        <div class="k-hero" data-kit="big" style="flex:1"></div>
+      </div>
+      <div class="k-label" style="color:var(--rb-night)">Flies on 24 mm motors</div>
+      <div class="k-motors" style="margin:.06in 0 .05in"><span class="k-motor first">C11-5</span><span class="k-motor">D12-7</span></div>
+      <div class="k-small" style="margin-bottom:.1in">First flight: C11-5 (orange). Up to 420 m / 1,370 ft on a D12-7.</div>
+      <div><span class="k-pill">Motors not included</span></div>
+      <div class="k-body" style="margin-top:.08in; font-weight:600">Ages 12+ · Adults handle motors and launching.</div>
+    </div>
+  </section>
+
+  <!-- FACE 2: contents, what you need, specs -->
+  <section class="face" id="face2">
+    <div class="head"><div class="k-label mist">Big kit · 24 mm</div><div class="bandtitle">What's in the tube</div></div>
+    <div class="inner k-body">
+      <ul class="k-list">
+        <li><span class="k-tag">A</span>Nose cone</li>
+        <li><span class="k-tag">B</span>Anchor section (cord strap inside)</li>
+        <li><span class="k-tag">D</span>Fin can with motor mount</li>
+        <li><span class="k-tag">E</span>Screw-on motor cap</li>
+        <li><span class="k-tag">F</span>Launch-lug standoff (1/8 in rod)</li>
+        <li><span class="k-tag">G</span>Kevlar shock cord, 5 ft</li>
+        <li><span class="k-tag">H</span>15 in parachute</li>
+        <li><span class="k-tag">I</span>Recovery wadding, 6 sheets</li>
+        <li style="padding-left:.21in">Waterproof decal sheet · quick-start card</li>
+      </ul>
+      <div class="k-small" style="margin:.03in 0 .16in">Parts A–F are 3D-printed PLA, made in Ellensburg, WA. Letters match the assembly guide.</div>
+      <h2 class="k-h">You also need</h2>
+      <ul class="k-list">
+        <li>24 mm motors: C11-5 or D12-7</li>
+        <li>Igniters and igniter plugs</li>
+        <li>Launch pad with a 1/8 in (3 mm) rod, and an electric launch controller</li>
+        <li>Super glue, scissors</li>
+      </ul>
+      <div class="k-small" style="margin:.03in 0 .16in">Supply list: rocket.quiverdesignworks.net/ordersupplies</div>
+      <div class="two">
+        <div>
+          <h2 class="k-h">The rocket</h2>
+          <table class="k-spec">
+            <tr><td>Height</td><td>360 mm</td></tr>
+            <tr><td>Diameter</td><td>27 mm</td></tr>
+            <tr><td>Weight</td><td>71 g · 2.5 oz</td></tr>
+            <tr><td>Stability</td><td>1.1 cal</td></tr>
+            <tr><td>C11-5</td><td>200 m · 650 ft</td></tr>
+            <tr><td>D12-7</td><td>420 m · 1,370 ft</td></tr>
+          </table>
+        </div>
+        <div>
+          <h2 class="k-h">Where to fly</h2>
+          <table class="k-spec">
+            <tr><td>C motors</td><td>120 m · 400 ft</td></tr>
+            <tr><td>D motors</td><td>150 m · 500 ft</td></tr>
+          </table>
+          <div class="k-small" style="margin-top:.05in">Smallest side of the field (NAR Model Rocket Safety Code). Get the landowner's OK.</div>
+        </div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="k-tip"><div class="lab">Fins are fletching</div>The fins keep the push point behind the balance point, like the feathers on an arrow. Design your own rocket free at <b>rocket.quiverdesignworks.net</b>.</div>
+    </div>
+  </section>
+
+  <!-- FACE 3: steps, safety, labels -->
+  <section class="face" id="face3">
+    <div class="head"><div class="k-label mist">Steps at a glance</div><div class="bandtitle">Build it. Fly it.</div></div>
+    <div class="inner k-body">
+      <ol class="k-steps">
+        <li><span class="k-step">1</span><div><b>Check the fit.</b> Slide <span class="k-tag">A</span><span class="k-tag">B</span><span class="k-tag">D</span> together. Snug, not forced.</div></li>
+        <li><span class="k-step">2</span><div><b>Tie the cord.</b> <span class="k-tag">G</span> through the strap in <span class="k-tag">B</span>, the other end to the nose <span class="k-tag">A</span>.</div></li>
+        <li><span class="k-step">3</span><div><b>Add the parachute.</b> Tie <span class="k-tag">H</span> to the loop in the cord.</div></li>
+        <li><span class="k-step">4</span><div><b>Finish.</b> Glue <span class="k-tag">F</span> beside a fin. Add the decals.</div></li>
+        <li><span class="k-step">5</span><div><b>Motor in.</b> An adult puts in the motor and screws on cap <span class="k-tag">E</span>.</div></li>
+        <li><span class="k-step">6</span><div><b>Pack and launch.</b> Wadding <span class="k-tag">I</span>, parachute, cord, nose on. Count down from 5.</div></li>
+      </ol>
+      <div class="k-safety" style="margin-top:.16in">
+        <div class="lab">Safety</div>
+        Follow the NAR Model Rocket Safety Code. Launch outdoors in an open field, away from people, trees and power lines, in winds under 20 mph. Use a launch rod and an electric controller with a safety key. Stand back 5 m (15 ft). Never lean over the rocket. If a motor doesn't fire, pull the safety key and wait 60 seconds before going to the rocket.
+      </div>
+      <div style="display:flex; gap:.15in; align-items:center; margin-top:.16in">
+        <div class="k-qr" style="width:1in; height:1in; flex:none"><div><b>QR</b>step-by-step guide</div></div>
+        <div class="k-small" style="color:var(--rb-night); font-size:7.5pt"><b style="font-family:var(--rb-font-head)">Full guide with pictures</b><br>Scan, or go to rocket.quiverdesignworks.net and open the guide.</div>
+      </div>
+      <h2 class="k-h" style="margin-top:.16in">Preflight checklist</h2>
+      <ul class="k-list k-check two" style="gap:.02in .2in">
+        <li>Cord tied at both ends</li>
+        <li>Wadding first, chute packed loosely</li>
+        <li>Motor cap <span class="k-tag">E</span> on all the way</li>
+        <li>Igniter touches the propellant</li>
+        <li>Safety key out until all are back</li>
+        <li>Wind under 20 mph, no dry grass</li>
+      </ul>
+      <div style="flex:1"></div>
+      <div class="k-warn" style="font-size:7.5pt"><b>WARNING: CHOKING HAZARD</b> – Small parts. Not for children under 3 yrs.</div>
+      <div style="display:flex; gap:.15in; align-items:flex-end; margin-top:.1in">
+        <div class="k-small" style="color:var(--rb-night); flex:1">For ages 12 and up. Launching needs adult supervision. Use only certified model rocket motors, installed by an adult.<br><br>
+          <b style="font-family:var(--rb-font-head)">Quiver Design Works LLC</b> · Ellensburg, WA, USA · quiverdesignworks.net. Designed and 3D-printed in Ellensburg. Printed parts: PLA.<br>
+          Batch <span class="k-num">RB-B-______</span> · Made <span class="k-num">__ / 20__</span> · Kit RB-KIT-M24</div>
+        <div class="k-upc" style="width:1.3in; height:.8in; flex:none"><div class="bars"></div>UPC-A placeholder</div>
+      </div>
+    </div>
+  </section>
+
+  <img class="dieline" src="tube-wrap-big-dieline.svg" style="width:17in; height:11in" alt="">
+</div>
+<script src="kit.js"></script>
+</body>
+</html>
