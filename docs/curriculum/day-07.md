@@ -77,11 +77,12 @@ To buy: nothing.
 
 1. In Rocket Builder, build your design and find the **Which parachute?** card. Write down the size (inches) and the descent speed (m/s).
 2. Work out how long it will take to come down from the predicted height: time = height ÷ descent speed.
-3. **Drift:** in a 10 mph breeze (about 4.5 m/s), how far will it drift? Drift = time × 4.5.
+3. Press **▶ Watch it launch** and watch the parachute drift.
+4. **Drift:** in a 10 mph breeze (about 4.5 m/s), how far will it drift? Drift = time × 4.5.
 
 **Example:** a rocket predicted to reach 140 m, with a 15-inch parachute falling at 3.8 m/s. Time = 140 ÷ 3.8 ≈ 37 s. Drift = 37 × 4.5 ≈ **166 m**. That's further than the 60 m minimum field for its B motor! This is why the app suggests a field bigger than the minimum.
 
-**Printer track:** get or make the parachute size the app says. Practise folding it: fold it in half, then in half again, wrap the lines loosely around it, and roll it so it slides easily into the body tube. Flame-resistant wadding goes in below it on launch day. A grown-up checks the packing.
+**12+ track:** get or make the parachute size the app says. Practise folding it: fold it in half, then in half again, wrap the lines loosely around it, and roll it so it slides easily into the body tube. Flame-resistant wadding goes in below it on launch day. A grown-up checks the packing.
 
 ## Worksheet
 
@@ -113,9 +114,9 @@ To buy: nothing.
 
 ## Differentiation
 
-**Grade 5:** use two parachute sizes and compare times only (skip descent rate). Do the drift problem with a grown-up.
+**Younger kids (grades 3–6):** use two parachute sizes and compare times only (skip descent rate). For the app part, just write down the parachute size, then press **▶ Watch it launch** and see how far the wind carries the rocket.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - The descent-rate formula: **speed = √( 2 × mass × g ÷ (air density × Cd × area) )**. With g = 9.8 m/s², air density 1.2 kg/m³ and Cd about 0.75 for a flat hobby chute.
 - Check Rocket Builder: a 76 g rocket under a 15-inch (0.381 m) chute. Area = π × 0.19² ≈ 0.114 m². Speed = √(2 × 0.076 × 9.8 ÷ (1.2 × 0.75 × 0.114)) ≈ **3.8 m/s**, the same as the app.
@@ -123,6 +124,6 @@ To buy: nothing.
 
 ## Track notes
 
-**Printer track:** make sure your parachute, shock cord and wadding have arrived (or make a plastic parachute the size the app says, with strong thread lines and reinforced corners).
+**Paper track (under 12):** save your best drop-test parachute. On Day 10, tape it to a paper rocket and toss it high, or fold it into the nose of a stomp rocket (it opens… sometimes!).
 
-**Paper track:** save your best drop-test parachute. On Day 10 you can tape it to a paper rocket and throw it high, or launch it on a stomp rocket (fold it into the nose so it comes out at the top… sometimes!).
+**Printed-rocket track (12+):** make sure your parachute, shock cord (braided flat elastic) and wadding have arrived, or make a plastic parachute the size the app says, with strong thread lines and reinforced corners. Practise folding and packing it (Activity 2).

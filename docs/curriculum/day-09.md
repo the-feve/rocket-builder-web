@@ -2,15 +2,15 @@
 
 [← Day 8](day-08.md) · [Overview](README.md) · [Day 10 →](day-10.md)
 
-**Time:** about 90 minutes. **Worksheet:** W9 Safety and preflight, plus W9b Graph your week.
+**Time:** about 60 minutes (younger kids) to 90 minutes (12+). **Worksheet:** W9 Safety and preflight, plus W9b Graph your week.
 
 ## Objectives
 
-- Explain the main rules of the NAR Model Rocket Safety Code and *why* each one matters.
-- Know each job on the launch team, and that grown-ups handle motors, igniters and the launch key.
-- Practise a countdown and a misfire drill.
+- Follow the paper-rocket safety rules: glasses on, never aim at anyone, the adult runs fizzy rockets.
+- Explain the main rules of the NAR Model Rocket Safety Code and *why* each one matters, and that motor rockets are 12+, with grown-ups handling motors, igniters and the launch key.
+- Know each job on the launch team, and practise a countdown (12+: and a misfire drill).
 - Make a clear graph from this week's data, with a title, labels and units, and describe what it shows.
-- Printer track: run preflight checks on the real rocket.
+- 12+ track: run preflight checks on the real rocket.
 
 ## Vocabulary
 
@@ -27,13 +27,22 @@
 
 - W9 and W9b worksheets, graph paper or the worksheet grid, ruler, coloured pencils
 - Your data sheets from Days 1–8
-- Printer track: the assembled rocket, a kitchen scale, string, one motor (a grown-up handles it), the launch controller **with no igniter attached**, the weather forecast
+- Under 12: a stomp rocket and safety glasses for the countdown practice
+- 12+ track: the assembled rocket, a kitchen scale, string, one motor (a grown-up handles it), the launch controller **with no igniter attached**, the weather forecast
 
 To buy: nothing.
 
 ## Teach (read aloud or adapt)
 
-> Model rocketry is one of the safest hobbies there is, because everyone follows the same rules: the **NAR Model Rocket Safety Code**. Let's go through the big ones and *why* they matter.
+> Every rocket launch has rules, even paper ones. Here are ours:
+>
+> - **Glasses on** for straw, stomp and fizzy rockets.
+> - **Never aim** a rocket at a person, a pet or a window.
+> - **Wait for "launch!"** Nobody stomps or blows until the countdown ends and everyone is behind the launcher.
+> - **Fizzy rockets are run by a grown-up.** The grown-up keeps the tablets.
+> - **Never chase a rocket** into a road, a tree or a power line.
+>
+> Real model rockets with motors are for ages **12 and up**, and they follow a bigger set of rules: the **NAR Model Rocket Safety Code**. That's why model rocketry is one of the safest hobbies there is. Let's go through the big ones and *why* they matter.
 >
 > 1. **Grown-ups handle motors and igniters.** Motors contain fuel that burns very hot. Only grown-ups load them, put in igniters and hold the launch key.
 > 2. **Use only real model rocket motors**, from the store, exactly as they come. Never open, change or reload one.
@@ -51,8 +60,8 @@ To buy: nothing.
 ## Activity 1 ★ Safety drills
 
 1. **Is it safe?** On W9, read each launch-day story and decide: safe or not safe? Which rule does it follow or break?
-2. **Countdown practice:** with *no* motor and *no* igniter, set up the pad and controller. The grown-up holds the key. Practise: "Range is clear! Rocket is armed. 5, 4, 3, 2, 1, launch!"
-3. **Misfire drill:** the grown-up pretends the rocket didn't go. The grown-up removes the key and everyone counts 60 seconds out loud, staying back, before anyone walks up to the pad.
+2. **Countdown practice (under 12):** set up the stomp rocket. Everyone puts on glasses and stands behind the launcher. The countdown caller says "Range is clear! 5, 4, 3, 2, 1, launch!" and the stomper waits for "launch!" Take turns at each job.
+3. **Countdown and misfire drill (12+):** with *no* motor and *no* igniter, set up the pad and controller. The grown-up holds the key. Practise: "Range is clear! Rocket is armed. 5, 4, 3, 2, 1, launch!" Then the grown-up pretends the rocket didn't go, removes the key, and everyone counts 60 seconds out loud, staying back, before anyone walks up to the pad.
 4. **Wind check:** look at tomorrow's forecast. Write the wind speed. Is it under 20 mph? (Lighter is better: under 10 mph means less drift.)
 
 ## Activity 2: Graph your week
@@ -63,7 +72,7 @@ To buy: nothing.
 4. Find the **mean** and the **range** for one group of trials.
 5. Write two sentences: "As ___ went up, ___ went ___." and "One thing that might have made my data less accurate is ___."
 
-## Activity 3 (printer track): Preflight checks on your real rocket
+## Activity 3 (12+ track): Preflight checks on your real rocket
 
 A grown-up handles the motor in steps 3–5. **No igniter today.**
 
@@ -105,9 +114,9 @@ A grown-up handles the motor in steps 3–5. **No igniter today.**
 
 ## Differentiation
 
-**Grade 5:** do the "Is it safe?" stories aloud. Graph one data set as a bar graph.
+**Younger kids (grades 3–6):** do the "Is it safe?" stories aloud and talk about the paper-rocket rules first. Graph one data set as a bar graph.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - Make a **scatter plot** from the design log (height vs score, or span vs score). Draw a line of best fit by eye. Is the relationship linear? Where does it bend?
 - Use the drop-test data: plot canopy *area* (side × side) against descent rate. Does doubling the area halve the speed? (It shouldn't! Speed goes with 1 ÷ √area, so doubling the area slows it by only about 30%.)
@@ -115,6 +124,6 @@ A grown-up handles the motor in steps 3–5. **No igniter today.**
 
 ## Track notes
 
-**Printer track:** pack your launch box tonight (see the list on [Day 10](day-10.md)). A grown-up makes sure the motors, igniters, wadding and the safety key are in it.
+**Paper track (under 12):** go through the paper-launch checklist on W9. Pack stomp rockets, fizzy rocket supplies (the adult keeps the tablets), safety glasses, inclinometers and the paper-rocket launch log.
 
-**Paper track:** pack stomp rockets, fizzy rocket supplies, safety glasses, inclinometers and the flight log.
+**Printed-rocket track (12+):** pack your launch box tonight (see the list on [Day 10](day-10.md)). A grown-up makes sure the motors, igniters, wadding and the safety key are in it.

@@ -103,9 +103,9 @@ Which angle sends a straw rocket furthest?
 
 ## Differentiation
 
-**Grade 5:** draw the arrows for "on the pad" and "boost" only. Use 3 angles (30°, 45°, 60°).
+**Younger kids (grades 3–6):** draw the arrows for "on the pad" and "boost" only. Use 3 angles (30°, 45°, 60°). Grades 3–4: measure in whole centimetres and compare the longest trials instead of averaging.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - Find the net force: a rocket weighs 1 N, the motor pushes 6 N and drag is 0.5 N. Net force = 6 − 1 − 0.5 = **4.5 N up**. Its mass is 0.1 kg, so a = F ÷ m = 4.5 ÷ 0.1 = **45 m/s²**, about 4½ times the pull of gravity.
 - Draw arrows *to scale* (1 cm = 1 N) for boost and coast.
@@ -113,6 +113,6 @@ Which angle sends a straw rocket furthest?
 
 ## Track notes
 
-**Both tracks:** In Rocket Builder, build any rocket and look at the report. The **power** bar is thrust ÷ weight: it needs 5× or more. Write the number on your worksheet.
+**Paper track (under 12):** in Rocket Builder, build any rocket and press **▶ Watch it launch**. Call out each part as it happens: liftoff, boost, coast, top (apogee), parachute. Which force is biggest in each part?
 
-**Printer track:** keep a straw rocket. It's a handy model on Day 3.
+**Printed-rocket track (12+):** do the same, then read the report's **power** bar: it's thrust ÷ weight, and it needs 5× or more. Write the number on W2. Keep a straw rocket: it's a handy model on Day 3.

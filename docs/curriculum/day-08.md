@@ -8,7 +8,7 @@
 
 - Build an inclinometer (an angle-measurer) and use it to read an angle of elevation.
 - Find the height of something tall using a measured distance and an angle.
-- Use a table of multipliers (grade 5–6) or the tangent (grade 7–8) to calculate height.
+- Use a table of multipliers (grades 3–6) or the tangent (grades 7–8) to calculate height.
 - Explain where errors come from and how to reduce them.
 
 ## Vocabulary
@@ -81,7 +81,7 @@ To buy: nothing. (Optional: a stomp rocket, $15–25, or a DIY one, to practise 
 4. Each tracker follows the rocket and pinches the string at the highest point.
 5. Work out the height. If two trackers stand on different sides, average their answers.
 
-## Tracking a real rocket on Day 10
+## Tracking a real rocket on Day 10 (12+ track)
 
 - Rockets go much higher, so stand further away: a baseline about **half to all** of the predicted altitude gives good angles (between about 30° and 60°).
 - Stand to the **side of the wind**, not upwind or downwind, so drift doesn't change your distance much.
@@ -117,9 +117,9 @@ To buy: nothing. (Optional: a stomp rocket, $15–25, or a DIY one, to practise 
 
 ## Differentiation
 
-**Grade 5:** use the multiplier table and a calculator. Or skip the math and make a **scale drawing**: on graph paper, let 1 square = 2 m. Draw the baseline, use a protractor to draw your angle, draw a line straight up from the far end, and count squares to find the height.
+**Younger kids (grades 3–6):** use the multiplier table and a calculator. Grades 3–4: skip the multiplying and make a **scale drawing**: on graph paper, let 1 square = 2 m. Draw the baseline, use a protractor to draw your angle, draw a line straight up from the far end, and count squares to find the height.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - Use the tangent: **height = baseline × tan(angle) + eye height**. Use a calculator's tan button (in degree mode).
 - **Error check:** if your angle is off by 2°, how much does the height change at 45° and at 75°? With a 50 m baseline: tan 45° = 1.00 and tan 47° = 1.07, so 50 m vs 53.6 m (about 7% off). tan 75° = 3.73 and tan 77° = 4.33, so 187 m vs 217 m (about 16% off). Steep angles magnify errors. That's why a long baseline is better for high flights.
@@ -127,6 +127,6 @@ To buy: nothing. (Optional: a stomp rocket, $15–25, or a DIY one, to practise 
 
 ## Track notes
 
-**Printer track:** a grown-up and your student assemble the printed rocket today, following the build notes in the ZIP: parts in order, shock cord through the anchor and tied to the nose, parachute on the cord. Check that the nose slides off smoothly (not too tight, not loose) and that the motor fits the motor tube. Don't put a motor in yet.
+**Paper track (under 12):** stomp-rocket tracking is your practice for launch day. Make two inclinometers so two people can track.
 
-**Paper track:** the stomp rocket tracking is your practice for launch day. Make two inclinometers so two people can track.
+**Printed-rocket track (12+):** a grown-up and your student assemble the printed rocket today, following the build notes in the ZIP: parts in order, shock cord (braided flat elastic) through the anchor and tied to the nose, parachute on the cord. Check that the nose slides off smoothly (not too tight, not loose) and that the motor fits the motor tube. Don't put a motor in yet.

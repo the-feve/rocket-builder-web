@@ -27,7 +27,7 @@
 
 - A computer or tablet with Rocket Builder (https://rocket.quiverdesignworks.net)
 - Pencil, ruler, W6 worksheet
-- Printer track: the 3D printer and filament
+- 12+ track: the 3D printer and filament
 
 To buy: nothing.
 
@@ -86,6 +86,7 @@ To buy: nothing.
 2. Fill in the **decision table** on W6: give each of your top 3 designs a score from 1 to 3 for stability, height (fits our field?), looks and printing time.
 3. Pick a winner. Write one sentence saying why, using your data.
 4. Press **Save** (and give it a name!). The app keeps your rockets under *My rockets*.
+5. Press **▶ Watch it launch** and watch your winner fly.
 
 **What to expect:** with fins kept the same size, a taller rocket usually gets a higher score, because the long body moves the balance point forward, away from the heavy motor. Very short rockets often show "fins grew" and a score just above 1, because the app enlarged the fins to make them stable. Swept-back fins push the push point further back than a rectangle of the same size, so they usually score higher. Taller rockets also weigh more, so with the same motor they don't fly quite as high.
 
@@ -119,9 +120,9 @@ To buy: nothing.
 
 ## Differentiation
 
-**Grade 5:** do Part A with 4 heights, then pick the design you like that meets the criteria. A grown-up can read the Build notes.
+**Younger kids (grades 3–6):** do Part A with 4 heights, then pick a favourite design that meets the criteria. A grown-up can read the Build notes. Then press **▶ Watch it launch** and watch your design fly.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - **Part D: custom fins (Advanced mode).** Switch to **Advanced**. Under **Fins**, tick **Custom fin size**. Keep everything else the same and change only the **Span** (how far the fins stick out): try 15, 20, 25 and 30 mm. Graph score against span. Find the span where the score crosses 1.0. (In one test with an M18 rocket, body length 250 mm and trapezoid fins: span 15 mm gave −0.5 cal, 25 mm gave 1.3 cal and 30 mm gave 1.7 cal. A negative score means the push point is *in front of* the balance point.)
 - **Find the score yourself:** in the full report, write down the CG and CP distances and the body width (Key dimensions), then check the score: (CP − CG) ÷ width.
@@ -129,6 +130,6 @@ To buy: nothing.
 
 ## Track notes
 
-**Printer track:** when your design is picked and it shows **Download STLs**, download the ZIP. A grown-up starts the first print today. The build notes and the parts list tell you each part's print height. Print the parts in the order the build notes give; a long rocket is split into several sections. Some prints take several hours, so plan around them.
+**Paper track (under 12):** your design stays on screen. Press **Save**, give it a name, and press **▶ Watch it launch** to see its flight, its parachute and where it lands. Then make a **paper prototype**: draw it full size on paper and build a paper-towel-tube model with the same fin shape, for a swing test. Don't download, print or order it: motor rockets are rated 12+.
 
-**No printer?** You have two choices: Rocket Builder can **order a printed rocket** for you (a grown-up needs an account), or keep your design as a "paper prototype": draw it to full size on paper and build a paper version with the same fin shape for the swing test.
+**Printed-rocket track (12+):** when your design is picked and it shows **Download STLs**, download the ZIP. A grown-up starts the first print today. The build notes and the parts list tell you each part's print height. Print the parts in the order the build notes give; a long rocket is split into several sections. Some prints take several hours, so plan around them. No printer? Rocket Builder can **order a printed rocket** for you (a grown-up needs an account).

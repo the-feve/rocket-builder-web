@@ -103,9 +103,9 @@ To buy: nothing new (safety glasses from Day 2).
 
 ## Differentiation
 
-**Grade 5:** do the nose-cone test only, with 2 trials each.
+**Younger kids (grades 3–6):** do the nose-cone test only, with 2 trials each. Use the squeeze launcher so every launch gets the same push. Grades 3–4: compare the longest trial for each nose instead of averaging.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - The drag formula: **drag = ½ × air density × speed² × Cd × frontal area**. Air density is about 1.2 kg/m³.
 - A rocket 30 mm wide has a frontal area of π × 0.015² ≈ 0.00071 m². With Cd = 0.65 at 50 m/s: drag ≈ 0.5 × 1.2 × 2500 × 0.65 × 0.00071 ≈ **0.7 N**. That's about the weight of the whole rocket (an 80 g rocket weighs about 0.8 N)! At 25 m/s, half the speed, drag is only about 0.17 N, a quarter as much.
@@ -113,6 +113,6 @@ To buy: nothing new (safety glasses from Day 2).
 
 ## Track notes
 
-**Both tracks:** in Rocket Builder, keep everything the same and change only the nose shape (Ogive, Cone, Round, Parabolic, Von Kármán). Build each one and write down the score. You'll find the score hardly changes: at model-rocket speeds, the nose shape matters much less than the fins. (The app uses the same drag number for every nose, so the predicted altitude changes only a little, from the different weights.)
+**Paper track (under 12):** in Rocket Builder, keep everything the same and change only the nose shape (Ogive, Cone, Round, Parabolic, Von Kármán). Build each one and write down the score. The score hardly changes: at model-rocket speeds, the nose shape matters much less than the fins. (The app uses the same drag number for every nose, so the predicted height changes only a little, from the different weights.)
 
-**Printer track:** a rounded nose (Round or Parabolic) is strong and easy to print. Smooth, sanded fin edges help with drag.
+**Printed-rocket track (12+):** the same, plus the drag-coefficient test in the grade 7–8 extension. A rounded nose (Round or Parabolic) is strong and easy to print. Smooth, sanded fin edges help with drag.

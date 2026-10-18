@@ -133,9 +133,9 @@ Test these four versions. Find the new balance point each time.
 
 ## Differentiation
 
-**Grade 5:** do versions A and C only. Skip the cut-out; just compare "nose leads" and "tumbles".
+**Younger kids (grades 3–6):** do versions A and C only. Skip the cut-out and the score math; just compare "nose leads" and "tumbles". Grades 5–6: add the cut-out and work out the score with a calculator.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - Do all four versions and work out the score for each.
 - A Rocket Builder rocket: balance point 253 mm from the tip, push point 289 mm, body 21.4 mm wide. Score = (289 − 253) ÷ 21.4 = **1.7 cal** (rounded).
@@ -144,6 +144,6 @@ Test these four versions. Find the new balance point each time.
 
 ## Track notes
 
-**Both tracks:** open Rocket Builder, build a rocket and find the blue and red dots. Read the score. Try a different fin shape and build again. Did the score change?
+**Paper track (under 12):** open Rocket Builder, build a rocket and find the blue and red dots. Read the score. Try a different fin shape and build again. Did the score change? Then press **▶ Watch it launch**: a stable rocket flies nose-first.
 
-**Printer track:** on Day 9 you'll do the swing test on your real printed rocket, with a motor inside. Same steps.
+**Printed-rocket track (12+):** the same on screen. On Day 9 you'll swing-test your real printed rocket, with a motor put in by a grown-up (no igniter). Same steps.

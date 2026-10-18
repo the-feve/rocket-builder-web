@@ -34,7 +34,7 @@ Household:
 - 10–20 paper clips
 - A piece of string to measure balloon size (or a soft tape measure)
 
-To buy: nothing. (Printer track: see "Plan ahead" below.)
+To buy: nothing. (12+ track: a grown-up starts ordering supplies today; see the track notes below.)
 
 ## Teach (read aloud or adapt)
 
@@ -95,7 +95,8 @@ You'll test two things: **how much air** (more push) and **how much mass** (more
 2. Follow the short tutorial. It walks through the steps: motor size, printer size, height, fins and nose.
 3. Press **Build my rocket**. Turn it around by dragging. Try **Exploded** to see the parts.
 4. Find the **stability score** and the **blue and red dots**. Don't worry what they mean yet: that's Day 3!
-5. Write down three things you noticed on your worksheet.
+5. Press **▶ Watch it launch** to see your rocket fly on screen: liftoff, parachute and landing. **◀ Back to 3D model** brings it back.
+6. Write down three things you noticed on your worksheet.
 
 ## Worksheet
 
@@ -127,9 +128,9 @@ You'll test two things: **how much air** (more push) and **how much mass** (more
 
 ## Differentiation
 
-**Grade 5:** focus on law 3 ("push back"). Do Part A only, with 2 balloon sizes. Average with a calculator.
+**Younger kids (grades 3–6):** focus on law 3 ("push back"). Do Part A with 2 balloon sizes. Grades 3–4: skip the averages and circle the longest of the three trials. Grades 5–6: find the averages with a calculator.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - Find the average speed: time the straw over a measured distance, then speed = distance ÷ time.
 - Use F = m × a. A balloon pushes with about 0.1 N, and the straw, tape and balloon have a mass of 10 g (0.010 kg). Ignoring friction, what's the acceleration? (a = F ÷ m = 0.1 ÷ 0.010 = **10 m/s²**.) Add 10 g of paper clips: a = 0.1 ÷ 0.020 = **5 m/s²**. Doubling the mass halves the acceleration.
@@ -137,9 +138,9 @@ You'll test two things: **how much air** (more push) and **how much mass** (more
 
 ## Track notes
 
-**Printer track (plan ahead):** Real motors take time to get. Today a grown-up should:
+**Paper track (under 12):** nothing extra to buy. Rocket Builder is your on-screen rocket lab all week: design a rocket, read its score, and press **▶ Watch it launch**. You won't download, print or order anything: motor rockets are rated 12+.
 
-- Order or buy a launch pad and controller and some recovery wadding (see the [materials list](README.md#materials-master-list)). Wait for Day 6 to pick the motor class, but Rocket Builder starts on the M18 size (the common Estes 18 mm motors), so 18 mm motors are a good bet.
+**Printed-rocket track (12+), plan ahead:** real motors take time to get. Today a grown-up should:
+
+- Order or buy a launch pad and controller and some recovery wadding (see the [materials list](README.md#materials-and-costs-by-track)). Wait for Day 6 to pick the motor class, but Rocket Builder starts on the M18 size (the common 18 mm motors), so 18 mm motors are a good bet.
 - Look for a launch field, or a local NAR club launch (nar.org).
-
-**Paper track:** nothing extra. Rocket Builder is free and works without a printer, so you'll use it as an on-screen rocket lab all week.

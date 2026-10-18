@@ -2,14 +2,14 @@
 
 [← Day 4](day-04.md) · [Overview](README.md) · [Day 6 →](day-06.md)
 
-**Time:** about 90 minutes. **Worksheet:** W5 Motor codes and impulse.
+**Time:** about 60 minutes (younger kids) to 90 minutes (12+). **Worksheet:** W5 Motor codes and impulse.
 
 ## Objectives
 
 - Name the parts of a model rocket motor and what each one does.
 - Decode a motor code like **C6-5**.
 - Work out total impulse: **impulse = average thrust × burn time**.
-- Check a rocket's **thrust-to-weight ratio** (at least 5 to 1).
+- Older kids: check a rocket's **thrust-to-weight ratio** (at least 5 to 1).
 - Run a fizzy film-canister rocket experiment and connect it to Newton's third law.
 
 ## Vocabulary
@@ -40,7 +40,7 @@ To buy:
 - Effervescent tablets (Alka-Seltzer or plain fizzy vitamin C tablets, $5–8)
 - Safety glasses for everyone (from Day 2)
 
-**Printer track:** if your motors have arrived, a grown-up can show one (still in its pack). Don't take it apart.
+**12+ track:** if your motors have arrived, a grown-up can show one (still in its pack). Don't take it apart. **Under 12:** no real motors; use the picture on W5.
 
 ## Teach (read aloud or adapt)
 
@@ -89,18 +89,18 @@ To buy:
 | M24 | 24 mm | C, D (and long E motors) | 150–350 m (long E: 300–550) |
 | M29 | 29 mm | E, F | 300–750 m: big fields only |
 
-## Activity 1 ★ Fizzy film-canister rockets
+## Activity 1 ★ Fizzy film-canister rockets (adult-led)
 
 The tablet has two powders in it (an acid and baking soda). When they get wet, they make **carbon dioxide gas**. The gas fills the canister and the pressure builds until the lid pops. Gas and water shoot down, and the canister shoots up: Newton's third law!
 
-**Safety:** outside, safety glasses on everyone, a grown-up hands out the tablet pieces (Alka-Seltzer contains aspirin, so it's medicine, not candy). Never lean over a canister. If one doesn't pop, wait at least 30 seconds, then pick it up pointing away from faces.
+**Safety:** an adult runs this activity, for every age. Outside, safety glasses on everyone. The adult keeps the tablets and hands out the pieces (Alka-Seltzer contains aspirin, so it's medicine, not candy; plain fizzy vitamin C tablets work too). Never lean over a canister. If one doesn't pop, wait at least 30 seconds; then the adult picks it up, pointing it away from faces.
 
 **Experiment: how much water?**
 
 1. Decide what you'll change: the amount of water. Keep the tablet size the same (half a tablet each time).
 2. Make a prediction: which amount will fly highest?
 3. Put 1 teaspoon (5 ml) of water in the canister.
-4. Drop in half a tablet, snap the lid on **quickly**, and set it **lid-down** next to the marked wall. Step back at least 2 m. Start the stopwatch.
+4. The adult drops in half a tablet and snaps the lid on **quickly**, then sets it **lid-down** next to the marked wall. Everyone steps back at least 2 m. Start the stopwatch.
 5. Record the time until it pops and how high it goes (use the wall marks or film it).
 6. Do 3 trials. Then try 2 teaspoons and 3 teaspoons (don't fill more than about half way).
 7. Optional: tape a paper tube, nose cone and fins around the canister (lid end down) to make it look like a rocket. Does it fly differently?
@@ -109,9 +109,9 @@ The tablet has two powders in it (an acid and baking soda). When they get wet, t
 
 ## Activity 2: Decode the motors (worksheet)
 
-Work through **W5**: decode motor codes, calculate impulse, find the class, and check thrust-to-weight.
+Work through **W5**: decode motor codes, calculate impulse, find the class, and (older kids) check thrust-to-weight. This is reading and math only: nobody handles a motor.
 
-**Printer track:** in Rocket Builder, build your rocket and open **Grown-up details**. The motor table lists every motor for your size, with its peak altitude, speed off the rod, thrust × weight, and a ✓ for motors that pass. Copy three rows onto your worksheet.
+**Everyone:** in Rocket Builder, build your rocket and find the **How high will it go?** card: the best motor, and how high it should fly. **12+:** also open **Grown-up details**. The motor table lists every motor for your size, with its peak altitude, speed off the rod, thrust × weight, and a ✓ for motors that pass. Copy three rows onto W5.
 
 ## Discussion questions
 
@@ -139,9 +139,9 @@ Work through **W5**: decode motor codes, calculate impulse, find the class, and 
 
 ## Differentiation
 
-**Grade 5:** do the fizzy rocket experiment and the first page of W5 (decoding codes). Skip the thrust-to-weight math, or do it with a calculator and a grown-up.
+**Younger kids (grades 3–6):** do the fizzy rocket experiment with an adult, and the decoding part of W5. Grades 3–4: decode the letter and the delay only, and do the impulse problems that use whole numbers (like 5 × 2). Skip thrust-to-weight.
 
-**Grade 8 extension:**
+**Grade 7–8 extension:**
 
 - **Impulse from a thrust curve.** W5 has a thrust-curve table for a B motor. Plot it, then find the area under the curve by counting squares (or splitting it into triangles and rectangles). The area is the total impulse: about **4.3 N·s**, a B motor.
 - **F = m × a at liftoff.** A printed rocket plus a C6 motor has a mass of 0.086 kg, so it weighs about 0.086 × 9.8 ≈ 0.84 N. The motor's measured average thrust is about 4.7 N. Net force = 4.7 − 0.84 ≈ 3.9 N. Acceleration a = F ÷ m ≈ 3.9 ÷ 0.086 ≈ **45 m/s²**, more than 4 times gravity. Thrust-to-weight = 4.7 ÷ 0.84 ≈ **5.6**, which passes (5 or more).
@@ -149,6 +149,6 @@ Work through **W5**: decode motor codes, calculate impulse, find the class, and 
 
 ## Track notes
 
-**Printer track:** don't open or test real motors today. Look at the pack: find the code, the delay and the warnings. Store motors in a cool, dry place away from flames, and out of children's reach.
+**Paper track (under 12):** the fizzy rocket is your "motor" for the week, always with an adult and safety glasses. You'll learn how real motors work from the picture on W5 and from the app, but you won't handle one: they're rated 12+. In Rocket Builder, the **How high will it go?** card shows the best motor for your design and how high it should fly.
 
-**Paper track:** the fizzy rocket is your "motor" for the week. On Day 10 you can also fly stomp rockets.
+**Printed-rocket track (12+):** don't open or test real motors today. A grown-up can show you the pack: find the code, the delay and the warnings. Motors are stored in a cool, dry place, away from flames and out of reach of younger children. In Rocket Builder, open **Grown-up details**: the motor table lists every motor for your size, with its peak altitude, speed off the rod, thrust × weight, and a ✓ for motors that pass. Copy three rows onto W5.
