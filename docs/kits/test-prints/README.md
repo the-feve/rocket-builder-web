@@ -1,5 +1,7 @@
 # Kit test prints
 
+> **2026-10-18:** the motor cap (E) now has a 2.5 mm retention lip over the motor's cardboard casing, so the nozzle hole is the motor diameter less 5 mm (it was less 6.35 mm). Reprint **E** only: the lighter cap moved the other parts by about 0.02 mm, too little to matter.
+
 Print-ready files for the three kits proposed in `../README.md` (Kit designs), to print, weigh and fly-test before any kit is sold. Each is the kit's fixed Beginner design (printer max height 256 mm, 3 trapezoid fins, tangent-ogive nose, PLA, auto-sized fins), built with the **4.0 mm launch lug bore** (1/8 in rod) and the elastic shock-cord clearances (`geometry/rocketgen/params.py`, `SHOCK_CORDS`), on 2026-10-18.
 
 | Kit | Folder | Motor | Height | Printed mass (solid) | Stability | Recommended motor (app) | Other motors that pass | Chute | Tallest part |

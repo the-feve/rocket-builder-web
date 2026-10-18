@@ -139,6 +139,13 @@ class Derived:
     thread: dict = field(default_factory=dict)
 
 
+# Motor cap retention lip: how far the cap's floor reaches in over the motor's
+# rear end, from the motor's OD. 2.5 mm covers the cardboard casing (owner,
+# 2026-10-18, from printed tests); the FeatureScript's 1/8 in (3.175 mm) made
+# the nozzle hole too small. The hole is mtr_d - 2 * CAP_LIP across.
+CAP_LIP = 2.5
+
+
 def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
                     pitch=None, turns=None, thread_clear=None) -> dict:
     """threadGeometry: the threaded motor cap and the boss it screws onto.
@@ -191,7 +198,7 @@ def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
         "base_chamfer_h": base_chamfer * math.tan(math.radians(60)),
         "top_chamfer": 1.0,
         "top_chamfer_h": 1.0 * math.tan(math.radians(60)),
-        "nose_bore_r": mtr_d / 2 - 3.175,
+        "nose_bore_r": mtr_d / 2 - CAP_LIP,
         "hang": -z_face,
         "turns": (cap_top - z_boss_end) / p,
         "z_lowest": min(z_face - cap_face_t, fin_lowest_z_within(fin, body_od, wall, 1e6)),

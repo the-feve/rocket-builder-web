@@ -509,3 +509,14 @@ def test_launch_profile_shows_unsafe_flights():
     a8 = next(m for m in fl.load_flight_motors() if m.code == "A8")
     heavy = fl.launch_profile(a8, 80, 23, 12, fl.WIND_MS, margin_cal=1.5, length_mm=300)
     assert {"slow", "windturn"} <= {d["kind"] for d in heavy["dangers"]} and heavy["landing_m"] < 0  # tipped upwind
+
+
+def test_motor_cap_lip_covers_2_5_mm_of_the_casing():
+    """The cap's retention lip reaches 2.5 mm in from the motor's OD (the
+    cardboard casing), so the nozzle hole is the motor diameter less 5 mm."""
+    from rocketgen.params import CAP_LIP, DesignParams, compute_derived
+    assert CAP_LIP == 2.5
+    for motor, mtr_d in (("M13", 13), ("M18", 18), ("M24", 24), ("M29", 29)):
+        d = compute_derived(DesignParams(motor=motor))
+        assert abs(2 * d.thread["nose_bore_r"] - (mtr_d - 5.0)) < 1e-6
+
