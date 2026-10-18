@@ -547,3 +547,39 @@ def test_critical_fit_fields():
     assert r.status_code == 422
     r = client.post("/api/build", json={"thread_turns": 1})
     assert r.status_code == 422
+
+
+def test_learn_pages():
+    """The home-school unit at /learn (static pages from docs/curriculum/tools/build_site.py)."""
+    r = client.get("/learn", follow_redirects=False)
+    assert r.status_code in (307, 308) and r.headers["location"] == "/learn/"
+    r = client.get("/learn/")
+    assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+    for text in ("Rockets and Model Rocketry", "grades 3–8", "Print the worksheets (PDF)", "/learn/worksheets.pdf",
+                 "Use it with Rocket Builder", "https://rocket.quiverdesignworks.net/", "/learn/day-10",
+                 "Standards alignment", "/learn/safety", "Materials and costs by track"):
+        assert text in r.text, text
+    r = client.get("/learn/day-03")
+    assert r.status_code == 200
+    for text in ("Stability", "/learn/day-02", "/learn/day-04", 'href="/learn/"', "Open Rocket Builder", "Answer key"):
+        assert text in r.text, text
+    assert client.get("/learn/day-03.html").status_code == 200
+    for page in ("day-01", "day-10", "safety", "worksheets"):
+        assert client.get(f"/learn/{page}").status_code == 200, page
+    assert "NAR Model Rocket Safety Code" in client.get("/learn/safety").text
+    r = client.get("/learn/worksheets.pdf")
+    assert r.status_code == 200 and r.headers["content-type"] == "application/pdf" and r.content.startswith(b"%PDF")
+
+
+def test_learn_unknown_pages_404():
+    for page in ("day-11", "day-1", "index", "learn.css", "..%2Fapp.py", "..%2F..%2Fapp.py", "worksheets.pdf.html"):
+        assert client.get(f"/learn/{page}").status_code == 404, page
+    assert client.get("/learn/../app.py").status_code == 404
+
+
+def test_secondary_pages_use_the_brand():
+    """/sources, /ordersupplies, /terms and /admin share static/brand.css and the branded header."""
+    assert client.get("/static/brand.css").status_code == 200
+    for path in ("/sources", "/ordersupplies", "/terms", "/admin"):
+        html = client.get(path).text
+        assert '/static/brand.css' in html and 'class="rb-header"' in html and "Quiver Design Works" in html, path

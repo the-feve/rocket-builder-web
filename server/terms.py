@@ -69,3 +69,36 @@ def stl_with_header(data: bytes) -> bytes:
     if len(data) >= 84 and not data[:5].lower() == b"solid":
         return STL_HEADER + data[80:]
     return data
+
+
+def page() -> str:
+    """The /terms page: the licence for generated files (linked from the download and order buttons)."""
+    from html import escape
+
+    import brand
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{brand.HEAD}
+<title>File license · Rocket Builder</title>
+<meta name="description" content="The licence for the files Rocket Builder makes: personal use only, don't share or sell them.">
+<style>
+  /* Page styles; the brand (tokens, fonts, header) is in /static/brand.css. */
+  .rb-main {{ max-width:780px; }}
+  .box {{ border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:16px 18px; margin:18px 0; }}
+  .box .rb-label {{ display:block; margin:0 0 8px; }}
+  pre {{ white-space:pre-wrap; overflow-wrap:anywhere; font:13.5px/1.55 var(--font-mono); margin:0; color:var(--ink); }}
+  @media (max-width:520px) {{ .box {{ padding:12px; }} pre {{ font-size:11.5px; }} }}
+</style>
+</head>
+<body>
+{brand.header("File license")}
+<main class="rb-main">
+<h1>Rocket Builder file license</h1>
+<p class="lede">The rockets you design here are yours to print and fly. The files aren't free to share: please don't upload them, or remixes of them, to MakerWorld, Printables, Thingiverse or any other site. Send friends a link to Rocket Builder instead, so they can design their own.</p>
+<div class="box"><span class="rb-label">LICENSE.txt</span><pre>{escape(LICENSE_TEXT)}</pre></div>
+<p class="lede">The same text is in LICENSE.txt in every download.</p>
+</main>
+<footer class="rb-footer"><a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net/">Quiver Design Works</a></footer>
+</body>
+</html>"""

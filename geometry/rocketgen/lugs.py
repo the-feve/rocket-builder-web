@@ -1,8 +1,8 @@
 """Launch lugs and the rod standoff (lugGeometry, buildRodStandoff,
 planForwardLug, buildOneLug, lugEdgeFillets).
 
-Lugs are kept as light as possible: a short ring (rod + 0.3 mm radial
-clearance, 0.8 mm wall) on a narrow stem flared into the body and the ring
+Lugs are kept as light as possible: a short ring (rod + LUG_BORE_CLEARANCE
+radial clearance, 0.8 mm wall) on a narrow stem flared into the body and the ring
 by small concave arcs, all on one line at `angle` so the rod runs straight
 through. The stem lets the ring stand off the body to clear the motor cap.
 The aft lug sits on the tail (z = 0 up); the forward lug has a 45-degree
@@ -18,9 +18,18 @@ from build123d import Face, Solid, Vector
 from .geom import GeometryError, as_shape, extrude_y_symmetric, one_solid, rotated_z, try_fillet, xy_wire_edges
 from .params import Derived
 
+# Radial clearance between the launch rod and the lug bore, per side. The
+# owner's printed lugs at 0.3 mm (a 3.775 mm bore on a 1/8 in rod) fit "a
+# little too snug" (2026-10-18): printed holes come out undersize, and a
+# lug that drags on the rod slows the rocket and can hang it up. 0.4125 mm
+# makes the bore exactly 4.0 mm on a 1/8 in (3.175 mm) rod; other rods get
+# the same clearance, since the print error doesn't grow with the rod. The
+# rod standoff clip (standoff_ri) is separate and stays snug on purpose.
+LUG_BORE_CLEARANCE = (4.0 - 3.175) / 2
+
 
 def lug_geometry(d: Derived, rod_diameter: float, rod_standoff: bool, pad_clearance: float) -> dict:
-    bore_r = rod_diameter / 2 + 0.3
+    bore_r = rod_diameter / 2 + LUG_BORE_CLEARANCE
     ring_wall = 0.8  # two 0.4 mm perimeters
     r_in = d.body_od / 2 - d.wall / 2  # neck buried half a wall into the body
     # The ring just clears the body, unless the rod would then hit the

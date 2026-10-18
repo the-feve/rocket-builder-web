@@ -27,6 +27,7 @@ This unit teaches the science behind rockets: forces, motion, stability, drag, m
 | `day-01.md` … `day-10.md` | One lesson plan per day |
 | `worksheets.html` | 22 printable pages for US Letter: worksheets W1–W9b, the inclinometer template, two launch logs (paper rockets; printed rocket 12+), the capstone planner and rubric, all ten quick checks, and answer keys at the end. Pages for the 12+ track are marked **12+**. Open it in a browser and print at 100% (turn on "background graphics" for the coloured headings). |
 | `tools/gen_ws.py` | Builds `worksheets.html` (`python3 tools/gen_ws.py worksheets.html`) |
+| `tools/build_site.py` | Builds the web version at rocket.quiverdesignworks.net/learn (`server/static/learn/`) from these files. After changing a lesson or the worksheets: `pip install markdown`, then `python3 docs/curriculum/tools/build_site.py --pdf` from the repo root (`--pdf` also re-renders `worksheets.pdf` with Playwright: needs node, the `playwright` package on `NODE_PATH` and `PLAYWRIGHT_BROWSERS_PATH`; leave it off if the worksheets didn't change). Commit the generated files. |
 | `preview-w3-swing-test.png`, `preview-inclinometer.png` | Pictures of two worksheet pages |
 
 ## How each day works

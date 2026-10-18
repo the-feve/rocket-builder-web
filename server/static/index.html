@@ -78,11 +78,7 @@
   header nav a:hover { text-decoration:underline; text-underline-offset:5px; }
   header .units { color:var(--muted); font-size:12px; }
   /* Switch between the two builders (same control on Trebuchet Builder) */
-  header nav.apps { gap:2px; padding:2px; border-radius:9px; background:var(--card); }
-  header nav.apps a { padding:4px 11px; border-radius:7px; font-weight:600; font-size:13px; color:var(--muted); }
-  header nav.apps a.cur { background:var(--ink); color:var(--panel); }
-  header nav.apps a:hover { text-decoration:none; }
-  header nav.apps a:not(.cur):hover { background:var(--hover); color:var(--ink); }
+  .betatag { display:inline-block; padding:2px 6px; margin-left:2px; font:700 9.5px/1 var(--font-head); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); clip-path:var(--chamfer); vertical-align:1px; }
   #acct { margin-left:auto; flex:none; padding:5px 12px; font:600 12px var(--font-body); color:var(--ink);
     background:transparent; border:1px solid var(--line); border-radius:8px; cursor:pointer; max-width:45vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #acct:hover { background:var(--hover); }
@@ -333,6 +329,7 @@
   #kidguide .safety .lab { display:block; font:700 10.5px/1 var(--font-head); letter-spacing:.12em; text-transform:uppercase; color:var(--cp); margin-bottom:4px; }
   #kidguide .btns { margin-top:20px; }
   #kidguide .kidlinks { display:flex; flex-wrap:wrap; gap:4px 18px; margin:12px 0 0; }
+  #kidguide .kidlinks a.link { display:inline-block; }
   #kidguide .kidlinks .link { flex:none; padding:4px 0; border:0; background:none; color:var(--accent); font:500 13.5px var(--font-body); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
   #kidguide .supplynote.compact { margin-top:18px; padding:0; border:0; background:none; font-size:13px; color:var(--muted); }
   #kidguide[hidden] { display:none; }
@@ -439,7 +436,9 @@
   .motorbuy .shopbtn { flex:none; padding:8px 14px; border-radius:6px; font:600 14px var(--font-body); text-decoration:none; color:var(--ink); border:1px solid var(--line); }
   .motorbuy .shopbtn:hover { border-color:var(--accent); color:var(--accent); }
   .affil { font-size:11.5px; color:var(--muted); margin:4px 0 0; }
-  .fitlink { flex:1 1 100%; font-size:12.5px; }
+  .fitrow { flex:1 1 100%; margin:4px 0 0; font-size:12.5px; line-height:1.4; }
+  .fitlink { font-weight:600; font-size:13px; }
+  #form.tut .fitrow { display:none; }  /* after the tutorial (or when it's skipped) */
   .licnote { flex:1 1 100%; margin:2px 0 0; font-size:11.5px; line-height:1.4; color:var(--muted); }
   .fieldbox .big { font-size:15px; } .fieldbox .big b { font-size:26px; } .fieldbox .big span { color:var(--muted); }
   #acctlinks { flex:1 1 100%; margin:2px 0 0; } #acctlinks[hidden] { display:none; }
@@ -606,7 +605,7 @@
 </script>
 </head>
 <body>
-<header><h1><a href="/" title="Rocket Builder: start page"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-hdr-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-hdr-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg>Rocket Builder</a></h1><nav class="apps" aria-label="Builders"><a href="https://rocket.quiverdesignworks.net/" class="cur" aria-current="page">Rocket Builder</a><a href="https://trebuchet.quiverdesignworks.net/">Trebuchet Builder</a></nav><nav><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint; trebuchet parts too">Order Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
+<header><h1><a href="/" title="Rocket Builder: start page"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-hdr-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-hdr-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg>Rocket Builder</a></h1><nav><a href="/learn/" title="A free two-week rocket science unit for home school, grades 3 to 8">Free lessons</a><a href="https://trebuchet.quiverdesignworks.net/" title="Our other builder, still in beta">Trebuchet<span class="long"> Builder</span> <span class="betatag">beta</span></a><a href="https://quiverdesignworks.net/#apps" class="qdw">← Quiver<span class="long"> Design Works</span></a><a class="long" href="https://fevergeon.com/">fevergeon.com</a><a href="#" id="supplieslink" target="_blank" rel="noopener" hidden title="Launch pads, motors, parachutes, filament and paint; trebuchet parts too">Order Supplies</a></nav><span class="units">Beta · units mm</span><button id="acct" type="button">Sign in</button><button id="theme" type="button"></button></header>
 <main>
   <form id="form" autocomplete="off">
     <div id="tutbar" hidden role="region" aria-label="Tutorial">
@@ -748,12 +747,12 @@
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
       <div class="dlsplit">
         <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs</span></a>
-        <button type="button" id="dlmorebtn" class="menubtn adv" aria-expanded="false" aria-controls="dlmenu" aria-label="More downloads: STEP files and fit-test parts" title="More downloads">▾</button>
+        <button type="button" id="dlmorebtn" class="menubtn adv" aria-expanded="false" aria-controls="dlmenu" aria-label="More downloads: STEP files" title="More downloads">▾</button>
         <div id="dlmenu" class="menu up adv" hidden>
           <a id="stepzip" class="btn off" href="#" download title="One STEP file per part, for editing in CAD">Download STEP (ZIP)</a>
-          <a id="fitlink" class="fitlink" href="https://fit.quiverdesignworks.net/#rocket" target="_blank" rel="noopener">Generate test fit parts ↗</a>
         </div>
       </div>
+      <p class="fitrow"><a id="fitlink" class="fitlink" href="https://fit.quiverdesignworks.net/#rocket" target="_blank" rel="noopener">Print test-fit parts first ↗</a><span class="hint"> Small test pieces for this rocket's body joint, nose and motor-cap thread, at a few clearances. Check your printer's fit before printing the whole rocket.</span></p>
       <p class="licnote">Files are for your personal use only: please don't share them or upload them to MakerWorld, Printables, Thingiverse or other sites. <a href="/terms" target="_blank" rel="noopener">License</a></p>
     </div>
   </form>
@@ -787,7 +786,7 @@
         <div class="btns">
           <button type="button" class="go" id="kidstart">Start designing</button>
         </div>
-        <p class="kidlinks"><button type="button" class="link" id="kidskip2">Skip tutorial</button><button type="button" class="link" id="kidadv">Advanced mode</button><button type="button" class="link" id="kidfull">Full guide</button></p>
+        <p class="kidlinks"><button type="button" class="link" id="kidskip2">Skip tutorial</button><button type="button" class="link" id="kidadv">Advanced mode</button><button type="button" class="link" id="kidfull">Full guide</button><a class="link" href="/learn/">Free lessons for parents</a></p>
         <p class="hint" id="kidreplay" hidden>You've done the tutorial before. <a href="#" id="replaytut">Replay it</a></p>
         <label class="hint kidpref" id="kidprefrow" hidden><input type="checkbox" id="kidskippref"> Skip the tutorial when I'm signed in (you can change this under your account)</label>
         <details class="moreinfo" id="kidmore">
@@ -1058,6 +1057,7 @@
     <h2 id="dlgtitle">Name your rocket</h2>
     <p id="dlghint"></p>
     <input id="dlgname" maxlength="80" required aria-labelledby="dlgtitle">
+    <p class="hint" id="dlgspec" aria-live="polite"></p>
     <menu><button value="ok">Save</button><button value="cancel" formnovalidate>Cancel</button></menu>
   </form>
 </dialog>
@@ -1765,7 +1765,7 @@ function shareCompareList() {
   try {
     sessionStorage.setItem('rbCompare', JSON.stringify({
       builds: buildHistory.map(e => ({ id: e.id, name: e.name, spec: specLine(e) })),
-      saved: loadMine().map(d => ({ id: d.id, name: baseName(d.name) })),
+      saved: loadMine().map(d => ({ id: d.id, name: prettyName(d.name) })),
     }));
   } catch {}
 }
@@ -2346,7 +2346,7 @@ function renderState() {
 function renderMine() {
   const list = loadMine();
   mineEl.innerHTML = `<option value="">My rockets (${list.length} ${user ? 'in your account' : 'saved in this browser'})…</option>` +
-    list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
+    list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(prettyName(d.name))}</option>`).join('');
   renderState();
   shareCompareList();
 }
@@ -2373,25 +2373,37 @@ function setForm(p) {
   lastBuild = null; markDirty();
 }
 const shareUrl = id => `${location.origin}/d/${id}`;
-// Saved names carry the key specs: "Name_Motor_Fins_Height", e.g.
-// "Zoomer_M18_Trapezoid_340". The name box shows only the name; the specs are
-// added (or refreshed) on every save, and stripped again when a design opens.
-const SPEC_RE = /_M\d+L?_[A-Za-z]+_\d+$/;
+// Saved names carry the key specs, so rockets are easy to pick and compare:
+// "Name_Motor_Height_Fins_Nose", e.g. "Zoomer_M18_340mm_3xTrapezoid_Ogive".
+// The name box shows only the name; the specs are added (or refreshed) on
+// every save, and stripped again when a design opens. The older
+// "Name_M18_Trapezoid_340" form is stripped too.
+const SPEC_RE = /(_M\d+L?_\d+mm_\d+x[A-Za-z]+_[A-Za-z]+|_M\d+L?_[A-Za-z]+_\d+)$/;
+const NOSE_SHORT = { tangent_ogive: 'Ogive', conical: 'Cone', elliptical: 'Round', parabolic: 'Parabolic', von_karman: 'VonKarman' };
 const baseName = n => (n || '').replace(SPEC_RE, '').trim() || 'My rocket';
+// For lists: "Zoomer · M18 · 340mm · 3xTrapezoid · Ogive"
+const prettyName = n => (n || '').split('_').filter(Boolean).join(' · ');
 function specName(base) {
   const fin = (LABELS[form.elements.fin_shape.value] || form.elements.fin_shape.value).replace(/[^A-Za-z]/g, '');
   const h = mode === 'beginner' ? Number(form.elements.overall_length.value)
     : (lastBuild ? lastBuild.length_mm : Number(form.elements.body_length.value));
-  return `${baseName(base)}_${form.elements.motor.value}_${fin}_${Math.round(h) || 0}`.slice(0, 80);
+  const nose = NOSE_SHORT[form.elements.nose_shape.value] || (LABELS[form.elements.nose_shape.value] || '').replace(/[^A-Za-z]/g, '');
+  const n = Number(form.elements.fin_count.value) || 3;
+  const spec = `_${form.elements.motor.value}_${Math.round(h) || 0}mm_${n}x${fin}_${nose}`;
+  return `${baseName(base).slice(0, 80 - spec.length)}${spec}`;
 }
 function say(text, kind = '') { msgEl.textContent = text; msgEl.className = kind; }
 
 // Asks for a name in a small dialog; resolves to the trimmed name, or null on Cancel.
 const dlg = document.getElementById('namedlg'), dlgName = document.getElementById('dlgname');
-function askName(title, hint, suggested) {
+function askName(title, hint, suggested, withSpecs = true) {
   document.getElementById('dlgtitle').textContent = title;
   document.getElementById('dlghint').textContent = hint;
   dlgName.value = suggested;
+  // Shows the full saved name: the specs added after the name, for comparing rockets later.
+  const spec = document.getElementById('dlgspec');
+  const preview = () => { spec.innerHTML = withSpecs ? `Saved as <b>${esc(prettyName(specName(dlgName.value || 'My rocket')))}</b>: motor, height, fins and nose are added so rockets are easy to tell apart.` : ''; };
+  dlgName.oninput = preview; preview();
   dlg.returnValue = '';
   dlg.showModal(); dlgName.select();
   return new Promise(resolve => dlg.addEventListener('close', () =>
@@ -2428,12 +2440,12 @@ async function save(asNew, chosenName = null) {
   storeMine([entry, ...localMine().filter(x => x.id !== d.id)]);
   if (user) await refreshAccount();
   current = entry; shared = false; history.replaceState(null, '', `/d/${d.id}`);
-  renderMine(); say(`Saved "${d.name}". Share link: ${shareUrl(d.id)}`, 'ok');
+  renderMine(); say(`Saved "${prettyName(d.name)}". Share link: ${shareUrl(d.id)}`, 'ok');
 }
 document.getElementById('save').onclick = () => save(false);
 document.getElementById('saveas').onclick = () => save(true);
 document.getElementById('newrocket').onclick = async () => {
-  const name = await askName('New rocket', 'Starts from the default settings and saves it under this name.', 'My rocket');
+  const name = await askName('New rocket', 'Starts from the default settings and saves it under this name.', 'My rocket', false);
   if (!name) return;
   current = null; shared = false;
   setForm({}); nameEl.value = name;
