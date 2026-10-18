@@ -85,13 +85,14 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 
 ## Assembly guide, kits and brand (2026-10-18, owner decisions)
 
-- [ ] **(owner)** Body joints: glue them (the guide says thin CA) so the aft section can't separate at ejection, or tape / push-fit? Which glue for PETG and ASA?
-- [ ] **(owner)** Shock cord for kits: the slot behind the anchor strap is ~2.5 mm deep, so the guide says Kevlar or braided cord up to 2 mm, 2–3× the rocket's length. Confirm type and length.
+- [x] ~~**(owner)** Body joints~~ (2026-10-18: medium CA such as Starbond Medium, adult only; guide updated). Was: glue them (the guide says thin CA) so the aft section can't separate at ejection, or tape / push-fit? Which glue for PETG and ASA?
+- [x] ~~**(owner)** Shock cord for kits~~ (2026-10-18: braided elastic, 1/8 in on M13/M18, 1/4 in on M24/M29; strap and nose recess resized). Was: the slot behind the anchor strap is ~2.5 mm deep, so the guide says Kevlar or braided cord up to 2 mm, 2–3× the rocket's length. Confirm type and length.
 - [ ] **(owner)** Nose fit (0.02 mm clearance): guide says sand if tight, a wrap of tape if loose. Confirm.
 - [ ] **(owner)** Shorter motors than the bay length rattle: add motor spacers to the guide?
 - [ ] **(owner)** Placeholders in the guide and packaging: skill level, age grade, kit numbers, QR codes, UPC (GS1, about $30 per product).
-- [ ] **(owner)** Kit age grade: the packaging says "Ages 12+" to stay a general-use product. Marketing kits to younger kids (Beginner mode, the curriculum) could make them children's products (CPSIA testing, certificate, tracking labels). Confirm with a professional; see `docs/kits/README.md`.
+- [x] ~~**(owner)** Kit age grade~~ (2026-10-18: 12+ confirmed; curriculum under 12 is paper only). Was: the packaging says "Ages 12+" to stay a general-use product. Marketing kits to younger kids (Beginner mode, the curriculum) could make them children's products (CPSIA testing, certificate, tracking labels). Confirm with a professional; see `docs/kits/README.md`.
 - [ ] **(owner)** Test-fly the three kit designs and weigh real prints before printing boxes (packaging numbers come from solid-PLA estimates).
-- [ ] **(owner)** Apply the brand to the app (`docs/brand/brand.md` → *How to apply this to the app*)?
+- [x] ~~**(owner)** Apply the brand to the app~~ (done 2026-10-18) (`docs/brand/brand.md` → *How to apply this to the app*)?
 - [ ] Leading-edge root fillet still doesn't build on the kit designs (known; `geometry/report.md`).
-
+- [ ] **(owner)** Print a test strap and nose (M18) and thread your elastic before the next kit batch; a PETG scrap-joint pull test with medium CA.
+- [ ] **(owner)** Fonts load from Google Fonts on the app; self-host from `/static` if you'd rather avoid the third-party request. 3D part colours still the old palette.

@@ -14,10 +14,10 @@ from functools import lru_cache
 
 import pytest
 
-from rocketgen.body import body_segment, nose_radius_at
+from rocketgen.body import body_segment, nose_cone, nose_radius_at
 from rocketgen.build import build_rocket
 from rocketgen.fins import FinShape
-from rocketgen.geom import as_shape, slice_area
+from rocketgen.geom import as_shape, intersect, slice_area
 from rocketgen.params import DATA_DIR, DesignParams, compute_derived
 
 FIN_SHAPES = list(FinShape)
@@ -238,6 +238,51 @@ def test_anchor_strap_prints_without_supports(motor):
     # Nothing outside half a wall into the wall.
     bb = strap.bounding_box()
     assert max(bb.max.X, -bb.min.X, bb.max.Y, -bb.min.Y) <= ri + d.wall / 2 + 1e-3
+
+
+@pytest.mark.parametrize("motor", ["M13", "M18", "M24", "M24L", "M29"])
+def test_anchor_strap_fits_the_shock_cord(motor):
+    """Elastic shock cord (params.SHOCK_CORDS) goes down the slot behind the
+    bar: a round cord, or a flat one doubled back, across a wide enough
+    stretch of the slot; and the open bore in front of the bar leaves room
+    for the parachute to come out."""
+    from rocketgen.anchor import anchor_strap_geometry
+    from rocketgen.params import CORD_PRINT_MARGIN, shock_cord
+    d = compute_derived(DesignParams(motor=motor))
+    s = anchor_strap_geometry(d)
+    cord = shock_cord(d.mtr_d)
+    ri = d.body_id / 2
+    back = s["front"] + s["t"]  # the bar's back face, from the axis
+
+    def width_at_depth(depth):  # across the slot, where it is at least `depth` deep
+        return 2 * math.sqrt(max(0.0, ri ** 2 - (back + depth) ** 2))
+
+    assert s["hole_depth"] >= cord["round_d"] + CORD_PRINT_MARGIN - 1e-9
+    assert width_at_depth(cord["round_d"]) >= cord["round_d"] + 1.0
+    assert width_at_depth(2 * cord["flat_t"]) >= cord["flat_w"] + 1.0
+    assert ri + s["front"] >= 0.55 * d.body_id  # bore left in front of the bar
+
+
+@pytest.mark.parametrize("motor", ["M13", "M18", "M24", "M29"])
+def test_nose_tie_bar_has_room_for_the_cord(motor):
+    """A round 3 mm cord bent round the tie bar (up one side, over the top,
+    down the other) clears the nose; the nose is one sound solid and every
+    slice of its shoulder keeps at least the plain shoulder wall."""
+    from build123d import Plane, Solid
+    d = compute_derived(DesignParams(motor=motor))
+    nose = nose_cone(d, "tangent_ogive", 3.0 * d.cal)
+    assert nose.is_valid and len(list(nose.solids())) == 1
+    r_cord, bend = 1.5, 3.0  # cord radius; bend radius of its centre line round the bar (2 x 2 mm, centre z = 1)
+    torus = Solid.make_torus(bend, r_cord, Plane.YZ).translate((0, 0, 1.0))
+    top = intersect(torus, Solid.make_box(10, 40, 20).translate((-5, -20, 1.0)))
+    legs = [Solid.make_cylinder(r_cord, 10).translate((0, y, -9.0)) for y in (-bend, bend)]
+    probe = top.fuse(*legs)
+    hit = nose.intersect(probe)
+    assert hit is None or as_shape(hit).volume < 0.01, f"cord probe hits the nose ({as_shape(hit).volume:.2f} mm3)"
+    sh_r_out, sh_r_in = d.shoulder_od / 2, d.shoulder_od / 2 - d.wall
+    annulus = math.pi * (sh_r_out ** 2 - sh_r_in ** 2)
+    for z in [0.5 + i * (d.nose_shoulder_len - 1) / 8 for i in range(9)]:
+        assert slice_area(nose, z) > annulus - 0.05, f"nose shoulder slice at z = {z:.2f}"
 
 
 def test_nose_shoulder_is_shorter_than_body_joints():

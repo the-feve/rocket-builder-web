@@ -23,7 +23,7 @@ export function defineScenes(h) {
   const focusSide = (z0, z1, r) => new THREE.Box3(V(z0, -r, -r), V(z1, r, r));
   const focusUp = (z0, z1, r) => new THREE.Box3(V(-r, -r, z0), V(r, r, z1));
   const P = (key, name) => R[key].info.parts.find(p => p.name === name);
-  const cordR = 0.8;  // about 1.5 mm cord (Kevlar or braided)
+  const cordR = 1.4;  // round 1/8 in elastic (about 3 mm); flat elastic is the same width
 
   // The cord threaded through the anchor strap: down behind the bar, under
   // it, up in front, and tied back onto itself above the bar. Returns the
@@ -31,36 +31,37 @@ export function defineScenes(h) {
   function strapCord(I, { up = 14 } = {}) {
     const S = I.strap;
     const yb = S.front + S.t + S.hole_depth / 2;  // in the slot behind the bar
-    const yf = S.front - 1.6;                       // in front of the bar
+    const yf = S.front - cordR - 0.4;               // in front of the bar
     const apex = S.z_bot + S.spring;                 // the bar's underside at its middle
     const zt = S.z_top;
     const g = new THREE.Group();
-    const kp = V(0.6, yb - 1.2, zt + 4.5);
+    const kp = V(0.6, yb - 1.6, zt + 5.5);
     g.add(tube([V(1.2, yb, zt + up), V(1.2, yb, zt + 6), V(1.2, yb, zt), V(1.0, yb, apex - 1.2), V(0, (yb + yf) / 2, apex - 3.4),
                 V(-1.6, yf, apex - 1.2), V(-1.8, yf, zt + 0.5), kp.clone().add(V(-0.6, -0.6, -0.8))], cordR, COL.cord));
-    g.add(tube([kp.clone().add(V(-0.4, 0.4, 0.6)), V(-2.5, yb - 3.2, zt + 8.5), V(-4, yb - 4.6, zt + 10)], cordR, COL.cord));
-    g.add(knot(kp, 1.25, COL.cord, V(0, 1, 0.6)));
+    g.add(tube([kp.clone().add(V(-0.4, 0.4, 0.8)), V(-2.5, yb - 3.6, zt + 10), V(-4, yb - 5.2, zt + 12)], cordR, COL.cord));
+    g.add(knot(kp, 1.9, COL.cord, V(0, 1, 0.6)));
     return { group: g, top: V(1.2, yb, zt + up), knot: kp };
   }
   // The cord tied round the nose's tie bar (bar along x at the bottom of the
   // shoulder, z = nz .. nz + 2): up one side, over, down, knotted below.
   function noseCord(nz, from) {
     const g = new THREE.Group();
-    const kp = V(0, 0.3, nz - 5);
-    g.add(tube([from, V(0, 2.6, nz - 9), V(0, 2.4, nz), V(0, 1.4, nz + 3.0), V(0, -1.4, nz + 3.0), V(0, -2.4, nz),
-                V(0, -1.4, nz - 4), kp.clone().add(V(0, -0.6, 0.2))], cordR, COL.cord));
-    g.add(knot(kp, 1.2, COL.cord, V(1, 0, 0.3)));
-    g.add(tube([kp.clone().add(V(0, 0.8, -0.6)), V(0, -1.0, nz - 9), V(0, -2.5, nz - 11)], cordR, COL.cord));
+    const kp = V(0, 0.3, nz - 7);
+    const side = 1 + cordR + 0.3, over = nz + 2 + cordR + 0.3;  // round the 2 x 2 mm bar
+    g.add(tube([from, V(0, side, nz - 11), V(0, side, nz + 0.5), V(0, side * 0.6, over), V(0, -side * 0.6, over), V(0, -side, nz + 0.5),
+                V(0, -side * 0.7, nz - 5), kp.clone().add(V(0, -0.8, 0.4))], cordR, COL.cord));
+    g.add(knot(kp, 1.8, COL.cord, V(1, 0, 0.3)));
+    g.add(tube([kp.clone().add(V(0, 1.0, -0.8)), V(0, -1.2, nz - 12), V(0, -3, nz - 14)], cordR, COL.cord));
     return g;
   }
   // A small loop knot in the cord (for the parachute), at p.
-  function loopKnot(p, r = 3) {
+  function loopKnot(p, r = 4) {
     const g = new THREE.Group();
-    const tg = new THREE.TorusGeometry(r, cordR, 12, 48);
+    const tg = new THREE.TorusGeometry(r, cordR * 0.8, 12, 48);
     tg.rotateY(Math.PI / 2);
     tg.translate(p.x, p.y + r * 0.2, p.z - r - 1.2);
     g.add(mesh(tg, COL.cord));
-    g.add(knot(p, 1.25, COL.cord, V(0, 1, 0)));
+    g.add(knot(p, 1.8, COL.cord, V(0, 1, 0)));
     return g;
   }
 
@@ -251,8 +252,8 @@ export function defineScenes(h) {
         root.add(noseCord(nz, V(0, 3, nz - 30)));
         return {
           dir: viewDir(200, -18), up: V(0, 0, 1), W: 1300, line: 2.6, margin: 2,
-          focus: focusUp(nz - 13, nz + I.nose_shoulder_len + 8, 16),
-          points: { bar: V(0, 0, nz + 1), knot: V(0, 0.3, nz - 5) },
+          focus: focusUp(nz - 16, nz + I.nose_shoulder_len + 8, 16),
+          points: { bar: V(0, 0, nz + 1), knot: V(0, 0.3, nz - 7) },
         };
       },
     },

@@ -11,12 +11,12 @@ from dataclasses import dataclass, field
 from build123d import Solid
 
 from .aft import build_aft
-from .body import body_segment, nose_cone
+from .body import body_segment, nose_cone, nose_recess
 from .fins import fin_dimensions
 from .geom import GeometryError
 from .anchor import add_anchor_strap, anchor_strap_geometry
 from .lugs import add_lug, lug_geometry, plan_forward_lug, rod_standoff
-from .params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, Derived, compute_derived
+from .params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, Derived, compute_derived, shock_cord
 from .thread import threaded_cap
 
 
@@ -272,6 +272,10 @@ def build_rocket(params: DesignParams) -> Rocket:
     nose_len, nose_joint = plan.nose_len, plan.nose_joint
     nose_z = top_z - nose_joint
     parts.append(Part("Nose", nose_cone(d, params.nose_shape, nose_len).translate((0, 0, nose_z)), nose_z))
+    side_gap = nose_recess(d)[0] - 1.0  # beside the nose's tie bar
+    if side_gap < shock_cord(d.mtr_d)["pass_d"] - 1e-6:
+        notes.append(f"The nose shoulder is narrow at this wall thickness: the gap beside its tie bar is {side_gap:.1f} mm, "
+                     "so tie on a cord thinner than that (flat 1/8 in elastic, not round).")
     # The cap prints face-down, which is how it is built; its placement is 0.
     parts.append(Part("Motor_Cap", threaded_cap(d.thread), 0.0))
     if lug and params.rod_standoff:
