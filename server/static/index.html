@@ -13,9 +13,13 @@
 <link rel="icon" href="/static/brand/rb-favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/static/brand/rb-apple-touch-icon-180.png">
 <!-- Brand fonts (free, Google Fonts); the system fonts stand in until they load or if they can't. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="preload" href="/static/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  /* Self-hosted (OFL, static/fonts/LICENSE-*.txt): same on every device, no third-party request. */
+  @font-face { font-family:"Inter"; src:url(/static/fonts/inter.woff2) format("woff2"); font-weight:100 900; font-style:normal; font-display:swap; }
+  @font-face { font-family:"Space Grotesk"; src:url(/static/fonts/space-grotesk.woff2) format("woff2"); font-weight:300 700; font-style:normal; font-display:swap; }
+</style>
 <style>
   /* Brand: Rocket Builder by Quiver Design Works (docs/brand/tokens.css, docs/brand/brand.md).
      Core colours: Night #12203A, Paper #F6F1E7, Launch orange #F2652B (the one main action),
@@ -146,6 +150,8 @@
   #viewopts label:has(input:checked), #viewopts button[aria-expanded=true]:not(.go) { color:var(--panel); background:var(--ink); }
   #viewopts label:has(input:focus-visible) { outline:2px solid var(--accent); outline-offset:1px; }
   #viewopts button.go { color:var(--panel); background:var(--ink); margin-right:4px; }
+  #viewopts button.go.unsafe { color:#fff; background:var(--rb-red-700, #C22E33); }  /* a design that isn't safe to fly: it still launches, to show why */
+  a.unsafe { color:var(--err); font-weight:600; }
   #viewopts [hidden] { display:none; }
   /* The launch simulator (launch.html?embed=1) over the 3D view; the scene and report stay as they are. */
   #launchpane { position:absolute; inset:0; z-index:2; padding-top:46px; background:var(--panel); }
@@ -312,9 +318,25 @@
   @media (pointer:coarse) { #tutbar button, .tutnext button { min-height:40px; } }
 
   /* Quick-start welcome for Beginner mode */
-  #kidguide { position:absolute; inset:50px 12px 12px; overflow-y:auto; padding:20px 24px; border:0; border-radius:16px; background:var(--panel); box-shadow:var(--shadow); font-size:14px; line-height:1.5; }
+  #kidguide { position:absolute; inset:50px 12px 12px; overflow-y:auto; padding:28px 32px; border:0; border-radius:16px; background:var(--panel); box-shadow:var(--shadow); font-size:14.5px; line-height:1.55; }
+  /* Quick start, laid out like the printed guides: a kicker, a big heading, short steps, one main button. */
+  #kidguide .kidhero { padding-bottom:18px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+  #kidguide .kidhero .lead { max-width:560px; }
+  #kidguide .kicker { display:block; font:600 11px/1 var(--font-head); letter-spacing:.15em; text-transform:uppercase; color:var(--cta); margin-bottom:10px; }
+  #kidguide .sec { font:700 11px/1 var(--font-head); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+  #kidguide .steps4 { gap:10px; }
+  #kidguide .steps4 li { padding:12px 14px; font-size:13.5px; line-height:1.45; }
+  #kidguide .steps4 li b { display:block; font:650 15px/1.3 var(--font-head); margin:6px 0 2px; }
+  #kidguide .steps4 li span { color:var(--muted); }
+  #kidguide .steps4 li::before { background:var(--cta); color:var(--cta-ink); }
+  #kidguide .safety { margin-top:16px; }
+  #kidguide .safety .lab { display:block; font:700 10.5px/1 var(--font-head); letter-spacing:.12em; text-transform:uppercase; color:var(--cp); margin-bottom:4px; }
+  #kidguide .btns { margin-top:20px; }
+  #kidguide .kidlinks { display:flex; flex-wrap:wrap; gap:4px 18px; margin:12px 0 0; }
+  #kidguide .kidlinks .link { flex:none; padding:4px 0; border:0; background:none; color:var(--accent); font:500 13.5px var(--font-body); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  #kidguide .supplynote.compact { margin-top:18px; padding:0; border:0; background:none; font-size:13px; color:var(--muted); }
   #kidguide[hidden] { display:none; }
-  #kidguide h2 { font:700 26px/1.15 var(--font-head); letter-spacing:-.015em; margin:0 0 6px; }
+  #kidguide h2 { font:700 30px/1.1 var(--font-head); letter-spacing:-.02em; margin:0 0 8px; }
   #kidguide .close { float:right; flex:none; margin-left:8px; padding:4px 12px; font:500 13px var(--font-body); border:0; color:var(--muted); background:transparent; }
   #kidguide .close:hover { color:var(--ink); background:var(--hover); }
   body.beginner #report { max-height:46vh; max-height:46dvh; }
@@ -538,8 +560,15 @@
     #guide, #kidguide { position:fixed; z-index:50; inset:calc(8px + var(--safe-t)) calc(8px + var(--safe-r)) calc(8px + var(--safe-b)) calc(8px + var(--safe-l));
       padding:14px 16px; box-shadow:0 10px 40px rgba(0,0,0,.45); -webkit-overflow-scrolling:touch; }
     #guide .close { position:sticky; top:0; min-height:36px; padding:4px 14px; }
-    #kidguide h2 { font-size:20px; }
+    #kidguide { padding:22px 22px 26px; }
+    #kidguide h2 { font-size:26px; }
     #kidguide .close { position:sticky; top:0; z-index:1; min-height:36px; }
+    /* Phones: the four steps as a simple list, one per line, and a full-width main button. */
+    #kidguide .steps4 { grid-template-columns:1fr; gap:0; }
+    #kidguide .steps4 li { display:grid; grid-template-columns:30px 1fr; column-gap:10px; padding:10px 0; border-radius:0; background:none; border-bottom:1px solid var(--line); }
+    #kidguide .steps4 li::before { grid-row:1 / span 2; margin:2px 0 0; width:26px; height:26px; font-size:13px; }
+    #kidguide .steps4 li b { margin:0; }
+    #kidguide .btns .go { width:100%; }
     body.beginner #report { order:2; max-height:none; }  /* the score right under the 3D view */
     body.beginner #form { order:3; }
   }
@@ -741,25 +770,24 @@
       </div>
       <div id="launchpane" hidden><iframe id="launchframe" title="Launch simulator"></iframe></div>
       <article id="kidguide" aria-label="Quick start" hidden>
-        <button type="button" class="close" id="kidskip">Skip tutorial</button>
-        <h2>Welcome, rocket builder!</h2>
-        <p class="lead">Design your own model rocket, see it in 3D, then print it on a 3D printer and fly it.</p>
-        <div class="supplynote" data-supplies hidden><b>Need to get your own supplies for building and launching?</b> <a href="#" data-supplies-link target="_blank" rel="noopener">Order through my link here to support me!</a> Launch pads, motors, igniters, parachutes, filament and paint, all in one list.
-          <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
-        <h3>How it works</h3>
+        <button type="button" class="close" id="kidskip" aria-label="Skip tutorial">Skip</button>
+        <div class="kidhero">
+          <span class="kicker">Rocket Builder · Quick start</span>
+          <h2>Welcome, rocket builder!</h2>
+          <p class="lead">Design a model rocket, test it in 3D, then print it and fly it.</p>
+        </div>
+        <h3 class="sec">How it works</h3>
         <ol class="steps4">
-          <li><b>Design it.</b> Pick a motor, a height, fins and a nose. Each step explains itself.</li>
-          <li><b>Build and check.</b> Press <i>Build my rocket</i>. It appears here with a stability score.</li>
-          <li><b>Print it.</b> Download the files and print the parts on a 3D printer.</li>
-          <li><b>Fly it!</b> Add a motor and parachute and launch it with a grown-up.</li>
+          <li><b>Design it</b><span>Pick a motor, a height, fins and a nose.</span></li>
+          <li><b>Check it</b><span>Build it here and get a stability score.</span></li>
+          <li><b>Print it</b><span>Download the files for your 3D printer.</span></li>
+          <li><b>Fly it</b><span>Add a motor and parachute. Launch with a grown-up.</span></li>
         </ol>
-        <div class="safety"><b>Safety first:</b> a grown-up handles and launches the motors, in a big open field, following the <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">model rocket safety code</a>.</div>
+        <div class="safety"><span class="lab">Safety first</span>A grown-up handles the motors and launches, in a big open field. <a href="https://nar.org/ModelRocketSafetyCode" target="_blank" rel="noopener">Safety code</a></div>
         <div class="btns">
           <button type="button" class="go" id="kidstart">Start designing</button>
-          <button type="button" class="ghost" id="kidskip2">Skip tutorial</button>
-          <button type="button" class="ghost" id="kidadv">Go to Advanced</button>
-          <button type="button" class="ghost" id="kidfull">Read the full guide</button>
         </div>
+        <p class="kidlinks"><button type="button" class="link" id="kidskip2">Skip tutorial</button><button type="button" class="link" id="kidadv">Advanced mode</button><button type="button" class="link" id="kidfull">Full guide</button></p>
         <p class="hint" id="kidreplay" hidden>You've done the tutorial before. <a href="#" id="replaytut">Replay it</a></p>
         <label class="hint kidpref" id="kidprefrow" hidden><input type="checkbox" id="kidskippref"> Skip the tutorial when I'm signed in (you can change this under your account)</label>
         <details class="moreinfo" id="kidmore">
@@ -823,6 +851,8 @@
           <li>Try it for real: balance your finished rocket (with a motor in) on one finger. That's the blue dot!</li>
         </ul>
         </details>
+        <div class="supplynote compact" data-supplies hidden>Need supplies? <a href="#" data-supplies-link target="_blank" rel="noopener">Shop my list</a>: launch pads, motors, parachutes and filament.
+          <small>As an Amazon Associate, I earn from qualifying purchases.</small></div>
       </article>
       <article id="guide" aria-label="User guide">
         <button type="button" class="close" id="guideclose" hidden>Close guide</button>
@@ -1628,10 +1658,15 @@ const view = document.getElementById('view');
 const launchBtn = document.getElementById('launchbtn'), launchPane = document.getElementById('launchpane'),
   launchFrame = document.getElementById('launchframe');
 let launchId = null;
+// Every built rocket can launch; one that isn't safe (no motor passes, or
+// unstable) gets a red button, and the simulator shows what goes wrong.
+let launchUnsafe = false;
 function setLaunch(r) {
-  launchId = r && r.field && r.id ? r.id : null;
+  launchId = r && r.id ? r.id : null;
+  launchUnsafe = !!(r && (!r.field || !(r.stability && r.stability.ok)));
   launchBtn.hidden = !launchId;
-  if (!launchId) openLaunch(false);
+  launchBtn.classList.toggle('unsafe', launchUnsafe);
+  if (!launchId) openLaunch(false); else openLaunch(!launchPane.hidden);
 }
 function openLaunch(on) {
   on = !!(on && launchId);
@@ -1642,7 +1677,8 @@ function openLaunch(on) {
   }
   launchPane.hidden = !on;
   view.classList.toggle('launching', on);
-  launchBtn.textContent = on ? '◀ Back to 3D model' : '▶ Watch it launch';
+  launchBtn.textContent = on ? '◀ Back to 3D model' : launchUnsafe ? '⚠ Watch it launch' : '▶ Watch it launch';
+  launchBtn.title = launchUnsafe && !on ? "This design isn't safe to fly. Launch it here to see what goes wrong." : '';
   launchBtn.setAttribute('aria-expanded', on);
 }
 launchBtn.addEventListener('click', () => openLaunch(launchPane.hidden));
@@ -1720,6 +1756,18 @@ function rememberBuild(r) {
   if (i >= 0) buildHistory.splice(i, 1);
   buildHistory.unshift(entry);
   buildHistory.length = Math.min(buildHistory.length, 10);
+  shareCompareList();
+}
+// The launch simulator (same origin, in the iframe or its own tab) offers
+// these rockets as ghosts to fly alongside: builds from this visit (instant)
+// and saved designs (it builds them).
+function shareCompareList() {
+  try {
+    sessionStorage.setItem('rbCompare', JSON.stringify({
+      builds: buildHistory.map(e => ({ id: e.id, name: e.name, spec: specLine(e) })),
+      saved: loadMine().map(d => ({ id: d.id, name: baseName(d.name) })),
+    }));
+  } catch {}
 }
 const cmpDlg = document.getElementById('cmpdlg'), cmpSel = document.getElementById('cmpsel'), cmpOut = document.getElementById('cmpout');
 const specLine = e => `${e.params.motor} · ${Math.round(e.result.stability.length_mm)} mm · ${LABELS[e.params.fin_shape] || e.params.fin_shape} fins`;
@@ -2051,7 +2099,12 @@ function fieldHtml(f, kid) {
 }
 // The launch simulator (launch.html): liftoff, parachute and drift in a wind the user sets.
 function launchLink(r, kid) {
-  if (!r.field || !r.id) return '';
+  if (!r.id) return '';
+  if (!r.field || !(r.stability && r.stability.ok)) {
+    const a = `<a href="/launch?build=${encodeURIComponent(r.id)}" data-launch class="unsafe">⚠ ${kid ? 'Launch it anyway' : 'Launch simulator'}</a>`;
+    return kid ? `<p>${a} in the simulator to see what would go wrong. (Never fly it for real.)</p>`
+               : `<li>${a}: not safe to fly; the simulator shows what goes wrong.</li>`;
+  }
   const a = `<a href="/launch?build=${encodeURIComponent(r.id)}" data-launch>${kid ? '▶ Watch it launch' : 'Launch simulator'}</a>`;
   return kid ? `<p>${a}: see it take off, open its parachute and drift, and set the wind to see the field you need.</p>`
              : `<li>${a}: the flight and landing spot in any wind, and the field size for it.</li>`;
@@ -2295,6 +2348,7 @@ function renderMine() {
   mineEl.innerHTML = `<option value="">My rockets (${list.length} ${user ? 'in your account' : 'saved in this browser'})…</option>` +
     list.map(d => `<option value="${esc(d.id)}" ${current?.id === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('');
   renderState();
+  shareCompareList();
 }
 // A design with an overall height is a beginner design; any other saved
 // design opens in Advanced. An empty one (New rocket) keeps the current mode.

@@ -9,9 +9,13 @@
 <title>Launch Simulator · Rocket Builder</title>
 <script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');  // inside the designer's 3D view</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/static/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  /* Self-hosted (OFL, static/fonts/LICENSE-*.txt): same on every device, no third-party request. */
+  @font-face { font-family:"Inter"; src:url(/static/fonts/inter.woff2) format("woff2"); font-weight:100 900; font-style:normal; font-display:swap; }
+  @font-face { font-family:"Space Grotesk"; src:url(/static/fonts/space-grotesk.woff2) format("woff2"); font-weight:300 700; font-style:normal; font-display:swap; }
+</style>
 <style>
   /* Brand: docs/brand/tokens.css (copied here: docs/ isn't served). The flight scene uses the
      kit-packaging style (docs/kits/packaging): blueprint grid, line-drawn rocket with orange
@@ -110,6 +114,28 @@
   .embed main { padding:8px 12px 24px; display:flex; flex-direction:column; }
   .embed .stage { order:-1; margin-top:0; }  /* the flight first; the controls and numbers below it */
   .embed .controls { margin-top:10px; }
+  /* A design that isn't safe to fly: it still launches, in red, to show why. */
+  button.primary.danger { background:var(--rb-red); border-color:var(--rb-red); color:#fff; }
+  .phase.bad { background:var(--rb-red); color:#fff; }
+  .danger { margin-top:12px; padding:12px 14px; border:1.5px solid var(--rb-red); border-radius:10px; background:var(--errbg); }
+  .danger:empty { display:none; }
+  .danger h3 { margin:0 0 6px; font:700 15px/1.25 var(--head); color:var(--err); }
+  .danger ul { margin:0; padding-left:18px; } .danger li { margin:5px 0; }
+  .danger li b { color:var(--err); } .danger li.lv-warn b { color:var(--ink); }
+  .danger p { margin:8px 0 0; font-size:12.5px; color:var(--muted); }
+  /* Compare: other rockets flown alongside as see-through ghosts */
+  .cmp { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px; font-size:13px; }
+  .cmp > .lbl { font:600 11.5px/1.2 var(--head); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .cmp select { font:500 14px var(--body); }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 6px 4px 10px; border:1.5px solid var(--line); border-radius:999px; background:var(--card); }
+  .chip i { width:12px; height:12px; border-radius:50%; flex:none; opacity:.85; }
+  .chip small { color:var(--muted); font-family:var(--head); font-variant-numeric:tabular-nums; }
+  .chip button { padding:0 6px; border:0; font-size:15px; line-height:1; color:var(--muted); }
+  table.cmpt { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; font-variant-numeric:tabular-nums; }
+  table.cmpt th, table.cmpt td { text-align:left; padding:6px 8px 6px 0; border-bottom:1px solid var(--line); }
+  table.cmpt th { font:600 11px var(--head); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  table.cmpt td:first-child { font-weight:600; }
+  table.cmpt i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
 </style>
 </head>
 <body>
@@ -132,12 +158,15 @@
     <button class="primary" id="play">▶ Launch</button>
     <button id="skip">Skip to landing</button>
   </div>
+  <div class="cmp" id="cmp" hidden><span class="lbl">Fly alongside</span><select id="cmpadd" aria-label="Add a rocket to compare"></select><span id="cmpchips" style="display:contents"></span></div>
   <div class="stage" id="stagebox" hidden>
     <span class="clock" id="clock">T+0.0 s</span><span class="phase" id="phase"></span>
     <svg id="stage" viewBox="0 0 1000 520" role="img" aria-label="Side view of the simulated flight"></svg>
   </div>
+  <div id="danger" class="danger" role="status"></div>
   <div id="warn" class="warn"></div>
   <div class="stats" id="stats"></div>
+  <div id="cmptable"></div>
   <section id="fieldsec" hidden>
     <h2>Launch field you need</h2>
     <div class="fieldwrap">
@@ -183,6 +212,8 @@ async function load(opts = {}) {
   data = await r.json();
   $('controls').hidden = $('stagebox').hidden = $('fieldsec').hidden = false;
   fillPickers();
+  if (opts.ghosts !== false) await reloadGhosts();
+  fillCompare();
   draw();
   stats();
   field();
@@ -199,8 +230,9 @@ function fillPickers() {
 // ---- the rocket, drawn like the kit box: flat side view, Paper-white body, Night outline,
 // orange fins (fletching) and two orange chevrons. Proportions from the build (data.shape, mm),
 // shown at a fixed length in px; very slim rockets are fattened a little so they read at this size.
-function rocketShape(len) {
-  const sh = data.shape || { length_mm: 300, od_mm: 21, nose_mm: 64, fin: { root: 49, span: 25, tip: 24, sweep: 24 } };
+function rocketShape(len, shape, col) {
+  col = col || { body: C.paper, fin: C.orange, line: C.night };
+  const sh = shape || data.shape || { length_mm: 300, od_mm: 21, nose_mm: 64, fin: { root: 49, span: 25, tip: 24, sweep: 24 } };
   const k = len / sh.length_mm, fat = Math.max(1, 6 / (sh.od_mm * k));
   const R = sh.od_mm * k * fat / 2, n = Math.min(sh.nose_mm * k, len * 0.32), f = sh.fin;
   const root = f.root * k, span = Math.max(f.span * k * Math.min(fat, 1.6), 3), tip = f.tip * k, sweep = f.sweep * k * Math.min(fat, 1.6);
@@ -208,13 +240,14 @@ function rocketShape(len) {
   const cap = Math.max(2, len * 0.025), yE = -cap, top = -len;
   const fin = s => `M${s * R} ${yE - root}L${s * (R + span)} ${yE - root + sweep}L${s * (R + span)} ${Math.min(yE - root + sweep + tip, 0)}L${s * R} ${yE}Z`;
   const g = el('g', {});
-  el('path', { d: `${fin(1)} ${fin(-1)}`, fill: C.orange, class: 'r-line', stroke: C.night, 'stroke-width': 1.3, 'stroke-linejoin': 'round' }, g);
+  const lc = col.ghost ? '' : 'r-line';  // ghosts keep their own colour in dark mode
+  el('path', { d: `${fin(1)} ${fin(-1)}`, fill: col.fin, class: lc, stroke: col.line, 'stroke-width': 1.3, 'stroke-linejoin': 'round' }, g);
   el('path', { d: `M0 ${top}C${R * .42} ${top + n * .22} ${R} ${top + n * .55} ${R} ${top + n}V${yE}H${-R}V${top + n}C${-R} ${top + n * .55} ${-R * .42} ${top + n * .22} 0 ${top}Z`,
-    fill: C.paper, class: 'r-line', stroke: C.night, 'stroke-width': 1.3, 'stroke-linejoin': 'round' }, g);
-  el('path', { d: `M${-R} ${top + n}H${R}`, class: 'r-line', stroke: C.night, 'stroke-width': .8 }, g);
-  el('rect', { x: -R * .8, y: yE, width: R * 1.6, height: cap, rx: .8, fill: C.paper, class: 'r-line', stroke: C.night, 'stroke-width': 1 }, g);
+    fill: col.body, class: lc, stroke: col.line, 'stroke-width': 1.3, 'stroke-linejoin': 'round' }, g);
+  el('path', { d: `M${-R} ${top + n}H${R}`, class: lc, stroke: col.line, 'stroke-width': .8 }, g);
+  el('rect', { x: -R * .8, y: yE, width: R * 1.6, height: cap, rx: .8, fill: col.body, class: lc, stroke: col.line, 'stroke-width': 1 }, g);
   const cy = top + n + (len - n) * 0.22, cw = R * .75, ch = Math.max(2.2, R * .55);
-  for (const dy of [0, ch * 1.5])
+  if (!col.ghost) for (const dy of [0, ch * 1.5])
     el('path', { d: `M${-cw} ${cy + dy + ch}L0 ${cy + dy}L${cw} ${cy + dy + ch}v${ch * .55}L0 ${cy + dy + ch * .45}L${-cw} ${cy + dy + ch * 1.55}Z`, fill: C.orange }, g);
   return { g, R, len };
 }
@@ -241,7 +274,8 @@ function draw() {
   [W, H] = narrow ? [420, 560] : [1000, 520]; GROUND = H - 78;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const f = data.field;
-  const xs = data.path.map(p => p[1]), hs = data.path.map(p => p[2]);
+  const all = [data, ...ghosts.filter(g => g.data).map(g => g.data)];
+  const xs = all.flatMap(d => d.path.map(p => p[1])), hs = all.flatMap(d => d.path.map(p => p[2]));
   // The view also takes in the field (pad to its downwind edge) so its marker fits.
   const fx0 = -f.pad_from_upwind_m, fx1 = f.length_m - f.pad_from_upwind_m;
   const xmin = Math.min(-10, fx0, ...xs), xmax = Math.max(10, fx1, ...xs), top = Math.max(20, ...hs);
@@ -302,7 +336,17 @@ function draw() {
   const lx = view.X(data.landing_m);
   el('path', { d: `M${lx} ${GROUND + 2} l-6 11 h12z`, fill: C.orange, class: 'r-line', stroke: C.night, 'stroke-width': 1, 'stroke-linejoin': 'round' }, svg);
   const anchor = lx > W - 110 ? 'end' : lx < 110 ? 'start' : 'middle';
-  el('text', { x: Math.min(W - 6, Math.max(6, lx)), y: GROUND + 36, 'text-anchor': anchor, class: 's-text' }, svg).textContent = landingText();
+  const crash = data.events.landing.speed_ms > 10;
+  el('text', { x: Math.min(W - 6, Math.max(6, lx)), y: GROUND + 36, 'text-anchor': anchor, class: 's-text', style: crash ? 'fill:var(--rb-red)' : '' }, svg).textContent = landingText();
+  // ghosts: other rockets' whole flights, faint, in their own colours, with a see-through rocket each
+  for (const g of ghosts) {
+    if (!g.data) continue;
+    el('polyline', { points: g.data.path.map(pt).join(' '), fill: 'none', stroke: g.color, 'stroke-width': 2, 'stroke-opacity': .45, 'stroke-dasharray': '3 5', 'stroke-linecap': 'round' }, svg);
+    const gl = view.X(g.data.landing_m);
+    el('path', { d: `M${gl} ${GROUND + 2} l-5 9 h10z`, fill: g.color, 'fill-opacity': .7 }, svg);
+    g.el = el('g', { opacity: .55 }, svg);
+    g.el.appendChild(rocketShape(narrow ? 50 : 64, g.data.shape, { body: g.color, fin: g.color, line: g.color, ghost: true }).g);
+  }
   // trail: orange dotted exhaust while the motor burns, then the dashed flight arc
   fireEnd = data.events.burnout?.t ?? 0;
   trailArc = el('polyline', { points: '', fill: 'none', class: 's-trail', 'stroke-width': 1.8, 'stroke-dasharray': '6 5', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
@@ -328,25 +372,42 @@ function niceStep(top) {
 }
 function landingText() {
   const d = Math.abs(Math.round(data.landing_m));
+  if (data.events.landing.speed_ms > 10) return `CRASHES at ${Math.round(data.events.landing.speed_ms)} m/s, ${d} m ${data.landing_m > 0 ? 'downwind' : data.landing_m < 0 ? 'upwind' : 'away'}`;
   return d < 2 ? 'lands by the pad' : `lands ${d} m (${ft(d)} ft) ${data.landing_m > 0 ? 'downwind' : 'upwind'}`;
 }
 
 // ---- animation: real time going up, 4× faster under the parachute
 function speedAt(t) { return t < (data.events.eject?.t ?? 1e9) + 1 ? 1 : 4; }
-function sampleAt(t) {
-  const P = data.path;
+function sampleAt(t, d = data) {
+  const P = d.path;
   let i = P.findIndex(p => p[0] >= t);
-  if (i <= 0) return { p: P[Math.max(0, i)], i: Math.max(0, i), ang: 0 };
-  const a = P[i - 1], b = P[i], f = (t - a[0]) / (b[0] - a[0] || 1);
+  if (i < 0) i = P.length - 1;
+  if (i === 0) return { p: P[0], i: 0, ang: 0 };
+  const a = P[i - 1], b = P[i], f = Math.min(1, (t - a[0]) / (b[0] - a[0] || 1));
   const x = a[1] + (b[1] - a[1]) * f, h = a[2] + (b[2] - a[2]) * f;
-  const ang = Math.atan2(b[1] - a[1], b[2] - a[2]) * 180 / Math.PI;
+  // The server sends the rocket's attitude (degrees from vertical); without it, follow the path.
+  const ang = a.length > 4 && b[3] !== 'landed' ? a[4] + (b[4] - a[4]) * f : Math.atan2(b[1] - a[1], b[2] - a[2]) * 180 / Math.PI;
   return { p: [t, x, h, b[3]], i, ang };
 }
 const narrow = () => W < 600;
 const pt = q => `${view.X(q[1]).toFixed(1)},${view.Y(q[2]).toFixed(1)}`;
 const PHASES = { rod: 'Liftoff!', boost: 'Motor burning', coast: 'Coasting up', chute: 'Parachute out', landed: 'Landed' };
+const kinds = () => new Set((data.dangers || []).map(d => d.kind));
+function phaseText(ph) {
+  // A bad flight says what's going wrong while it happens.
+  const k = kinds();
+  if (ph === 'boost' || ph === 'coast') {
+    if (k.has('tumble')) return ['Tumbling!', true];
+    if (k.has('wobble')) return ['Wobbling off course', true];
+    if (k.has('windturn') || k.has('slow')) return [ph === 'boost' ? 'Too slow: tipping over' : 'Arcing over low', true];
+  }
+  if (ph === 'landed' && data.events.landing.speed_ms > 10) return ['Crashed', true];
+  if (ph === 'chute' && (k.has('noeject') || k.has('lowchute'))) return ['Parachute too late', true];
+  return [PHASES[ph] || '', false];
+}
 function render(t) {
-  const end = data.path[data.path.length - 1][0];
+  const own = data.path[data.path.length - 1][0];
+  const end = Math.max(own, ...ghosts.filter(g => g.data).map(g => g.data.path[g.data.path.length - 1][0]));
   t = Math.min(t, end);
   const { p, i, ang } = sampleAt(t);
   const X = view.X(p[1]), Y = view.Y(p[2]), here = `${X.toFixed(1)},${Y.toFixed(1)}`;
@@ -355,8 +416,14 @@ function render(t) {
   const fire = nf < 0 ? done : done.slice(0, nf + 1), rest = nf < 0 ? [] : done.slice(nf);
   trailFire.setAttribute('points', (nf < 0 ? fire.map(pt).concat(here) : fire.map(pt)).join(' '));
   trailArc.setAttribute('points', nf < 0 ? '' : rest.map(pt).concat(here).join(' '));
-  const ph = t >= end ? 'landed' : p[3];
+  const ph = t >= own ? 'landed' : p[3];
   const under = ph === 'chute' || ph === 'landed';
+  for (const g of ghosts) {
+    if (!g.el || !g.data) continue;
+    const gs = sampleAt(t, g.data), gp = gs.p, gl = t >= g.data.path[g.data.path.length - 1][0] || gp[3] === 'landed';
+    const gx = view.X(gp[1]), gy = view.Y(gp[2]);
+    g.el.setAttribute('transform', gl ? `translate(${gx - rocketLen / 2} ${gy - 4}) rotate(90)` : `translate(${gx} ${gy}) rotate(${gp[3] === 'chute' ? 0 : gs.ang})`);
+  }
   if (ph === 'landed') {
     rocketG.setAttribute('transform', `translate(${X - rocketLen / 2} ${Y - rocketR - 1}) rotate(90)`);
     restG.setAttribute('visibility', 'visible');
@@ -372,7 +439,8 @@ function render(t) {
   const pf = t < 0.05 ? 0 : Math.max(0, 1 - (t - 0.3) / 3.5);
   puffG.setAttribute('opacity', pf.toFixed(2));
   $('clock').textContent = `T+${t.toFixed(1)} s`;
-  $('phase').textContent = PHASES[ph] || '';
+  const [ptxt, bad] = phaseText(ph);
+  $('phase').textContent = ptxt; $('phase').classList.toggle('bad', bad);
   marks.innerHTML = '';
   const ev = data.events;
   if (ev.apogee && t >= ev.apogee.t) mark(ev.apogee, `APOGEE ${Math.round(ev.apogee.h)} m · ${ft(ev.apogee.h)} ft`, -12, true);
@@ -389,7 +457,7 @@ function mark(e, txt, dy, tick) {
 function start() {
   cancelAnimationFrame(raf);
   simT = 0; t0 = performance.now(); playing = true;
-  $('play').textContent = '↻ Launch again';
+  $('play').textContent = data.safe ? '↻ Launch again' : '⚠ Launch anyway';
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { render(1e9); playing = false; return; }
   let last = t0;
   const tick = now => {
@@ -411,8 +479,13 @@ function stats() {
   ];
   $('stats').innerHTML = tiles.map(([k, v, s]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${esc(s)}</div></div>`).join('');
   const w = [...data.warnings];
-  if (!data.safe) w.unshift(`The ${data.code} isn't a safe pick for this rocket: ${data.problems.join(', ').toLowerCase()}.`);
+  const ds = data.dangers || [], bad = ds.some(d => d.level === 'danger') || !data.safe;
+  if (!data.safe && !ds.length) w.unshift(`The ${data.code} isn't a safe pick for this rocket: ${data.problems.join(', ').toLowerCase()}.`);
   $('warn').innerHTML = w.map(esc).join('<br>');
+  $('play').classList.toggle('danger', bad);
+  $('danger').innerHTML = ds.length ? `<h3>${bad ? '⚠ Not safe to fly' : 'Heads up'}</h3><ul>${ds.map(d =>
+    `<li class="lv-${d.level}"><b>${esc(d.title)}.</b> ${esc(d.text)}</li>`).join('')}</ul>${bad ? '<p>This is only a simulation, so you can see what would go wrong. Never fly this design for real: change it in Rocket Builder until it gets a ✓.</p>' : ''}` : '';
+  cmpTable();
   const mph = +$('wind').value;
   $('windhint').textContent = mph > data.max_wind_mph ? 'Too windy to launch (over 20 mph)' : mph >= 15 ? 'Gusty: use a smaller parachute or a streamer' : mph >= 5 ? 'A normal breeze' : 'Calm';
 }
@@ -452,13 +525,85 @@ function field() {
     </ul>`;
 }
 
+// ---- compare: other rockets flown alongside (same wind), from the designer's list
+const GHOST_COLORS = ['#3D8BFD', '#2FB67C', '#9B7BF0'];
+let ghosts = [];  // [{key, name, color, buildId, data, err}]
+const cmpList = () => { try { return JSON.parse(sessionStorage.getItem('rbCompare') || '{}'); } catch { return {}; } };
+function fillCompare() {
+  const L = cmpList(), used = new Set(ghosts.map(g => g.key));
+  const builds = (L.builds || []).filter(b => b.id !== buildId && !used.has('b' + b.id));
+  const saved = (L.saved || []).filter(d => !used.has('d' + d.id));
+  $('cmp').hidden = !builds.length && !saved.length && !ghosts.length;
+  const full = ghosts.length >= GHOST_COLORS.length;
+  $('cmpadd').innerHTML = `<option value="">${full ? 'Up to 3 at a time' : '+ Add a rocket…'}</option>` + (full ? '' :
+    (builds.length ? `<optgroup label="Built this visit">${builds.map(b => `<option value="b${esc(b.id)}">${esc(b.name)} · ${esc(b.spec)}</option>`).join('')}</optgroup>` : '') +
+    (saved.length ? `<optgroup label="My rockets (builds it, up to 30 s)">${saved.map(d => `<option value="d${esc(d.id)}">${esc(d.name)}</option>`).join('')}</optgroup>` : ''));
+  $('cmpchips').innerHTML = ghosts.map((g, i) => `<span class="chip"><i style="background:${g.color}"></i>${esc(g.name)}
+    <small>${g.err ? esc(g.err) : g.data ? `${Math.round(g.data.apogee_m)} m · ${g.data.code}` : 'building…'}</small>
+    <button type="button" data-rm="${i}" aria-label="Stop comparing ${esc(g.name)}">×</button></span>`).join('');
+}
+async function ghostFlight(g) {
+  const q = new URLSearchParams({ wind_mph: $('wind').value });
+  const r = await fetch(`/api/builds/${encodeURIComponent(g.buildId)}/launch?${q}`);
+  if (r.status === 404) throw new Error('no longer in memory: build it again');
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || "couldn't fly it");
+  return r.json();
+}
+let optsCache = null;
+async function buildSaved(id) {
+  const d = await (await fetch(`/api/designs/${encodeURIComponent(id)}`)).json();
+  optsCache = optsCache || await (await fetch('/api/options')).json();
+  const p = Object.fromEntries(Object.entries({ ...optsCache.defaults, ...d.params }).filter(([k]) => k in optsCache.defaults));
+  const r = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof body.detail === 'string' ? body.detail : "couldn't build it");
+  return body.id;
+}
+async function addGhost(v) {
+  const L = cmpList(), kind = v[0], id = v.slice(1);
+  const src = kind === 'b' ? (L.builds || []).find(b => b.id === id) : (L.saved || []).find(d => d.id === id);
+  const color = GHOST_COLORS.find(c => !ghosts.some(g => g.color === c));
+  const g = { key: v, name: src ? src.name : 'Rocket', color, buildId: kind === 'b' ? id : null };
+  ghosts.push(g); fillCompare();
+  try {
+    if (!g.buildId) g.buildId = await buildSaved(id);
+    g.data = await ghostFlight(g);
+  } catch (e) { g.err = e.message; }
+  if (!ghosts.includes(g)) return;  // removed meanwhile
+  fillCompare(); draw(); stats(); start();
+}
+async function reloadGhosts() {
+  await Promise.all(ghosts.filter(g => g.buildId).map(async g => {
+    try { g.data = await ghostFlight(g); g.err = null; } catch (e) { g.err = e.message; g.data = null; }
+  }));
+}
+function cmpTable() {
+  const gs = ghosts.filter(g => g.data);
+  if (!gs.length) { $('cmptable').innerHTML = ''; return; }
+  const row = (name, color, d) => `<tr><td><i style="background:${color}"></i>${esc(name)}</td><td>${esc(d.motor)}</td>
+    <td>${Math.round(d.apogee_m)} m</td><td>${d.events.rod?.speed_ms ?? '–'} m/s</td>
+    <td>${Math.abs(Math.round(d.landing_m))} m${d.events.landing.speed_ms > 10 ? ' <b style="color:var(--err)">crash</b>' : ''}</td><td>${d.field.length_m} m</td>
+    <td>${d.safe ? '✓' : '<b style="color:var(--err)">⚠ unsafe</b>'}</td></tr>`;
+  $('cmptable').innerHTML = `<table class="cmpt"><thead><tr><th>Rocket</th><th>Motor</th><th>Highest</th><th>Off the rod</th><th>Lands</th><th>Field</th><th>Safe</th></tr></thead><tbody>
+    ${row('This rocket', C.orange, data)}${gs.map(g => row(g.name, g.color, g.data)).join('')}</tbody></table>`;
+}
+$('cmpadd').addEventListener('change', e => { const v = e.target.value; e.target.value = ''; if (v) addGhost(v); });
+$('cmpchips').addEventListener('click', e => {
+  const b = e.target.closest('[data-rm]');
+  if (!b) return;
+  ghosts.splice(Number(b.dataset.rm), 1);
+  ghosts.forEach((g, i) => g.color = GHOST_COLORS[i]);
+  fillCompare(); draw(); stats(); render(simT);
+});
+addEventListener('storage', e => { if (e.key === 'rbCompare') fillCompare(); });
+
 let timer;
 $('wind').addEventListener('input', () => {
   $('windout').textContent = `${$('wind').value} mph (${Math.round($('wind').value * 1.609)} km/h)`;
   clearTimeout(timer); timer = setTimeout(() => load({ motor: data?.code, delay: data?.delay_s }), 200);
 });
-$('motor').addEventListener('change', () => load({ motor: $('motor').value }));
-$('delay').addEventListener('change', () => load({ motor: $('motor').value, delay: $('delay').value }));
+$('motor').addEventListener('change', () => load({ motor: $('motor').value, ghosts: false }));
+$('delay').addEventListener('change', () => load({ motor: $('motor').value, delay: $('delay').value, ghosts: false }));
 $('play').addEventListener('click', start);
 $('skip').addEventListener('click', () => { cancelAnimationFrame(raf); simT = 1e9; render(simT); });
 let lastNarrow = null;

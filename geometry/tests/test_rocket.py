@@ -462,3 +462,22 @@ def test_critical_fit_overrides():
     assert nose.local.bounding_box().size.Z == pytest.approx(9.0 + d.joint_rise + r.params.nose_fineness * d.cal, abs=0.05)
     # A longer body joint alone: the nose follows it (70%).
     assert compute_derived(DesignParams(shoulder_len=20.0)).nose_shoulder_len == pytest.approx(14.0)
+
+
+def test_launch_profile_shows_unsafe_flights():
+    """The launch page's flight: stable rockets fly as before; a negative
+    margin tumbles (spins, barely climbs, crashes); a margin under 1 wobbles
+    and flies lower; a too-heavy rocket crawls off the rod into the wind."""
+    from rocketgen import flight as fl
+    b6 = next(m for m in fl.load_flight_motors() if m.code == "B6")
+    stable = fl.launch_profile(b6, 50, 23, 12, fl.WIND_MS)
+    assert fl.launch_profile(b6, 50, 23, 12, fl.WIND_MS, margin_cal=1.5, length_mm=300)["path"] == stable["path"]
+    assert not stable["dangers"]
+    tumble = fl.launch_profile(b6, 50, 23, 12, fl.WIND_MS, margin_cal=-0.5, length_mm=300)
+    assert tumble["turns"] >= 2 and tumble["apogee_m"] < 0.3 * stable["apogee_m"]
+    assert {"tumble", "crash"} <= {d["kind"] for d in tumble["dangers"]}
+    wobble = fl.launch_profile(b6, 50, 23, 12, fl.WIND_MS, margin_cal=0.5, length_mm=300)
+    assert wobble["apogee_m"] < stable["apogee_m"] and "wobble" in {d["kind"] for d in wobble["dangers"]}
+    a8 = next(m for m in fl.load_flight_motors() if m.code == "A8")
+    heavy = fl.launch_profile(a8, 80, 23, 12, fl.WIND_MS, margin_cal=1.5, length_mm=300)
+    assert {"slow", "windturn"} <= {d["kind"] for d in heavy["dangers"]} and heavy["landing_m"] < 0  # tipped upwind

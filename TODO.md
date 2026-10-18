@@ -95,4 +95,4 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [x] ~~**(owner)** Apply the brand to the app~~ (done 2026-10-18) (`docs/brand/brand.md` → *How to apply this to the app*)?
 - [ ] Leading-edge root fillet still doesn't build on the kit designs (known; `geometry/report.md`).
 - [ ] **(owner)** Print a test strap and nose (M18) and thread your elastic before the next kit batch; a PETG scrap-joint pull test with medium CA.
-- [ ] **(owner)** Fonts load from Google Fonts on the app; self-host from `/static` if you'd rather avoid the third-party request. 3D part colours still the old palette.
+- [x] ~~Fonts self-hosted~~ (2026-10-18). Still open: 3D part colours use the old palette.

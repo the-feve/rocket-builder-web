@@ -115,6 +115,8 @@
     <dl>
       <dt>Two-dimensional flight in a steady wind <span class="ours">Our choice</span></dt>
       <dd>The same thrust, mass and drag as the altitude simulation, in two dimensions with the wind along the ground. Off the rod the rocket points into its own airflow (a stable rocket turns into the wind, called weathercocking); the parachute opens over half a second at burnout + delay and drifts with the wind. The field covers the landing spot with 25% extra for gusts, and is never smaller than the safety-code size.</dd>
+      <dt>Unsafe designs: wobble and tumble <span class="ours">Our choice</span></dt>
+      <dd>So the simulator can show why a design isn't safe, a rocket under 1 caliber of stability gets a simple pitch model instead of pointing straight into its airflow: the fins' restoring push grows with the margin and the square of the airspeed, with light damping, and a small nudge as it leaves the rod. Under 1 cal it wobbles off course; under 0 cal (push point ahead of the balance point) it tumbles, and side-on to the air its drag is many times higher, so it barely climbs. The numbers are tuned to look right, not measured: treat these flights as examples of what goes wrong, not predictions. A safe landing is taken as under 10 m/s.</dd>
     </dl>
   </section>
 
