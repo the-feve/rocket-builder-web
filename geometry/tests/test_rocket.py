@@ -310,6 +310,34 @@ def test_rod_line_clears_motor_cap():
     assert lug["center_r"] - lug["standoff_ro"] >= d.thread["r_cap_max"] + 0.5 - 1e-9
 
 
+def test_lug_bore_is_4mm_for_eighth_inch_rod():
+    # Owner, 2026-10-18: the 3.775 mm bore was a little too snug on a 1/8 in rod.
+    from build123d import Solid
+    from rocketgen.lugs import LUG_BORE_CLEARANCE, lug_geometry
+    d = compute_derived(DesignParams())
+    lug = lug_geometry(d, 3.175, True, 15.0)
+    assert 2 * lug["bore_r"] == pytest.approx(4.0, abs=1e-9)
+    assert 2 * lug_geometry(d, 6.35, True, 15.0)["bore_r"] == pytest.approx(6.35 + 2 * LUG_BORE_CLEARANCE)
+    assert lug["standoff_ri"] == pytest.approx(3.175 / 2 - d.fit_press)  # the clip still grips the rod
+    # The built aft (both lugs on it): a 3.98 mm rod along the rod line
+    # passes clean through, a 4.1 mm one doesn't.
+    r = rocket()
+    aft = r.parts[0].assembled
+    a = math.radians(180 / r.params.fin_count)
+    c = (lug["center_r"] * math.cos(a), lug["center_r"] * math.sin(a))
+    h = aft.bounding_box().max.Z + 10
+
+    def rod(dia):
+        return Solid.make_cylinder(dia / 2, h + 10).translate((c[0], c[1], -10))
+
+    def overlap(dia):
+        x = as_shape(aft.intersect(rod(dia)))
+        return 0.0 if x is None else x.volume
+
+    assert overlap(3.98) < 1e-6
+    assert overlap(4.1) > 0.01
+
+
 # ---- stability ------------------------------------------------------------
 
 def test_nose_cp_matches_textbook_values():
