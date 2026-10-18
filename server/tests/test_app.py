@@ -221,6 +221,22 @@ def test_launch_simulator():
     assert "The NAR Safety Code" in client.get(f"/api/builds/{r['id']}/launch?wind_mph=25").json()["warnings"][-1]
 
 
+def test_unsafe_rocket_still_launches_and_says_why():
+    """An unstable design (or a motor that fails) still flies in the simulator,
+    marked unsafe, with plain-words reasons and its attitude along the path."""
+    body = client.post("/api/build", json=SMALL_FINS).json()
+    assert not body["stability"]["ok"]
+    out = client.get(f"/api/builds/{body['id']}/launch?wind_mph=10")
+    assert out.status_code == 200
+    d = out.json()
+    assert not d["safe"] and d["margin_cal"] < 1
+    assert {x["kind"] for x in d["dangers"]} & {"tumble", "wobble"}
+    assert all(len(p) == 5 for p in d["path"])  # t, x, h, phase, attitude
+    good = client.post("/api/build", json={}).json()
+    calm = client.get(f"/api/builds/{good['id']}/launch?wind_mph=0").json()
+    assert calm["safe"] and not [x for x in calm["dangers"] if x["level"] == "danger"]
+
+
 def test_body_od_offset():
     o = client.get("/api/options").json()
     stock = o["stock_od"]["M18"]

@@ -181,8 +181,28 @@ MPH = 0.44704  # m/s
 MAX_WIND_MPH = 20  # the NAR Safety Code: don't launch in winds over 20 mph
 
 
+# Pitch model for rockets that aren't stable enough (margin under 1 cal), so the
+# launch page can show why they're unsafe. Stable rockets keep the simple
+# model: they point straight into their own airflow (weathercocking).
+# Under 1 cal the fins' restoring moment is weak, so the rocket's attitude is
+# integrated: angular acceleration -K * margin * v^2 * sin(off-angle), with
+# light aerodynamic damping. Below 0 cal the push point is ahead of the
+# balance point and the rocket tumbles (a spin that builds up to a few turns
+# a second). Side-on to the airflow, a rocket has far more drag (the side
+# area L x D at Cd ~1.2), which is what stops a tumbling rocket climbing.
+# K and the damping give a stable 1.5 cal rocket a few hertz of weathercock
+# wobble at 30 m/s, the usual size for model rockets. Deterministic: no random
+# gusts, so the same design always flies the same way.
+PITCH_K = 0.26  # 1 / (m^2 cal)
+PITCH_DAMP = 0.13  # 1 / m
+TIP_OFF = 2.0  # rad/s nudge leaving the rod (rod whip, thrust misalignment, a gust): enough to show the wobble
+TUMBLE_RATE = 2.5 * 2 * math.pi  # rad/s, a tumble's full spin
+CD_SIDE = 1.2
+
+
 def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in: float | None,
-                   wind_ms: float = WIND_MS, delay: int | None = None, cd: float = 0.65, rod_m: float = 0.91) -> dict:
+                   wind_ms: float = WIND_MS, delay: int | None = None, cd: float = 0.65, rod_m: float = 0.91,
+                   margin_cal: float | None = None, length_mm: float | None = None) -> dict:
     """A whole flight in two dimensions, for the launch page: up the rod,
     boost and coast, the ejection charge at burnout + delay, then down under
     the parachute, with the wind blowing along +x.
@@ -193,8 +213,13 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
     its flat diameter) acts on the speed through the air, so it falls at
     `descent_rate` and drifts at about the wind speed. `rocket_mass_g` is
     the rocket without the motor; it lands with the motor's empty casing.
-    Returns the sampled path (every 0.05 s: t, x, h, phase), the events and
-    the landing distance (negative = upwind of the pad)."""
+    Returns the sampled path (every 0.05 s: t, x, h, phase, attitude in
+    degrees from vertical, + downwind), the events, the landing distance
+    (negative = upwind of the pad) and `dangers`: what makes this flight
+    unsafe, in plain words, for the page to show.
+
+    `margin_cal` (with that motor loaded) under 1 switches on the pitch model
+    above; None or 1 and over flies the stable model."""
     area = math.pi * (diameter_mm / 2000) ** 2
     chute_area = math.pi * (chute_in * 0.0254 / 2) ** 2 if chute_in else 0.0
     m0, prop = (rocket_mass_g + m.mass_g) / 1000, m.prop_g / 1000
@@ -207,20 +232,36 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
     chute_open = 0.0  # 0 → 1 over half a second after ejection
     on_rod, path, events = True, [], {}
     step = 0
+    pitch = margin_cal is not None and margin_cal < 1.0
+    side_area = (length_mm or 15 * diameter_mm) / 1000 * diameter_mm / 1000
+    th = om = 0.0  # attitude (rad from vertical, + downwind) and its rate, for the pitch model
+    spun = 0.0  # total angle turned, to tell a tumble
     while t < 600:
         f = thrust(t)
         mass = m0 - prop * min(burnt / m.impulse, 1.0)
         ax_air, ah_air = vx - wind_ms, vh  # velocity through the air
         speed_air = math.hypot(ax_air, ah_air)
+        th_air = math.atan2(ax_air, ah_air) if speed_air > 1e-6 else 0.0
+        off = 0.0  # angle between the rocket and its airflow
         if on_rod:
-            ux, uh = 0.0, 1.0
+            ux, uh, th = 0.0, 1.0, 0.0
+        elif pitch and t < t_eject:
+            off = math.remainder(th - th_air, 2 * math.pi) if speed_air > 1e-6 else 0.0
+            if margin_cal < 0:  # tumbling: the air flips it, the spin builds up
+                om += (TUMBLE_RATE * min(1.0, 0.4 - margin_cal) - om) * min(1.0, dt / 0.4)
+            else:
+                om += (-PITCH_K * margin_cal * speed_air ** 2 * math.sin(off) - PITCH_DAMP * speed_air * om) * dt
+            th += om * dt
+            spun += abs(om) * dt
+            ux, uh = math.sin(th), math.cos(th)
         elif speed_air > 1e-6:
             ux, uh = ax_air / speed_air, ah_air / speed_air
+            th = th_air
         else:
             ux, uh = 0.0, 1.0
         if t >= t_eject:
             chute_open = min(1.0, (t - t_eject) / 0.5)
-        cda = cd * area + (CHUTE_CD * chute_area * chute_open)
+        cda = cd * area + CD_SIDE * side_area * abs(math.sin(off)) + (CHUTE_CD * chute_area * chute_open)
         drag = 0.5 * RHO * cda * speed_air
         ax = f * ux / mass - drag * ax_air / mass
         ah = f * uh / mass - drag * ah_air / mass - G0
@@ -238,6 +279,8 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
         if on_rod and h >= rod_m:
             on_rod = False
             events["rod"] = {"t": round(t, 2), "speed_ms": round(vh, 1)}
+            if pitch:
+                om = TIP_OFF
         if "burnout" not in events and t >= m.burn:
             events["burnout"] = {"t": round(t, 2), "h": round(h, 1), "x": round(x, 1)}
         if "apogee" not in events and t > m.burn and vh <= 0:
@@ -247,11 +290,11 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
                                "speed_ms": round(math.hypot(vx, vh), 1)}
         phase = "rod" if on_rod else "boost" if t < m.burn else "coast" if t < t_eject else "chute"
         if step % every == 0:
-            path.append([round(t, 2), round(x, 2), round(max(h, 0.0), 2), phase])
+            path.append([round(t, 2), round(x, 2), round(max(h, 0.0), 2), phase, round(math.degrees(th), 1)])
         if t > 0.1 and h <= 0 and not on_rod:
             break
     landing = {"t": round(t, 1), "x": round(x, 1), "speed_ms": round(abs(vh), 1)}
-    path.append([round(t, 2), round(x, 2), 0.0, "landed"])
+    path.append([round(t, 2), round(x, 2), 0.0, "landed", 90.0])
     events["landing"] = landing
     eject = events.get("eject")
     apo = events.get("apogee", {"h": 0.0})
@@ -263,9 +306,58 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
                         "a delay closer to the coast time is gentler.")
     if wind_ms > MAX_WIND_MPH * MPH + 1e-9:
         warnings.append("The NAR Safety Code says don't launch in winds over 20 mph.")
+    tw = m.avg_thrust / (m0 * G0)
+    dangers = flight_dangers(margin_cal, tw, events, wind_ms, spun / (2 * math.pi))
     return {"motor": f"{m.code}-{delay}", "code": m.code, "cls": m.cls, "delay_s": delay, "wind_ms": round(wind_ms, 2),
             "chute_in": chute_in, "apogee_m": round(apo["h"], 1), "events": events, "path": path,
-            "landing_m": landing["x"], "field": launch_field(m.cls, path), "warnings": warnings}
+            "landing_m": landing["x"], "field": launch_field(m.cls, path), "warnings": warnings,
+            "dangers": dangers, "turns": round(spun / (2 * math.pi), 1)}
+
+
+SAFE_LANDING_MS = 10.0  # faster than this hurts people and breaks rockets (a chute gives about 4.5)
+
+
+def flight_dangers(margin_cal: float | None, thrust_to_weight: float, events: dict, wind_ms: float,
+                   turns: float = 0.0) -> list[dict]:
+    """Why a flight is unsafe, for kids: [{kind, level ('danger' or 'warn'),
+    title, text}], worst first."""
+    out = []
+    rod = events.get("rod", {}).get("speed_ms", 0.0)
+    land, eject, apo = events["landing"], events.get("eject"), events.get("apogee")
+    if margin_cal is not None and margin_cal < 0:
+        out.append({"kind": "tumble", "level": "danger", "title": "It tumbles",
+                    "text": f"Score {margin_cal:.1f} cal: the push point is in front of the balance point, so the air flips "
+                            f"the rocket over{f' ({turns:.0f} turns)' if turns >= 1 else ''}. A tumbling rocket can fly in "
+                            "any direction, even at people. Make the fins bigger or the rocket taller."})
+    elif margin_cal is not None and margin_cal < 1:
+        out.append({"kind": "wobble", "level": "danger", "title": "It wobbles off course",
+                    "text": f"Score {margin_cal:.1f} cal: the fins are too small to hold it straight, so it wobbles and "
+                            "wanders instead of going up. 1 to 2 cal flies straight."})
+    if thrust_to_weight < MIN_THRUST_TO_WEIGHT:
+        out.append({"kind": "slow", "level": "danger", "title": "Too heavy for this motor",
+                    "text": f"The motor pushes only {thrust_to_weight:.1f}× the rocket's weight (5× is safe). It crawls off "
+                            "the pad and arcs over low."})
+    if rod < MIN_ROD_SPEED:
+        out.append({"kind": "windturn", "level": "danger", "title": "Too slow off the rod",
+                    "text": f"It leaves the launch rod at {rod:.0f} m/s (15 m/s is safe). That's too slow for the fins to "
+                            "steer, so " + ("the wind tips it over and it flies off sideways into the wind."
+                                            if wind_ms > 0.5 else "it can tip over as soon as it leaves the rod.")})
+    if eject is None or eject["t"] >= land["t"]:
+        out.append({"kind": "noeject", "level": "danger", "title": "Hits the ground before the parachute opens",
+                    "text": "The rocket comes down before the ejection charge fires, then the charge goes off on the "
+                            "ground. Pick a motor with a shorter delay, or one that flies it higher."})
+    elif apo and eject["h"] < 15 and eject["t"] > apo["t"]:
+        out.append({"kind": "lowchute", "level": "danger", "title": "The parachute opens too low",
+                    "text": f"It opens only {eject['h']:.0f} m up, coming down fast, so it has no time to slow the rocket."})
+    if land["speed_ms"] > SAFE_LANDING_MS:
+        out.append({"kind": "crash", "level": "danger", "title": f"Lands at {land['speed_ms']:.0f} m/s",
+                    "text": "That's fast enough to hurt someone or break the rocket. Under a parachute it would land at "
+                            "about 4 to 5 m/s."})
+    if margin_cal is not None and margin_cal > 3:
+        out.append({"kind": "overstable", "level": "warn", "title": "Over-stable",
+                    "text": f"Score {margin_cal:.1f} cal: it turns hard into any wind (weathercocking) and flies off at an "
+                            "angle, so it lands further away. Smaller fins would help."})
+    return out
 
 
 def launch_field(motor_cls: str, path: list) -> dict:

@@ -483,20 +483,25 @@ def launch(build_id: str, request: Request, wind_mph: float = 10.0, motor: str |
     b, g = _get(build_id)
     p, bal = b["params"], g["balance"]
     motors = {m.code: m for m in motors_for(p["motor"])}
-    code = motor or b["flights"]["recommended"] or p.get("flight_motor")
+    rows = b["flights"]["rows"]
+    # With no safe motor, fly the closest one anyway: the page shows why it's unsafe.
+    closest = min(rows, key=lambda r: (len(r["problems"]), -r["thrust_to_weight"]))["code"] if rows else None
+    code = motor or b["flights"]["recommended"] or p.get("flight_motor") or closest
     m = motors.get(code) if code else None
     if m is None:
-        raise HTTPException(422, "No motor of this size flies this rocket safely; pick one from the motor list.")
+        raise HTTPException(422, "Pick a motor from the motor list.")
     if delay is not None and delay not in m.delays:
         raise HTTPException(422, f"The {m.code} comes with delays of {', '.join(map(str, m.delays))} s.")
     rec = b["stability"]["recovery_mass_g"]
     chute = parachute(bal.printed_mass_g + rec + m.mass_g - m.prop_g)
+    row = next((r for r in rows if r["code"] == m.code), None)
+    margin = row["margin_cal"] if row else None
     out = launch_profile(m, bal.printed_mass_g + rec, bal.body_od, chute["size_in"] or max(CHUTE_SIZES_IN),
-                         wind_mph * MPH, delay, p["drag_cd"], p["launch_rod_m"])
-    row = next((r for r in b["flights"]["rows"] if r["code"] == m.code), None)
+                         wind_mph * MPH, delay, p["drag_cd"], p["launch_rod_m"], margin_cal=margin, length_mm=bal.length)
+    unsafe = bool(not row or row["problems"] or any(d["level"] == "danger" for d in out["dangers"]))
     out.update(wind_mph=wind_mph, max_wind_mph=MAX_WIND_MPH, motors=[
         {"code": r["code"], "delays": list(motors[r["code"]].delays), "ok": not r["problems"], "problems": r["problems"]}
-        for r in b["flights"]["rows"]], recommended=b["flights"]["recommended"], safe=bool(row and not row["problems"]),
+        for r in rows], recommended=b["flights"]["recommended"], safe=not unsafe, margin_cal=margin,
         problems=row["problems"] if row else [], parachute=chute, shape=_shape(bal))
     return out
 
