@@ -2,6 +2,8 @@
 
 Short slices of the real M24 parts (Rocket Builder's current fits: body joint 0.22 mm, nose 0.18 mm per side, 0.5 mm shoulder chamfer). Print `M24-fit-check.3mf` (one plate, as laid out, no supports) or the STLs.
 
+Each piece has its code engraved on the outside: **24-1** to **24-4**.
+
 - Push **1** (nose bottom) into **2** (top of the body tube, with the cord strap): the nose should slide in by hand and come out with a firm pull.
 - Push **4** (shoulder) into **3** (socket): a snug slide that you'd glue.
 

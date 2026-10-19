@@ -2,6 +2,8 @@
 
 Short slices of the real M29 parts (Rocket Builder's current fits: body joint 0.22 mm, nose 0.18 mm per side, 0.5 mm shoulder chamfer). Print `M29-fit-check.3mf` (one plate, as laid out, no supports) or the STLs.
 
+Each piece has its code engraved on the outside: **29-1** to **29-4**.
+
 - Push **1** (nose bottom) into **2** (top of the body tube, with the cord strap): the nose should slide in by hand and come out with a firm pull.
 - Push **4** (shoulder) into **3** (socket): a snug slide that you'd glue.
 

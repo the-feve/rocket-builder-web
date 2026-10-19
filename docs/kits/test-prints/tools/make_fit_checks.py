@@ -23,7 +23,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from build123d import Axis, Mesher, Solid, export_stl
+from build123d import Axis, FontStyle, Plane, Solid, Text, export_stl, extrude
 
 ROOT = Path(__file__).resolve().parents[4]
 OUT = Path(__file__).resolve().parents[1] / "fit-check"
@@ -37,6 +37,21 @@ from rocketgen.params import DesignParams, compute_derived  # noqa: E402
 SIZES = ("M13", "M18", "M24", "M29")
 EXTRA = 6.0  # mm of plain tube or cone kept past each fit, to hold and to see the joint
 GAP = 6.0  # between pieces on the plate
+FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+MARK_DEPTH = 0.5  # engraved label depth; the walls are 1.5 mm
+
+
+def engrave(solid: Solid, label: str, z: float, r_out: float, what: str) -> Solid:
+    """Cut `label` MARK_DEPTH into the outside wall at height z, on the -y
+    side (the cord strap is built at +y), reading upright from outside. The
+    part's axis is the z axis."""
+    face = Plane.XZ * Text(label, font_size=3.6, font_path=FONT, font_style=FontStyle.BOLD)
+    # Through the wall, then trimmed to a ring MARK_DEPTH deep, so every
+    # letter is cut equally deep into the curved surface.
+    letters = extrude(face, amount=r_out + 2).translate((0, 0, z))
+    ring = (Solid.make_cylinder(r_out + 2, 8).translate((0, 0, z - 4))
+            .cut(Solid.make_cylinder(r_out - MARK_DEPTH, 8).translate((0, 0, z - 4))))
+    return one_solid(solid.cut(intersect(letters, ring)), f"{what} label")
 
 
 def slab(solid: Solid, z0: float, z1: float, what: str) -> Solid:
@@ -64,17 +79,54 @@ def pieces(size: str) -> list[tuple[str, Solid]]:
                         key=lambda q: q.placement_z)
     aft, above = body_parts[0], body_parts[1]
 
-    out = [("1_nose_bottom", slab(nose, 0, d.nose_shoulder_len + d.nose_joint_rise + EXTRA, f"{size} nose bottom"))]
+    num = size[1:]
+    ro = d.body_od / 2
+    nose_fit = d.nose_shoulder_len + d.nose_joint_rise
+    out = [("1_nose_bottom", engrave(slab(nose, 0, nose_fit + EXTRA, f"{size} nose bottom"), f"{num}-1",
+                                     nose_fit + EXTRA / 2 - 0.3, ro - 0.1, f"{size} nose bottom"))]
     top_local = top.local
     h = top_local.bounding_box().max.Z
     strap_bot = r.strap["z_bot"] - top.placement_z - (top.assembled.translate((0, 0, -top.placement_z)).bounding_box().min.Z)
-    out.append(("2_top_section", slab(top_local, max(0.0, strap_bot - EXTRA), h, f"{size} top section")))
+    out.append(("2_top_section", engrave(slab(top_local, max(0.0, strap_bot - EXTRA), h, f"{size} top section"),
+                                         f"{num}-2", EXTRA / 2, ro, f"{size} top section")))
     a = aft.local
     ah = a.bounding_box().max.Z
     socket = d.shoulder_len + d.inner_taper_rise
-    out.append(("3_joint_socket", slab(a, ah - socket - EXTRA, ah, f"{size} joint socket")))
-    out.append(("4_joint_shoulder", slab(above.local, 0, d.shoulder_len + d.joint_rise + EXTRA, f"{size} joint shoulder")))
+    out.append(("3_joint_socket", engrave(slab(a, ah - socket - EXTRA, ah, f"{size} joint socket"), f"{num}-3",
+                                          EXTRA / 2, ro, f"{size} joint socket")))
+    joint_fit = d.shoulder_len + d.joint_rise
+    out.append(("4_joint_shoulder", engrave(slab(above.local, 0, joint_fit + EXTRA, f"{size} joint shoulder"),
+                                            f"{num}-4", joint_fit + EXTRA / 2, ro, f"{size} joint shoulder")))
     return out
+
+
+def write_3mf(items: list[tuple[str, Solid]], path: Path) -> None:
+    """A plain 3MF: one mesh object per piece and one build item each, in
+    place. (build123d's Mesher also writes a wrapper object per piece, which
+    Bambu Studio imported as a second copy of every piece.)"""
+    import zipfile
+    objs, build = [], []
+    for i, (name, s) in enumerate(items, 1):
+        verts, tris = s.tessellate(0.01, 0.1)
+        v = "".join(f'<vertex x="{p.X:.4f}" y="{p.Y:.4f}" z="{p.Z:.4f}"/>' for p in verts)
+        t = "".join(f'<triangle v1="{a}" v2="{b}" v3="{c}"/>' for a, b, c in tris)
+        objs.append(f'<object id="{i}" name="{name}" type="model"><mesh><vertices>{v}</vertices>'
+                    f'<triangles>{t}</triangles></mesh></object>')
+        build.append(f'<item objectid="{i}"/>')
+    model = ('<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" '
+             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">'
+             f'<resources>{"".join(objs)}</resources><build>{"".join(build)}</build></model>')
+    types = ('<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/'
+             'content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.'
+             'relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing'
+             '-3dmodel+xml"/></Types>')
+    rels = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/'
+            '2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.'
+            'com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("[Content_Types].xml", types)
+        z.writestr("_rels/.rels", rels)
+        z.writestr("3D/3dmodel.model", model)
 
 
 def turned(s: Solid) -> Solid:
@@ -100,12 +152,9 @@ def main(sizes: list[str]) -> None:
         folder = OUT / size.lower()
         folder.mkdir(parents=True, exist_ok=True)
         items = lay_out(pieces(size))
-        mesher = Mesher()
         for name, s in items:
-            s.label = f"{size}_{name}"
-            mesher.add_shape(s, linear_deflection=0.01, angular_deflection=0.1)
             export_stl(s, str(folder / f"{size}_{name}.stl"), tolerance=0.01, angular_tolerance=0.1)
-        mesher.write(str(folder / f"{size}-fit-check.3mf"))
+        write_3mf([(f"{size}_{n}", s) for n, s in items], folder / f"{size}-fit-check.3mf")
         render_png([(half(turned(s)), (0.95, 0.40, 0.17)) for _, s in items], folder / "preview.png", elev=20, azim=90,
                    px=1100, title=f"{size} fit check, cut in half; right to left: 1 nose bottom, 2 top section, 3 socket, 4 shoulder")
         heights = ", ".join(f"{n.split('_', 1)[1]} {s.bounding_box().size.Z:.0f} mm" for n, s in items)
@@ -114,6 +163,7 @@ def main(sizes: list[str]) -> None:
             f"Short slices of the real {size} parts (Rocket Builder's current fits: body joint {d.fit_slip:.2f} mm, "
             f"nose {d.fit_nose:.2f} mm per side, 0.5 mm shoulder chamfer). Print `{size}-fit-check.3mf` (one plate, "
             f"as laid out, no supports) or the STLs.\n\n"
+            f"Each piece has its code engraved on the outside: **{size[1:]}-1** to **{size[1:]}-4**.\n\n"
             f"- Push **1** (nose bottom) into **2** (top of the body tube, with the cord strap): the nose should slide "
             f"in by hand and come out with a firm pull.\n"
             f"- Push **4** (shoulder) into **3** (socket): a snug slide that you'd glue.\n\n"
