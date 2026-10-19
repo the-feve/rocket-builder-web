@@ -48,10 +48,10 @@ def test_min_diameter_m18_hand_values():
     assert d.body_od == pytest.approx(d.bay_id + 2 * d.wall) == pytest.approx(21.4)
     assert d.body_id == pytest.approx(18.4)
     assert not d.has_mount
-    assert d.shoulder_od == pytest.approx(18.36)
+    assert d.shoulder_od == pytest.approx(18.04)  # 0.18 mm per side (web_fits)
     assert d.shoulder_len == pytest.approx(0.75 * 21.4 - 4)
-    assert d.joint_rise == pytest.approx(1.52)
-    assert d.inner_taper_rise == pytest.approx((9.2 - (9.18 - 1.5)) / math.tan(math.radians(8)))
+    assert d.joint_rise == pytest.approx(1.68)
+    assert d.inner_taper_rise == pytest.approx((9.2 - (9.02 - 1.5)) / math.tan(math.radians(8)))
     assert d.zmax == 195
 
 
@@ -136,7 +136,8 @@ def test_body_segment_volume_matches_pappus():
     seg_len = 55.0
     sh = d.shoulder_len
     pts = [
-        (d.shoulder_od / 2 - d.wall, 0), (d.shoulder_od / 2, 0), (d.shoulder_od / 2, sh),
+        (d.shoulder_od / 2 - d.wall, 0), (d.shoulder_od / 2 - d.shoulder_chamfer, 0),
+        (d.shoulder_od / 2, d.shoulder_chamfer), (d.shoulder_od / 2, sh),
         (d.body_od / 2, sh + d.joint_rise), (d.body_od / 2, seg_len), (d.body_id / 2, seg_len - d.wall),
         (d.body_id / 2, sh + d.inner_taper_rise), (d.shoulder_od / 2 - d.wall, sh),
     ]
@@ -475,11 +476,13 @@ def test_critical_fit_overrides():
     they reach the joint, the nose and the motor thread, and the parts build."""
     from rocketgen.geom import meshes
     base = compute_derived(DesignParams())
-    assert base.fit_slip == 0.02 and base.thread["thread_clear"] == 0.25 and base.thread["p"] == 2.5
-    r = rocket(joint_clearance=0.18, shoulder_len=15.0, nose_shoulder_len=9.0,
+    assert base.fit_slip == 0.18 and base.fit_nose == 0.15
+    assert base.thread["thread_clear"] == 0.25 and base.thread["p"] == 2.5
+    r = rocket(joint_clearance=0.2, nose_clearance=0.17, shoulder_len=15.0, nose_shoulder_len=9.0,
                thread_clearance=0.35, thread_pitch=3.0, thread_turns=4)
     d, t = r.derived, r.derived.thread
-    assert d.fit_slip == 0.18 and d.shoulder_od == pytest.approx(d.body_id - 0.36)
+    assert d.fit_slip == 0.2 and d.shoulder_od == pytest.approx(d.body_id - 0.4)
+    assert d.fit_nose == 0.17 and d.nose_shoulder_od == pytest.approx(d.body_id - 0.34)
     assert (d.shoulder_len, d.nose_shoulder_len) == (15.0, 9.0)
     assert t["thread_clear"] == 0.35 and t["p"] == 3.0
     assert t["cap_top"] - t["z_boss_end"] == pytest.approx(4 * 3.0)
@@ -487,7 +490,7 @@ def test_critical_fit_overrides():
     for p in r.parts:
         assert p.assembled.is_valid and meshes(p.assembled), p.name
     nose = next(q for q in r.parts if q.name == "Nose")
-    assert nose.local.bounding_box().size.Z == pytest.approx(9.0 + d.joint_rise + r.params.nose_fineness * d.cal, abs=0.05)
+    assert nose.local.bounding_box().size.Z == pytest.approx(9.0 + d.nose_joint_rise + r.params.nose_fineness * d.cal, abs=0.05)
     # A longer body joint alone: the nose follows it (70%).
     assert compute_derived(DesignParams(shoulder_len=20.0)).nose_shoulder_len == pytest.approx(14.0)
 
@@ -520,3 +523,31 @@ def test_motor_cap_lip_covers_2_5_mm_of_the_casing():
         d = compute_derived(DesignParams(motor=motor))
         assert abs(2 * d.thread["nose_bore_r"] - (mtr_d - 5.0)) < 1e-6
 
+
+
+def test_printed_fit_defaults():
+    """Fits from the fit-test prints (owner, 2026-10-16/18: the CAD 0.02 mm
+    printed far too tight). M13's short nose shoulder gets the short pair."""
+    from rocketgen.params import web_fits
+    for motor, joint, nose in (("M13", 0.16, 0.14), ("M18", 0.18, 0.15), ("M24", 0.18, 0.15), ("M29", 0.18, 0.15)):
+        d = compute_derived(DesignParams(motor=motor))
+        assert (d.fit_slip, d.fit_nose) == (joint, nose), motor
+        assert web_fits(d.nose_shoulder_len) == (joint, nose)
+        assert d.shoulder_od == pytest.approx(d.body_id - 2 * joint)
+        assert d.nose_shoulder_od == pytest.approx(d.body_id - 2 * nose)
+        assert d.shoulder_chamfer == 0.5
+
+
+def test_shoulder_chamfer():
+    """The shoulders' bed edge is chamfered 0.5 mm so elephant's foot doesn't bind."""
+    from build123d import Solid
+    r = rocket(motor="M18")
+    d = r.derived
+    for name, sh_od in (("Nose", d.nose_shoulder_od), ("Anchor_Seg", d.shoulder_od)):
+        part = next(p for p in r.parts if p.name == name).local
+        bb = part.bounding_box()
+        z0 = bb.min.Z
+        bottom = as_shape(part.intersect(Solid.make_box(100, 100, 0.1).translate((-50, -50, z0))))
+        mid = as_shape(part.intersect(Solid.make_box(100, 100, 0.1).translate((-50, -50, z0 + 2))))
+        assert bottom.bounding_box().size.X == pytest.approx(sh_od - 0.8, abs=0.05), name  # top of the 0.1 mm slab
+        assert mid.bounding_box().size.X == pytest.approx(sh_od, abs=0.05), name

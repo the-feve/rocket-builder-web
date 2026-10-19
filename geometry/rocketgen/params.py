@@ -99,7 +99,9 @@ class DesignParams:
     material: str = "PLA"
     # Critical fit dimensions (website, Advanced). None = the computed value,
     # as before. They let a result from a fit-test print be typed in.
-    joint_clearance: float | None = None  # shoulder into socket, radial; None = fit_slip (settings CSV)
+    joint_clearance: float | None = None  # body shoulder into socket, radial; None = web_fits()
+    nose_clearance: float | None = None  # nose shoulder into the top socket, radial; None = web_fits()
+    shoulder_chamfer: float = 0.5  # 45-degree chamfer on each shoulder's bed edge (elephant's foot)
     shoulder_len: float | None = None  # body-to-body joint engagement; None = max(0.75 cal - 4, 10)
     nose_shoulder_len: float | None = None  # nose joint engagement; None = 70% of the body joint (min 7)
     thread_clearance: float | None = None  # motor cap thread, radial (crest to cap bore); None = 0.25
@@ -108,6 +110,27 @@ class DesignParams:
 
     def with_(self, **kw) -> "DesignParams":
         return replace(self, **kw)
+
+
+# Printed fits (radial, per side, mm), from fit-test coupons on a Bambu P1S
+# in PLA (2026-10-16). The settings CSV's fit_slip (0.02) is the CAD value
+# and prints far too tight (owner, 2026-10-18: first M13 and M18 kit test
+# prints "way too tight"). Body joints: 0.15 a little snug, 0.20 a little
+# loose on M18-M29, so 0.18. Nose: 0.15 on M18-M29. M13's short shoulders
+# (nose shoulder under SHORT_NOSE_SHOULDER) grip harder per mm: joint 0.16
+# just right; nose 0.12 too tight, 0.15 too loose, so 0.14.
+WEB_FIT_JOINT = 0.18
+WEB_FIT_NOSE = 0.15
+WEB_FIT_JOINT_SHORT = 0.16
+WEB_FIT_NOSE_SHORT = 0.14
+SHORT_NOSE_SHOULDER = 8.0
+
+
+def web_fits(nose_shoulder_len: float) -> tuple[float, float]:
+    """Default (joint, nose) radial clearances for a nose shoulder this long."""
+    if nose_shoulder_len < SHORT_NOSE_SHOULDER:
+        return WEB_FIT_JOINT_SHORT, WEB_FIT_NOSE_SHORT
+    return WEB_FIT_JOINT, WEB_FIT_NOSE
 
 
 @dataclass
@@ -137,6 +160,10 @@ class Derived:
     inner_taper_rise: float
     nose_shoulder_len: float = 0.0
     thread: dict = field(default_factory=dict)
+    fit_nose: float = 0.0
+    nose_shoulder_od: float = 0.0
+    nose_joint_rise: float = 0.0
+    shoulder_chamfer: float = 0.0
 
 
 # Motor cap retention lip: how far the cap's floor reaches in over the motor's
@@ -214,7 +241,6 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     mtr_d, mtr_len, mtr_hang = m["mtr_d"], m["mtr_len"], m["mtr_hang"]
     z_margin = settings["z_margin"]
     wall = params.wall if params.wall else settings["wall"]
-    fit_slip = settings["fit_slip"] if params.joint_clearance is None else params.joint_clearance
     fit_press = settings["fit_press"]
     mtr_clear = settings["mtr_clear"]
 
@@ -223,11 +249,15 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     body_od = max(min_body_od, params.body_od_override) if params.body_od_override else min_body_od
     body_id = body_od - 2 * wall
     cal = body_od
-    shoulder_od = body_id - 2 * fit_slip
     shoulder_len = params.shoulder_len or max(0.75 * cal - 4.0, 10.0)
     # The nose's insert is 30% shorter than a body joint's (owner's request,
     # 2026-10-09: a shorter transition); body-to-body joints keep the full length.
     nose_shoulder_len = params.nose_shoulder_len or max(0.7 * shoulder_len, 7.0)
+    default_joint, default_nose = web_fits(nose_shoulder_len)
+    fit_slip = default_joint if params.joint_clearance is None else params.joint_clearance
+    fit_nose = default_nose if params.nose_clearance is None else params.nose_clearance
+    shoulder_od = body_id - 2 * fit_slip
+    nose_shoulder_od = body_id - 2 * fit_nose
     mount_od = bay_id + 2 * wall
 
     fin = fin_dimensions(params, cal)
@@ -240,6 +270,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
     has_mount = (body_id - mount_od) / 2 >= wall
     aft_socket_base = bay_len + block_thickness + ((body_id - bay_id) / 2 if has_mount else 0.0)
     joint_rise = (body_od - shoulder_od) / 2
+    nose_joint_rise = (body_od - nose_shoulder_od) / 2
     inner_taper_rise = (body_id / 2 - (shoulder_od / 2 - wall)) / math.tan(math.radians(8))
 
     return Derived(
@@ -249,5 +280,7 @@ def compute_derived(params: DesignParams, motors=None, settings=None) -> Derived
         has_mount=has_mount, bay_len=bay_len, zmax=zmax, stop_depth=stop_depth,
         block_thickness=block_thickness, aft_socket_base=aft_socket_base,
         joint_rise=joint_rise, inner_taper_rise=inner_taper_rise, nose_shoulder_len=nose_shoulder_len, thread=thread,
+        fit_nose=fit_nose, nose_shoulder_od=nose_shoulder_od, nose_joint_rise=nose_joint_rise,
+        shoulder_chamfer=max(params.shoulder_chamfer, 0.0),
     )
 
