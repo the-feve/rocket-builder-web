@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: mkdir -p trebuchet fittest  # deploys check out Trebuchet Builder and Fit Test Builder here; CI builds the rocket app alone
+      - run: mkdir -p trebuchet fittest shed  # deploys check out Trebuchet Builder, Fit Test Builder and ShedCAD here; CI builds the rocket app alone
       - name: Build the image and check it serves
         run: |
           docker build -t rocket-builder .

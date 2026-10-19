@@ -50,6 +50,7 @@ import shop
 import supplies
 import terms
 import fit_mount
+import shed_mount
 import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -1009,4 +1010,15 @@ if FIT is not None:
 
     app.mount(fit_mount.PREFIX, FIT.app, name="fit")
 
-app.add_middleware(trebuchet_mount.HostRouter, routes={"trebuchet.": trebuchet_mount.PREFIX, "fit.": fit_mount.PREFIX})
+# ShedCAD too: /shed/ and shed.* hosts. Stateless here (designs stay in each
+# visitor's browser); its builds are quick pure Python, so no shared lock.
+SHED = shed_mount.load_app()
+if SHED is not None:
+    @app.get(shed_mount.PREFIX, include_in_schema=False)
+    def shed_slash():
+        return RedirectResponse(shed_mount.PREFIX + "/")
+
+    app.mount(shed_mount.PREFIX, SHED, name="shed")
+
+app.add_middleware(trebuchet_mount.HostRouter, routes={"trebuchet.": trebuchet_mount.PREFIX, "fit.": fit_mount.PREFIX,
+                                                        "shed.": shed_mount.PREFIX})

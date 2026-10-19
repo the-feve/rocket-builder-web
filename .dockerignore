@@ -14,3 +14,11 @@ trebuchet/.github
 trebuchet/geometry/report
 trebuchet/geometry/tests
 trebuchet/server/tests
+shed/.git
+shed/.github
+shed/.vscode
+shed/desktop
+shed/tests
+shed/data/sites
+shed/data/tile_cache
+shed/data/designs/Feve_*

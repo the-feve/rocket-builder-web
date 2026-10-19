@@ -2,3 +2,5 @@
 /trebuchet/
 # Fit Test Builder checkout (deploy only; see server/fit_mount.py)
 /fittest/
+# ShedCAD checkout (deploy only; see server/shed_mount.py)
+/shed/

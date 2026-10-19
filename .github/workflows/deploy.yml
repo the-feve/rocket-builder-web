@@ -3,9 +3,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Sent by the-feve/trebuchet_builder (or 3D_print_test_fitter) after a push to its main branch.
+  # Sent by the-feve/trebuchet_builder (or 3D_print_test_fitter, or Shed_builder) after a push to its main branch.
   repository_dispatch:
-    types: [trebuchet-updated, fit-updated]
+    types: [trebuchet-updated, fit-updated, shed-updated]
 
 concurrency: deploy
 
@@ -18,6 +18,9 @@ jobs:
       # A token that can read 3D_print_test_fitter: its own secret, or the
       # trebuchet one once that fine-grained token also lists this repo.
       FIT_TOKEN: ${{ secrets.FIT_REPO_TOKEN || secrets.TREBUCHET_REPO_TOKEN }}
+      # A token that can read Shed_builder: its own secret, or the trebuchet one
+      # once that fine-grained token also lists Shed_builder.
+      SHED_TOKEN: ${{ secrets.SHED_REPO_TOKEN || secrets.TREBUCHET_REPO_TOKEN }}
     steps:
       - name: Skip until the Fly token is set
         if: env.FLY_API_TOKEN == ''
@@ -57,6 +60,22 @@ jobs:
         run: |
           echo "::warning::Fit Test Builder not checked out (no token that can read 3D_print_test_fitter, or no main branch there); deploying without it."
           rm -rf fittest && mkdir fittest
+      # ShedCAD is hosted here too (server/shed_mount.py), at shed.quiverdesignworks.net.
+      - name: Check out ShedCAD
+        id: shed
+        if: env.FLY_API_TOKEN != '' && env.SHED_TOKEN != ''
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: the-feve/Shed_builder
+          ref: main
+          path: shed
+          token: ${{ env.SHED_TOKEN }}
+      - name: Without ShedCAD
+        if: env.FLY_API_TOKEN != '' && (env.SHED_TOKEN == '' || steps.shed.outcome != 'success')
+        run: |
+          echo "::warning::ShedCAD not checked out (no token that can read Shed_builder, or no main branch there); deploying without it."
+          rm -rf shed && mkdir shed
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: env.FLY_API_TOKEN != ''
       - run: flyctl deploy --remote-only
@@ -71,3 +90,8 @@ jobs:
         run: |
           for i in $(seq 1 20); do curl -fsS https://rocket-fevergeon.fly.dev/fit/ | grep -q "Fit Test Builder" && exit 0; sleep 6; done
           echo "::error::/fit/ isn't answering after the deploy (if ROCKETGEN_FIT=admin is set, that's expected)"; exit 1
+      - name: Check the ShedCAD page
+        if: env.FLY_API_TOKEN != '' && steps.shed.outcome == 'success'
+        run: |
+          for i in $(seq 1 20); do curl -fsS https://rocket-fevergeon.fly.dev/shed/ | grep -q "ShedCAD" && curl -fsS https://rocket-fevergeon.fly.dev/shed/api/schema | grep -q '"hosted":true' && exit 0; sleep 6; done
+          echo "::error::/shed/ isn't answering after the deploy"; exit 1
