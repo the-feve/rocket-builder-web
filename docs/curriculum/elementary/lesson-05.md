@@ -57,6 +57,8 @@ Write it on the board and on E5:
 
 ### 4. Build (15 minutes)
 
+<!-- figure: stomp-build -->
+
 1. Roll the paper around the tube and tape it. Close the top into a nose and tape it airtight.
 2. Cut fins from the index card. Tape them on evenly.
 3. Write your name on it. Testing is next lesson!
@@ -84,3 +86,6 @@ Pairs share: *What did you pick, and why?*
 - **Rocket Builder as a class tool:** in Beginner mode it takes a few seconds per build. Have one student "drive" on the projector while the class decides what to change. On tablets, groups can build their own; no account or download is needed.
 - **No downloads or printing for this age group.** Rocket Builder's printed rockets fly on real motors, which are rated 12+.
 - **DIY stomp launcher:** tape the PVC pipe into the bottle's mouth airtight. Students stomp on the bottle; the air shoots up the pipe and launches the paper rocket.
+
+<!-- figure: stomp-launcher -->
+- **Class codes (optional):** sign in and make a class code at [rocket.quiverdesignworks.net/classes](https://rocket.quiverdesignworks.net/classes). Groups on tablets hand in their Rocket Builder design with the code and a nickname (no student accounts), and you see every design in one list for the class discussion.

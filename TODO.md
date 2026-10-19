@@ -103,3 +103,11 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [ ] **(owner)** Read both tracks, especially the elementary wording and the optional instructor demo (Lesson 8: a printed rocket flown by an experienced adult with under-12 students as spectators behind a 30 ft line). Keep it, or limit the elementary demo to show-and-tell plus a club-launch visit?
 - [ ] **(owner)** A teacher or two in Washington to try a lesson from each track and say what to cut
 - [ ] When OSPI finally adopts WA Science 2026 (expected before June 2027), check the PE wording and switch the lesson codes to the new `S.3.PS2.1` form (the crosswalk is already on `/learn/teachers`); from 2027–28 also lead with the WA Math/ELA 2026 codes
+- [x] Printable teacher guides per track and labelled diagrams in the lessons (2026-10-19)
+- [ ] Diagrams are small on phones (text scales with the drawing); add a tap-to-enlarge if teachers use phones a lot
+
+## Classroom (added 2026-10-19)
+
+- [ ] A class behind one school address shares the per-address limits: 30 new builds / 10 min (`ROCKETGEN_BUILDS_PER_10_MIN`) is tight for 25+ students building at once (cached designs don't count). Consider raising it, or a per-class allowance, before a classroom pilot.
+- [ ] Link `/tools/altitude` and the mission card from the lessons (`docs/curriculum`, rebuilt by `build_site.py`); this session didn't touch the curriculum.
+- [ ] **(owner)** Lawyer look at the *Class sharing* paragraph on `/terms` with the rest of `server/terms.py`.

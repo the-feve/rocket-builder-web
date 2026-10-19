@@ -16,11 +16,13 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
 
 ## How it works
 
-- `build_meshes.py`: the example rockets (`ROCKETS`: the Beginner default M18 with trapezoid fins,
-  and an M24 at 480 mm with two body sections) are built with `rocketgen.stability.build_stable`.
-  Each part goes into a GLB in its assembled position (named as in the app: `Aft`, `Seg_2`,
-  `Anchor_Seg`, `Nose`, `Motor_Cap`, `Rod_Standoff`), plus a JSON of the dimensions the drawings need
-  (anchor strap position and slot, nose tie bar, motor bay, thread, launch-lug line) and each part's
+- `build_meshes.py`: the example rockets (`ROCKETS`): `m18` is the Starter kit (M18, 300 mm, 256 mm
+  printer, trapezoid fins, tangent ogive), a one-print body: the fin can `Aft` (D) carries the cord strap
+  in its top; `m24` is an M24 at 480 mm on a 200 mm printer, a three-print body (`Aft`, `Seg_2`, `Top_Seg`,
+  the top one with the strap), used for the joint and glue steps. They are built with
+  `rocketgen.stability.build_stable`. Each part goes into a GLB in its assembled position (named as in the
+  app: `Aft`, `Seg_2`…, `Top_Seg`, `Nose`, `Motor_Cap`, `Rod_Standoff`), plus a JSON of the dimensions the drawings need
+  (the strap from `rocket.strap`: its part, angle and height, plus its slot from `anchor_strap_geometry`; nose tie bar, motor bay, thread, launch-lug line) and each part's
   **fillet edges** (`fillet_edges()`: the tangent edges where a fillet meets the body or fin, found in
   the B-rep: two faces meeting tangentially where one bulges out past the shared tangent plane, so
   convex roundings, split faces and bores are left out; edges under 4 mm are skipped). STL output
@@ -51,7 +53,7 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
   shading, nose to the left in step drawings, Night shock cord, orange canopy and motion arrows.
 
 Drawings are not to scale unless they say so: the overview (`recovery`) shortens the cord with a
-break mark, and in `chute_fold` only picture 4 (roll next to B) is real size. The swivel is
+break mark, and in `chute_fold` only picture 4 (roll next to the top of the body) is real size. The swivel is
 clipped to the cord, not the tie bar, in the drawings (an 18 mm rocket): the M13/M18 tie-bar recess
 leaves room for one cord pass only (`body.nose_recess`); 24 mm and up have room for both.
 

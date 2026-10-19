@@ -35,6 +35,7 @@
     "target_altitude_m": 150.0,
     "drag_cd": 0.65,
     "launch_rod_m": 0.91,
+    "nose_weight_g": 0.0,
     "joint_clearance": null,
     "nose_clearance": null,
     "shoulder_len": null,

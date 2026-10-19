@@ -39,11 +39,17 @@ Paper-towel tube, cardstock nose and fins, modeling clay, 1.5 m of string, scrap
 
 ### 2. Measure (15 minutes)
 
+<!-- figure: cg-cp -->
+
 1. Build a test rocket (tube, cone nose, 3–4 fins). Balance it on a finger: mark the CG (blue). Measure from the nose tip.
 2. Trace the rocket's side view on cardboard, cut it out and balance the cut-out: that's a cautious estimate of the CP (red). Mark it.
 3. Score = (CP − CG) ÷ body width.
 
 ### 3. Swing-test demo (20 minutes)
+
+<!-- figure: swing-test -->
+
+<!-- figure: rocket-versions -->
 
 Outdoors, nobody within 3 m. Tie the string at the CG; swing the rocket in a circle; does the nose lead? Test **A** no fins, **B** fins, **C** fins + nose clay, **D** fins + tail clay. Re-find the CG each time. Record on W3.
 
@@ -75,3 +81,4 @@ Which version was best, and what did the data show about why?
 - **What to expect:** A tumbles, C is steady, D wobbles or tumbles.
 - **Extension:** a Rocket Builder rocket with CG 253 mm and CP 289 mm from the tip, body 21.4 mm: (289 − 253) ÷ 21.4 ≈ **1.7 cal**. Look up the Barrowman method, the hand calculation the app uses.
 - **Further resources:** Apogee Components' free lesson *Fins and Finish Lines* (apogeerockets.com/downloads/PDFs/58-3.pdf).
+- **Nose weight setting:** Advanced mode has **Nose weight (clay)**, in grams. Add 5 g at a time and rebuild: the CG moves forward and the score rises, but the predicted altitude drops. A good trade-off discussion.

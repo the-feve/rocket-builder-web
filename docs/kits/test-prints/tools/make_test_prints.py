@@ -5,7 +5,7 @@ GET /api/builds/{id}/rocket.zip, via FastAPI's TestClient: no web server, no
 network), so the STLs are byte for byte what the app's Download gives. For
 each kit it writes, under docs/kits/test-prints/<kit>/:
 
-  A_nose.stl, B_anchor_section.stl, ... (letters as in the assembly guide)
+  A_nose.stl, D_fin_can.stl, ... (letters as in the assembly guide)
   <kit>-rocket.zip   the app's ZIP, unchanged
   design.json        the app's saved-design file (Open file in the app)
   README.md          parameters, parts, print settings, motors, assembly order
@@ -44,39 +44,82 @@ import app as server  # noqa: E402
 
 # docs/kits/README.md, Kit designs: Beginner settings, printer max height
 # 256 mm, trapezoid fins, tangent-ogive nose, 3 fins, PLA, auto-sized fins.
+# "notes": dated lines for the top of the kit's README (newest first; the
+# README is rewritten on every run, so they live here).
+ROUND_3 = ("**2026-10-19 (round 3):** the shock-cord strap is now inside the top of the body tube; the separate "
+           "anchor section is gone. Reprint everything.")
+
+
+def fits_note(joint: float, nose: float) -> str:
+    return (f"**2026-10-19:** reprint everything. Joints from the fit tests (body {joint:.2f} mm, nose {nose:.2f} mm per "
+            "side, 0.5 mm chamfer on each shoulder's bed edge; they were the CAD 0.02 mm and wouldn't go in). Motor cap: "
+            "1.75 mm retention lip (nozzle hole = motor diameter - 3.5 mm) and the slimmer cap (1.2 mm wall, 0.4 mm "
+            "ribs). Launch lugs 4.0 mm bore.")
+
+
 KITS = [
-    {"dir": "starter-m18", "name": "Starter kit (M18, 18 mm motors)", "motor": "M18", "overall_length": 300},
-    {"dir": "big-m24", "name": "Big kit (M24, 24 mm motors)", "motor": "M24", "overall_length": 360},
-    {"dir": "mini-m13", "name": "Mini kit (M13, 13 mm motors)", "motor": "M13", "overall_length": 190},
+    {"dir": "starter-m18", "name": "Starter kit (M18, 18 mm motors)", "motor": "M18", "overall_length": 300,
+     "notes": [ROUND_3, fits_note(0.18, 0.15)]},
+    {"dir": "big-m24", "name": "Big kit (M24, 24 mm motors)", "motor": "M24", "overall_length": 360,
+     "notes": [ROUND_3, fits_note(0.18, 0.15)]},
+    {"dir": "mini-m13", "name": "Mini kit (M13, 13 mm motors)", "motor": "M13", "overall_length": 190,
+     "notes": [ROUND_3, fits_note(0.16, 0.14)]},
 ]
 COMMON = {"print_max_height": 256, "fin_shape": "trapezoid", "nose_shape": "tangent_ogive", "fin_count": 3,
           "material": "PLA"}
 
 # Part names in the app -> the assembly guide's letters (docs/assembly/tools/scene_defs.js).
-LETTERS = {"Nose": ("A", "nose"), "Anchor_Seg": ("B", "anchor_section"), "Aft": ("D", "fin_can"),
+# Since 2026-10-19 the cord strap is in the top body piece: "Top_Seg" (B) when
+# the body is two or more prints, else the fin can (D) itself. There is no
+# separate anchor section any more.
+LETTERS = {"Nose": ("A", "nose"), "Top_Seg": ("B", "top_body_section"), "Aft": ("D", "fin_can"),
            "Motor_Cap": ("E", "motor_cap"), "Rod_Standoff": ("F", "rod_standoff")}
 PART_TEXT = {
     "Nose": "Nose cone. Its tie bar inside the shoulder takes the shock cord's top end.",
-    "Anchor_Seg": "Anchor section: the body tube's top piece, with the strap the shock cord ties to.",
+    "Top_Seg": "Top body section: the body tube's top piece, with the strap inside its top that the shock cord clips or ties to.",
     "Seg": "Middle body section.",
     "Aft": "Fin can: fins, motor bay, launch lugs and the threaded tail.",
+    "Aft+strap": "Fin can (the whole body tube): fins, motor bay, launch lugs, the threaded tail, and the strap inside its top that the shock cord clips or ties to.",
     "Motor_Cap": "Motor cap: screws onto the tail and holds the motor in.",
     "Rod_Standoff": "Rod standoff: clips onto the launch rod under the aft lug, so the motor cap clears the blast deflector.",
 }
 PRINT_TIPS = {
     "Nose": "Tip up, shoulder on the bed. The shoulder's bed edge can bulge: sand it before fitting.",
-    "Anchor_Seg": "Upright, as exported (strap prints without supports). Sand the bed edge of the shoulder.",
+    "Top_Seg": "Upright, as exported (the cord strap prints without supports). Sand the bed edge of the shoulder.",
     "Seg": "Upright, as exported.",
     "Aft": "Upright on the tail, as exported; the fins stand vertical and the forward lug's 45-degree underside needs no support.",
+    "Aft+strap": "Upright on the tail, as exported; the fins stand vertical, and the forward lug's 45-degree underside and the cord strap in the top need no support.",
     "Motor_Cap": "Flat face on the bed, as exported. 0.16 mm layers give a smoother thread if it binds.",
     "Rod_Standoff": "Upright, as exported. Tall and thin: add a 3-5 mm brim.",
 }
+
+
+def text_key(name: str, names: list[str]) -> str:
+    """PART_TEXT / PRINT_TIPS key: middle sections share one; the fin can
+    has its own when it carries the cord strap (a one-piece body)."""
+    if name.startswith("Seg_"):
+        return "Seg"
+    if name == "Aft" and "Top_Seg" not in names:
+        return "Aft+strap"
+    return name
 
 
 def part_label(name: str, seg_index: int) -> tuple[str, str]:
     if name.startswith("Seg_"):
         return "C", f"body_section_{name.split('_')[1]}" if seg_index > 1 else "body_section"
     return LETTERS[name]
+
+
+def strap_part(names: list[str]) -> str:
+    return "B" if "Top_Seg" in names else "D (the fin can)"
+
+
+def joints_line(names: list[str]) -> str:
+    if "Top_Seg" in names:
+        below = "C, then C into D" if any(n.startswith("Seg_") for n in names) else "D"
+        return (f"2. Dry-fit the joints: B slides into {below}, and A's shoulder slides into B "
+                "(only the motor cap E is threaded).")
+    return "2. Dry-fit the joints: A's shoulder slides into the top of D (only the motor cap E is threaded)."
 
 
 def form(kit: dict, defaults: dict) -> dict:
@@ -108,7 +151,12 @@ def write_readme(kit, folder, params, body, files, heights, z_margin):
     rec = next((r for r in fl["rows"] if r["code"] == fl["recommended"]), None)
     cord = "flat 1/8 in (3 mm) braided elastic" if params["motor"] in ("M13", "M18") else "flat 1/4 in (6 mm) braided elastic"
     length_m = st["length_mm"] / 1000
-    L = [f"# {kit['name']}: test prints", "",
+    L = [f"# {kit['name']}: test prints", ""]
+    for note in kit.get("notes", []):
+        L += [f"> {note}", ">"]
+    if kit.get("notes"):
+        L[-1] = ""
+    L += [
          f"Generated by `tools/make_test_prints.py` through the app's own build path (Rocket Builder "
          f"{server.GENERATOR_VERSION}); the STLs are the ones in `{kit['dir']}-rocket.zip`, which is what the app's "
          "Download gives. Open `design.json` with **Open file** in the app to see or change this design.", ""]
@@ -131,9 +179,10 @@ def write_readme(kit, folder, params, body, files, heights, z_margin):
           f"(the generator keeps {z_margin:g} mm spare).", "",
           "| Letter | File | Part | Print height | Solid mass |", "|---|---|---|---|---|"]
     parts = sorted(body["parts"], key=lambda p: files[p["name"]][1])  # A, B, C..., D, E, F
+    names = [p["name"] for p in body["parts"]]
     for p in parts:
         letter, fname = files[p["name"]]
-        L.append(f"| **{letter}** | `{fname}` | {PART_TEXT['Seg' if p['name'].startswith('Seg_') else p['name']]} "
+        L.append(f"| **{letter}** | `{fname}` | {PART_TEXT[text_key(p['name'], names)]} "
                  f"| {p['height_mm']} mm | {p['mass_g']} g |")
     L += [f"| | | **Total printed** | tallest {max(heights):.1f} mm | **{body['total_mass_g']} g** |", "",
           "## Print settings", "",
@@ -143,12 +192,12 @@ def write_readme(kit, folder, params, body, files, heights, z_margin):
           "Top/bottom 5 layers.",
           "- **Infill:** 20 % gyroid (only the thick bits have any: the tail, the cap, the nose tip).",
           "- **Orientation:** as exported (each STL already rests on z = 0 in its print orientation). Do not rotate.",
-          "- **Supports:** none. The overhangs (forward lug underside, anchor strap, nose tie bar recess) are 45 degrees "
+          "- **Supports:** none. The overhangs (forward lug underside, cord strap, nose tie bar recess) are 45 degrees "
           "or bridged by design.",
           "- **Bed adhesion:** clean PEI or glue stick; brim only on the rod standoff (F).", ""]
     L += ["| Part | Orientation note |", "|---|---|"]
     for p in parts:
-        L.append(f"| {files[p['name']][0]} | {PRINT_TIPS['Seg' if p['name'].startswith('Seg_') else p['name']]} |")
+        L.append(f"| {files[p['name']][0]} | {PRINT_TIPS[text_key(p['name'], names)]} |")
     L += ["", "## Flying it", "",
           f"- **Stability:** {st['margin_cal']} calibers with the {st['motor']} (the heaviest {params['motor']} motor) "
           f"and the default recovery allowance ({st['recovery_mass_g']} g): {st['status']}. CG {st['cg_mm']} mm and "
@@ -177,8 +226,10 @@ def write_readme(kit, folder, params, body, files, heights, z_margin):
           "", "## Assembly order", "",
           "Follow `docs/assembly/assembly-guide.html` (or the PDF). In short:", "",
           "1. Check every part: sand the bed-edge lip off the shoulders and the start of the tail thread; no cracks.",
-          "2. Dry-fit the joints: B and D slide together, A's shoulder slides into B (only the motor cap E is threaded).",
-          "3. Tie the shock cord behind B's anchor strap, and its other end to A's tie bar; tie the parachute on near A.",
+          joints_line(names),
+          f"3. With the nose off, reach into the top of {strap_part(names)} and clip the shock cord's lower end onto "
+          "the strap there with a snap swivel (through the slot behind the bar), or tie it round the bar. Tie its other "
+          "end to A's tie bar and the parachute on near A.",
           "4. Wadding, then fold in the parachute and cord; fit A.",
           "5. Motor in (nozzle end last), screw on E.",
           "6. At the pad: F clips onto the rod, and the rocket's lugs slide down onto it until the aft lug sits on F.", ""]

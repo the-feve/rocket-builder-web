@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFDF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12203A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/static/brand/rb-favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/rb-favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/rb-apple-touch-icon-180.png">
+<link rel="preload" href="/static/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/brand.css">
+<script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
+<meta name="robots" content="noindex">
+<title>My classes · Rocket Builder</title>
+<style>
+  /* Teachers' class page (classroom.py / classes.py). Page styles; the brand is in /static/brand.css. */
+  .rb-main { max-width:1000px; }
+  .msg { padding:12px 14px; border-radius:10px; background:var(--card); border:1px solid var(--line); }
+  .msg.err { color:var(--err); background:var(--errbg); border-color:var(--errline); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel); color:var(--ink); font:600 14px var(--font-body); cursor:pointer; text-decoration:none; white-space:nowrap; }
+  .btn:hover { background:var(--hover); }
+  .btn.main { background:var(--cta); color:var(--cta-ink); border-color:var(--cta); }
+  .btn.ink { background:var(--ink); color:var(--panel); border-color:var(--ink); }
+  .btn.danger { color:var(--err); }
+  .btn:disabled { opacity:.55; cursor:default; }
+  input[type=text], input[type=email], input[type=password] { font:inherit; font-size:16px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; color:var(--ink); background:var(--field); min-width:0; }
+  form.inline { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 18px; }
+  form.inline input { flex:1 1 220px; }
+  .signin { display:grid; gap:8px; max-width:380px; }
+  .signin label { display:flex; flex-direction:column; gap:4px; font-size:13px; font-weight:600; }
+  .cards { display:grid; gap:12px; }
+  .card { border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:14px 16px; }
+  .card.closed { background:var(--card); }
+  .chead { display:grid; grid-template-columns:auto 1fr auto; gap:6px 18px; align-items:center; }
+  .code { font:700 30px/1 var(--font-head); letter-spacing:.14em; padding:8px 12px; border-radius:8px; background:var(--card); border:1px dashed var(--line); font-variant-numeric:tabular-nums; }
+  .card.closed .code { color:var(--muted); text-decoration:line-through; }
+  .chead h2 { margin:0; font-size:1.2rem; overflow-wrap:anywhere; }
+  .meta { color:var(--muted); font-size:13px; }
+  .st { display:inline-block; padding:2px 8px; font:700 10.5px/1.4 var(--font-head); letter-spacing:.08em; text-transform:uppercase; clip-path:var(--chamfer); }
+  .st.open { color:var(--ok); background:var(--okbg); } .st.shut { color:var(--muted); background:var(--card); box-shadow:inset 0 0 0 1px var(--line); }
+  .acts { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+  .subs { margin:12px 0 0; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--rowline); vertical-align:top; }
+  th { font:600 11.5px var(--font-head); text-transform:uppercase; letter-spacing:.07em; color:var(--muted); }
+  td.n { font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td small { display:block; color:var(--muted); font-size:12px; }
+  .cal { font:700 15px var(--font-head); } .cal.unstable { color:var(--err); } .cal.stable { color:var(--ok); } .cal.overstable { color:var(--warn); }
+  .rowacts { display:flex; gap:6px; flex-wrap:wrap; }
+  .rowacts .btn { padding:5px 10px; font-size:13px; }
+  .how { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin:6px 0 18px; padding:0; list-style:none; counter-reset:s; }
+  .how li { border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--panel); font-size:14px; display:flex; gap:10px; align-items:flex-start; }
+  .how li::before { counter-increment:s; content:counter(s); }
+  .how li::before { display:inline-grid; place-items:center; width:26px; height:26px; flex:none; font:700 13px/1 var(--font-head); color:var(--rb-night); background:var(--rb-orange); clip-path:var(--chamfer); }
+  #big { position:fixed; inset:0; z-index:50; display:grid; place-items:center; align-content:center; gap:14px; background:var(--rb-night); color:var(--rb-paper); text-align:center; padding:24px; }
+  #big[hidden] { display:none; }
+  #big .bc { font:700 clamp(3.5rem, 16vw, 11rem)/1 var(--font-head); letter-spacing:.12em; }
+  #big p { font-size:clamp(1rem, 2.6vw, 1.6rem); margin:0; color:var(--rb-night-300); }
+  #big p b { color:var(--rb-paper); }
+  #big .btn { background:transparent; color:var(--rb-paper); border-color:var(--rb-night-600); }
+  @media (max-width:720px) {
+    .chead { grid-template-columns:1fr; } .acts { justify-content:flex-start; } .how { grid-template-columns:1fr; }
+    .subs table thead { display:none; } .subs table, .subs tbody, .subs tr, .subs td { display:block; width:100%; }
+    .subs tr { border-bottom:1px solid var(--line); padding:6px 0; } .subs td { border:0; padding:3px 0; }
+    .subs td[data-l]::before { content:attr(data-l) ": "; color:var(--muted); font-size:12px; }
+  }
+</style>
+</head>
+<body>
+<header class="rb-header"><a class="rb-brand" href="/" title="Rocket Builder: start page"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-hdr-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-hdr-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><span>Rocket Builder<small>My classes</small></span></a><nav class="rb-nav" aria-label="Site"><a href="/learn/teachers">For teachers</a><a href="/tools/altitude">Altitude calculator</a><a href="/">← Back to Rocket Builder</a></nav></header>
+<main class="rb-main">
+  <h1>My classes</h1>
+  <p class="lede">Make a class code, put it on the board, and students hand in the rocket on their screen with just the code and a first name or nickname. No student accounts or emails.</p>
+  <ol class="how">
+    <li><span>Make a class here and show students its <b>class code</b>.</span></li>
+    <li><span>Students build a rocket in <a href="/">Rocket Builder</a>, then choose <b>⋯ → Hand in to my class</b>.</span></li>
+    <li><span>They type the code and a <b>first name or nickname</b>. Their rockets show up below.</span></li>
+  </ol>
+  <div id="out" class="msg">Loading…</div>
+  <p class="meta" id="privacy">Privacy: students give only a first name or nickname (the form tells them not to use their full name). We don't store their IP address or any other detail with it. Classes and everything handed in are deleted 180 days after the class is made, or as soon as you delete them. See the <a href="/terms">terms</a>.</p>
+</main>
+<div id="big" hidden role="dialog" aria-modal="true" aria-labelledby="bigname">
+  <p id="bigname"></p><div class="bc" id="bigcode"></div>
+  <p>Open <b id="bighost"></b>, build your rocket, then <b>⋯ → Hand in to my class</b>.</p>
+  <button type="button" class="btn" id="bigclose">Close (Esc)</button>
+</div>
+<footer class="rb-footer"><a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net/">Quiver Design Works</a> · <a href="/terms">Terms</a></footer>
+<script type="module">
+const out = document.getElementById('out');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const LABEL = { tangent_ogive: 'Ogive', conical: 'Cone', elliptical: 'Round', parabolic: 'Parabolic', von_karman: 'Von Kármán',
+  trapezoid: 'trapezoid', delta: 'delta', swept: 'swept', clipped_delta: 'clipped delta', rectangular: 'rectangle' };
+const day = t => new Date(t * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+const when = t => new Date(t * 1000).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const pretty = n => (n || '').split('_').filter(Boolean).join(' · ');
+let info = null, open = new Set();
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(typeof d.detail === 'string' ? d.detail : `Error ${r.status}`); e.status = r.status; throw e; }
+  return d;
+}
+function signInForm(msg = '') {
+  out.className = '';
+  out.innerHTML = `<div class="card"><h2>Sign in to make a class</h2>
+    <p class="meta">Teachers use the same grown-up account as Rocket Builder. No account yet? <a href="/">Create one in Rocket Builder</a> (Sign in → Create account), then come back.</p>
+    <form class="signin" id="si"><label>Email <input type="email" id="em" autocomplete="email" required maxlength="254"></label>
+      <label>Password <input type="password" id="pw" autocomplete="current-password" required maxlength="200"></label>
+      <p class="msg err" id="sierr" ${msg ? '' : 'hidden'}>${esc(msg)}</p>
+      <div><button class="btn ink" type="submit">Sign in</button></div></form></div>`;
+  document.getElementById('si').onsubmit = async e => {
+    e.preventDefault();
+    try {
+      await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: document.getElementById('em').value.trim(), password: document.getElementById('pw').value }) });
+      load();
+    } catch (err) { signInForm(err.message); }
+  };
+}
+function summary(s) {
+  const m = s.summary || {};
+  return `${esc(m.motor_size)} · ${Math.round(m.height_mm)} mm · ${m.fin_count} ${esc(LABEL[m.fin_shape] || m.fin_shape)} fins · ${esc(LABEL[m.nose_shape] || m.nose_shape)} nose${m.nose_weight_g ? ` · ${m.nose_weight_g} g clay` : ''}`;
+}
+function subsHtml(c) {
+  if (!c.items) return '<p class="meta">Loading…</p>';
+  if (!c.items.length) return `<p class="meta">No rockets handed in yet. Students: ⋯ → <b>Hand in to my class</b>, code <b>${esc(c.code)}</b>.</p>`;
+  return `<table><thead><tr><th>Student</th><th>Rocket</th><th>Stability</th><th>Best motor</th><th>Handed in</th><th></th></tr></thead><tbody>
+    ${c.items.map(s => { const m = s.summary || {}; return `<tr>
+      <td data-l="Student"><b>${esc(s.nickname)}</b></td>
+      <td data-l="Rocket">${esc(pretty(s.design_name).split(' · ')[0])}<small>${summary(s)}</small></td>
+      <td data-l="Stability" class="n"><span class="cal ${esc(m.status)}">${Number(m.margin_cal).toFixed(2)} cal</span><small>${m.ok ? (m.margin_cal > 3 ? 'too stable' : m.margin_cal > 2 ? 'very stable' : 'just right') : 'not stable yet'}</small></td>
+      <td data-l="Best motor" class="n">${m.recommended ? `<b>${esc(m.recommended)}</b><small>about ${m.apogee_m} m high${m.field_m ? `, ${m.field_m} m field` : ''}</small>` : '<small>none passes yet</small>'}</td>
+      <td data-l="Handed in" class="n">${when(s.updated_at)}</td>
+      <td><div class="rowacts"><a class="btn" href="/?classsub=${encodeURIComponent(s.id)}" target="_blank" rel="noopener" title="Open this rocket in Rocket Builder (a copy: the student's stays as it is)">Open in designer ↗</a>
+        <button class="btn danger" type="button" data-delsub="${esc(s.id)}" data-class="${esc(c.id)}" data-nick="${esc(s.nickname)}">Delete</button></div></td></tr>`; }).join('')}
+    </tbody></table>`;
+}
+function render() {
+  const cs = info.classes, openCount = cs.filter(c => !c.closed).length;
+  out.className = '';
+  out.innerHTML = `<form class="inline" id="newc"><input type="text" id="cname" maxlength="60" placeholder="Class name, e.g. Room 12, period 3" aria-label="Class name">
+      <button class="btn main" type="submit" ${openCount >= info.max_open ? 'disabled' : ''}>Make a class code</button>
+      <span class="meta">${openCount} of ${info.max_open} open classes · up to ${info.max_submissions} rockets each</span></form>
+    <p class="msg err" id="cerr" hidden></p>
+    <div class="cards">${cs.length ? cs.map(c => `<section class="card ${c.closed ? 'closed' : ''}" data-id="${esc(c.id)}">
+      <div class="chead"><span class="code" aria-label="Class code ${esc(c.code.split('').join(' '))}">${esc(c.code)}</span>
+        <div><h2>${esc(c.name)}</h2><div class="meta"><span class="st ${c.closed ? 'shut' : 'open'}">${c.closed ? 'Closed' : 'Open'}</span>
+          ${c.submissions} rocket${c.submissions === 1 ? '' : 's'} · made ${day(c.created_at)} · deleted ${day(c.expires_at)}</div></div>
+        <div class="acts"><button class="btn" type="button" data-show>${open.has(c.id) ? 'Hide rockets' : 'Show rockets'}</button>
+          ${c.closed ? '' : '<button class="btn" type="button" data-big>Show code big</button>'}
+          <button class="btn" type="button" data-close="${c.closed ? 0 : 1}" title="${c.closed ? 'Take hand-ins again' : 'Stop taking hand-ins; the rockets stay'}">${c.closed ? 'Reopen' : 'Close class'}</button>
+          <button class="btn danger" type="button" data-del>Delete</button></div></div>
+      ${open.has(c.id) ? `<div class="subs" id="subs-${esc(c.id)}">${subsHtml(c)}</div>` : ''}</section>`).join('')
+      : '<p class="msg">No classes yet. Give your class a name and press <b>Make a class code</b>.</p>'}</div>`;
+  document.getElementById('newc').onsubmit = async e => {
+    e.preventDefault();
+    try { const c = await api('/api/classes', { method: 'POST', body: JSON.stringify({ name: document.getElementById('cname').value.trim() || 'My class' }) });
+      open.add(c.id); await load(); }
+    catch (err) { const el = document.getElementById('cerr'); el.textContent = err.message; el.hidden = false; }
+  };
+  for (const id of open) loadSubs(id);
+}
+async function loadSubs(id) {
+  const c = info.classes.find(x => x.id === id);
+  if (!c) return;
+  try { const d = await api(`/api/classes/${encodeURIComponent(id)}`); c.items = d.items; c.submissions = d.items.length; }
+  catch (err) { c.items = []; }
+  const box = document.getElementById(`subs-${id}`);
+  if (box) box.innerHTML = subsHtml(c);
+}
+async function load() {
+  try {
+    const me = await api('/api/auth/me');
+    if (!me.user) { signInForm(); return; }
+    info = await api('/api/classes');
+    render();
+  } catch (err) {
+    if (err.status === 401) signInForm(); else { out.className = 'msg err'; out.textContent = err.message; }
+  }
+}
+out.addEventListener('click', async e => {
+  const card = e.target.closest('.card[data-id]'), id = card?.dataset.id, c = info?.classes.find(x => x.id === id);
+  const b = e.target.closest('button');
+  if (!b) return;
+  try {
+    if (b.dataset.delsub) {
+      if (!confirm(`Delete ${b.dataset.nick}'s rocket from this class?`)) return;
+      await api(`/api/classes/${encodeURIComponent(b.dataset.class)}/submissions/${encodeURIComponent(b.dataset.delsub)}`, { method: 'DELETE' });
+      await load(); return;
+    }
+    if (!c) return;
+    if (b.hasAttribute('data-show')) { open.has(id) ? open.delete(id) : open.add(id); render(); }
+    else if (b.hasAttribute('data-big')) showBig(c);
+    else if (b.dataset.close) { await api(`/api/classes/${encodeURIComponent(id)}/close`, { method: 'POST', body: JSON.stringify({ closed: b.dataset.close === '1' }) }); await load(); }
+    else if (b.hasAttribute('data-del')) {
+      if (!confirm(`Delete "${c.name}" and all ${c.submissions} rocket${c.submissions === 1 ? '' : 's'} handed in? This can't be undone.`)) return;
+      await api(`/api/classes/${encodeURIComponent(id)}`, { method: 'DELETE' }); open.delete(id); await load();
+    }
+  } catch (err) { alert(err.message); }
+});
+const big = document.getElementById('big');
+function showBig(c) {
+  document.getElementById('bigname').textContent = `${c.name} · class code`;
+  document.getElementById('bigcode').textContent = c.code;
+  document.getElementById('bighost').textContent = location.host;
+  big.hidden = false; document.getElementById('bigclose').focus();
+}
+document.getElementById('bigclose').onclick = () => { big.hidden = true; };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') big.hidden = true; });
+load();
+</script>
+</body>
+</html>

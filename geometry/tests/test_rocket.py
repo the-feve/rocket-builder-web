@@ -82,7 +82,7 @@ def test_larger_body_gets_inner_mount():
 @pytest.mark.parametrize("shape", FIN_SHAPES)
 def test_every_part_is_one_valid_solid(shape):
     r = rocket(shape)
-    assert [p.name for p in r.parts] == ["Aft", "Anchor_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]
+    assert [p.name for p in r.parts] == ["Aft", "Top_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]
     for p in r.parts:
         assert p.assembled.is_valid, p.name
         assert len(p.assembled.solids()) == 1, p.name
@@ -170,8 +170,8 @@ def test_mass_estimate_is_plausible():
 # ---- Phase 1: lugs, standoff, anchor strap ----------------------------------
 
 @pytest.mark.parametrize("lugs,names", [
-    ("none", ["Aft", "Anchor_Seg", "Nose", "Motor_Cap"]),
-    ("aft_only", ["Aft", "Anchor_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]),
+    ("none", ["Aft", "Top_Seg", "Nose", "Motor_Cap"]),
+    ("aft_only", ["Aft", "Top_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]),
 ])
 def test_lug_options(lugs, names):
     r = rocket(launch_lugs=lugs)
@@ -188,7 +188,7 @@ def test_lugs_add_material_on_one_line():
 
 def test_forward_lug_on_seg_2():
     r = rocket(body_length=400.0, forward_lug_frac=0.7)
-    assert [p.name for p in r.parts] == ["Aft", "Seg_2", "Anchor_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]
+    assert [p.name for p in r.parts] == ["Aft", "Seg_2", "Top_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]
     d = r.derived
     plain = body_segment(d, r.seg_lens[1]).volume
     assert r.parts[1].volume > plain + 20  # the forward lug
@@ -199,14 +199,104 @@ def test_anchor_strap_is_inside_the_bore():
     r = rocket()
     d = r.derived
     seg = r.parts[1]
-    assert seg.name == "Anchor_Seg"
+    assert seg.name == "Top_Seg" and r.strap["part"] == "Top_Seg"
     plain = body_segment(d, r.seg_lens[1]).volume
     assert seg.volume > plain + 20
     # Nothing added outside the body OD.
     bb = seg.assembled.bounding_box()
     assert max(bb.max.X, -bb.min.X, bb.max.Y, -bb.min.Y) <= d.body_od / 2 + 1e-3
     s = anchor_strap_geometry(d)
-    assert r.seg_lens[-1] >= s["sec_len"] - 1e-9  # a short leftover is folded into it
+    assert r.seg_lens[-1] >= s["sec_len"] - 1e-9  # a short leftover is taken from the piece below
+
+
+# One-piece bodies (2026-10-19): the kits' Starter (M18 300 mm) and Mini
+# (M13 190 mm) on a 256 mm printer, and a fat M18 with the inner motor mount.
+ONE_PIECE = [
+    dict(motor="M18", print_max_height=256, fin_shape=FinShape.TRAPEZOID, body_length=224.3),
+    dict(motor="M13", print_max_height=256, fin_shape=FinShape.TRAPEZOID, body_length=129.3, forward_lug_frac=0.95),
+    dict(motor="M18", print_max_height=256, body_od_override=33.7, body_length=180.0),
+]
+
+
+@pytest.mark.parametrize("i", range(len(ONE_PIECE)))
+def test_one_piece_body_carries_the_strap(i):
+    """A body that fits the printer is one print, the fin can, with the
+    shock-cord strap in its top (owner, 2026-10-19: no separate anchor
+    section). The strap sits in the plain bore, its top at least `gap`
+    under the nose's shoulder, and the cord slot behind the bar is open from
+    the part's top edge to below the strap; every part is sound (meshed,
+    not just is_valid) and nothing overlaps."""
+    from build123d import Solid
+
+    from rocketgen.anchor import anchor_strap_geometry
+    from rocketgen.geom import meshes
+    kw = dict(ONE_PIECE[i])
+    r = rocket(kw.pop("fin_shape", FinShape.CLIPPED_DELTA), **kw)
+    d = r.derived
+    names = [p.name for p in r.parts]
+    assert names[:2] == ["Aft", "Nose"] and "Anchor_Seg" not in names and len(r.seg_lens) == 1
+    assert r.seg_lens == [r.params.body_length]
+    for p in r.parts:
+        assert p.assembled.is_valid and len(p.assembled.solids()) == 1 and meshes(p.assembled), p.name
+    for a in range(len(r.parts)):
+        for b in range(a + 1, len(r.parts)):
+            x = as_shape(r.parts[a].assembled.intersect(r.parts[b].assembled))
+            assert x is None or x.volume < 0.01, f"{names[a]} overlaps {names[b]}"
+    s = anchor_strap_geometry(d)
+    st = r.strap
+    aft, nose = r.parts[0], next(p for p in r.parts if p.name == "Nose")
+    assert st["part"] == "Aft"
+    assert st["z_top"] == pytest.approx(nose.assembled.bounding_box().min.Z - s["gap"], abs=1e-6)
+    assert st["z_bot"] >= d.aft_socket_base + s["z_spring"] - 1e-6  # well above the motor stop
+    # The strap is there: the bore is partly filled at mid-strap, not above or below it.
+    ri = d.body_id / 2
+    inner = math.pi * ((ri + d.wall / 2) ** 2 - ri ** 2)
+
+    def inside_area(z):
+        cut = as_shape(aft.assembled.intersect(Solid.make_cylinder(ri + d.wall / 2, 0.2).translate((0, 0, z))))
+        return cut.volume / 0.2
+
+    assert inside_area((st["z_bot"] + st["z_top"]) / 2) > inner + 5
+    for z in (st["z_bot"] - 3, st["z_top"] + 0.5):
+        assert inside_area(z) == pytest.approx(inner, abs=0.5)
+    # The cord slot (strap at 90 degrees: on +Y) is open from the top edge down past the strap.
+    y = ri - s["hole_depth"] / 2
+    top = r.seg_lens[0]
+    probe = Solid.make_box(1, 1, top - st["z_bot"] + 6).translate((-0.5, y - 0.5, st["z_bot"] - 5))
+    hit = aft.assembled.intersect(probe)
+    assert hit is None or as_shape(hit) is None or as_shape(hit).volume < 1e-6
+
+
+def test_body_parts_split():
+    """The body is one print when it fits the printer; otherwise the aft
+    part is the printer's height and the top part (the strap) at least
+    sec_len, taken from the piece below if the leftover is shorter. The
+    printed lengths always add up to body_length."""
+    from rocketgen.anchor import anchor_strap_geometry
+    from rocketgen.build import plan_segments, seg_part_name
+    p = DesignParams(print_max_height=200)
+    d = compute_derived(p)
+    sec = anchor_strap_geometry(d)["sec_len"]
+    assert plan_segments(p.with_(body_length=195.0), d) == [195.0]
+    two = plan_segments(p.with_(body_length=200.0), d)
+    assert two == pytest.approx([200.0 - sec, sec])
+    assert plan_segments(p.with_(body_length=300.0), d) == pytest.approx([195.0, 105.0])
+    many = plan_segments(p.with_(body_length=600.0), d)
+    assert len(many) == 4 and sum(many) == pytest.approx(600.0) and max(many) <= 195.0 + 1e-9
+    assert many[-1] >= sec
+    assert [seg_part_name(i, 4) for i in range(4)] == ["Aft", "Seg_2", "Seg_3", "Top_Seg"]
+    assert seg_part_name(0, 1) == "Aft"
+
+
+def test_one_piece_body_too_short_for_the_strap():
+    from rocketgen.anchor import anchor_strap_geometry
+    from rocketgen.build import plan_rocket
+    from rocketgen.geom import GeometryError
+    p = DesignParams(motor="M18", fin_shape=FinShape.TRAPEZOID)
+    need = anchor_strap_geometry(compute_derived(p))["aft_len"]
+    plan_rocket(p.with_(body_length=need))
+    with pytest.raises(GeometryError, match="shock-cord strap"):
+        plan_rocket(p.with_(body_length=need - 1))
 
 
 @pytest.mark.parametrize("motor", ["M13", "M18", "M29"])
@@ -377,6 +467,31 @@ def test_auto_size_fins_makes_the_heaviest_motor_stable():
     assert build_stable(DesignParams()).params.fin_scale == 1  # already stable: untouched
 
 
+def test_nose_weight_moves_the_cg_forward():
+    """Clay in the nose (DesignParams.nose_weight_g, the stability lessons):
+    the CG moves toward the nose, the score goes up, the rocket is heavier,
+    and it matches the advice's own clay estimate (Balance.predict nose_g)."""
+    import copy
+
+    from rocketgen.stability import Balance
+    r = rocket()
+    b0 = Balance(r)
+    s0 = b0.check()
+    b10 = b0.with_nose_weight(10)
+    s10 = b10.check()
+    assert s10.cg < s0.cg and s10.margin_cal > s0.margin_cal + 0.1
+    assert s10.total_mass_g == pytest.approx(s0.total_mass_g + 10)
+    assert b10.printed_mass_g == pytest.approx(b0.printed_mass_g + 10) and b10.nose_weight_g == 10
+    assert s10.margin_cal == pytest.approx(b0.predict(nose_g=10), abs=1e-6)
+    assert b0.check().margin_cal == s0.margin_cal and b0.with_nose_weight(0) is b0  # the cached balance is untouched
+    # From the params (the CLI / build_stable path) it's the same.
+    r10 = copy.copy(r)
+    r10.params = r.params.with_(nose_weight_g=10)
+    assert Balance(r10).check().margin_cal == pytest.approx(s10.margin_cal)
+    # It slides with the nose when the body is made longer.
+    assert b10.predict_length(100) > b0.predict_length(100)
+
+
 def test_flight_sim_matches_the_motor_picker():
     # M18, 52 g without motor, 20.8 mm: the HTML picker's numbers.
     from rocketgen.flight import motors_for, pick, simulate
@@ -389,7 +504,8 @@ def test_flight_sim_matches_the_motor_picker():
 # ---- overall height (the website's beginner mode) --------------------------
 
 @pytest.mark.parametrize("shape,kw", [
-    (FinShape.CLIPPED_DELTA, {}),                                     # default M18, one body part + anchor
+    (FinShape.CLIPPED_DELTA, {}),                                     # default M18, aft + top part
+    (FinShape.TRAPEZOID, {"print_max_height": 256}),                  # one-piece body (strap in the aft)
     (FinShape.SWEPT, {"fin_scale": 1.5}),                             # fins trail below the tail
     (FinShape.TRAPEZOID, {"body_length": 420.0}),                     # three body parts (two joints)
     (FinShape.DELTA, {"motor": "M24", "nose_fineness": 4.0}),
@@ -514,6 +630,47 @@ def test_launch_profile_shows_unsafe_flights():
     assert {"slow", "windturn"} <= {d["kind"] for d in heavy["dangers"]} and heavy["landing_m"] < 0  # tipped upwind
 
 
+def test_launch_profile_angle_streamer_and_forces():
+    """Classroom options on the launch page: a tilted rod sends the rocket
+    downwind (into the wind when negative) and leaves the vertical flight
+    unchanged at 0°; a streamer brings a light rocket down at 6-9 m/s, faster
+    than a chute, and drifts less; the per-point forces add up (thrust while
+    burning, drag about equal to the weight under the chute)."""
+    from rocketgen import flight as fl
+    b6 = next(m for m in fl.load_flight_motors() if m.code == "B6")
+    base = fl.launch_profile(b6, 50, 23, 12, 0.0)
+    assert fl.launch_profile(b6, 50, 23, 12, 0.0, angle_deg=0.0)["path"] == base["path"]
+    tilt = fl.launch_profile(b6, 50, 23, 12, 0.0, angle_deg=20)
+    into = fl.launch_profile(b6, 50, 23, 12, 0.0, angle_deg=-20)
+    assert tilt["landing_m"] > 30 and into["landing_m"] < -30 and abs(base["landing_m"]) < 1
+    assert tilt["apogee_m"] < base["apogee_m"] and tilt["path"][0][3:] == ["rod", 20.0]  # on the rod, tilted
+    assert tilt["events"]["rod"]["speed_ms"] >= base["events"]["rod"]["speed_ms"] - 0.3
+    # Streamers: the assumed Cd gives the usual 6-9 m/s for light rockets.
+    assert 6 <= fl.streamer_descent_rate(30, fl.streamer_size("M13")) <= 9
+    assert 6 <= fl.streamer_descent_rate(80, fl.streamer_size("M24")) <= 9
+    assert fl.streamer_size("M18") == (1, 24) and fl.streamer_size("M29") == (2, 36)
+    chute = fl.launch_profile(b6, 25, 18, 12, fl.WIND_MS)
+    stre = fl.launch_profile(b6, 25, 18, 12, fl.WIND_MS, streamer_in=(1, 24))
+    assert stre["streamer_in"] == [1, 24] and stre["chute_in"] is None
+    assert 6 <= stre["events"]["landing"]["speed_ms"] <= 9.5 < 9.5 + chute["events"]["landing"]["speed_ms"]
+    assert stre["events"]["landing"]["speed_ms"] > chute["events"]["landing"]["speed_ms"]
+    assert abs(stre["landing_m"]) < abs(chute["landing_m"])  # comes down sooner, drifts less
+    # Forces and graph samples, one per path point.
+    S, cols = base["samples"], base["sample_cols"]
+    assert len(S) == len(base["path"]) and cols == list(fl.SAMPLE_COLS)
+    i = {c: k for k, c in enumerate(cols)}
+    burn = [s for p, s in zip(base["path"], S) if p[3] == "boost"]
+    assert burn and all(s[i["thrust_n"]] > 0 for s in burn) and max(s[i["accel_ms2"]] for s in burn) > 50
+    coast = [s for p, s in zip(base["path"], S) if p[3] == "coast"]
+    assert all(s[i["thrust_n"]] == 0 and s[i["accel_ms2"]] < -9 for s in coast)
+    assert 50 + b6.mass_g - b6.prop_g < S[0][i["mass_g"]] < 50 + b6.mass_g and S[-1][i["mass_g"]] == pytest.approx(50 + b6.mass_g - b6.prop_g, abs=0.2)
+    down = [s for p, s in zip(base["path"], S) if p[3] == "chute"][-5:]
+    for s in down:  # steady descent: drag holds up the weight
+        assert s[i["drag_h_n"]] == pytest.approx(s[i["weight_n"]], rel=0.05) and abs(s[i["accel_ms2"]]) < 0.5
+    top = max(range(len(S)), key=lambda k: S[k][i["speed_ms"]])
+    assert S[top][i["speed_ms"]] == pytest.approx(fl.simulate(b6, 50, 23).max_speed, rel=0.03)
+
+
 def test_motor_cap_lip_covers_the_casing():
     """The cap's retention lip reaches 1.75 mm in from the motor's OD (inside
     the ~2.5 mm cardboard casing wall), so the nozzle hole is the motor
@@ -544,7 +701,7 @@ def test_shoulder_chamfer():
     from build123d import Solid
     r = rocket(motor="M18")
     d = r.derived
-    for name, sh_od in (("Nose", d.nose_shoulder_od), ("Anchor_Seg", d.shoulder_od)):
+    for name, sh_od in (("Nose", d.nose_shoulder_od), ("Top_Seg", d.shoulder_od)):
         part = next(p for p in r.parts if p.name == name).local
         bb = part.bounding_box()
         z0 = bb.min.Z

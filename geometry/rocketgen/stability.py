@@ -15,6 +15,7 @@ scaled up until the rocket is stable with the heaviest motor of its size.
 
 from __future__ import annotations
 
+import copy
 import math
 from dataclasses import dataclass
 
@@ -102,15 +103,19 @@ class Balance:
         self.motor_z = -d.thread["hang"] + d.mtr_len / 2  # resting on the cap's face
         self.recovery_z = parts["Nose"].placement_z - d.cal  # packed just under the nose shoulder
         self.nose_z = parts["Nose"].assembled.center(CenterOf.MASS).Z  # where nose weight (clay) sits, roughly
-        # For predict_length: the body between the aft part and the anchor
-        # section (the Seg_* parts) is what grows or shrinks; the aft part
-        # stays, and the anchor section, nose and parachute slide with the top.
+        # For predict_length: the body between the aft part and the top body
+        # part (the Seg_* parts) is what grows or shrinks; the aft part
+        # stays, and the top part (with the cord strap), nose and parachute
+        # slide with the top. A one-piece body (the strap in the aft part's
+        # top) has no middle: new tube is added above the aft part and only
+        # the nose and parachute slide (the ~1 g strap stays; close enough).
         masses = rocket.mass_g()
         joint = d.shoulder_len + d.joint_rise
         self.aft_top = rocket.seg_lens[0]
-        anchor = parts["Anchor_Seg"]
-        self.mid_len = max(anchor.placement_z + joint - self.aft_top, 0.0)  # exposed height of the Seg_* parts
-        mid = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in parts if n.startswith("Seg_")]
+        body = [q.name for q in rocket.parts[:len(rocket.seg_lens)]]  # aft first, top last
+        top = parts[body[-1]] if len(body) > 1 else None
+        self.mid_len = max(top.placement_z + joint - self.aft_top, 0.0) if top else 0.0  # exposed height of the Seg_* parts
+        mid = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in body[1:-1]]
         self.mid_m = sum(m for m, _ in mid)
         self.mid_z = sum(m * z for m, z in mid) / self.mid_m if mid else self.aft_top
         # g per mm of height: measured from the Seg_* parts (joints and lug included), else a plain tube
@@ -118,9 +123,34 @@ class Balance:
         tube = math.pi / 4 * (d.body_od ** 2 - d.body_id ** 2) * MATERIALS[p.material] / 1000.0
         self.mid_g_per_mm = (self.mid_m / self.mid_len if self.mid_m and self.mid_len > 20
                              else tube * d.zmax / max(d.zmax - joint, 1.0))
-        self.slides = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in ("Anchor_Seg", "Nose")]
+        sliding = ([top.name] if top else []) + ["Nose"]
+        self.slides = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in sliding]
         self.fixed = [(masses[n], parts[n].assembled.center(CenterOf.MASS).Z) for n in parts
-                      if n not in ("Anchor_Seg", "Nose", "Rod_Standoff") and not n.startswith("Seg_")]
+                      if n not in sliding and n != "Rod_Standoff" and n not in body[1:-1]]
+        self.nose_weight_g = 0.0
+        if p.nose_weight_g:
+            self._add_nose_weight(p.nose_weight_g)
+
+    def _add_nose_weight(self, grams: float) -> None:
+        # Clay pressed into the nose: a point mass at the nose cone's own
+        # centroid (nose_z, where the advice's clay estimate puts it too).
+        # Pushed in from the shoulder it sits between there and the tip, so
+        # the centroid is the cautious end: the real gain is a little more.
+        # It flies with the rocket, so it counts in printed_mass_g (the flight
+        # sim and parachute see it) and slides with the nose in predict_length.
+        self.parts = self.parts + [(grams, self.nose_z)]
+        self.slides = self.slides + [(grams, self.nose_z)]
+        self.nose_weight_g += grams
+
+    def with_nose_weight(self, grams: float) -> "Balance":
+        """A copy of this balance carrying `grams` more nose weight (clay).
+        The website caches one Balance per geometry; the nose weight is not
+        geometry, so each request adds its own."""
+        if not grams:
+            return self
+        b = copy.copy(self)
+        b._add_nose_weight(grams)
+        return b
 
     @property
     def printed_mass_g(self) -> float:
@@ -189,9 +219,9 @@ class Balance:
     def predict_length(self, delta: float, motor: Motor | None = None, recovery_mass_g: float | None = None) -> float | None:
         """The margin if the rocket were `delta` mm taller (negative:
         shorter), without rebuilding: the middle of the body (the Seg_*
-        parts) grows or shrinks at its measured weight per mm, and the anchor
-        section, nose and parachute slide with the top. None when shorter
-        would cut into the aft part or anchor section (no estimate then).
+        parts) grows or shrinks at its measured weight per mm, and the top
+        body part, nose and parachute slide with the top. None when shorter
+        would cut into the aft part or top body part (no estimate then).
         Checked against rebuilds: within about 0.2 cal for changes of a few
         hundred mm."""
         new_len = self.mid_len + delta

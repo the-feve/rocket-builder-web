@@ -42,7 +42,8 @@ export function defineScenes(h) {
     return pts;
   }
 
-  // The cord at the anchor strap: the long part comes down the slot behind
+  // The cord at the strap (inside the top of the top body piece: the fin can
+  // D on a one-piece body, B otherwise): the long part comes down the slot behind
   // the bar, under it, up in front, and the end is tied round the long part
   // just above the bar. `top`: how far above the bar the long part is drawn.
   // Returns the group and the points the labels and other cords need.
@@ -245,29 +246,30 @@ export function defineScenes(h) {
   }
 
   return {
-    // Cover: the M24 rocket, assembled.
+    // Cover: the Starter rocket (one-piece body), assembled.
     hero: {
       build(root) {
-        const k = 'm24';
-        for (const p of ['Aft', 'Seg_2', 'Anchor_Seg', 'Nose', 'Motor_Cap']) root.add(part(k, p, { rot: 200 }));
+        const k = 'm18';
+        for (const p of ['Aft', 'Nose', 'Motor_Cap']) root.add(part(k, p, { rot: 200 }));
         return { dir: viewDir(-75, 12), up: V(0, 0, 1), W: 420, line: 2.0 };
       },
     },
 
-    // Parts layout (A–F): every printed part pulled apart along the axis.
+    // Parts layout: every printed part of the Starter rocket (one-piece body:
+    // A, D, E, F) pulled apart along the axis. Taller rockets add B and C.
     layout: {
       build(root) {
-        const k = 'm24', I = R[k].info;
+        const k = 'm18', I = R[k].info;
         const g = sideways(root);
-        const rot = 48, gap = 34;
-        const dz = { Aft: 0, Seg_2: gap, Anchor_Seg: 2 * gap, Nose: 3 * gap, Motor_Cap: -gap * 0.9, Rod_Standoff: -gap * 2.2 };
+        const rot = 48, gap = 30;
+        const dz = { Aft: 0, Nose: gap, Motor_Cap: -gap * 0.9, Rod_Standoff: -gap * 2.2 };
         for (const p of Object.keys(dz)) g.add(part(k, p, { dz: dz[p], rot }));
         const at = (name, f = 0.5, x = -I.body_od / 2) => { const p = P(k, name); return mark(g, x, 0, p.zmin + dz[name] + (p.zmax - p.zmin) * f); };
         const lr = I.lug.center_r, la = deg(I.lug_angle_deg + rot);
         return {
           dir: V(0.28, 1, 0.42), up: V(0, 0, 1), W: 2400, line: 2.4,
           points: {
-            A: at('Nose', 0.45), B: at('Anchor_Seg', 0.6), C: at('Seg_2', 0.5), D: at('Aft', 0.62),
+            A: at('Nose', 0.45), D: at('Aft', 0.55),
             E: at('Motor_Cap', 0.5, -I.thread.r_cap_out),
             F: mark(g, lr * Math.cos(la) - 3, lr * Math.sin(la), -I.lug.standoff_h / 2 + dz.Rod_Standoff),
           },
@@ -360,12 +362,12 @@ export function defineScenes(h) {
         const g = sideways(root);
         const rot = 0;
         const gap = 30;
-        const dz = { Aft: 0, Seg_2: gap, Anchor_Seg: 2 * gap };
+        const dz = { Aft: 0, Seg_2: gap, Top_Seg: 2 * gap };
         for (const p of Object.keys(dz)) g.add(part(k, p, { dz: dz[p], rot }));
         const la = deg(I.lug_angle_deg + rot), lr = I.lug.center_r;
-        const rodTop = P(k, 'Anchor_Seg').zmax + 2 * gap + 10;
+        const rodTop = P(k, 'Top_Seg').zmax + 2 * gap + 10;
         g.add(cyl(I.rod_diameter / 2, -25, rodTop, COL.steel).translateX(lr * Math.cos(la)).translateY(lr * Math.sin(la)));
-        const seg = P(k, 'Seg_2'), anc = P(k, 'Anchor_Seg');
+        const seg = P(k, 'Seg_2'), anc = P(k, 'Top_Seg');
         return {
           dir: V(0.15, 1, 0.75), up: V(0, 0, 1), W: 2400, line: 2.4, margin: 4,
           points: {
@@ -377,13 +379,14 @@ export function defineScenes(h) {
       },
     },
 
-    // Step 4: the shock cord through the anchor strap. The near half of the
-    // anchor section is cut away; we look at the bar face-on.
-    anchor_cord: {
+    // Step 4: the shock cord through the strap inside the top of the body
+    // (the Starter's fin can D). The near half of the tube is cut away; we
+    // look at the bar face-on.
+    strap_cord: {
       build(root) {
         const k = 'm18', I = R[k].info, S = I.strap;
         const clip = cutPlane(root, V(0, 1, 0), 1);
-        root.add(part(k, 'Anchor_Seg', { clip }));
+        root.add(part(k, S.part, { clip }));
         const c = strapRig(I, { top: 26 });
         root.add(c.group);
         return {
@@ -472,13 +475,13 @@ export function defineScenes(h) {
     // Overview: how it all hangs under the parachute. Nose on top, the lines
     // girth-hitched to the cord just under the nose, the cord (shortened, with
     // a break mark) down to the strap in the top of the body. The nose and the
-    // anchor section are cut open to show the tie bar and the strap.
+    // top of the body (D, one piece) are cut open to show the tie bar and the strap.
     recovery: {
       build(root) {
         const k = 'm18', I = R[k].info, S = I.strap;
         const lift = 92;
-        root.add(part(k, 'Anchor_Seg', { clip: cutPlane(root, V(0, 1, 0), 1) }));
-        root.add(part(k, 'Aft', { rot: 30 }));
+        // Only the top of the body is cut open: a window above z = S.z_bot - 14.
+        root.add(part(k, S.part, { clip: [new THREE.Plane(V(0, 1, 0), 1), new THREE.Plane(V(0, 0, -1), S.z_bot - 14)], clipAnd: true }));
         root.add(part(k, 'Nose', { dz: lift, clip: cutPlane(root, V(0, 1, 0), 1.3) }));
         const nz = I.nose.placement_z + lift;
         const sr = strapRig(I, { top: 9 });
@@ -515,7 +518,7 @@ export function defineScenes(h) {
 
     // Step 7: folding the parachute, four pictures: flat (fold line), half
     // (fold line), thin wedge with the lines laid back along it (side fold
-    // lines), rolled next to the anchor section B for size.
+    // lines), rolled next to the top of the body tube for size.
     chute_fold: {
       build(root) {
         const pts = {};
@@ -573,7 +576,8 @@ export function defineScenes(h) {
         row2.add(curvedArrow([V(ax - 3, wy + 9, 1), V(ax + 2, wy + 6, 1), V(ax + 3, wy * 0.45, 1)], 0.9));
         row2.add(curvedArrow([V(ax - 3, -wy - 9, 1), V(ax + 2, -wy - 6, 1), V(ax + 3, -wy * 0.45, 1)], 0.9));
         pts.f3 = V(x3 + 8, -wy - 4 + dy2, 0);
-        // 4. rolled, lines wrapped, beside B (anchor section, cut open) for size: real scale
+        // 4. rolled, lines wrapped, beside the top of the body tube (D of the
+        // Starter, cut open, its open top toward the roll) for size: real scale
         const x4 = 120;
         const I = R.m18.info, ri = I.body_id / 2;
         const rollLen = 46, rollR = ri * 0.74;
@@ -581,16 +585,17 @@ export function defineScenes(h) {
         roll.rotation.y = Math.PI / 2;
         roll.position.set(x4, 0, 0);
         row2.add(roll);
+        const aft = P('m18', 'Aft'), win = 62;
         const tubeG = new THREE.Group();
-        tubeG.rotation.y = Math.PI / 2;
+        tubeG.rotation.y = -Math.PI / 2;   // rocket z -> -x: the top end faces the roll
+        tubeG.position.set(x4 + rollLen + 26 + aft.zmax, 0, 0);
         row2.add(tubeG);
-        const anc = P('m18', 'Anchor_Seg');
-        tubeG.position.set(x4 + rollLen + 26 - anc.zmin, 0, 0);
         tubeG.updateMatrixWorld(true);
-        tubeG.add(part('m18', 'Anchor_Seg', { clip: [new THREE.Plane(V(0, 0, -1), 0)] }));
+        tubeG.add(part('m18', 'Aft', { clip: [...cutPlane(tubeG, V(0, 0, 1), -(aft.zmax - win)), new THREE.Plane(V(0, 0, -1), 0)] }));
         row2.add(arrow(V(x4 + rollLen + 4, 0, 4), V(x4 + rollLen + 22, 0, 4), 1.0));
+        row2.add(ball(V(x4 + rollLen + 26 + win + 2, 0, 0), 0.01, COL.paper, { outline: false }));  // frame the cut end (it has no vertices)
         pts.f4 = V(x4 + 6, -rollR + dy2, 0);
-        pts.B = V(x4 + rollLen + 26 + (anc.zmax - anc.zmin) * 0.55, -I.body_od / 2 + dy2, 0);
+        pts.B = V(x4 + rollLen + 26 + win * 0.45, -I.body_od / 2 + dy2, 0);
         return { dir: V(0, 0, 1), up: V(0, 1, 0), W: 2400, line: 3.0, margin: 4, points: pts };
       },
     },
@@ -602,7 +607,6 @@ export function defineScenes(h) {
         const g = sideways(root);
         const clip = cutPlane(g);
         g.add(part(k, 'Aft', { clip }));
-        g.add(part(k, 'Anchor_Seg', { clip }));
         const lift = 34;
         g.add(part(k, 'Nose', { dz: lift, clip }));
         g.add(part(k, 'Motor_Cap', { clip }));
@@ -705,7 +709,7 @@ export function defineScenes(h) {
         const la = deg(I.lug_angle_deg + rot), lr = I.lug.center_r;
         const rx = lr * Math.cos(la), ry = lr * Math.sin(la);
         const base = -I.lug.standoff_h;
-        for (const p of ['Aft', 'Motor_Cap', 'Anchor_Seg', 'Nose']) root.add(part(k, p, { rot }));
+        for (const p of ['Aft', 'Motor_Cap', 'Nose']) root.add(part(k, p, { rot }));
         root.add(part(k, 'Rod_Standoff', { rot, color: COL.focus }));
         root.add(cyl(I.rod_diameter / 2, base - 4, 360, COL.steel).translateX(rx).translateY(ry));
         const plate = new THREE.BoxGeometry(110, 110, 2);

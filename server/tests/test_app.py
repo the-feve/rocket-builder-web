@@ -29,6 +29,10 @@ def test_build_preview_zip():
     body = r.json()
     names = [p["name"] for p in body["parts"]]
     assert names[0] == "Aft" and "Nose" in names and "Motor_Cap" in names
+    # The default (250 mm body on a 200 mm printer) is two prints: the fin can and the top
+    # part with the cord strap. No separate anchor section since 2026-10-19.
+    assert names == ["Aft", "Top_Seg", "Nose", "Motor_Cap", "Rod_Standoff"]
+    assert body["dimensions"]["Body segments"] == 2
     assert body["total_mass_g"] > 0 and body["summary"]
     glb = client.get(f"/api/builds/{body['id']}/preview.glb")
     assert glb.status_code == 200 and glb.content[:4] == b"glTF"
@@ -56,11 +60,11 @@ def test_build_preview_zip():
 
 
 def test_unbuildable_design_is_a_422_with_a_message():
-    # Too short for the aft segment plus the anchor section under the nose
-    # (M29's anchor section is the longest; the M18 one got shorter with the
-    # 2026-10-09 strap and nose insert).
+    # Too short for the motor bay plus the shock-cord strap and the nose's
+    # socket in a one-piece body (since 2026-10-19 the strap is in the top
+    # of the fin can; there is no separate anchor section).
     r = client.post("/api/build", json={"motor": "M29", "body_length": 60})
-    assert r.status_code == 422 and "Body length" in r.json()["detail"]
+    assert r.status_code == 422 and "Increase body length" in r.json()["detail"]
 
 
 def test_out_of_bounds_input_is_rejected():
@@ -224,6 +228,36 @@ def test_launch_simulator():
     assert client.get(f"/api/builds/{r['id']}/launch?delay=99").status_code == 422
     assert client.get("/api/builds/nope/launch").status_code == 404
     assert "The NAR Safety Code" in client.get(f"/api/builds/{r['id']}/launch?wind_mph=25").json()["warnings"][-1]
+
+
+def test_launch_classroom_options():
+    """The launch page's classroom options: rod angle (within the NAR's 30°),
+    parachute size or streamer (default: the app's recommendation), and the
+    per-point samples for the graphs and force arrows."""
+    r = client.post("/api/build", json={}).json()
+    url = f"/api/builds/{r['id']}/launch"
+    base = client.get(f"{url}?wind_mph=0").json()
+    rec = base["recovery"]
+    assert rec["kind"] == rec["recommended"] == ("streamer" if r["parachute"]["streamer_recommended"] else "chute")
+    assert rec["chute_in"] == r["parachute"]["size_in"] and base["max_angle_deg"] == 30
+    assert len(base["samples"]) == len(base["path"]) and "thrust_n" in base["sample_cols"]
+    tilt = client.get(f"{url}?wind_mph=0&angle_deg=25").json()
+    assert tilt["angle_deg"] == 25 and tilt["landing_m"] > base["landing_m"] + 30
+    big = client.get(f"{url}?wind_mph=10&chute_in=36").json()
+    small = client.get(f"{url}?wind_mph=10&chute_in=12").json()
+    assert big["recovery"]["chute_in"] == 36 and big["recovery"]["descent_ms"] < small["recovery"]["descent_ms"]
+    assert big["events"]["landing"]["speed_ms"] < small["events"]["landing"]["speed_ms"] and big["landing_m"] > small["landing_m"]
+    st = client.get(f"{url}?wind_mph=10&recovery=streamer").json()
+    assert st["recovery"]["kind"] == "streamer" and st["recovery"]["streamer_in"] == [1, 24] and st["chute_in"] is None
+    assert st["events"]["landing"]["speed_ms"] > small["events"]["landing"]["speed_ms"]
+    page = client.get("/launch").text
+    for ui in ("Save prediction", "Download flight data (CSV)", "Change one thing", "Simple mode", "Force arrows", "@media print"):
+        assert ui in page, ui
+    for bad in ("angle_deg=31", "angle_deg=-45", "chute_in=13", "recovery=balloon"):
+        assert client.get(f"{url}?{bad}").status_code == 422, bad
+    mini = client.post("/api/build", json={"motor": "M13", "overall_length": 190}).json()
+    assert mini["parachute"]["streamer_recommended"]  # narrow and light: flies its streamer by default
+    assert client.get(f"/api/builds/{mini['id']}/launch").json()["recovery"]["kind"] == "streamer"
 
 
 def test_unsafe_rocket_still_launches_and_says_why():
@@ -569,7 +603,7 @@ def test_learn_pages():
     r = client.get("/learn/teachers")
     assert r.status_code == 200
     for text in ("Washington State K–12 Science Learning Standards", "WA Science 2026", "S.MS.PS2.2",
-                 "3-PS2-1", "MS-ETS1-4", "apogeerockets.com"):
+                 "3-PS2-1", "MS-ETS1-4", "apogeerockets.com", "/learn/elementary/teacher-guide.pdf", "/learn/middle/teacher-guide.pdf"):
         assert text in r.text, text
     for track, count, codes in (("elementary", 8, ("3-PS2-1", "5-PS2-1", "3-5-ETS1-3")),
                                 ("middle", 9, ("MS-PS2-2", "MS-PS3-1", "MS-ETS1-4"))):
@@ -588,8 +622,11 @@ def test_learn_pages():
                 assert text in r.text, (track, n, text)
         assert client.get(f"/learn/{track}/lesson-02.html").status_code == 200
         assert client.get(f"/learn/{track}/worksheets").status_code == 200
-        r = client.get(f"/learn/{track}/worksheets.pdf")
-        assert r.status_code == 200 and r.headers["content-type"] == "application/pdf" and r.content.startswith(b"%PDF")
+        for pdf in ("worksheets.pdf", "teacher-guide.pdf"):
+            r = client.get(f"/learn/{track}/{pdf}")
+            assert r.status_code == 200 and r.headers["content-type"] == "application/pdf" and r.content.startswith(b"%PDF"), pdf
+        assert f"/learn/{track}/teacher-guide.pdf" in client.get(f"/learn/{track}/").text
+        assert '<figure class="dg"' in client.get(f"/learn/{track}/lesson-01").text   # the labelled diagrams
     assert "NAR Model Rocket Safety Code" in client.get("/learn/middle/safety").text
     assert "Paper rockets only" in client.get("/learn/elementary/safety").text
 
@@ -607,7 +644,8 @@ def test_learn_old_addresses_redirect_to_middle_school():
 def test_learn_unknown_pages_404():
     for page in ("day-11", "day-1", "index", "learn.css", "..%2Fapp.py", "..%2F..%2Fapp.py", "worksheets.pdf.html",
                  "high", "high/", "elementary/lesson-09", "middle/lesson-10", "middle/lesson-1", "middle/index",
-                 "middle/learn.css", "elementary/day-01", "middle/..%2Findex.html"):
+                 "middle/learn.css", "elementary/day-01", "middle/..%2Findex.html", "middle/teacher-guide",
+                 "middle/teacher-guide.html", "elementary/guide.pdf"):
         assert client.get(f"/learn/{page}").status_code == 404, page
     assert client.get("/learn/../app.py").status_code == 404
     assert client.get("/learn/middle/../../app.py").status_code == 404

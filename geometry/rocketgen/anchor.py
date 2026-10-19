@@ -1,7 +1,14 @@
-"""Shock-cord anchor section (anchorStrapGeometry, buildAnchorStrap).
+"""Shock-cord strap (anchorStrapGeometry, buildAnchorStrap).
 
-The body's last section, right under the nose, is kept short so a strap on
-its inside wall can be reached through the open top with the nose off.
+The strap sits on the inside wall at the top of the body's top piece, just
+under the nose's socket, so it can be reached through the open top with the
+nose off. Since 2026-10-19 (owner's request) that piece is whichever body
+part is on top: the fin can itself when the body prints in one piece, else
+the top body segment. Before, the body always ended in a separate short
+"anchor section" (the FeatureScript's anchor-section branch) just to hold
+the strap: one more joint, shoulder and print. The strap and its clearances
+are unchanged; only where it lives moved. The cord's lower end is clipped on
+with a snap swivel or tied round the bar, through the open top.
 
 The strap is a straight bar across the bore, a chord from wall to wall,
 standing hole_depth off the wall at its middle. The cord drops in from the
@@ -24,9 +31,9 @@ import math
 from build123d import Face, Solid, Vector, Wire
 
 from .geom import cylinder, intersect, one_solid, rotated_z, try_fillet
+from .params import Derived, shock_cord
 
 APEX_FILLET = 1.5  # radius of the round at the arch's peak
-from .params import Derived, shock_cord
 
 
 def anchor_strap_geometry(d: Derived) -> dict:
@@ -43,8 +50,15 @@ def anchor_strap_geometry(d: Derived) -> dict:
     spring = math.sqrt(ri * ri - front * front)  # where the front face meets the wall
     # The arch springs just below the top of the 8-degree inner taper (the
     # taper barely narrows the cord gap there) and above the outer joint chamfer.
+    # (Segment-local, shoulder at z = 0: the lowest the strap can sit in a
+    # body segment. It is placed higher whenever the piece is longer, always
+    # keeping `gap` under the nose's shoulder: strap_shift.)
     z_spring = max(d.shoulder_len + d.inner_taper_rise - 2.0, d.shoulder_len + d.joint_rise + 1.0)
-    z_out_top = z_spring + spring + above_apex
+    height = spring + above_apex  # spring line to the bar's top
+    z_out_top = z_spring + height
+    # The bar's top sits this far below the piece's top edge: the gap, then
+    # the nose's shoulder + chamfer.
+    top_drop = gap + d.nose_shoulder_len + d.nose_joint_rise
     return {
         "hole_depth": hole_depth,
         "t": t,
@@ -55,9 +69,28 @@ def anchor_strap_geometry(d: Derived) -> dict:
         "z_spring": z_spring,
         "z_out_bot": z_spring,
         "z_out_top": z_out_top,
-        # Strap, then the gap, then the nose's shoulder + chamfer.
-        "sec_len": z_out_top + gap + d.nose_shoulder_len + d.nose_joint_rise,
+        "height": height,
+        "gap": gap,
+        "top_drop": top_drop,
+        # The shortest body segment that can be the top piece (what the
+        # separate anchor section's length was): strap, gap, nose socket.
+        "sec_len": z_out_top + top_drop,
+        # The shortest fin can that can be the top piece (a one-piece body).
+        # Its strap stands above the motor stop (aft_socket_base: where the
+        # plain bore starts) by as much as it would in a segment seated on
+        # that socket, so a one-piece body keeps the open bore under the strap
+        # (wadding, parachute) that the shortest aft + anchor section had,
+        # and the shortest rocket that builds is the same height as before.
+        "aft_len": d.aft_socket_base + z_out_top + top_drop,
     }
+
+
+def strap_shift(s0: dict, seg_len: float) -> float:
+    """How far above its lowest place (s0's z_spring, segment-local) the
+    strap goes in a top piece `seg_len` long, so its top stays `gap` under
+    the nose's shoulder. On the fin can (z = 0 at the tail) this is at least
+    aft_socket_base, by plan_rocket's check against s0["aft_len"]."""
+    return seg_len - s0["sec_len"]
 
 
 def _yz_prism(pts, x0: float, x1: float) -> Solid:
@@ -67,11 +100,11 @@ def _yz_prism(pts, x0: float, x1: float) -> Solid:
 
 
 def add_anchor_strap(segment, d: Derived, s0: dict, angle: float, z_shift: float):
-    """Union the strap onto the anchor segment (local coordinates). Built on
-    +X, then rotated. `z_shift` is how much longer the section is than
-    sec_len; the strap moves up by it, keeping its place under the nose."""
+    """Union the strap onto the top body piece (its local coordinates: the
+    fin can's are world). Built on +X, then rotated. `z_shift` is
+    strap_shift(): the strap moves up by it, keeping its place under the nose."""
     strap = anchor_strap(d, s0, z_shift)
-    return one_solid(segment.fuse(rotated_z(strap, angle)), "anchor segment + strap")
+    return one_solid(segment.fuse(rotated_z(strap, angle)), "top body piece + strap")
 
 
 def anchor_strap(d: Derived, s0: dict, z_shift: float = 0.0) -> Solid:

@@ -39,11 +39,15 @@ Read the [safety page](safety.md) together. For each rule, ask *why?* Do the "Is
 
 ### 2. Inclinometer and a tall object (30 minutes)
 
+<!-- figure: inclinometer-trig -->
+
 1. Build the inclinometer from the template (straw on the top edge, weighted string at the pivot). Level = 0°.
 2. Measure a 20 m baseline from a tree or pole. Read the angle to the top 3 times; average.
 3. Height = baseline × multiplier (table on W8) + eye height. Check with a second baseline.
 
 ### 3. Preflight checks (12+ track, 30 minutes)
+
+<!-- figure: nickel-test -->
 
 1. **Weigh** the rocket without a motor; compare with the app.
 2. **Look it over:** fins firm, shock cord tied, parachute folded and not torn.
@@ -76,3 +80,4 @@ Check the wind forecast: under 20 mph (under 10 is better). Pack the launch box 
 - **Swing test:** students can swing-test the real rocket (motor in, no igniter) as a demonstration, but the balance-point check is the go/no-go.
 - **Assembly** happens out of class with an adult, following Rocket Builder's build notes and the assembly guide. Adults use the glue.
 - **Further resources:** Apogee Components' free newsletter *Tracking Model Rockets* (apogeerockets.com/education/downloads/Newsletter222.pdf) and their Teaching Tips page (apogeerockets.com/Edu/Teaching_Tips) for running a launch with a class (two pads, separate launch and recovery crews, the adult installs igniters).
+- **Altitude calculator:** [rocket.quiverdesignworks.net/tools/altitude](https://rocket.quiverdesignworks.net/tools/altitude) does height from angle and distance, shows the working, the 45° rule and the average of two stations. Use it to check hand calculations, not replace them. The simulator's launch angle setting (0–30°) shows how a tilted rod changes where the rocket lands.

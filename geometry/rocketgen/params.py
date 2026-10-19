@@ -107,6 +107,10 @@ class DesignParams:
     thread_clearance: float | None = None  # motor cap thread, radial (crest to cap bore); None = 0.25
     thread_pitch: float | None = None  # None = 2.5 mm under 21 mm motors, else 3 mm
     thread_turns: int | None = None  # None = 3
+    # Nose weight (modelling clay pressed into the nose cone), g. Not geometry:
+    # only the mass and CG (stability.Balance) see it. Website (Advanced, 0-50);
+    # the stability lessons add clay and watch the score and CG move.
+    nose_weight_g: float = 0.0
 
     def with_(self, **kw) -> "DesignParams":
         return replace(self, **kw)

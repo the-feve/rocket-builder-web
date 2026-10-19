@@ -44,6 +44,8 @@ Work through W5: decode four codes, find impulse = average thrust × burn time a
 
 ### 3. Energy through a flight (15 minutes)
 
+<!-- figure: energy-path -->
+
 Draw a flight path. Label where energy is:
 
 - **On the pad:** stored in the propellant (chemical).
@@ -82,3 +84,4 @@ Why do bigger motors need bigger fields?
 - **Optional adult-led fizzy demo (third law and energy from a reaction):** an adult drops half a tablet into a film canister with a teaspoon of water, snaps the lid on, sets it lid-down and steps back; outside, glasses on, nobody leans over it; if it doesn't pop, wait 30 s. The adult keeps the tablets (Alka-Seltzer contains aspirin).
 - **Extension (W5b):** plot the B-motor thrust curve and find the area under it (≈ 4.3 N·s). F = m × a at liftoff: 0.086 kg rocket, 4.7 N average thrust: weight ≈ 0.84 N, net ≈ 3.9 N, a ≈ 45 m/s². Kinetic energy at 50 m/s: ½ × 0.086 × 50² ≈ 108 J; potential energy at 120 m: 0.086 × 9.8 × 120 ≈ 101 J. Where did the other energy go? (Drag.)
 - **Students under 12** do the paper and math parts; the motor itself stays with an adult.
+- **Energy from real numbers:** the launch simulator's flight graphs show speed and altitude against time, and **Download flight data (CSV)** gives the numbers. Students compute kinetic energy (½mv²) and potential energy (mgh) at a few moments in a spreadsheet and graph both.

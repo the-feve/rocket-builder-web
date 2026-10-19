@@ -136,6 +136,85 @@
   table.cmpt th { font:600 11px var(--head); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
   table.cmpt td:first-child { font-weight:600; }
   table.cmpt i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+  /* ---- classroom features (2026-10-19) ---- */
+  :root { --weight:var(--rb-night); --drag:var(--rb-sky); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme=light]) { --weight:var(--rb-paper); --drag:var(--rb-sky-300); } }
+  :root[data-theme=dark] { --weight:var(--rb-paper); --drag:var(--rb-sky-300); }
+  .hbtn { white-space:nowrap; padding:6px 12px; font:600 13px var(--body); border-radius:999px; }
+  .hbtn[aria-pressed=true] { background:var(--cta); border-color:var(--cta); color:var(--cta-ink); }
+  .controls .row { display:flex; gap:8px; align-items:center; }
+  .controls .row select { font-size:14px; }
+  .controls label.chk { flex-direction:row; align-items:center; gap:6px; align-self:center; }
+  .chk input { width:18px; height:18px; accent-color:var(--rb-orange); margin:0; }
+  .forcekey { display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:8px; font-size:12.5px; color:var(--muted); }
+  .forcekey i { display:inline-block; width:22px; height:4px; border-radius:2px; vertical-align:middle; margin-right:6px; }
+  section h2 small { font:400 13px var(--body); color:var(--muted); margin-left:6px; }
+  .bar { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:6px 0 10px; }
+  .seg { display:inline-flex; border:1.5px solid var(--line); border-radius:10px; overflow:hidden; }
+  .seg button { border:0; border-radius:0; padding:7px 12px; }
+  .seg button + button { border-left:1.5px solid var(--line); }
+  .seg button[aria-pressed=true] { background:var(--cta); color:var(--cta-ink); }
+  .charts { display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:12px; }
+  .chart { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:8px 10px 4px; }
+  .chart h3 { margin:0; font:700 13px/1.3 var(--head); }
+  .chart h3 small { font:500 12px var(--body); color:var(--muted); margin-left:4px; }
+  .chart svg { display:block; width:100%; height:auto; touch-action:pan-y; }
+  .c-axis { font:500 10.5px var(--head); font-variant-numeric:tabular-nums; fill:var(--muted); }
+  .c-grid { stroke:var(--line); }
+  .c-zero { stroke:var(--muted); }
+  .c-ev { stroke:var(--muted); stroke-dasharray:3 3; }
+  .c-evt { font:600 10px var(--head); letter-spacing:.04em; fill:var(--muted); }
+  .c-read { font:600 11px var(--head); font-variant-numeric:tabular-nums; fill:var(--ink); paint-order:stroke; stroke:var(--card); stroke-width:4px; }
+  .c-head { stroke:var(--ink); stroke-opacity:.35; }
+  .vals { display:flex; flex-wrap:wrap; gap:6px; }
+  .vals label { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border:1.5px solid var(--line); border-radius:999px; background:var(--card); font-size:13px; cursor:pointer; }
+  .vals label:has(input:checked) { border-color:var(--rb-orange); }
+  .vals input { accent-color:var(--rb-orange); margin:0; }
+  .logent { margin-top:12px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--card); }
+  #expout td + td, .logent td + td { white-space:nowrap; }
+  .logent .lh { display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; }
+  .logent .lh b { font:700 15px var(--head); }
+  .logent .lh .sp { flex:1; }
+  .logent table.cmpt { margin-top:6px; }
+  .logent td.d { font-weight:600; }
+  .meas { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:end; margin-top:10px; }
+  .meas label { display:flex; flex-direction:column; gap:3px; font:600 11px var(--head); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  .meas input, .meas select { padding:6px 8px; border:1px solid var(--line); border-radius:6px; font:500 16px var(--body); color:var(--ink); background:var(--field); width:7.5em; }
+  .meas input.notes { width:16em; max-width:100%; }
+  .meas select { width:auto; }
+  .pager { overflow-x:auto; }
+  /* Simple mode: for a class on a projector. Big buttons, three choices at most, results in kid terms. */
+  .simplebox { display:flex; flex-wrap:wrap; gap:16px 28px; align-items:end; padding:16px 18px; background:var(--card); border:1px solid var(--line); border-radius:14px; }
+  .simplebox[hidden] { display:none; }
+  .simplebox .sl { display:block; font:700 15px var(--head); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .simplebox .seg button { padding:14px 22px; font:700 21px var(--head); }
+  button.big { padding:16px 34px; font:700 26px var(--head); border-radius:14px; }
+  .kid { display:none; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin-top:16px; }
+  .kid .stat { padding:16px 18px; border-radius:14px; }
+  .kid .k { font-size:15px; }
+  .kid .v { font-size:34px; line-height:1.15; margin:4px 0; }
+  .kid .s { font-size:18px; }
+  html.simple body { font-size:18px; }
+  html.simple .kid { display:grid; }
+  html.simple #controls, html.simple #cmp, html.simple #stats, html.simple #warn, html.simple #cmptable, html.simple #graphsec,
+  html.simple #expsec, html.simple #logsec, html.simple #fieldsec, html.simple #intro, html.simple #forcekey { display:none !important; }
+  @media (min-width:700px) {
+    html.simple .clock { font-size:22px; padding:4px 12px; }
+  }
+  html.simple .s-label { font-size:14px; } html.simple .s-text { font-size:16px; } html.simple .s-big { font-size:18px; }
+  html.simple .danger { font-size:18px; } html.simple .danger h3 { font-size:22px; }
+  .embed #simpleBtn { display:none; }
+  /* Print: the numbers, graphs and the predict-and-compare log, without the controls. */
+  @media print {
+    :root, :root[data-theme=dark] { --bg:#fff; --panel:#fff; --card:#fff; --ink:#000; --muted:#444; --line:#bbb; --field:#fff; color-scheme:light; }
+    header a, header button, .controls, .cmp, .stage, #expsec .bar, #fieldsec, button, .bar, .forcekey, #simple { display:none !important; }
+    html.simple .kid { display:none; }
+    html.simple #stats, html.simple #graphsec, html.simple #logsec { display:block !important; }
+    html.simple #stats { display:grid !important; }
+    .chart, .logent, .stat { break-inside:avoid; }
+    .meas input, .meas select { border:0; border-bottom:1px solid #999; border-radius:0; }
+    main { max-width:none; }
+  }
 </style>
 </head>
 <body>
@@ -143,6 +222,7 @@
   <svg viewBox="0 0 64 64" aria-hidden="true"><defs><mask id="rbcut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs>
     <g transform="translate(32 32) scale(1.22975) translate(0.35 -0.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rbcut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg>
   <h1>Launch simulator<small>Rocket Builder</small></h1>
+  <button type="button" class="hbtn" id="simpleBtn" aria-pressed="false" title="Big buttons and kid-sized answers, for a class on a projector">Simple mode</button>
   <a href="/" id="back">← Back to Rocket Builder</a>
 </header>
 <main>
@@ -155,18 +235,60 @@
     </label>
     <label>Motor <select id="motor"></select></label>
     <label>Delay <select id="delay"></select></label>
+    <label>Comes down with <select id="recov"><option value=""></option></select><span class="note" id="recovnote"></span></label>
+    <label>Launch angle <output id="angleout">0° (straight up)</output>
+      <span class="row"><input type="range" id="angle" min="0" max="30" step="1" value="0" aria-describedby="anglehint">
+        <select id="angledir" aria-label="Tilt the rod"><option value="1">downwind</option><option value="-1">into the wind</option></select></span>
+      <span id="anglehint" class="note">Safety code: the rod must be within 30° of straight up.</span>
+    </label>
+    <label class="chk"><input type="checkbox" id="forces"> Force arrows</label>
     <button class="primary" id="play">▶ Launch</button>
     <button id="skip">Skip to landing</button>
+  </div>
+  <div class="simplebox" id="simple" hidden>
+    <div><span class="sl">Wind</span><div class="seg" id="swind"><button type="button" data-v="0">Calm</button><button type="button" data-v="5">Breezy</button><button type="button" data-v="15">Windy</button></div></div>
+    <div><span class="sl">Comes down with</span><div class="seg" id="srec"><button type="button" data-v="chute">Parachute</button><button type="button" data-v="streamer">Streamer</button></div></div>
+    <button type="button" class="primary big" id="splay">▶ Launch!</button>
   </div>
   <div class="cmp" id="cmp" hidden><span class="lbl">Fly alongside</span><select id="cmpadd" aria-label="Add a rocket to compare"></select><span id="cmpchips" style="display:contents"></span></div>
   <div class="stage" id="stagebox" hidden>
     <span class="clock" id="clock">T+0.0 s</span><span class="phase" id="phase"></span>
     <svg id="stage" viewBox="0 0 1000 520" role="img" aria-label="Side view of the simulated flight"></svg>
   </div>
+  <div class="forcekey" id="forcekey" hidden><span><i style="background:var(--rb-orange)"></i>Thrust: the motor pushes</span><span><i style="background:var(--drag)"></i>Drag: the air pushes back</span><span><i style="background:var(--weight)"></i>Weight: gravity pulls down</span><span>Longer arrow = bigger force, compared at each moment.</span></div>
   <div id="danger" class="danger" role="status"></div>
+  <div id="kid" class="kid" aria-live="polite"></div>
   <div id="warn" class="warn"></div>
   <div class="stats" id="stats"></div>
   <div id="cmptable"></div>
+  <section id="graphsec" hidden>
+    <h2>Flight graphs</h2>
+    <div class="bar">
+      <div class="seg" id="grange" role="group" aria-label="Time range"><button type="button" data-v="all" aria-pressed="true">Whole flight</button><button type="button" data-v="up" aria-pressed="false">Going up</button></div>
+      <label class="chk" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ke"> Kinetic energy <span class="note">(KE = ½ m v²)</span></label>
+      <button type="button" id="csv">Download flight data (CSV)</button>
+    </div>
+    <div class="charts" id="charts"></div>
+    <p class="note" id="evnote"></p>
+  </section>
+  <section id="expsec" hidden>
+    <h2>Change one thing <small>a fair test</small></h2>
+    <p class="note">Pick one thing to change and the values to try. Everything else stays as set above (same rocket, motor, wind and angle). Each value flies alongside your rocket.</p>
+    <div class="bar">
+      <label class="chk" style="display:flex;gap:8px;align-items:center">Change <select id="expvar">
+        <option value="recovery">Parachute or streamer</option><option value="wind">Wind</option><option value="motor">Motor</option>
+        <option value="delay">Ejection delay</option><option value="angle">Launch angle</option></select></label>
+      <div class="vals" id="expvals"></div>
+    </div>
+    <div class="bar"><button type="button" class="primary" id="exprun">Fly them</button><button type="button" id="expclear" hidden>Clear</button><span class="note" id="expmsg"></span></div>
+    <div id="expout" class="pager"></div>
+  </section>
+  <section id="logsec" hidden>
+    <h2>Predict, fly, compare</h2>
+    <p class="note">1. Save the simulator's prediction for the motor and settings you'll fly. 2. Fly the real rocket and measure. 3. Type in what you measured and compare. Kept in this browser for this design.</p>
+    <div class="bar"><button type="button" class="primary" id="predict">Save prediction</button><button type="button" id="logcsv">Download log (CSV)</button><button type="button" id="logprint">Print</button><span class="note" id="logmsg"></span></div>
+    <div id="log"></div>
+  </section>
   <section id="fieldsec" hidden>
     <h2>Launch field you need</h2>
     <div class="fieldwrap">
@@ -180,7 +302,11 @@
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const ft = m => Math.round(m * 3.28084);
-const buildId = new URLSearchParams(location.search).get('build');
+const qs = new URLSearchParams(location.search);
+const buildId = qs.get('build');
+// localStorage can throw (private windows, blocked storage): never let that break the page.
+const LS = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+             set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } } };
 let data = null, raf = 0, t0 = 0, simT = 0, playing = false;
 const SVGNS = 'http://www.w3.org/2000/svg';
 let W = 1000, H = 520, GROUND = 444;
@@ -197,7 +323,7 @@ function fail(msg) { $('err').textContent = msg; }
 
 async function load(opts = {}) {
   if (!buildId) { fail('Build a rocket first, then press "Watch a launch" in its report.'); return; }
-  const q = new URLSearchParams({ wind_mph: $('wind').value });
+  const q = launchQuery();
   if (opts.motor) q.set('motor', opts.motor);
   if (opts.delay) q.set('delay', opts.delay);
   let r;
@@ -211,12 +337,18 @@ async function load(opts = {}) {
   fail('');
   data = await r.json();
   $('controls').hidden = $('stagebox').hidden = $('fieldsec').hidden = false;
+  $('graphsec').hidden = $('expsec').hidden = $('logsec').hidden = false;
   fillPickers();
   if (opts.ghosts !== false) await reloadGhosts();
+  if (!opts.keepExp) clearExp(true);
   fillCompare();
   draw();
   stats();
   field();
+  chartsDraw();
+  expVals();
+  renderLog();
+  syncSimple();
   start();
 }
 
@@ -225,6 +357,11 @@ function fillPickers() {
   ms.innerHTML = data.motors.map(m => `<option value="${esc(m.code)}"${m.code === data.code ? ' selected' : ''}>${esc(m.code)}${m.code === data.recommended ? ' (recommended)' : ''}${m.ok ? '' : ' ⚠ ' + esc(m.problems.join(', '))}</option>`).join('');
   const mine = data.motors.find(m => m.code === data.code);
   $('delay').innerHTML = mine.delays.map(d => `<option value="${d}"${d === data.delay_s ? ' selected' : ''}>${d} s</option>`).join('');
+  const R = data.recovery, [sw, sl] = R.streamer_size_in;
+  $('recov').innerHTML = `<option value="streamer">Streamer ${sw} × ${sl} in${R.recommended === 'streamer' ? ' (recommended)' : ''}</option>` +
+    R.chute_sizes_in.map(c => `<option value="chute:${c}">Parachute ${c} in${R.recommended === 'chute' && c === data.parachute.size_in ? ' (recommended)' : ''}</option>`).join('');
+  $('recov').value = R.kind === 'streamer' ? 'streamer' : `chute:${R.chute_in}`;
+  $('recovnote').textContent = `comes down at about ${R.descent_ms} m/s`;
 }
 
 // ---- the rocket, drawn like the kit box: flat side view, Paper-white body, Night outline,
@@ -274,7 +411,7 @@ function draw() {
   [W, H] = narrow ? [420, 560] : [1000, 520]; GROUND = H - 78;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const f = data.field;
-  const all = [data, ...ghosts.filter(g => g.data).map(g => g.data)];
+  const all = [data, ...overlays().filter(g => g.data).map(g => g.data)];
   const xs = all.flatMap(d => d.path.map(p => p[1])), hs = all.flatMap(d => d.path.map(p => p[2]));
   // The view also takes in the field (pad to its downwind edge) so its marker fits.
   const fx0 = -f.pad_from_upwind_m, fx1 = f.length_m - f.pad_from_upwind_m;
@@ -339,7 +476,7 @@ function draw() {
   const crash = data.events.landing.speed_ms > 10;
   el('text', { x: Math.min(W - 6, Math.max(6, lx)), y: GROUND + 36, 'text-anchor': anchor, class: 's-text', style: crash ? 'fill:var(--rb-red)' : '' }, svg).textContent = landingText();
   // ghosts: other rockets' whole flights, faint, in their own colours, with a see-through rocket each
-  for (const g of ghosts) {
+  for (const g of overlays()) {
     if (!g.data) continue;
     el('polyline', { points: g.data.path.map(pt).join(' '), fill: 'none', stroke: g.color, 'stroke-width': 2, 'stroke-opacity': .45, 'stroke-dasharray': '3 5', 'stroke-linecap': 'round' }, svg);
     const gl = view.X(g.data.landing_m);
@@ -362,6 +499,7 @@ function draw() {
   rocketG.appendChild(r.g);
   flame.setAttribute('d', `M${-r.R * .7} 1L0 ${10 + r.R * 2.2}L${r.R * .7} 1Z`);
   chuteG = chute(svg, narrow ? 17 : 21);
+  forceG = el('g', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, svg);
   // after landing: the rocket lies on its side with the chute folded beside it
   restG = el('g', { visibility: 'hidden' }, svg);
   el('path', { d: 'M-16 0Q-8 -9 0 -3Q8 -9 16 0Z', fill: C.orange, class: 'r-line', stroke: C.night, 'stroke-width': 1.2, 'stroke-linejoin': 'round' }, restG);
@@ -403,11 +541,12 @@ function phaseText(ph) {
   }
   if (ph === 'landed' && data.events.landing.speed_ms > 10) return ['Crashed', true];
   if (ph === 'chute' && (k.has('noeject') || k.has('lowchute'))) return ['Parachute too late', true];
+  if (ph === 'chute' && data.recovery?.kind === 'streamer') return ['Streamer out', false];
   return [PHASES[ph] || '', false];
 }
 function render(t) {
   const own = data.path[data.path.length - 1][0];
-  const end = Math.max(own, ...ghosts.filter(g => g.data).map(g => g.data.path[g.data.path.length - 1][0]));
+  const end = Math.max(own, ...overlays().filter(g => g.data).map(g => g.data.path[g.data.path.length - 1][0]));
   t = Math.min(t, end);
   const { p, i, ang } = sampleAt(t);
   const X = view.X(p[1]), Y = view.Y(p[2]), here = `${X.toFixed(1)},${Y.toFixed(1)}`;
@@ -418,7 +557,7 @@ function render(t) {
   trailArc.setAttribute('points', nf < 0 ? '' : rest.map(pt).concat(here).join(' '));
   const ph = t >= own ? 'landed' : p[3];
   const under = ph === 'chute' || ph === 'landed';
-  for (const g of ghosts) {
+  for (const g of overlays()) {
     if (!g.el || !g.data) continue;
     const gs = sampleAt(t, g.data), gp = gs.p, gl = t >= g.data.path[g.data.path.length - 1][0] || gp[3] === 'landed';
     const gx = view.X(gp[1]), gy = view.Y(gp[2]);
@@ -435,6 +574,10 @@ function render(t) {
   flame.setAttribute('visibility', ph === 'boost' || ph === 'rod' ? 'visible' : 'hidden');
   chuteG.setAttribute('visibility', under && ph !== 'landed' ? 'visible' : 'hidden');
   chuteG.setAttribute('transform', `translate(${X} ${Y - rocketLen - (narrow() ? 20 : 24)})`);
+  if (data.recovery?.kind === 'streamer') chuteG.setAttribute('visibility', 'hidden');
+  streamerAt(under && ph !== 'landed', X, Y, t);
+  drawForces(i, X, Y, under ? 0 : ang, ph);
+  for (const c of charts) c.head(Math.min(t, own));
   // launch puffs: billow at liftoff, fade over a few seconds
   const pf = t < 0.05 ? 0 : Math.max(0, 1 - (t - 0.3) / 3.5);
   puffG.setAttribute('opacity', pf.toFixed(2));
@@ -444,7 +587,7 @@ function render(t) {
   marks.innerHTML = '';
   const ev = data.events;
   if (ev.apogee && t >= ev.apogee.t) mark(ev.apogee, `APOGEE ${Math.round(ev.apogee.h)} m · ${ft(ev.apogee.h)} ft`, -12, true);
-  if (ev.eject && t >= ev.eject.t && Math.abs((ev.apogee?.t ?? 0) - ev.eject.t) > 0.4) mark(ev.eject, 'parachute opens', 16);
+  if (ev.eject && t >= ev.eject.t && Math.abs((ev.apogee?.t ?? 0) - ev.eject.t) > 0.4) mark(ev.eject, data.recovery?.kind === 'streamer' ? 'streamer out' : 'parachute opens', 16);
   return t >= end;
 }
 function mark(e, txt, dy, tick) {
@@ -458,7 +601,7 @@ function start() {
   cancelAnimationFrame(raf);
   simT = 0; t0 = performance.now(); playing = true;
   $('play').textContent = data.safe ? '↻ Launch again' : '⚠ Launch anyway';
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { render(1e9); playing = false; return; }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { simT = 1e9; render(simT); playing = false; return; }
   let last = t0;
   const tick = now => {
     simT += (now - last) / 1000 * speedAt(simT); last = now;
@@ -473,9 +616,10 @@ function stats() {
   const tiles = [
     ['Highest point', `${Math.round(data.apogee_m)} m`, `${ft(data.apogee_m)} ft, at ${e.apogee?.t ?? '–'} s`],
     ['Off the rod', `${e.rod?.speed_ms ?? '–'} m/s`, 'needs 15 m/s or more'],
-    ['Parachute opens', `${e.eject?.t ?? '–'} s`, e.eject ? `${Math.round(e.eject.h)} m up, ${e.eject.speed_ms} m/s` : ''],
+    [data.recovery?.kind === 'streamer' ? 'Streamer out' : 'Parachute opens', `${e.eject?.t ?? '–'} s`, e.eject ? `${Math.round(e.eject.h)} m up, ${e.eject.speed_ms} m/s` : ''],
     ['Time in the air', `${Math.round(land.t)} s`, `lands at ${land.speed_ms} m/s`],
     ['Lands', `${Math.abs(Math.round(data.landing_m))} m`, Math.abs(data.landing_m) < 2 ? 'next to the pad' : `${ft(Math.abs(data.landing_m))} ft ${data.landing_m > 0 ? 'downwind' : 'upwind'}`],
+    ['Comes down with', recLabel(data), `about ${data.recovery.descent_ms} m/s (${ft(data.recovery.descent_ms)} ft/s)`],
   ];
   $('stats').innerHTML = tiles.map(([k, v, s]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${esc(s)}</div></div>`).join('');
   const w = [...data.warnings];
@@ -486,6 +630,7 @@ function stats() {
   $('danger').innerHTML = ds.length ? `<h3>${bad ? '⚠ Not safe to fly' : 'Heads up'}</h3><ul>${ds.map(d =>
     `<li class="lv-${d.level}"><b>${esc(d.title)}.</b> ${esc(d.text)}</li>`).join('')}</ul>${bad ? '<p>This is only a simulation, so you can see what would go wrong. Never fly this design for real: change it in Rocket Builder until it gets a ✓.</p>' : ''}` : '';
   cmpTable();
+  kid();
   const mph = +$('wind').value;
   $('windhint').textContent = mph > data.max_wind_mph ? 'Too windy to launch (over 20 mph)' : mph >= 15 ? 'Gusty: use a smaller parachute or a streamer' : mph >= 5 ? 'A normal breeze' : 'Calm';
 }
@@ -543,7 +688,7 @@ function fillCompare() {
     <button type="button" data-rm="${i}" aria-label="Stop comparing ${esc(g.name)}">×</button></span>`).join('');
 }
 async function ghostFlight(g) {
-  const q = new URLSearchParams({ wind_mph: $('wind').value });
+  const q = new URLSearchParams({ wind_mph: $('wind').value, angle_deg: rodAngle() });
   const r = await fetch(`/api/builds/${encodeURIComponent(g.buildId)}/launch?${q}`);
   if (r.status === 404) throw new Error('no longer in memory: build it again');
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || "couldn't fly it");
@@ -597,10 +742,370 @@ $('cmpchips').addEventListener('click', e => {
 });
 addEventListener('storage', e => { if (e.key === 'rbCompare') fillCompare(); });
 
+// ======== Classroom features (2026-10-19): launch angle, parachute or streamer, force arrows,
+// flight graphs + CSV, change-one-thing experiments, predict-fly-compare log, simple mode. ========
+
+const rodAngle = () => +$('angle').value * +$('angledir').value;  // + downwind, - into the wind
+function angleOut() {
+  const a = +$('angle').value;
+  $('angleout').textContent = a ? `${a}° ${+$('angledir').value > 0 ? 'downwind' : 'into the wind'}` : '0° (straight up)';
+}
+// The query for this rocket's flight with the controls as set; `over` replaces (null removes) params.
+function launchQuery(over = {}) {
+  const q = new URLSearchParams({ wind_mph: $('wind').value });
+  if (rodAngle()) q.set('angle_deg', rodAngle());
+  const rv = $('recov').value;  // '' = the app's recommendation, 'streamer' or 'chute:<in>'
+  if (rv === 'streamer') q.set('recovery', 'streamer');
+  else if (rv.startsWith('chute')) { q.set('recovery', 'chute'); if (rv.includes(':')) q.set('chute_in', rv.split(':')[1]); }
+  for (const [k, v] of Object.entries(over)) { if (v === null || v === undefined) q.delete(k); else q.set(k, v); }
+  return q;
+}
+const recLabel = d => d.recovery.kind === 'streamer' ? `Streamer ${d.recovery.streamer_in[0]}×${d.recovery.streamer_in[1]} in` : `Parachute ${d.recovery.chute_in} in`;
+// URL params: wind (mph), angle (degrees, negative = into the wind), recovery (chute|streamer), chute (in),
+// motor, delay, simple (1|0). The rest (build, embed) as before.
+function initFromUrl() {
+  const w = qs.get('wind'); if (w !== null && isFinite(w)) $('wind').value = Math.max(0, Math.min(25, Math.round(+w)));
+  const a = qs.get('angle');
+  if (a !== null && isFinite(a)) { $('angle').value = Math.min(30, Math.abs(Math.round(+a))); $('angledir').value = +a < 0 ? '-1' : '1'; }
+  const rc = qs.get('recovery'), ch = qs.get('chute');
+  const v = rc === 'streamer' ? 'streamer' : (rc === 'chute' || ch) ? `chute${ch ? ':' + ch : ''}` : '';
+  $('recov').innerHTML = `<option value="${esc(v)}"></option>`;
+  angleOut();
+  const sp = qs.get('simple');
+  setSimple(sp !== null ? sp === '1' : LS.get('rbSimple') === '1', false);
+}
+
+// ---- streamer: an orange ribbon fluttering above the rocket on the way down
+let streamG = null;
+function streamerAt(show, X, Y, t) {
+  if (!streamG || !streamG.isConnected) streamG = el('path', { fill: 'none', stroke: C.orange, 'stroke-width': 5, 'stroke-linecap': 'round', class: '' }, $('stage'));
+  if (!show || data.recovery?.kind !== 'streamer') { streamG.setAttribute('d', ''); return; }
+  const L = narrow() ? 46 : 60, top = Y - rocketLen, ph = t * 9;
+  let d = `M${X} ${top}`;
+  for (let k = 1; k <= 12; k++) d += `L${(X + Math.sin(ph + k * 0.9) * k * 0.9).toFixed(1)} ${(top - k * L / 12).toFixed(1)}`;
+  streamG.setAttribute('d', d);
+}
+
+// ---- force arrows: thrust (orange), drag (sky), weight (navy), from the rocket's middle, to scale
+let forceG = null;
+function arrow(x, y, ux, uy, len, color, txt, left) {
+  if (!(len > 0.5)) return;
+  len = Math.max(len, 12);
+  const x2 = x + ux * len, y2 = y + uy * len, hx = -uy * 5, hy = ux * 5;
+  el('line', { x1: x, y1: y, x2: x2 - ux * 7, y2: y2 - uy * 7, style: `stroke:${color}`, 'stroke-width': 3.5 }, forceG);
+  el('path', { d: `M${x2} ${y2}L${x2 - ux * 10 + hx} ${y2 - uy * 10 + hy}L${x2 - ux * 10 - hx} ${y2 - uy * 10 - hy}Z`, style: `fill:${color}` }, forceG);
+  const right = left === undefined ? ux >= -0.2 : !left;  // weight labels go left, drag right, so they don't overlap
+  el('text', { x: x2 + (right ? 6 : -6), y: y2 + (uy > 0.5 ? 12 : uy < -0.5 ? -4 : 4), 'text-anchor': right ? 'start' : 'end', class: 's-big', style: 'font-size:11.5px' }, forceG).textContent = txt;
+}
+const fN = f => f >= 10 ? f.toFixed(0) : f >= 1 ? f.toFixed(1) : f.toFixed(2);
+function drawForces(i, X, Y, ang, ph) {
+  if (!forceG) return;
+  forceG.innerHTML = '';
+  if (!$('forces').checked || isSimple() || ph === 'landed' || !data.samples) return;
+  // Scaled to the largest force at this moment (the peak thrust would shrink weight and drag to a few
+  // pixels): the arrows compare the forces now, and the labels give their size.
+  const q = data.samples[Math.min(i, data.samples.length - 1)];
+  const k = (narrow() ? 70 : 100) / Math.max(q[2], Math.hypot(q[3], q[4]), q[5], 1e-6);
+  const a = ang * Math.PI / 180, cx = X + Math.sin(a) * rocketLen / 2, cy = Y - Math.cos(a) * rocketLen / 2;
+  arrow(cx, cy, 0, 1, q[5] * k, 'var(--weight)', `Weight ${fN(q[5])} N`, true);
+  const dm = Math.hypot(q[3], q[4]);
+  if (dm > 1e-4) arrow(cx, cy, q[3] / dm, -q[4] / dm, dm * k, 'var(--drag)', `Drag ${fN(dm)} N`, q[3] < -0.3 * dm);
+  if (q[2] > 0) arrow(cx, cy, Math.sin(a), -Math.cos(a), q[2] * k, C.orange, `Thrust ${fN(q[2])} N`);
+}
+
+// ---- flight graphs
+let charts = [], grange = 'all';
+const SERIES = {
+  alt: { title: 'Altitude', unit: 'm', get: (p, q) => p[2] },
+  speed: { title: 'Speed', unit: 'm/s', get: (p, q) => q[0] },
+  acc: { title: 'Vertical acceleration', unit: 'm/s²', note: '+ up', get: (p, q) => q[1] },
+  ke: { title: 'Kinetic energy', unit: 'J', note: '½ × mass × speed²', get: (p, q) => 0.5 * q[6] / 1000 * q[0] ** 2 },
+};
+const EVENTS = [['burnout', 'BURNOUT'], ['apogee', 'APOGEE'], ['eject', 'EJECTION'], ['landing', 'LANDING']];
+function tRange() {
+  const P = data.path, last = P[P.length - 1][0], ev = data.events;
+  return grange === 'up' ? Math.min(last, (ev.eject?.t ?? ev.apogee?.t ?? last) + 1.5) : last;
+}
+function chartsDraw() {
+  if (!data?.samples) return;
+  charts = [];
+  const box = $('charts'); box.innerHTML = '';
+  const keys = ['alt', 'speed', 'acc', ...($('ke').checked ? ['ke'] : [])], tEnd = tRange();
+  for (const k of keys) charts.push(chart(box, k, tEnd));
+  const ev = data.events;
+  $('evnote').textContent = 'Dashed lines: ' + EVENTS.filter(([k]) => ev[k]).map(([k, n]) => `${n.toLowerCase()} ${ev[k].t} s`).join(' · ') +
+    `. Mass ${Math.round(data.samples[0][6])} g at liftoff, ${Math.round(data.samples[data.samples.length - 1][6])} g after the motor burns.`;
+  if (playing || simT) for (const c of charts) c.head(Math.min(simT, data.path[data.path.length - 1][0]));
+}
+function chart(box, key, tEnd) {
+  const S = SERIES[key], P = data.path, Q = data.samples;
+  const n = P.findIndex(p => p[0] > tEnd), idx = n < 0 ? P.length : n + 1;
+  const pts = P.slice(0, idx).map((p, j) => [p[0], S.get(p, Q[j])]);
+  // altitude also shows the change-one-thing runs, in their colours
+  const extra = key === 'alt' ? expRuns.filter(g => g.data).map(g => ({ color: g.color, pts: g.data.path.filter(p => p[0] <= tEnd).map(p => [p[0], p[2]]) })) : [];
+  const card = document.createElement('div'); card.className = 'chart';
+  const peak = pts.reduce((m, q) => Math.abs(q[1]) > Math.abs(m) ? q[1] : m, 0);
+  card.innerHTML = `<h3>${S.title} <small>${S.unit} vs time (s)${S.note ? ' · ' + S.note : ''} · peak ${fmt(peak)}</small></h3>`;
+  box.appendChild(card);
+  const Wc = 360, Hc = 200, L = 46, R = 10, T = 28, B = 24;
+  const svg = el('svg', { viewBox: `0 0 ${Wc} ${Hc}`, role: 'img', 'aria-label': `${S.title} against time` }, card);
+  const all = pts.concat(...extra.map(e => e.pts));
+  let lo = Math.min(0, ...all.map(q => q[1])), hi = Math.max(0, ...all.map(q => q[1]));
+  if (hi - lo < 1e-6) hi = lo + 1;
+  const ys = niceStep((hi - lo) * 5 / 4), xs = niceStep(tEnd * 5 / 5);
+  lo = Math.floor(lo / ys) * ys; hi = Math.ceil(hi / ys) * ys;
+  const X = t => L + t / tEnd * (Wc - L - R), Y = v => T + (hi - v) / (hi - lo) * (Hc - T - B);
+  for (let v = lo; v <= hi + ys / 2; v += ys) {
+    el('line', { x1: L, x2: Wc - R, y1: Y(v), y2: Y(v), class: Math.abs(v) < ys / 2 ? 'c-zero' : 'c-grid', 'stroke-width': 1 }, svg);
+    el('text', { x: L - 6, y: Y(v) + 3.5, 'text-anchor': 'end', class: 'c-axis' }, svg).textContent = fmt(v);
+  }
+  for (let t = 0; t <= tEnd + 1e-6; t += xs)
+    el('text', { x: X(t), y: Hc - 7, 'text-anchor': 'middle', class: 'c-axis' }, svg).textContent = `${+t.toFixed(2)}${t === 0 ? '' : ''}`;
+  // events: dashed lines, labels staggered on two rows so close ones don't collide
+  const rows = [-1e9, -1e9];
+  for (const [k, name] of EVENTS) {
+    const e = data.events[k]; if (!e || e.t > tEnd + 1e-6) continue;
+    const x = X(e.t);
+    el('line', { x1: x, x2: x, y1: T - 4, y2: Hc - B, class: 'c-ev', 'stroke-width': 1 }, svg);
+    const w = name.length * 6.2, r = rows[0] + 4 < x - w / 2 ? 0 : rows[1] + 4 < x - w / 2 ? 1 : -1;
+    if (r < 0) continue;
+    rows[r] = Math.min(x + w / 2, Wc - R);
+    el('text', { x: Math.max(L + w / 2, Math.min(Wc - R - w / 2, x)), y: 10 + r * 11, 'text-anchor': 'middle', class: 'c-evt' }, svg).textContent = name;
+  }
+  for (const e of extra) el('polyline', { points: e.pts.map(q => `${X(q[0]).toFixed(1)},${Y(q[1]).toFixed(1)}`).join(' '), fill: 'none', stroke: e.color, 'stroke-width': 1.5, 'stroke-opacity': .85, 'stroke-dasharray': '4 3' }, svg);
+  el('polyline', { points: pts.map(q => `${X(q[0]).toFixed(1)},${Y(q[1]).toFixed(1)}`).join(' '), fill: 'none', stroke: C.orange, 'stroke-width': 2, 'stroke-linejoin': 'round' }, svg);
+  // playhead (follows the animation) and hover readout
+  const head = el('line', { x1: L, x2: L, y1: T - 4, y2: Hc - B, class: 'c-head', 'stroke-width': 1.5, visibility: 'hidden' }, svg);
+  const hv = el('g', { visibility: 'hidden' }, svg);
+  const hl = el('line', { y1: T - 4, y2: Hc - B, class: 'c-zero', 'stroke-width': 1 }, hv);
+  const hd = el('circle', { r: 4, fill: C.orange, stroke: 'var(--card)', 'stroke-width': 2 }, hv);
+  const ht = el('text', { y: T + 10, class: 'c-read' }, hv);
+  const hit = el('rect', { x: L, y: T, width: Wc - L - R, height: Hc - T - B, fill: 'transparent' }, svg);
+  const show = ev => {
+    const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) / r.width * Wc;
+    const t = Math.max(0, Math.min(tEnd, (sx - L) / (Wc - L - R) * tEnd));
+    let j = pts.findIndex(q => q[0] >= t); if (j < 0) j = pts.length - 1;
+    const q = pts[j], x = X(q[0]);
+    hl.setAttribute('x1', x); hl.setAttribute('x2', x); hd.setAttribute('cx', x); hd.setAttribute('cy', Y(q[1]));
+    ht.setAttribute('x', x > Wc / 2 ? x - 8 : x + 8); ht.setAttribute('text-anchor', x > Wc / 2 ? 'end' : 'start');
+    ht.textContent = `${q[0].toFixed(2)} s · ${fmt(q[1])} ${S.unit}`;
+    hv.setAttribute('visibility', 'visible');
+  };
+  hit.addEventListener('pointermove', show); hit.addEventListener('pointerdown', show);
+  hit.addEventListener('pointerleave', () => hv.setAttribute('visibility', 'hidden'));
+  return { head: t => { const on = t > 0 && t <= tEnd; head.setAttribute('visibility', on ? 'visible' : 'hidden'); if (on) { head.setAttribute('x1', X(t)); head.setAttribute('x2', X(t)); } } };
+}
+function fmt(v) { const a = Math.abs(v); return a >= 100 ? v.toFixed(0) : a >= 10 ? v.toFixed(1).replace(/\.0$/, '') : a >= 1 ? v.toFixed(1) : a === 0 ? '0' : v.toFixed(2); }
+$('grange').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  grange = b.dataset.v;
+  for (const x of $('grange').children) x.setAttribute('aria-pressed', x === b);
+  chartsDraw();
+});
+$('ke').addEventListener('change', chartsDraw);
+
+function download(name, text) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+  a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const csvCell = v => v === null || v === undefined ? '' : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
+const csvRows = rows => rows.map(r => r.map(csvCell).join(',')).join('\r\n') + '\r\n';
+$('csv').addEventListener('click', () => {
+  if (!data?.samples) return;
+  const head = ['time_s', 'downwind_m', 'altitude_m', 'phase', 'attitude_deg', 'speed_ms', 'vertical_accel_ms2', 'thrust_n', 'drag_n', 'weight_n', 'mass_g', 'kinetic_energy_j'];
+  const rows = data.path.map((p, j) => { const q = data.samples[j];
+    return [p[0], p[1], p[2], p[3], p[4], q[0], q[1], q[2], +Math.hypot(q[3], q[4]).toFixed(3), q[5], q[6], +(0.5 * q[6] / 1000 * q[0] ** 2).toFixed(3)]; });
+  download(`flight_${data.motor}_${data.wind_mph}mph${rodAngle() ? `_${rodAngle()}deg` : ''}.csv`, csvRows([head, ...rows]));
+});
+
+// ---- change one thing: fly several values of one launch-time variable, overlaid and tabled
+const EXP_COLORS = ['#3D8BFD', '#2FB67C', '#9B7BF0', '#C9A227', '#D9488F'];  // validated with the orange (dataviz validator, light + dark)
+let expRuns = [];
+function expOptions() {
+  const v = $('expvar').value, R = data.recovery, cur = { motor: data.code, delay: data.delay_s };
+  if (v === 'recovery') return [{ label: `Streamer ${R.streamer_size_in[0]}×${R.streamer_size_in[1]} in`, q: { ...cur, recovery: 'streamer', chute_in: null } },
+    ...R.chute_sizes_in.map(c => ({ label: `Parachute ${c} in`, q: { ...cur, recovery: 'chute', chute_in: c } }))];
+  if (v === 'wind') return [0, 5, 10, 15, 20].map(w => ({ label: `${w} mph`, q: { ...cur, wind_mph: w } }));
+  if (v === 'motor') return data.motors.map(m => ({ label: m.code + (m.ok ? '' : ' ⚠'), q: { motor: m.code, delay: null } }));
+  if (v === 'delay') return data.motors.find(m => m.code === data.code).delays.map(d => ({ label: `${d} s`, q: { ...cur, delay: d } }));
+  const dir = +$('angledir').value;
+  return [0, 10, 20, 30].map(a => ({ label: a ? `${a}° ${dir > 0 ? 'downwind' : 'into the wind'}` : '0° (straight up)', q: { ...cur, angle_deg: a * dir } }));
+}
+function expVals() {
+  const opts = expOptions(), keep = new Set([...$('expvals').querySelectorAll('input:checked')].map(i => i.value));
+  const pre = keep.size && opts.some(o => keep.has(o.label)) ? keep : new Set(spread(opts.map(o => o.label), 4));
+  $('expvals').innerHTML = opts.map((o, j) => `<label><input type="checkbox" value="${esc(o.label)}" data-j="${j}"${pre.has(o.label) ? ' checked' : ''}>${esc(o.label)}</label>`).join('');
+  capVals();
+}
+function spread(a, n) { if (a.length <= n) return a; return Array.from({ length: n }, (_, k) => a[Math.round(k * (a.length - 1) / (n - 1))]); }
+function capVals() {
+  const boxes = [...$('expvals').querySelectorAll('input')], on = boxes.filter(b => b.checked).length;
+  for (const b of boxes) b.disabled = !b.checked && on >= EXP_COLORS.length;
+  $('expmsg').textContent = on >= EXP_COLORS.length ? `Up to ${EXP_COLORS.length} at a time.` : '';
+}
+$('expvals').addEventListener('change', capVals);
+$('expvar').addEventListener('change', () => { $('expvals').innerHTML = ''; expVals(); });
+function clearExp(quiet) {
+  expRuns = []; $('expout').innerHTML = ''; $('expclear').hidden = true;
+  if (!quiet && data) { draw(); chartsDraw(); render(simT); }
+}
+$('expclear').addEventListener('click', () => clearExp(false));
+$('exprun').addEventListener('click', async () => {
+  const opts = expOptions(), picked = [...$('expvals').querySelectorAll('input:checked')].map(i => opts[+i.dataset.j]).filter(Boolean);
+  if (!picked.length) { $('expmsg').textContent = 'Tick at least one value.'; return; }
+  $('exprun').disabled = true; $('expmsg').textContent = 'Flying…';
+  const runs = [];
+  for (const [j, o] of picked.entries()) {
+    try {
+      const r = await fetch(`/api/builds/${encodeURIComponent(buildId)}/launch?${launchQuery(o.q)}`);
+      const body = await r.json().catch(() => ({}));
+      runs.push(r.ok ? { name: o.label, color: EXP_COLORS[j], data: body } : { name: o.label, color: EXP_COLORS[j], err: body.detail || "couldn't fly it" });
+    } catch { runs.push({ name: o.label, color: EXP_COLORS[j], err: "can't reach Rocket Builder" }); }
+  }
+  $('exprun').disabled = false; $('expmsg').textContent = '';
+  expRuns = runs; $('expclear').hidden = false;
+  draw(); chartsDraw(); expTable(); start();
+});
+function expTable() {
+  const v = $('expvar').selectedOptions[0].textContent, land = d => d.events.landing;
+  const row = (name, color, d, mine) => d ? `<tr><td><i style="background:${color}"></i>${esc(name)}${mine ? ' <small class="note">(as set above)</small>' : ''}</td>
+    <td>${Math.round(d.apogee_m)} m</td><td>${Math.abs(Math.round(d.landing_m))} m${Math.abs(d.landing_m) >= 2 ? (d.landing_m > 0 ? ' downwind' : ' upwind') : ''}</td>
+    <td>${land(d).speed_ms} m/s${land(d).speed_ms > 10 ? ' <b style="color:var(--err)">too fast</b>' : ''}</td><td>${Math.round(land(d).t)} s</td>
+    <td>${d.safe ? '✓' : '<b style="color:var(--err)">⚠ unsafe</b>'}</td></tr>` : `<tr><td><i style="background:${color}"></i>${esc(name)}</td><td colspan="5" class="note">${esc(mine)}</td></tr>`;
+  $('expout').innerHTML = `<table class="cmpt"><thead><tr><th>${esc(v)}</th><th>Highest</th><th>Lands</th><th>Landing speed</th><th>In the air</th><th>Safe</th></tr></thead><tbody>
+    ${row('Your rocket', C.orange, data, true)}
+    ${expRuns.map(g => g.data ? row(g.name, g.color, g.data) : row(g.name, g.color, null, g.err)).join('')}</tbody></table>`;
+}
+const isSimple = () => document.documentElement.classList.contains('simple');
+const overlays = () => isSimple() ? [] : [...ghosts, ...expRuns];  // simple mode: just the one rocket
+
+// ---- predict, fly, compare: kept in this browser per design (the build id is a hash of the design)
+const logKey = () => `rbLog:${buildId}`;
+function logLoad() { try { const a = JSON.parse(LS.get(logKey()) || '[]'); return Array.isArray(a) ? a : []; } catch { return []; } }
+function logStore(a) { if (!LS.set(logKey(), JSON.stringify(a))) $('logmsg').textContent = "This browser won't save the log (private window?): download it as CSV before you close the page."; }
+let logMem = null;  // fallback when storage is blocked
+const logGet = () => logMem ?? (logMem = logLoad());
+function logPut(a) { logMem = a; logStore(a); renderLog(); }
+$('predict').addEventListener('click', () => {
+  const e = data.events, a = logGet();
+  a.push({ id: Date.now(), when: new Date().toISOString().slice(0, 16).replace('T', ' '),
+    setup: { motor: data.motor, recovery: recLabel(data), wind_mph: data.wind_mph, angle_deg: rodAngle() },
+    pred: { apogee_m: Math.round(data.apogee_m), delay_s: data.delay_s, t_apogee_s: e.apogee?.t ?? null, flight_s: Math.round(e.landing.t),
+            landing_m: Math.abs(Math.round(data.landing_m)), descent_ms: data.recovery.descent_ms }, meas: null });
+  logPut(a);
+  $('logmsg').textContent = 'Saved. Fly it, then type what you measured below.';
+});
+const UNITS = { m: 1, ft: 0.3048 };
+function diff(p, m, unit) {
+  if (m === null || m === undefined || m === '' || p === null) return '–';
+  const d = m - p, pc = p ? Math.round(d / p * 100) : null;
+  return `${d > 0 ? '+' : ''}${fmt(d)} ${unit}${pc !== null ? ` (${pc > 0 ? '+' : ''}${pc}%)` : ''}`;
+}
+function renderLog() {
+  const a = logGet();
+  $('log').innerHTML = a.length ? a.map((x, n) => {
+    const m = x.meas || {}, P = x.pred;
+    const tr = (k, pv, mv, unit, dv) => `<tr><td>${k}</td><td>${pv ?? '–'}${pv !== null && pv !== undefined ? ' ' + unit : ''}</td><td>${mv ?? '–'}${mv !== null && mv !== undefined && mv !== '' ? ' ' + unit : ''}</td><td class="d">${dv ?? ''}</td></tr>`;
+    return `<div class="logent" data-id="${x.id}"><div class="lh"><b>Flight ${n + 1}</b><span>${esc(x.setup.motor)} · ${esc(x.setup.recovery)} · wind ${x.setup.wind_mph} mph · rod ${x.setup.angle_deg}°</span>
+      <span class="sp"></span><span class="note">predicted ${esc(x.when)}</span><button type="button" data-del="${x.id}" aria-label="Delete flight ${n + 1}">Delete</button></div>
+      <div class="pager"><table class="cmpt"><thead><tr><th></th><th>Predicted</th><th>Measured</th><th>Difference</th></tr></thead><tbody>
+      ${tr('Highest point', P.apogee_m, m.alt_m, 'm', diff(P.apogee_m, m.alt_m, 'm'))}
+      ${tr('Time in the air', P.flight_s, m.time_s, 's', diff(P.flight_s, m.time_s, 's'))}
+      ${tr('Landing distance', P.landing_m, m.landing_m, 'm', diff(P.landing_m, m.landing_m, 'm'))}
+      ${tr('Time to the top', P.t_apogee_s, null, 's')}${tr('Ejection delay', P.delay_s, null, 's')}${tr('Descent speed', P.descent_ms, null, 'm/s')}
+      </tbody></table></div>
+      <form class="meas" data-id="${x.id}">
+        <label>Altitude <input name="alt" type="number" min="0" step="any" inputmode="decimal" value="${m.alt_m ?? ''}"></label>
+        <label>Flight time (s) <input name="time" type="number" min="0" step="any" inputmode="decimal" value="${m.time_s ?? ''}"></label>
+        <label>Landing distance <input name="land" type="number" min="0" step="any" inputmode="decimal" value="${m.landing_m ?? ''}"></label>
+        <label>Units <select name="unit"><option value="m">m</option><option value="ft">ft</option></select></label>
+        <label>Notes <input name="notes" class="notes" maxlength="300" value="${esc(m.notes ?? '')}"></label>
+        <button type="submit">Save results</button>
+      </form>${m.notes ? `<p class="note">Notes: ${esc(m.notes)}</p>` : ''}</div>`;
+  }).join('') : '<p class="note">No predictions saved yet.</p>';
+}
+$('log').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target, a = logGet(), x = a.find(y => String(y.id) === f.dataset.id); if (!x) return;
+  const u = UNITS[f.unit.value] || 1, num = (v, k) => v === '' ? null : Math.round(+v * k * 10) / 10;
+  x.meas = { alt_m: num(f.alt.value, u), time_s: num(f.time.value, 1), landing_m: num(f.land.value, u), notes: f.notes.value.trim() };
+  logPut(a);
+});
+$('log').addEventListener('click', e => {
+  const b = e.target.closest('[data-del]'); if (!b) return;
+  if (!confirm('Delete this flight from the log?')) return;
+  logPut(logGet().filter(y => String(y.id) !== b.dataset.del));
+});
+$('logprint').addEventListener('click', () => print());
+$('logcsv').addEventListener('click', () => {
+  const head = ['flight', 'predicted_at', 'motor', 'recovery', 'wind_mph', 'angle_deg', 'pred_apogee_m', 'pred_delay_s', 'pred_time_to_apogee_s',
+    'pred_flight_time_s', 'pred_landing_m', 'pred_descent_ms', 'meas_altitude_m', 'meas_flight_time_s', 'meas_landing_m',
+    'diff_altitude_m', 'diff_flight_time_s', 'diff_landing_m', 'notes'];
+  const d = (p, m) => m === null || m === undefined ? '' : +(m - p).toFixed(1);
+  const rows = logGet().map((x, n) => { const P = x.pred, m = x.meas || {};
+    return [n + 1, x.when, x.setup.motor, x.setup.recovery, x.setup.wind_mph, x.setup.angle_deg, P.apogee_m, P.delay_s, P.t_apogee_s, P.flight_s,
+      P.landing_m, P.descent_ms, m.alt_m, m.time_s, m.landing_m, d(P.apogee_m, m.alt_m), d(P.flight_s, m.time_s), d(P.landing_m, m.landing_m), m.notes]; });
+  download(`rocket_${buildId}_predict_vs_measured.csv`, csvRows([head, ...rows]));
+});
+
+// ---- simple mode: three choices at most, big buttons, answers in kid terms
+const FLAGPOLE_M = 7.6;   // a school flagpole is about 25 ft
+const STORY_M = 3.0;      // one floor of a building, about 10 ft
+const FOOTBALL_M = 91.44; // 100 yards, goal line to goal line
+function setSimple(on, save) {
+  document.documentElement.classList.toggle('simple', on);
+  $('simpleBtn').setAttribute('aria-pressed', String(on));
+  $('simple').hidden = !on;
+  if (save) LS.set('rbSimple', on ? '1' : '0');
+  if (data) { draw(); render(simT); kid(); syncSimple(); }
+}
+$('simpleBtn').addEventListener('click', () => setSimple(!document.documentElement.classList.contains('simple'), true));
+function syncSimple() {
+  if (!data) return;
+  const w = +$('wind').value, near = [0, 5, 15].reduce((a, b) => Math.abs(b - w) < Math.abs(a - w) ? b : a);
+  for (const b of $('swind').children) b.setAttribute('aria-pressed', String(+b.dataset.v === near));
+  for (const b of $('srec').children) b.setAttribute('aria-pressed', String(b.dataset.v === data.recovery.kind));
+}
+$('swind').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $('wind').value = b.dataset.v; $('wind').dispatchEvent(new Event('input'));
+});
+$('srec').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !data) return;
+  // the parachute is the app's recommended size
+  $('recov').value = b.dataset.v === 'streamer' ? 'streamer' : `chute:${data.parachute.size_in || data.recovery.chute_sizes_in.at(-1)}`;
+  load({ motor: data.code, delay: data.delay_s, ghosts: false });
+});
+$('splay').addEventListener('click', () => { if (data) start(); });
+function fields(d) {
+  const f = d / FOOTBALL_M;
+  if (d < 10) return ['Right by the pad', `about ${Math.max(1, Math.round(d / 0.75))} big steps away`];
+  if (f < 0.375) return ['¼ of a football field', `${Math.round(d)} m away`];
+  if (f < 0.625) return ['½ a football field', `${Math.round(d)} m away`];
+  if (f < 0.875) return ['¾ of a football field', `${Math.round(d)} m away`];
+  const h = Math.round(f * 2) / 2, w = h % 1 ? `${Math.floor(h) || ''}½` : `${h}`;
+  return [`${w} football field${h > 1 ? 's' : ''}`, `${Math.round(d)} m away`];
+}
+function kid() {
+  if (!data) return;
+  const h = data.apogee_m, poles = Math.round(h / FLAGPOLE_M), floors = Math.round(h / STORY_M), land = data.events.landing;
+  const [fv, fs] = fields(Math.abs(data.landing_m));
+  const gentle = land.speed_ms <= 5.5 ? ['Gently', 'a soft landing, like a jump off a step'] : land.speed_ms <= 10 ? ['A bit fast', 'it might get a scratch'] : ['Too fast!', 'it would break, or hurt someone'];
+  const tiles = [
+    ['How high?', poles >= 1 ? `${poles} flagpole${poles === 1 ? '' : 's'}` : 'Lower than a flagpole', `as tall as a ${floors}-story building (${Math.round(h)} m)`],
+    ['How far away did it land?', fv, fs],
+    ['How long in the air?', `${Math.round(land.t)} seconds`, `count “one-Mississippi” ${Math.round(land.t)} times`],
+    ['How did it land?', gentle[0], `${gentle[1]}, under its ${data.recovery.kind === 'streamer' ? 'streamer' : 'parachute'}`],
+  ];
+  $('kid').innerHTML = tiles.map(([k, v, s]) => `<div class="stat"><div class="k">${k}</div><div class="v">${esc(v)}</div><div class="s">${esc(s)}</div></div>`).join('');
+}
+
 let timer;
 $('wind').addEventListener('input', () => {
   $('windout').textContent = `${$('wind').value} mph (${Math.round($('wind').value * 1.609)} km/h)`;
-  clearTimeout(timer); timer = setTimeout(() => load({ motor: data?.code, delay: data?.delay_s }), 200);
+  clearTimeout(timer); timer = setTimeout(() => load({ motor: data?.code ?? qs.get('motor'), delay: data?.delay_s ?? qs.get('delay') }), 200);
 });
 $('motor').addEventListener('change', () => load({ motor: $('motor').value, ghosts: false }));
 $('delay').addEventListener('change', () => load({ motor: $('motor').value, delay: $('delay').value, ghosts: false }));
@@ -609,8 +1114,14 @@ $('skip').addEventListener('click', () => { cancelAnimationFrame(raf); simT = 1e
 let lastNarrow = null;
 addEventListener('resize', () => {
   const n = $('stagebox').clientWidth < 600;
-  if (data && n !== lastNarrow) { lastNarrow = n; draw(); render(simT); }
+  if (data && n !== lastNarrow) { lastNarrow = n; draw(); chartsDraw(); render(simT); }
 });
+const again = () => { clearTimeout(timer); timer = setTimeout(() => load({ motor: data?.code, delay: data?.delay_s }), 200); };
+$('angle').addEventListener('input', () => { angleOut(); again(); });
+$('angledir').addEventListener('change', () => { angleOut(); if (+$('angle').value) again(); });
+$('recov').addEventListener('change', () => load({ motor: data?.code, delay: data?.delay_s, ghosts: false }));
+$('forces').addEventListener('change', () => { $('forcekey').hidden = !$('forces').checked; if (data) render(simT); });
+initFromUrl();
 $('wind').dispatchEvent(new Event('input'));
 </script>
 </body>

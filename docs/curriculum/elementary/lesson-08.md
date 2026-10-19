@@ -42,6 +42,8 @@ Read the launch rules together (see the [safety page](safety.md)). Give out jobs
 
 **How the 45° card works:** fold a square of paper corner to corner to make a triangle. Hold the long edge level and sight up the slanted edge. That line goes up at 45°. If you stand **10 m** from the launcher and the rocket goes **above** your 45° line, it went **higher than 10 m**. Below the line? Lower than 10 m.
 
+<!-- figure: sight45 -->
+
 ### 2. Launch! (25 minutes)
 
 1. Trackers stand 10 m from the launcher (measure it), off to the side.
@@ -52,7 +54,7 @@ Read the launch rules together (see the [safety page](safety.md)). Give out jobs
 
 ### 3. Rocket Builder and the real thing (5 minutes)
 
-On the tablet, open a Rocket Builder design and press **▶ Watch it launch**. Read the predicted height. Compare: the app's rocket flies on a real motor, which pushes for about a second. A stomp pushes for a split second. That's why the app's rocket goes much higher.
+On the tablet or projector, open a Rocket Builder design and press **▶ Watch it launch** (Simple mode on a projector). Read the predicted height. Compare: the app's rocket flies on a real motor, which pushes for about a second. A stomp pushes for a split second. That's why the app's rocket goes much higher.
 
 ### 4. Wrap up (10 minutes)
 
@@ -79,3 +81,4 @@ On the tablet, open a Rocket Builder design and press **▶ Watch it launch**. R
 - **Optional instructor demo, a printed rocket on a real motor:** only if an adult experienced with model rockets runs it, following the NAR Model Rocket Safety Code, on a field big enough for the motor (see the middle-school safety page), with students behind a spectator line at least 30 feet (10 m) from the pad. Students never handle motors, igniters or the launch key, and never go to the pad. A simpler option: watch a local NAR club launch as spectators, or show a video of one. Kits and motor flights are rated 12+.
 - **Rain or wind?** Do launch day in a gym with straw rockets, and use Rocket Builder's simulated launch.
 - **Further resources:** Apogee Components' free *Rocketry Reservoir* (apogeerockets.com/downloads/PDFs/Rocketry_Education_Pack.pdf) has rocket colouring pages and certificates you can print. The NAR (nar.org) lists clubs that welcome school groups at their launches.
+- **Rocket Builder tools for launch day:** the **altitude calculator** ([rocket.quiverdesignworks.net/tools/altitude](https://rocket.quiverdesignworks.net/tools/altitude)) turns an angle and a distance into a height, shows the working, the 45° rule and the average of two trackers (good for grade 5). Each design also has a one-page **mission card** (designer ▾ download menu → *Mission card*) with its predicted height, to print for the clipboard. The simulator's **Predict, fly, compare** log keeps the class's guesses and results.
