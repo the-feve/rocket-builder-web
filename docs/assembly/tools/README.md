@@ -38,8 +38,10 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
   way (the parachute fold lines).
 - **Cord** (`rope()`): a smooth Catmull-Rom tube of constant radius with a braid pattern and flat cut
   ends; knots are drawn as two snug turns round the long part (`wraps()`), as tied in steps 4 and 5.
-  `strapRig`, `noseRig` and `larks` (the parachute's lark's head on the cord just under the nose knot)
-  are shared by steps 4–6, the overview and the packing drawing.
+  `strapRig`, `noseRig` and `swivelRig` (a size 14 snap swivel clipped round the cord just under the
+  nose knot, with the parachute's lines lark's-headed to its eye; states 'clip', 'through', 'snug')
+  are shared by steps 4–6, the overview and the packing drawing. (`larks` hitches the lines straight
+  onto the cord; no longer used.)
 - `scene_defs.js`: one entry per drawing (camera, which parts, how far each is pulled apart, and
   the labelled points). Labels are not baked into the PNGs: `render.mjs` writes each scene's
   points to `images/callouts.js`, and the guide draws the part tags over the images with
@@ -49,8 +51,8 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
   shading, nose to the left in step drawings, Night shock cord, orange canopy and motion arrows.
 
 Drawings are not to scale unless they say so: the overview (`recovery`) shortens the cord with a
-break mark, and in `chute_fold` only picture 4 (roll next to B) is real size. The parachute is
-hitched to the cord, not the tie bar, in the drawings (an 18 mm rocket): the M13/M18 tie-bar recess
+break mark, and in `chute_fold` only picture 4 (roll next to B) is real size. The swivel is
+clipped to the cord, not the tie bar, in the drawings (an 18 mm rocket): the M13/M18 tie-bar recess
 leaves room for one cord pass only (`body.nose_recess`); 24 mm and up have room for both.
 
 To check a render by eye, composite it onto paper (the PNGs are transparent): the page previews
