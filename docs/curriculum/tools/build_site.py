@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
-"""Build the curriculum web pages served at /learn from docs/curriculum/*.md.
+"""Build the lesson web pages served at /learn from docs/curriculum/.
 
     pip install markdown            # dev only; the server never imports it
-    python3 docs/curriculum/tools/build_site.py          # HTML pages
-    python3 docs/curriculum/tools/build_site.py --pdf    # also worksheets.pdf (Playwright)
+    python3 docs/curriculum/tools/build_site.py          # worksheets HTML + web pages
+    python3 docs/curriculum/tools/build_site.py --pdf    # also both worksheets PDFs (Playwright)
 
-Writes server/static/learn/: index.html, safety.html, day-01.html … day-10.html,
-worksheets.html (a copy of ../worksheets.html with self-hosted fonts) and, with --pdf,
-worksheets.pdf. learn.css there is hand-written and not touched. server/app.py serves
-them at /learn/, /learn/safety, /learn/day-01 … and /learn/worksheets(.pdf).
+Two tracks, each a folder of markdown: elementary/ (grades 3–5) and middle/ (grades 6–8),
+with README.md (overview), lesson-NN.md, safety.md, and worksheets.html (built here by
+gen_ws.py). Writes server/static/learn/:
+
+    index.html                       the chooser (from ../README.md)
+    teachers.html                    standards and sources (from ../standards.md)
+    <track>/index.html               the track overview
+    <track>/lesson-NN.html, safety.html, worksheets.html (+ worksheets.pdf with --pdf)
+
+learn.css there is hand-written and not touched. server/app.py serves these at /learn/,
+/learn/teachers, /learn/<track>/ and /learn/<track>/<page>; keep its LEARN_TRACKS in step
+with TRACKS below.
 
 --pdf runs tools/worksheets_pdf.js with node; it needs the playwright package on
 NODE_PATH and a Chromium in PLAYWRIGHT_BROWSERS_PATH.
@@ -29,7 +37,13 @@ CUR = HERE.parent                                   # docs/curriculum
 ROOT = CUR.parent.parent                            # repo root
 OUT = ROOT / "server" / "static" / "learn"
 APP = "https://rocket.quiverdesignworks.net/"
-DAYS = [f"day-{n:02d}" for n in range(1, 11)]
+
+TRACKS = {
+    "elementary": {"grades": "Grades 3–5", "short": "Elementary", "lessons": 8,
+                   "blurb": "Paper, straw and stomp rockets; Rocket Builder on the class projector."},
+    "middle": {"grades": "Grades 6–8", "short": "Middle school", "lessons": 9,
+               "blurb": "Paper rockets, then a 3D-printed rocket on a real motor, launched by an adult."},
+}
 
 # The Rocket Builder mark (docs/brand/logo/rb-mark-light.svg), ink follows the theme.
 MARK = ('<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" '
@@ -43,22 +57,30 @@ MARK = ('<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><ma
 
 
 # ---------------------------------------------------------------- markdown
-def md_fix(text: str) -> str:
+def md_fix(text: str, track: str | None) -> str:
     """Rewrite the repo links in the markdown for the web pages."""
-    text = text.replace("`worksheets.html`", "[the worksheets](/learn/worksheets)")
-    text = re.sub(r"\]\(README\.md#safety\)", "](/learn/safety)", text)
-    text = re.sub(r"\]\(#safety\)", "](/learn/safety)", text)
-    text = re.sub(r"\]\(README\.md(#[\w-]+)?\)", lambda m: f"](/learn/{m.group(1) or ''})", text)
-    text = re.sub(r"\]\((day-\d\d)\.md(#[\w-]+)?\)", lambda m: f"](/learn/{m.group(1)}{m.group(2) or ''})", text)
-    # Bare app URLs and nar.org become links.
-    text = re.sub(r"(?<!\]\()(?<!<)https://rocket\.quiverdesignworks\.net/?",
+    base = f"/learn/{track}" if track else "/learn"
+    text = re.sub(r"\]\((?:\.\./)?standards\.md\)", "](/learn/teachers)", text)
+    text = re.sub(r"\]\(\.\./(elementary|middle)/(lesson-\d\d|safety)\.md\)", r"](/learn/\1/\2)", text)
+    text = re.sub(r"\]\((elementary|middle)/(lesson-\d\d|safety)\.md\)", r"](/learn/\1/\2)", text)
+    text = re.sub(r"\]\((elementary|middle)/README\.md\)", r"](/learn/\1/)", text)
+    text = re.sub(r"\]\((lesson-\d\d|safety)\.md(#[\w-]+)?\)", lambda m: f"]({base}/{m.group(1)}{m.group(2) or ''})", text)
+    text = re.sub(r"\]\(README\.md(#[\w-]+)?\)", lambda m: f"]({base}/{m.group(1) or ''})", text)
+    text = re.sub(r"\]\(worksheets\.html\)", f"]({base}/worksheets)", text)
+    # Bare app URLs, nar.org and apogeerockets.com addresses become links.
+    text = re.sub(r"(?<!\]\()(?<!<)https://rocket\.quiverdesignworks\.net/?(?![\w/])",
                   f"[rocket.quiverdesignworks.net]({APP})", text)
-    text = re.sub(r"(?<![\w./])nar\.org\b", "[nar.org](https://www.nar.org/)", text)
+    text = re.sub(r"(?<![\w./\[(])nar\.org\b", "[nar.org](https://www.nar.org/)", text)
+
+    def apogee(m):
+        url = m.group(0).rstrip(".")
+        return f"[{url}](https://www.{url})" + m.group(0)[len(url):]
+    text = re.sub(r"(?<![\w./\[(])apogeerockets\.com/[^\s),]+", apogee, text)
     return text
 
 
-def md(text: str) -> str:
-    return markdown.markdown(md_fix(text), extensions=["tables", "sane_lists", "toc"],
+def md(text: str, track: str | None = None) -> str:
+    return markdown.markdown(md_fix(text, track), extensions=["tables", "sane_lists", "toc"],
                              extension_configs={"toc": {"permalink": False}})
 
 
@@ -72,7 +94,6 @@ def link_app_mentions(body: str) -> str:
             out.append(part)
             continue
         pieces = re.split(r"(<[^>]+>)", part)
-        # "Rocket Builder" first; a section that only says "the app" links that.
         for pat in (r"Rocket Builder", r"\bthe app\b"):
             done = False
             depth_a = depth_h = 0
@@ -83,7 +104,7 @@ def link_app_mentions(body: str) -> str:
                     closing = p.startswith("</")
                     if name == "a":
                         depth_a += -1 if closing else 1
-                    elif name in ("h1", "h2", "h3", "h4", "summary"):
+                    elif name in ("h1", "h2", "h3", "h4", "summary", "th"):
                         depth_h += -1 if closing else 1
                     continue
                 if depth_a == 0 and depth_h == 0 and re.search(pat, p):
@@ -97,24 +118,21 @@ def link_app_mentions(body: str) -> str:
 
 
 def polish(body: str) -> str:
-    """Callouts, the answer key, the read-aloud box and scrollable tables."""
+    """Callouts, the answer key, the read-aloud box, the teacher-notes box and scrollable tables."""
     def call(kind, label):
         def f(m):
             return f'<div class="call {kind}"><span class="lab">{label}</span><p>{m.group(1)}</p></div>'
         return f
     body = re.sub(r"<p><strong>Safety:</strong>\s*(.*?)</p>", call("safety", "Safety"), body, flags=re.S)
     body = re.sub(r"<p><strong>Tips?:</strong>\s*(.*?)</p>", call("tip", "Tip"), body, flags=re.S)
-    body = re.sub(r"<p><strong>What to expect:</strong>\s*(.*?)</p>", call("tip", "What to expect"), body, flags=re.S)
     body = re.sub(r"<p><strong>Answer key</strong></p>\s*(<ol>.*?</ol>)",
                   r'<details class="answers"><summary>Answer key</summary>\1</details>', body, flags=re.S)
-    body = body.replace("<blockquote>", '<blockquote class="aloud"><span class="lab">Read aloud</span>', )
+    body = body.replace("<blockquote>", '<blockquote class="aloud"><span class="lab">Read aloud</span>')
     body = body.replace("<table>", '<div class="tbl"><table>').replace("</table>", "</table></div>")
-    body = re.sub(r"<p><strong>(Paper track \(under 12\)[^<]*)</strong>", r'<p class="trk trk-paper"><strong>\1</strong>', body)
-    body = re.sub(r"<p><strong>(Printed-rocket track \(12\+\)[^<]*)</strong>", r'<p class="trk trk-print"><strong>\1</strong>', body)
-    # "Launch day rules" is a safety section: frame it.
-    body = re.sub(r'(<h2 id="launch-day-rules">.*?)(?=<h2\b)',
-                  r'<section class="call safety rules">\1</section>', body, flags=re.S)
-    body = body.replace("★", '<span class="star" title="Keep this one in the 1-week version">★</span>')
+    # The standards box at the top of a lesson, and the teacher notes at the end.
+    body = re.sub(r'(<h2 id="standards">.*?)(?=<h2\b)', r'<section class="stdbox">\1</section>', body, count=1, flags=re.S)
+    body = re.sub(r'(<h2 id="teacher-notes">.*?)(?=<h2\b|\Z)', r'<section class="call notes">\1</section>', body, count=1, flags=re.S)
+    body = re.sub(r'(<h2 id="launch-day-rules">.*?)(?=<h2\b|\Z)', r'<section class="call safety rules">\1</section>', body, flags=re.S)
     return link_app_mentions(body)
 
 
@@ -141,11 +159,11 @@ def page(title: str, desc: str, main: str, current: str = "") -> str:
 <script>try {{ const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; }} catch {{}}</script>
 </head>
 <body>
-<!-- Generated by docs/curriculum/tools/build_site.py from docs/curriculum/*.md: edit those, then rebuild. -->
+<!-- Generated by docs/curriculum/tools/build_site.py from docs/curriculum/: edit those, then rebuild. -->
 <a class="skip" href="#main">Skip to the lesson</a>
 <header class="site">
-  <a class="brand" href="/learn/" title="Rockets and Model Rocketry: the home-school unit">{MARK}<span>Rocket Builder <small>Learn</small></span></a>
-  <nav aria-label="Unit">{nav('/learn/', 'Lessons', 'index')}{nav('/learn/worksheets.pdf', 'Worksheets', 'ws')}{nav('/learn/safety', 'Safety', 'safety')}</nav>
+  <a class="brand" href="/learn/" title="Rockets and Model Rocketry: free lessons">{MARK}<span>Rocket Builder <small>Learn</small></span></a>
+  <nav aria-label="Lessons">{nav('/learn/elementary/', 'Grades 3–5', 'elementary')}{nav('/learn/middle/', 'Grades 6–8', 'middle')}{nav('/learn/teachers', 'Teachers', 'teachers')}</nav>
   <a class="btn launch" href="{APP}"><span class="long">Open Rocket Builder</span><span class="short">Open the app</span></a>
   <button id="theme" type="button">Dark mode</button>
 </header>
@@ -153,9 +171,9 @@ def page(title: str, desc: str, main: str, current: str = "") -> str:
 {main}
 </main>
 <footer class="site">
-  <p><b>Rockets and Model Rocketry</b> is a free home-school unit from <a href="{APP}">Rocket Builder</a> by
-  <a href="https://quiverdesignworks.net/">Quiver Design Works</a>. Free to use at home, in co-ops and in classrooms.</p>
-  <p><a href="/learn/">All lessons</a> · <a href="/learn/worksheets.pdf">Worksheets (PDF)</a> · <a href="/learn/worksheets">Worksheets (web page)</a> · <a href="/learn/safety">Safety</a> · <a href="/sources">Sources</a></p>
+  <p><b>Rockets and Model Rocketry</b> is a set of free lessons from <a href="{APP}">Rocket Builder</a> by
+  <a href="https://quiverdesignworks.net/">Quiver Design Works</a>, built on Washington's K–12 Science Learning Standards. Free to use in classrooms, co-ops and at home.</p>
+  <p><a href="/learn/">All lessons</a> · <a href="/learn/elementary/">Grades 3–5</a> · <a href="/learn/middle/">Grades 6–8</a> · <a href="/learn/teachers">Standards and sources</a> · <a href="/sources">App sources</a></p>
   <p class="fine">Model rocket motors and Rocket Builder kits are rated 12+. Adults handle all motors and igniters.</p>
 </footer>
 <script>
@@ -175,152 +193,157 @@ def page(title: str, desc: str, main: str, current: str = "") -> str:
 """
 
 
-# ---------------------------------------------------------------- days
-def read_day(slug: str) -> dict:
-    text = (CUR / f"{slug}.md").read_text(encoding="utf-8")
-    lines = text.splitlines()
-    m = re.match(r"# Day (\d+): (.*)", lines[0])
-    num, title = int(m.group(1)), m.group(2).strip()
-    rest = "\n".join(l for l in lines[1:] if not l.startswith("[← ") and not l.startswith("[Day "))
-    # The first paragraph is the time / worksheet line.
+def sections(path: Path) -> tuple[str, dict[str, str]]:
+    """The text before the first h2, and each h2 section's body by heading."""
+    text = path.read_text(encoding="utf-8")
+    head, *chunks = re.split(r"\n(?=## )", text)
+    secs = {}
+    for chunk in chunks:
+        h, _, body = chunk.partition("\n")
+        secs[h[3:].strip()] = body.strip()
+    return head, secs
+
+
+# ---------------------------------------------------------------- lessons
+def read_lesson(track: str, n: int) -> dict:
+    slug = f"lesson-{n:02d}"
+    text = (CUR / track / f"{slug}.md").read_text(encoding="utf-8")
+    first, _, rest = text.partition("\n")
+    m = re.match(r"# Lesson (\d+): (.*)", first)
+    assert m and int(m.group(1)) == n, f"{track}/{slug}.md must start with '# Lesson {n}: …'"
     meta, _, body = rest.strip().partition("\n\n")
-    return {"slug": slug, "num": num, "title": title, "meta": meta, "body": body}
+    codes = re.findall(r"^\| \*\*([^*]+)\*\*", body.split("## I can", 1)[0], flags=re.M)
+    return {"track": track, "slug": slug, "num": n, "title": m.group(2).strip(), "meta": meta, "body": body,
+            "codes": [c for c in codes if "(" not in c and not re.match(r"\d\.|[A-Z]{2,4}\.", c)]}
 
 
-def day_page(d: dict, prev: dict | None, nxt: dict | None) -> str:
-    meta = md(d["meta"]).removeprefix("<p>").removesuffix("</p>")
-    body = polish(md(d["body"]))
-    body = body.replace('<h2 id="worksheet">Worksheet</h2>',
-                        '<h2 id="worksheet">Worksheet</h2>\n<p class="small">In the <a href="/learn/worksheets.pdf">worksheets PDF</a> '
-                        '(or <a href="/learn/worksheets">as a web page</a>). Print at 100%.</p>', 1)
-    toc = "".join(f'<li><a href="#{i}">{t}</a></li>'
-                  for i, t in re.findall(r'<h2 id="([^"]+)">(.*?)</h2>', body))
+def lesson_page(d: dict, prev: dict | None, nxt: dict | None) -> str:
+    tr, cfg = d["track"], TRACKS[d["track"]]
+    meta = md(d["meta"], tr).removeprefix("<p>").removesuffix("</p>")
+    body = polish(md(d["body"], tr))
+    toc = "".join(f'<li><a href="#{i}">{t}</a></li>' for i, t in re.findall(r'<h2 id="([^"]+)">(.*?)</h2>', body))
 
     def card(x, rel, label):
         if not x:
-            return f'<a class="pn {rel}" href="/learn/"><span class="lab">{label}</span>Back to the overview</a>'
-        return (f'<a class="pn {rel}" href="/learn/{x["slug"]}" rel="{rel}"><span class="lab">{label}</span>'
-                f'<span class="tag">Day {x["num"]}</span> {html.escape(x["title"])}</a>')
+            return f'<a class="pn {rel}" href="/learn/{tr}/"><span class="lab">{label}</span>Back to the overview</a>'
+        return (f'<a class="pn {rel}" href="/learn/{tr}/{x["slug"]}" rel="{rel}"><span class="lab">{label}</span>'
+                f'<span class="tag">Lesson {x["num"]}</span> {html.escape(x["title"])}</a>')
 
-    main = f"""<article class="lesson">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> Day {d['num']} of 10</nav>
-<p class="daytag"><span class="tag big">Day {d['num']}</span></p>
+    main = f"""<article class="lesson {tr}">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> <a href="/learn/{tr}/">{cfg['grades']}</a> <span aria-hidden="true">›</span> Lesson {d['num']} of {cfg['lessons']}</nav>
+<p class="daytag"><span class="tag big">Lesson {d['num']}</span> <span class="tag grade">{cfg['grades']}</span></p>
 <h1>{html.escape(d['title'])}</h1>
 <p class="meta">{meta}</p>
-<p class="tools"><a class="btn ink" href="/learn/worksheets.pdf">Worksheets (PDF)</a> <a class="btn outline" href="{APP}">Open Rocket Builder</a> <button class="btn outline" type="button" onclick="print()">Print this lesson</button></p>
+<p class="tools"><a class="btn ink" href="/learn/{tr}/worksheets.pdf">Worksheets (PDF)</a> <a class="btn outline" href="{APP}">Open Rocket Builder</a> <button class="btn outline" type="button" onclick="print()">Print this lesson</button></p>
 <details class="toc"><summary>On this page</summary><ol>{toc}</ol></details>
 {body}
 </article>
 <nav class="prevnext" aria-label="Lessons">{card(prev, 'prev', '← Previous')}{card(nxt, 'next', 'Next →')}</nav>
-<p class="back"><a href="/learn/">← Back to the overview and schedule</a></p>"""
-    return page(f"Day {d['num']}: {d['title']} · Rocket Builder Learn",
-                f"Day {d['num']} of a free 2-week home-school rocketry unit (grades 3–8): {d['title']}.", main)
+<p class="back"><a href="/learn/{tr}/">← Back to the {cfg['grades'].lower()} overview</a></p>"""
+    return page(f"Lesson {d['num']}: {d['title']} · {cfg['grades']} · Rocket Builder Learn",
+                f"{cfg['short']} rocketry lesson {d['num']} of {cfg['lessons']} ({cfg['grades'].lower()}): {d['title']}. "
+                f"Standards: {', '.join(d['codes'])}.", main)
 
 
-# ---------------------------------------------------------------- overview
-def readme_sections() -> dict[str, str]:
-    text = (CUR / "README.md").read_text(encoding="utf-8")
-    secs = {}
-    for chunk in re.split(r"\n(?=## )", text)[1:]:
-        head, _, body = chunk.partition("\n")
-        secs[head[3:].strip()] = body.strip()
-    return secs
-
-
-def index_page(days: list[dict]) -> str:
-    s = readme_sections()
-    sched = s["Schedule at a glance"]
-    table, _, rest = sched.partition("\n### ")
-    table = re.sub(r"^\| (\d+) \|", lambda m: f"| [Day {m.group(1)}](/learn/day-{int(m.group(1)):02d}) |",
-                   table, flags=re.M)
-    sched = table + ("\n### " + rest if rest else "")
-    safety = s["Safety"]
-    big_rules = safety.split("### The big rules", 1)[1].split("\n### ", 1)[0]
-
-    hands = {}
-    main_table = s["Schedule at a glance"].split("\n### ", 1)[0]   # not the 1-week table
-    for row in re.findall(r"^\| (\d+) \| [^|]* \| ([^|]*) \|", main_table, flags=re.M):
-        hands[int(row[0])] = row[1].strip()
+# ---------------------------------------------------------------- track overview
+def track_page(tr: str, lessons: list[dict]) -> str:
+    cfg = TRACKS[tr]
+    head, s = sections(CUR / tr / "README.md")
+    intro = head.split("\n", 1)[1].strip()          # drop the h1
+    glance = s["Lessons at a glance"]
+    glance = re.sub(r"^\| (\d+) \|", lambda m: f"| [{m.group(1)}](/learn/{tr}/lesson-{int(m.group(1)):02d}) |", glance, flags=re.M)
+    smap = re.sub(r"^\| (\d+) ([^|]+)\|", lambda m: f"| [{m.group(1)} {m.group(2).strip()}](/learn/{tr}/lesson-{int(m.group(1)):02d}) |",
+                  s["Standards map"], flags=re.M)
     cards = "".join(
-        f'<li><a href="/learn/{d["slug"]}"><span class="tag">Day {d["num"]}</span>'
-        f'<b>{html.escape(d["title"])}</b><span class="hands">{md(hands.get(d["num"], ""))[3:-4]}</span></a></li>'
-        for d in days)
-
-    sec = lambda key, sid=None, title=None: (
-        f'<section id="{sid or re.sub(r"[^a-z0-9]+", "-", key.lower()).strip("-")}"><h2>{title or key}</h2>'
-        f'{polish(md(s[key]))}</section>')
-
+        f'<li><a href="/learn/{tr}/{d["slug"]}"><span class="tag">Lesson {d["num"]}</span>'
+        f'<b>{html.escape(d["title"])}</b><span class="hands">{html.escape(", ".join(d["codes"]))}</span></a></li>'
+        for d in lessons)
+    rest = "".join(f'<section id="{re.sub(r"[^a-z0-9]+", "-", k.lower()).strip("-")}"><h2>{k}</h2>{polish(md(v, tr))}</section>'
+                   for k, v in s.items() if k not in ("Lessons at a glance", "Standards map"))
+    ws_pages = "14 pages" if tr == "elementary" else "21 pages"
     main = f"""<div class="hero">
-  <p class="eyebrow">Free home-school unit · Grades 3–8 · 10 days</p>
-  <h1>Rockets and Model Rocketry</h1>
-  <p class="lead">A free two-week rocket science unit for grades 3–8. Each day has a short lesson to read aloud,
-  hands-on activities, a worksheet, discussion questions and a quick check with answers. It ends with a launch day
-  and a mission report.</p>
-  <ul class="tracks">
-    <li><b>Under 12:</b> paper, straw, balloon and stomp rockets, and Rocket Builder on screen only.</li>
-    <li><b>12 and up:</b> all of that, plus a 3D-printed rocket on a real model rocket motor, <b>with an adult handling the motor</b>.</li>
-  </ul>
+  <p class="eyebrow">Free lessons · {cfg['grades']} · {cfg['lessons']} lessons · Washington science standards</p>
+  <h1>Rockets: {cfg['short'].lower()} track</h1>
+  {polish(md(intro, tr))}
   <div class="ctas">
-    <a class="btn print" href="/learn/worksheets.pdf" download="rocketry-worksheets.pdf">Print the worksheets (PDF)<small>22 pages, US Letter, answer keys at the end</small></a>
-    <a class="btn outline big" href="/learn/day-01">Start with Day 1 →</a>
+    <a class="btn print" href="/learn/{tr}/worksheets.pdf" download="rocketry-worksheets-{tr}.pdf">Print the worksheets (PDF)<small>{ws_pages}, US Letter, answer key at the end</small></a>
+    <a class="btn outline big" href="/learn/{tr}/lesson-01">Start with Lesson 1 →</a>
+    <a class="btn outline big" href="/learn/{tr}/safety">Safety page</a>
   </div>
-  <p class="small">You need no account and nothing to install. Most materials are already in your house; see the
-  <a href="#materials-and-costs-by-track">materials list</a>. Prefer a web page? <a href="/learn/worksheets">Open the worksheets in the browser</a>.</p>
 </div>
-
-<div class="call safety"><span class="lab">Safety first</span><p>Model rocket motors and Rocket Builder kits are
-rated <b>12+</b>. Kids under 12 do the whole unit with paper-style rockets. In the 12+ track, <b>adults handle all
-rocket motors and igniters</b>, every time, following the NAR Model Rocket Safety Code.
-<a href="/learn/safety">Read the safety page</a> before Day 1 and again before Day 10.</p></div>
-
-<section id="days"><h2>The ten lessons</h2>
+<section id="lessons"><h2>The {cfg['lessons']} lessons</h2>
 <ol class="days">{cards}</ol>
-<p class="small">★ in a lesson marks the activity to keep if you do the <a href="#short-on-time-a-1-week-version">1-week version</a>.</p>
+{polish(md(glance, tr))}
 </section>
+<section id="standards-map"><h2>Standards map</h2>{polish(md(smap, tr))}</section>
+{rest}"""
+    return page(f"Rockets for {cfg['grades'].lower()}: free lessons · Rocket Builder",
+                f"Free rocketry lessons for {cfg['grades'].lower()}, mapped to Washington's K–12 Science Learning Standards (NGSS). "
+                + cfg["blurb"], main, tr)
 
+
+def safety_page(tr: str) -> str:
+    cfg = TRACKS[tr]
+    text = (CUR / tr / "safety.md").read_text(encoding="utf-8")
+    first, _, rest = text.partition("\n")
+    main = f"""<article class="lesson">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> <a href="/learn/{tr}/">{cfg['grades']}</a> <span aria-hidden="true">›</span> Safety</nav>
+<p class="daytag"><span class="tag big red">Safety</span> <span class="tag grade">{cfg['grades']}</span></p>
+<h1>{html.escape(first.lstrip('# ').strip())}</h1>
+{polish(md(rest, tr))}
+</article>
+<p class="back"><a href="/learn/{tr}/">← Back to the {cfg['grades'].lower()} overview</a></p>"""
+    desc = ("Paper-rocket safety rules for grades 3–5." if tr == "elementary" else
+            "Safety for grades 6–8: classroom rules, the NAR Model Rocket Safety Code in plain words, launch field sizes and launch day rules.")
+    return page(f"Safety · {cfg['grades']} · Rocket Builder Learn", desc, main, tr)
+
+
+def teachers_page() -> str:
+    text = (CUR / "standards.md").read_text(encoding="utf-8")
+    first, _, rest = text.partition("\n")
+    main = f"""<article class="lesson">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> For parents and teachers</nav>
+<p class="daytag"><span class="tag big">Teachers</span></p>
+<h1>{html.escape(first.lstrip('# ').strip())}</h1>
+{polish(md(rest))}
+</article>
+<p class="back"><a href="/learn/">← Back to the lessons</a></p>"""
+    return page("Washington standards and sources · Rocket Builder Learn",
+                "How the free rocketry lessons line up with Washington's K–12 Science Learning Standards (NGSS), "
+                "WA Science 2026, and the math and ELA standards, with sources and further resources.", main, "teachers")
+
+
+def index_page() -> str:
+    head, s = sections(CUR / "README.md")
+    pick = s["Pick a track"]
+    table, _, after = pick.partition("\n\n")
+    cards = "".join(f"""<a class="chooser {tr}" href="/learn/{tr}/"><span class="tag big">{cfg['grades']}</span>
+<b>{cfg['short']}</b><span>{cfg['lessons']} lessons. {cfg['blurb']}</span><span class="go">Open the {cfg['short'].lower()} lessons →</span></a>"""
+                    for tr, cfg in TRACKS.items())
+    main = f"""<div class="hero">
+  <p class="eyebrow">Free lessons · Grades 3–8 · Washington science standards</p>
+  <h1>Rockets and Model Rocketry</h1>
+  <p class="lead">Free rocket science lessons in two versions: one for elementary school and one for middle school.
+  Each lesson lists its Washington K–12 Science Learning Standards (NGSS), "I can…" goals, materials, steps, a quick check
+  with answers and teacher notes, with printable worksheets.</p>
+</div>
+<nav class="choose" aria-label="Pick a track">{cards}
+<a class="chooser teachers" href="/learn/teachers"><span class="tag big">Parents &amp; teachers</span><b>Standards and sources</b>
+<span>The Washington standards behind each lesson, the new WA Science 2026 codes, math and ELA links, and free resources.</span><span class="go">Read the standards page →</span></a></nav>
+<section id="compare"><h2>Which track?</h2>{polish(md(table + "\n\n" + after)).replace('<blockquote class="aloud"><span class="lab">Read aloud</span>', '<blockquote class="call safety"><span class="lab">Safety first</span>')}</section>
 <section id="rocket-builder" class="rb"><h2>Use it with Rocket Builder</h2>
-<p><a href="{APP}">Rocket Builder</a> is the free web app this unit is built around. It runs in the browser on a computer or tablet.</p>
+<p><a href="{APP}">Rocket Builder</a> is the free web app these lessons use. It runs in the browser on a computer or tablet, with no account or install.</p>
 <div class="two">
-  <div class="card"><span class="tag">All ages</span><h3>Design on screen</h3>
-  <p>Pick a motor size, the height, the fins and the nose. Read the stability score and find the blue balance point and the red push point. Then press <b>▶ Watch it launch</b> to see the simulated flight: liftoff, coast, parachute and landing.</p></div>
-  <div class="card"><span class="tag">12+ with an adult</span><h3>Print it and fly it</h3>
-  <p>Download the files and 3D-print the rocket (or order it printed), build it, and fly it on a real model rocket motor on Day 10. An adult buys, loads and launches every motor. Compare the flight with the app's prediction.</p></div>
+  <div class="card"><span class="tag">Grades 3–5</span><h3>A class tool on the projector</h3>
+  <p>Build a rocket, point at the blue balance point and the red push point, and press <b>▶ Watch it launch</b>. On screen only.</p></div>
+  <div class="card"><span class="tag">Grades 6–8</span><h3>Design, print and fly (12+)</h3>
+  <p>Beginner mode first, then Advanced. Download and 3D-print the rocket (or order it printed) and fly it with an adult handling the motor.</p></div>
 </div>
 <p><a class="btn launch" href="{APP}">Open Rocket Builder</a></p>
-</section>
-
-{sec("Pick a track by age")}
-<section id="schedule-at-a-glance"><h2>Schedule at a glance</h2>{polish(md(sched))}</section>
-{sec("How each day works")}
-{sec("Materials and costs by track")}
-<section id="safety"><h2>Safety</h2>
-<div class="call safety rules"><span class="lab">The big rules</span>{md(big_rules)}</div>
-<p>The <a href="/learn/safety">safety page</a> has the rules for each kind of rocket, a plain summary of the NAR Model
-Rocket Safety Code and the minimum launch field for each motor class. Day 10 has the <a href="/learn/day-10#launch-day-rules">launch day rules</a>.</p>
-</section>
-<section id="standards-alignment"><h2>Standards alignment</h2>
-<details class="std"><summary>NGSS, Common Core math and literacy: where each standard is covered</summary>{polish(md(s["Standards alignment"]))}</details>
-</section>
-{sec("A note on the numbers")}"""
-    return page("Rockets and Model Rocketry: a free home-school unit · Rocket Builder",
-                "A free 2-week rocket science unit for grades 3–8: ten lessons, printable worksheets and answer keys. "
-                "Paper rockets for under 12; 3D-printed model rockets for 12+ with an adult.", main, "index")
-
-
-def safety_page() -> str:
-    s = readme_sections()["Safety"].replace("### ", "## ", 1)
-    s = re.sub(r"^### ", "## ", s, flags=re.M)
-    main = f"""<article class="lesson">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> Safety</nav>
-<p class="daytag"><span class="tag big red">Safety</span></p>
-<h1>Safety for the rocketry unit</h1>
-{polish(md(s))}
-<p class="tools"><a class="btn outline" href="/learn/day-10#launch-day-rules">Launch day rules (Day 10)</a> <a class="btn outline" href="/learn/day-09">Day 9: safety and launch prep</a></p>
-</article>
-<p class="back"><a href="/learn/">← Back to the overview and schedule</a></p>"""
-    return page("Safety · Rockets and Model Rocketry · Rocket Builder",
-                "Safety rules for the free home-school rocketry unit: paper rockets, fizzy rockets and the NAR Model Rocket Safety Code for 12+.",
-                main, "safety")
+</section>"""
+    return page("Rockets and Model Rocketry: free lessons for grades 3–8 · Rocket Builder",
+                "Free rocketry lessons for grades 3–5 and 6–8, mapped to Washington's K–12 Science Learning Standards (NGSS): "
+                "paper rockets for elementary, 3D-printed model rockets with an adult for middle school.", main, "index")
 
 
 # ---------------------------------------------------------------- worksheets
@@ -332,32 +355,39 @@ FONT_FACE = ('<style>@font-face{font-family:"Inter";src:url(/static/fonts/inter.
              '@media print{.wsbar{display:none}}</style>')
 
 
-def worksheets_page() -> str:
-    src = (CUR / "worksheets.html").read_text(encoding="utf-8")
+def worksheets_page(tr: str) -> str:
+    src = (CUR / tr / "worksheets.html").read_text(encoding="utf-8")
     src = re.sub(r'<link rel="preconnect"[^>]*>\s*', "", src)
     src = re.sub(r'<link href="https://fonts\.googleapis\.com[^>]*>\s*', "", src)
-    src = re.sub(r'<link rel="stylesheet" href="\.\./brand/tokens\.css">', FONT_FACE, src)
+    src = re.sub(r'<link rel="stylesheet" href="\.\./\.\./brand/tokens\.css">', FONT_FACE, src)
     assert not re.search(r'(href|src)="(https?:|\.\./)', src), "worksheets.html links something new: update build_site.py"
-    bar = ('<div class="wsbar"><a href="/learn/">← Lessons</a><span>Print at 100% with background graphics on.</span>'
-           '<a class="dl" href="/learn/worksheets.pdf">Download the PDF</a></div>')
-    src = src.replace("<body>", "<body>\n<!-- Generated by docs/curriculum/tools/build_site.py from docs/curriculum/worksheets.html. -->\n" + bar, 1)
+    bar = (f'<div class="wsbar"><a href="/learn/{tr}/">← {TRACKS[tr]["grades"]} lessons</a><span>Print at 100% with background graphics on.</span>'
+           f'<a class="dl" href="/learn/{tr}/worksheets.pdf">Download the PDF</a></div>')
+    src = re.sub(r"<body([^>]*)>", lambda m: f"<body{m.group(1)}>\n<!-- Generated by docs/curriculum/tools/build_site.py from docs/curriculum/{tr}/worksheets.html. -->\n" + bar, src, count=1)
     return src
 
 
 def main():
-    OUT.mkdir(parents=True, exist_ok=True)
-    days = [read_day(s) for s in DAYS]
-    files = {"index.html": index_page(days), "safety.html": safety_page(), "worksheets.html": worksheets_page()}
-    for i, d in enumerate(days):
-        files[f"{d['slug']}.html"] = day_page(d, days[i - 1] if i else None, days[i + 1] if i + 1 < len(days) else None)
+    for tr in TRACKS:     # the worksheets first: gen_ws.py writes docs/curriculum/<track>/worksheets.html
+        subprocess.run([sys.executable, str(HERE / "gen_ws.py"), tr, str(CUR / tr / "worksheets.html")], check=True)
+    files = {"index.html": index_page(), "teachers.html": teachers_page()}
+    for tr, cfg in TRACKS.items():
+        lessons = [read_lesson(tr, n) for n in range(1, cfg["lessons"] + 1)]
+        files[f"{tr}/index.html"] = track_page(tr, lessons)
+        files[f"{tr}/safety.html"] = safety_page(tr)
+        files[f"{tr}/worksheets.html"] = worksheets_page(tr)
+        for i, d in enumerate(lessons):
+            files[f"{tr}/{d['slug']}.html"] = lesson_page(d, lessons[i - 1] if i else None, lessons[i + 1] if i + 1 < len(lessons) else None)
     for name, text in files.items():
+        (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUT / name).write_text(text, encoding="utf-8")
         print("wrote", (OUT / name).relative_to(ROOT))
     if "--pdf" in sys.argv:
-        pdf = OUT / "worksheets.pdf"
-        subprocess.run(["node", str(HERE / "worksheets_pdf.js"), str(OUT / "worksheets.html"),
-                        str(ROOT / "server" / "static"), str(pdf)], check=True, env=os.environ)
-        print("wrote", pdf.relative_to(ROOT))
+        for tr in TRACKS:
+            pdf = OUT / tr / "worksheets.pdf"
+            subprocess.run(["node", str(HERE / "worksheets_pdf.js"), str(OUT / tr / "worksheets.html"),
+                            str(ROOT / "server" / "static"), str(pdf)], check=True, env=os.environ)
+            print("wrote", pdf.relative_to(ROOT))
 
 
 if __name__ == "__main__":

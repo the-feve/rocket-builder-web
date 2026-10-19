@@ -552,31 +552,60 @@ def test_critical_fit_fields():
 
 
 def test_learn_pages():
-    """The home-school unit at /learn (static pages from docs/curriculum/tools/build_site.py)."""
+    """The rocketry lessons at /learn (static pages from docs/curriculum/tools/build_site.py):
+    a chooser, a teachers page and two tracks."""
     r = client.get("/learn", follow_redirects=False)
     assert r.status_code in (307, 308) and r.headers["location"] == "/learn/"
     r = client.get("/learn/")
     assert r.status_code == 200 and "text/html" in r.headers["content-type"]
-    for text in ("Rockets and Model Rocketry", "grades 3–8", "Print the worksheets (PDF)", "/learn/worksheets.pdf",
-                 "Use it with Rocket Builder", "https://rocket.quiverdesignworks.net/", "/learn/day-10",
-                 "Standards alignment", "/learn/safety", "Materials and costs by track"):
+    for text in ("Rockets and Model Rocketry", "/learn/elementary/", "/learn/middle/", "/learn/teachers",
+                 "Grades 3–5", "Grades 6–8", "Use it with Rocket Builder", "https://rocket.quiverdesignworks.net/"):
         assert text in r.text, text
-    r = client.get("/learn/day-03")
+    r = client.get("/learn/teachers")
     assert r.status_code == 200
-    for text in ("Stability", "/learn/day-02", "/learn/day-04", 'href="/learn/"', "Open Rocket Builder", "Answer key"):
+    for text in ("Washington State K–12 Science Learning Standards", "WA Science 2026", "S.MS.PS2.2",
+                 "3-PS2-1", "MS-ETS1-4", "apogeerockets.com"):
         assert text in r.text, text
-    assert client.get("/learn/day-03.html").status_code == 200
-    for page in ("day-01", "day-10", "safety", "worksheets"):
-        assert client.get(f"/learn/{page}").status_code == 200, page
-    assert "NAR Model Rocket Safety Code" in client.get("/learn/safety").text
-    r = client.get("/learn/worksheets.pdf")
-    assert r.status_code == 200 and r.headers["content-type"] == "application/pdf" and r.content.startswith(b"%PDF")
+    for track, count, codes in (("elementary", 8, ("3-PS2-1", "5-PS2-1", "3-5-ETS1-3")),
+                                ("middle", 9, ("MS-PS2-2", "MS-PS3-1", "MS-ETS1-4"))):
+        r = client.get(f"/learn/{track}", follow_redirects=False)
+        assert r.status_code == 308 and r.headers["location"] == f"/learn/{track}/"
+        r = client.get(f"/learn/{track}/")
+        assert r.status_code == 200
+        for text in ("Standards map", f"/learn/{track}/lesson-{count:02d}", f"/learn/{track}/worksheets.pdf",
+                     f"/learn/{track}/safety", *codes):
+            assert text in r.text, (track, text)
+        for n in range(1, count + 1):
+            r = client.get(f"/learn/{track}/lesson-{n:02d}")
+            assert r.status_code == 200, (track, n)
+            for text in ("Standards", "I can", "Materials", "Check for understanding", "Answer key",
+                         "Teacher notes", f'href="/learn/{track}/"', "Open Rocket Builder"):
+                assert text in r.text, (track, n, text)
+        assert client.get(f"/learn/{track}/lesson-02.html").status_code == 200
+        assert client.get(f"/learn/{track}/worksheets").status_code == 200
+        r = client.get(f"/learn/{track}/worksheets.pdf")
+        assert r.status_code == 200 and r.headers["content-type"] == "application/pdf" and r.content.startswith(b"%PDF")
+    assert "NAR Model Rocket Safety Code" in client.get("/learn/middle/safety").text
+    assert "Paper rockets only" in client.get("/learn/elementary/safety").text
+
+
+def test_learn_old_addresses_redirect_to_middle_school():
+    """The first unit's /learn/day-NN, /learn/safety and /learn/worksheets(.pdf) still work."""
+    for old, new in (("day-01", "lesson-01"), ("day-03", "lesson-03"), ("day-03.html", "lesson-03"), ("day-08", "lesson-08"),
+                     ("day-09", "lesson-08"), ("day-10", "lesson-09"), ("safety", "safety"),
+                     ("worksheets", "worksheets"), ("worksheets.pdf", "worksheets.pdf")):
+        r = client.get(f"/learn/{old}", follow_redirects=False)
+        assert r.status_code == 301 and r.headers["location"] == f"/learn/middle/{new}", old
+        assert client.get(f"/learn/{old}").status_code == 200, old
 
 
 def test_learn_unknown_pages_404():
-    for page in ("day-11", "day-1", "index", "learn.css", "..%2Fapp.py", "..%2F..%2Fapp.py", "worksheets.pdf.html"):
+    for page in ("day-11", "day-1", "index", "learn.css", "..%2Fapp.py", "..%2F..%2Fapp.py", "worksheets.pdf.html",
+                 "high", "high/", "elementary/lesson-09", "middle/lesson-10", "middle/lesson-1", "middle/index",
+                 "middle/learn.css", "elementary/day-01", "middle/..%2Findex.html"):
         assert client.get(f"/learn/{page}").status_code == 404, page
     assert client.get("/learn/../app.py").status_code == 404
+    assert client.get("/learn/middle/../../app.py").status_code == 404
 
 
 def test_secondary_pages_use_the_brand():

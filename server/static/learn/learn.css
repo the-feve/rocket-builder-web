@@ -307,6 +307,29 @@ details.std h3 { font-size: 1.05rem; }
   h2 { font-size: 1.35rem; }
 }
 
+/* Two tracks (2026-10-19): the chooser, the standards box and the teacher notes ------------------ */
+.choose { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 12px; margin: 8px 0 12px; }
+.chooser { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--rb-r-lg);
+           background: var(--panel); color: var(--ink); text-decoration: none; border-top: 5px solid var(--rb-sky); }
+.chooser.middle { border-top-color: var(--rb-orange); }
+.chooser.teachers { border-top-color: var(--rb-green); }
+.chooser:hover { border-color: var(--accent); }
+.chooser .tag { align-self: flex-start; }
+.chooser b { font: 700 1.35rem/1.2 var(--rb-font-head); }
+.chooser span { color: var(--muted); font-size: .95rem; }
+.chooser .go { margin-top: auto; color: var(--accent); font-weight: 600; }
+main { overflow-wrap: break-word; }
+blockquote.call { margin: 0 0 1.2em; }
+main a { overflow-wrap: anywhere; }
+header.site nav a { white-space: nowrap; }
+.tag.grade { background: var(--rb-sky) !important; color: var(--rb-night) !important; }
+section.stdbox { background: var(--card); border: 1px solid var(--line); border-radius: var(--rb-r-md); padding: 2px 16px 4px; margin: 1.2em 0; }
+section.stdbox h2 { border-top: 0; margin-top: .6em; padding-top: 0; font-size: 1.2rem; }
+section.stdbox td:first-child { white-space: normal; min-width: 7.5em; }
+section.call.notes { background: var(--callbg-tip); border-color: var(--rb-sky); padding-top: 2px; margin-top: 2em; }
+section.call.notes h2 { border-top: 0; margin-top: .6em; padding-top: 0; color: var(--tip-ink); }
+section.call.safety.rules { padding-top: 2px; }
+
 /* Print: the lesson only, black on white */
 @media print {
   :root { color-scheme: light; --bg: #fff; --panel: #fff; --card: #fff; --ink: #12203A; --muted: #444; --line: #bbb; --accent: #12203A; --quote: #fff; }
@@ -319,7 +342,7 @@ details.std h3 { font-size: 1.05rem; }
   h2 { break-after: avoid; margin-top: 1.4em; }
   h3 { break-after: avoid; }
   .call, .trk, blockquote.aloud, details, table, li { break-inside: avoid; }
-  .call, .trk, .tag, blockquote.aloud { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .call, .trk, .tag, blockquote.aloud, .stdbox { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   details.answers summary { list-style: none; }
   details.answers::details-content { content-visibility: visible; display: contents; }
   .tbl { overflow: visible; }
