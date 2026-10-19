@@ -123,10 +123,15 @@ class DesignParams:
 # loose on M18-M29, so 0.18. Nose: 0.15 on M18-M29. M13's short shoulders
 # (nose shoulder under SHORT_NOSE_SHOULDER) grip harder per mm: joint 0.16
 # just right; nose 0.12 too tight, 0.15 too loose, so 0.14.
-WEB_FIT_JOINT = 0.18
-WEB_FIT_NOSE = 0.15
-WEB_FIT_JOINT_SHORT = 0.16
-WEB_FIT_NOSE_SHORT = 0.14
+# Round 2 (owner, 2026-10-19, M13/M18/M24 kit prints): every body joint and
+# nose still a bit tight. Measured worst case: sockets print 0.21-0.35 mm
+# under on diameter, shoulders 0.10-0.20 mm over, so the parts touch or
+# overlap by up to ~0.2 mm on diameter at the seam. All four gaps +20 %
+# (owner's call): 0.18 -> 0.22, 0.15 -> 0.18, 0.16 -> 0.19, 0.14 -> 0.17.
+WEB_FIT_JOINT = 0.22
+WEB_FIT_NOSE = 0.18
+WEB_FIT_JOINT_SHORT = 0.19
+WEB_FIT_NOSE_SHORT = 0.17
 SHORT_NOSE_SHOULDER = 8.0
 
 

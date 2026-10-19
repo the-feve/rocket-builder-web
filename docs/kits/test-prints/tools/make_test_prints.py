@@ -50,6 +50,11 @@ ROUND_3 = ("**2026-10-19 (round 3):** the shock-cord strap is now inside the top
            "anchor section is gone. Reprint everything.")
 
 
+FITS_4 = ("**2026-10-19 (round 4):** body joints and nose 20 % looser after the round-2 kit prints were still a "
+          "bit tight (measured: sockets printed 0.2-0.35 mm small, shoulders 0.1-0.2 mm big on diameter). "
+          "Reprint A, D and B/C if your rocket has them.")
+
+
 def fits_note(joint: float, nose: float) -> str:
     return (f"**2026-10-19:** reprint everything. Joints from the fit tests (body {joint:.2f} mm, nose {nose:.2f} mm per "
             "side, 0.5 mm chamfer on each shoulder's bed edge; they were the CAD 0.02 mm and wouldn't go in). Motor cap: "
@@ -59,11 +64,11 @@ def fits_note(joint: float, nose: float) -> str:
 
 KITS = [
     {"dir": "starter-m18", "name": "Starter kit (M18, 18 mm motors)", "motor": "M18", "overall_length": 300,
-     "notes": [ROUND_3, fits_note(0.18, 0.15)]},
+     "notes": [FITS_4, ROUND_3, fits_note(0.22, 0.18)]},
     {"dir": "big-m24", "name": "Big kit (M24, 24 mm motors)", "motor": "M24", "overall_length": 360,
-     "notes": [ROUND_3, fits_note(0.18, 0.15)]},
+     "notes": [FITS_4, ROUND_3, fits_note(0.22, 0.18)]},
     {"dir": "mini-m13", "name": "Mini kit (M13, 13 mm motors)", "motor": "M13", "overall_length": 190,
-     "notes": [ROUND_3, fits_note(0.16, 0.14)]},
+     "notes": [FITS_4, ROUND_3, fits_note(0.19, 0.17)]},
 ]
 COMMON = {"print_max_height": 256, "fin_shape": "trapezoid", "nose_shape": "tangent_ogive", "fin_count": 3,
           "material": "PLA"}

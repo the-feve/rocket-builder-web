@@ -48,10 +48,10 @@ def test_min_diameter_m18_hand_values():
     assert d.body_od == pytest.approx(d.bay_id + 2 * d.wall) == pytest.approx(21.4)
     assert d.body_id == pytest.approx(18.4)
     assert not d.has_mount
-    assert d.shoulder_od == pytest.approx(18.04)  # 0.18 mm per side (web_fits)
+    assert d.shoulder_od == pytest.approx(17.96)  # 0.22 mm per side (web_fits)
     assert d.shoulder_len == pytest.approx(0.75 * 21.4 - 4)
-    assert d.joint_rise == pytest.approx(1.68)
-    assert d.inner_taper_rise == pytest.approx((9.2 - (9.02 - 1.5)) / math.tan(math.radians(8)))
+    assert d.joint_rise == pytest.approx(1.72)
+    assert d.inner_taper_rise == pytest.approx((9.2 - (8.98 - 1.5)) / math.tan(math.radians(8)))
     assert d.zmax == 195
 
 
@@ -592,7 +592,7 @@ def test_critical_fit_overrides():
     they reach the joint, the nose and the motor thread, and the parts build."""
     from rocketgen.geom import meshes
     base = compute_derived(DesignParams())
-    assert base.fit_slip == 0.18 and base.fit_nose == 0.15
+    assert base.fit_slip == 0.22 and base.fit_nose == 0.18
     assert base.thread["thread_clear"] == 0.25 and base.thread["p"] == 2.5
     r = rocket(joint_clearance=0.2, nose_clearance=0.17, shoulder_len=15.0, nose_shoulder_len=9.0,
                thread_clearance=0.35, thread_pitch=3.0, thread_turns=4)
@@ -687,7 +687,7 @@ def test_printed_fit_defaults():
     """Fits from the fit-test prints (owner, 2026-10-16/18: the CAD 0.02 mm
     printed far too tight). M13's short nose shoulder gets the short pair."""
     from rocketgen.params import web_fits
-    for motor, joint, nose in (("M13", 0.16, 0.14), ("M18", 0.18, 0.15), ("M24", 0.18, 0.15), ("M29", 0.18, 0.15)):
+    for motor, joint, nose in (("M13", 0.19, 0.17), ("M18", 0.22, 0.18), ("M24", 0.22, 0.18), ("M29", 0.22, 0.18)):
         d = compute_derived(DesignParams(motor=motor))
         assert (d.fit_slip, d.fit_nose) == (joint, nose), motor
         assert web_fits(d.nose_shoulder_len) == (joint, nose)
