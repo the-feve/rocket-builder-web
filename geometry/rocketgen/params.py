@@ -167,10 +167,12 @@ class Derived:
 
 
 # Motor cap retention lip: how far the cap's floor reaches in over the motor's
-# rear end, from the motor's OD. 2.5 mm covers the cardboard casing (owner,
-# 2026-10-18, from printed tests); the FeatureScript's 1/8 in (3.175 mm) made
-# the nozzle hole too small. The hole is mtr_d - 2 * CAP_LIP across.
-CAP_LIP = 2.5
+# rear end, from the motor's OD. The FeatureScript's 1/8 in (3.175 mm) made
+# the nozzle hole too small; 2.5 mm (2026-10-18) still looked small on the
+# kit caps. The owner measured an 18 mm casing wall at about 2.5 mm and asked
+# for a 1.5-2 mm lip (2026-10-19): 1.75 still sits well inside the casing
+# wall, clear of the nozzle. The hole is mtr_d - 2 * CAP_LIP across.
+CAP_LIP = 1.75
 
 
 def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
@@ -183,7 +185,9 @@ def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
     turns = turns or 3
     if thread_clear is None:
         thread_clear = 0.25  # radial; fit_slip is far too tight for a printed thread
-    cap_wall = 1.6
+    # Website: 1.2 mm (three 0.4 mm perimeters) and 0.4 mm ribs, for a more
+    # compact cap (owner, 2026-10-16; the FeatureScript has 1.6 and 0.6).
+    cap_wall = 1.2
     cap_face_t = max(1.5, 0.08 * mtr_d)
     gap = 0.5  # boss end to the cap's floor
 
@@ -192,7 +196,7 @@ def thread_geometry(mtr_d, mtr_hang, bay_id, mount_od, body_od, wall, fin,
     r_cap_in = r_crest + thread_clear
     r_cap_out = r_cap_in + cap_wall
     rib_r = 0.8
-    rib_out = 0.6
+    rib_out = 0.4
     r_cap_max = r_cap_out + rib_out
 
     # At least 2 mm below the tail (clear of the root fillets), and 1 mm

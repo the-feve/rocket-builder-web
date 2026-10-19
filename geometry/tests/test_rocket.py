@@ -58,10 +58,10 @@ def test_min_diameter_m18_hand_values():
 @pytest.mark.parametrize("shape,hang", [
     (FinShape.CLIPPED_DELTA, 10.0),  # HANDOFF: Clipped delta -> hang 10, bay 60
     (FinShape.TRAPEZOID, 10.0),
-    # Swept: HANDOFF's 12.8 predates the grip ribs (r_cap_max +0.6 mm); by
-    # hand with the ribs, the fin's lower edge at u = 4.075 is z = -4.41,
-    # cap top -5.41, face -13.41.
-    (FinShape.SWEPT, 13.41),
+    # Swept: the cap's top sits 1 mm below the fin's lower edge at the cap's
+    # outer radius, so a slimmer cap hangs less. 13.41 with the FeatureScript's
+    # 1.6 mm wall and 0.6 mm ribs; 12.76 with the website's 1.2 / 0.4 (2026-10-16).
+    (FinShape.SWEPT, 12.76),
 ])
 def test_motor_hang_and_bay(shape, hang):
     d = compute_derived(DesignParams(fin_shape=shape))
@@ -514,14 +514,15 @@ def test_launch_profile_shows_unsafe_flights():
     assert {"slow", "windturn"} <= {d["kind"] for d in heavy["dangers"]} and heavy["landing_m"] < 0  # tipped upwind
 
 
-def test_motor_cap_lip_covers_2_5_mm_of_the_casing():
-    """The cap's retention lip reaches 2.5 mm in from the motor's OD (the
-    cardboard casing), so the nozzle hole is the motor diameter less 5 mm."""
+def test_motor_cap_lip_covers_the_casing():
+    """The cap's retention lip reaches 1.75 mm in from the motor's OD (inside
+    the ~2.5 mm cardboard casing wall), so the nozzle hole is the motor
+    diameter less 3.5 mm."""
     from rocketgen.params import CAP_LIP, DesignParams, compute_derived
-    assert CAP_LIP == 2.5
+    assert CAP_LIP == 1.75
     for motor, mtr_d in (("M13", 13), ("M18", 18), ("M24", 24), ("M29", 29)):
         d = compute_derived(DesignParams(motor=motor))
-        assert abs(2 * d.thread["nose_bore_r"] - (mtr_d - 5.0)) < 1e-6
+        assert abs(2 * d.thread["nose_bore_r"] - (mtr_d - 3.5)) < 1e-6
 
 
 
