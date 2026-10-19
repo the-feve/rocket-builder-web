@@ -6,7 +6,7 @@
 // the image positions of its labelled points.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
+import { toCreasedNormals, mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 THREE.ColorManagement.enabled = false;  // brand hex values straight through, no linear conversion
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -34,6 +34,9 @@ async function loadRocket(key) {
   });
   R[key] = { info, geo };
 }
+// Fillet tangent edges from build_meshes.py: {part: [[[x,y,z,nx,ny,nz], ...], ...]}.
+const edgesOf = (key, name) => (R[key].info.fillet_edges?.[name] || []).map(line => ({
+  pts: line.map(q => V(q[0], q[1], q[2])), nrm: line.map(q => V(q[3], q[4], q[5])) }));
 
 // ---------- materials ----------
 // Two materials per mesh: the colour pass and the normal/depth pass, sharing
@@ -62,6 +65,34 @@ function colorMat(color, clip = [], opts = {}) {
         vec3 L = normalize(vec3(-0.45, 0.65, 0.62));
         float k = 1.0;  // flat fills, no shading (brand.md, Illustration style)
         gl_FragColor = vec4(uColor * k, 1.0);
+      }`,
+    side: THREE.DoubleSide, clipping: clip.length > 0, clippingPlanes: clip,
+  });
+}
+// Shock cord: flat cord colour with a braid (two darker helices, crossing),
+// so it reads as cord rather than as a pipe. Uses the tube's uv (u along,
+// v round); uTurns = how many braid repeats along the whole tube.
+function ropeMat(color, turns, clip = []) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(color) }, uDark: { value: new THREE.Color(color).multiplyScalar(0.8) },
+                uCut: { value: new THREE.Color(COL.cut) }, uTurns: { value: turns } },
+    vertexShader: `${clipVS}
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        #include <begin_vertex>
+        #include <project_vertex>
+        #include <clipping_planes_vertex>
+      }`,
+    fragmentShader: `#include <clipping_planes_pars_fragment>
+      uniform vec3 uColor, uDark, uCut; uniform float uTurns;
+      varying vec2 vUv;
+      void main() {
+        #include <clipping_planes_fragment>
+        if (!gl_FrontFacing) { gl_FragColor = vec4(uCut, 1.0); return; }
+        float a = fract(vUv.x * uTurns + vUv.y * 2.0), b = fract(vUv.x * uTurns - vUv.y * 2.0 + 0.5);
+        float k = (a < 0.12 || b < 0.12) ? 1.0 : 0.0;
+        gl_FragColor = vec4(mix(uColor, uDark, k), 1.0);
       }`,
     side: THREE.DoubleSide, clipping: clip.length > 0, clippingPlanes: clip,
   });
@@ -109,10 +140,10 @@ function idMat(id, clip = []) {
 
 // ---------- scene-building helpers ----------
 let nextId = 1;
-function mesh(geometry, color, { clip = [], flat = false, outline = true, cut } = {}) {
+function mesh(geometry, color, { clip = [], flat = false, outline = true, cut, rope } = {}) {
   const m = new THREE.Mesh(geometry, null);
   const id = outline ? nextId++ : 0;
-  m.userData = { color: colorMat(color, clip, { flat, cut }), nd: ndMat(id, clip), id: idMat(id, clip) };
+  m.userData = { color: rope ? ropeMat(color, rope, clip) : colorMat(color, clip, { flat, cut }), nd: ndMat(id, clip), id: idMat(id, clip) };
   return m;
 }
 // A printed part of rocket `key`, moved up by dz and turned by rot (degrees) about the axis.
@@ -123,7 +154,19 @@ function part(key, name, { dz = 0, rot = 0, color = COL.part, clip = [], cut } =
   m.position.z = dz;
   m.rotation.z = THREE.MathUtils.degToRad(rot);
   m.userData.part = name;
+  m.userData.dashPolys = edgesOf(key, name);  // fillet tangent edges, drawn dashed
   return m;
+}
+// Dashed lines (fold lines, hidden outlines...): polylines in the parent's
+// coordinates; drawn by render() like the fillet edges. normal: the side to
+// lift them toward (default: toward the camera).
+function dashed(polys, { clip = [], normal = null, color = COL.night, width = 0.75 } = {}) {
+  const o = new THREE.Object3D();
+  o.userData.dashPolys = polys.map(pts => ({ pts, nrm: normal ? pts.map(() => normal) : null }));
+  o.userData.dashClip = clip;
+  o.userData.dashColor = color;
+  o.userData.dashWidth = width;
+  return o;
 }
 function cyl(r, z0, z1, color, opts = {}, seg = 48) {
   const g = new THREE.CylinderGeometry(r, r, z1 - z0, seg, 1, opts.open || false);
@@ -140,6 +183,27 @@ function tube(points, r, color, opts = {}) {
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   const g = new THREE.TubeGeometry(curve, Math.max(64, points.length * 24), r, 12, false);
   return mesh(g, color, opts);
+}
+// A length of cord: a smooth curve through `points`, round in section, with
+// a braid pattern and flat cut ends (light discs). r: cord radius.
+function rope(points, r, { color = COL.cord, ends = [true, true], braid = 2.2 * r, clip = [] } = {}) {
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal', 0.5);
+  const L = curve.getLength();
+  const g = new THREE.TubeGeometry(curve, Math.max(48, Math.ceil(L / (r * 0.25))), r, 24, false);
+  const grp = new THREE.Group();
+  grp.add(mesh(g, color, braid ? { rope: L / braid, clip } : { clip }));
+  const cap = (t, sgn) => {
+    const p = curve.getPointAt(t), d = curve.getTangentAt(t).multiplyScalar(sgn);
+    const cg = new THREE.CircleGeometry(r * 0.999, 32);
+    const m = mesh(cg, COL.cut, { flat: true, clip });
+    m.position.copy(p);
+    m.quaternion.setFromUnitVectors(V(0, 0, 1), d);
+    grp.add(m);
+  };
+  if (ends[0]) cap(0, -1);
+  if (ends[1]) cap(1, 1);
+  grp.userData.curve = curve;
+  return grp;
 }
 function ball(p, r, color, opts = {}) {
   const g = new THREE.SphereGeometry(r, 24, 16);
@@ -372,6 +436,7 @@ async function render(def) {
   const { cam, w, h } = frameCamera(root, dir, up, s.margin ?? 6, s.aspect, s.focus);
   const W = s.W || 2400;
   const H = Math.round(W * h / w);
+  addDashes(root, cam, W, H, w / W, s.line ?? 2.6, s.dash);
   const SS = Math.min(2, 8000 / Math.max(W, H));  // supersample (textures max out near 8k)
   const PW = Math.round(W * SS), PH = Math.round(H * SS);
   renderer.setSize(PW, PH, false);
@@ -383,7 +448,7 @@ async function render(def) {
   scene.add(root);
   const meshes = collectMeshes(root);
   const pass = (key, target, clear, alpha) => {
-    for (const m of meshes) m.material = m.userData[key];
+    for (const m of meshes) { m.material = m.userData[key]; m.visible = key === 'color' || !m.userData.dash; }
     renderer.setRenderTarget(target);
     renderer.setClearColor(clear, alpha);
     renderer.clear();
@@ -422,6 +487,63 @@ async function render(def) {
   return { png: out.toDataURL('image/png'), w: W, h: H, points };
 }
 
+// Dashed lines: every object with userData.dashPolys (fillet edges of the
+// printed parts, dashed() helpers) gets thin tubes along its lines, cut into
+// dashes measured on the screen (so they look the same in every view), lifted
+// just off the surface and depth-tested, so hidden ones stay hidden. They are
+// drawn in the colour pass only: the outline pass doesn't see them.
+function addDashes(root, cam, W, H, worldPerPx, line, opts = {}) {
+  root.updateMatrixWorld(true);
+  const owners = [];
+  root.traverse(o => { if (o.userData.dashPolys?.length && !o.userData.dash) owners.push(o); });
+  const toCam = V(0, 0, 1).applyQuaternion(cam.quaternion);
+  const dashPx = (opts.on ?? 3.4) * line, gapPx = (opts.off ?? 2.2) * line;
+  for (const o of owners) {
+    const wpx = (o.userData.dashWidth ?? opts.width ?? 0.62) * line;
+    const r = wpx * worldPerPx / 2;
+    const nm = new THREE.Matrix3().getNormalMatrix(o.matrixWorld);
+    const geos = [];
+    for (const poly of o.userData.dashPolys) {
+      const P = poly.pts.map((p, i) => {
+        const q = p.clone().applyMatrix4(o.matrixWorld);
+        const n = poly.nrm ? poly.nrm[i].clone().applyMatrix3(nm).normalize() : toCam;
+        return q.addScaledVector(n, r * 1.1);
+      });
+      const S = P.map(p => { const q = p.clone().project(cam); return new THREE.Vector2(q.x * W / 2, q.y * H / 2); });
+      const cum = [0];
+      for (let i = 1; i < S.length; i++) cum.push(cum[i - 1] + S[i].distanceTo(S[i - 1]));
+      const total = cum[cum.length - 1];
+      if (total < 2 * dashPx + gapPx) continue;  // seen end-on, or too short to read as dashed
+      // Whole dashes at both ends: stretch the gap a little to fit.
+      const n = Math.max(1, Math.round((total + gapPx) / (dashPx + gapPx)));
+      const gap = n > 1 ? (total - n * dashPx) / (n - 1) : 0;
+      const dash = n > 1 ? dashPx : total;
+      const at = d => {  // world point at screen distance d along the line
+        let i = 1;
+        while (i < cum.length - 1 && cum[i] < d) i++;
+        const t = (d - cum[i - 1]) / Math.max(1e-9, cum[i] - cum[i - 1]);
+        return P[i - 1].clone().lerp(P[i], Math.min(1, Math.max(0, t)));
+      };
+      for (let k = 0; k < n; k++) {
+        const d0 = k * (dash + Math.max(gap, gapPx * 0.5)), d1 = Math.min(total, d0 + dash);
+        if (d1 - d0 < 1) continue;
+        const pts = [at(d0)];
+        for (let i = 1; i < cum.length - 1; i++) if (cum[i] > d0 && cum[i] < d1) pts.push(P[i].clone());
+        pts.push(at(d1));
+        if (pts[0].distanceTo(pts[pts.length - 1]) < 1e-6) continue;
+        const curve = pts.length > 2 ? new THREE.CatmullRomCurve3(pts) : new THREE.LineCurve3(pts[0], pts[1]);
+        const g = new THREE.TubeGeometry(curve, Math.max(2, pts.length * 2), r, 8, false);
+        geos.push(g);
+      }
+    }
+    if (!geos.length) continue;
+    const clip = o.userData.dashClip ?? o.userData.color?.clippingPlanes ?? [];
+    const m = mesh(mergeGeometries(geos), o.userData.dashColor ?? COL.night, { flat: true, clip, cut: o.userData.dashColor ?? COL.night });
+    m.userData.dash = true;
+    root.add(m);
+  }
+}
+
 // A marker that follows its parent's transforms (for callouts).
 function mark(parent, x, y, z) {
   const o = new THREE.Object3D();
@@ -434,7 +556,7 @@ const viewDir = (az, el) => V(Math.cos(deg(el)) * Math.cos(deg(az)), Math.cos(de
 
 // ---------- the scenes ----------
 import { defineScenes } from './scene_defs.js';
-const SCENES = defineScenes({ THREE, V, COL, R, part, cyl, lathe, tube, ball, knot, arrow, turnArrow, motor, igniter,
+const SCENES = defineScenes({ THREE, V, COL, R, part, cyl, lathe, tube, rope, dashed, ball, knot, arrow, turnArrow, motor, igniter,
                               chuteOpen, chuteRolled, wadding, mark, viewDir, deg, mesh });
 
 setup();

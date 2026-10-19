@@ -20,6 +20,10 @@ from pathlib import Path
 
 import numpy as np
 import trimesh
+from build123d import Edge, Face
+from OCP.collections import IndexedDataMap_TopoDS_Shape_List_TopoDS_Shape_TopTools_ShapeMapHasher as EdgeFaceMap
+from OCP.TopAbs import TopAbs_EDGE, TopAbs_FACE
+from OCP.TopExp import TopExp
 
 from rocketgen.anchor import anchor_strap_geometry
 from rocketgen.build import body_length_for
@@ -44,6 +48,51 @@ def mesh(solid, tol=0.05):
     return trimesh.Trimesh(np.array([(v.X, v.Y, v.Z) for v in verts]), np.array(tris), process=True)
 
 
+def fillet_edges(solid, tangent_deg=3.0, bulge=0.1, min_len=4.0, step=0.8):
+    """The tangent edges where a fillet meets its neighbours (the fin-root
+    fillets on the body and fin, the lug fillets...), as polylines of
+    [x, y, z, nx, ny, nz] (n: the outward surface normal there). A drawing
+    of smooth surfaces has no outline there, so the renderer draws these
+    dashed, as a CAD drawing shows tangent edges.
+
+    An edge counts when its two faces meet tangentially (normals within
+    `tangent_deg`) and it is concave: one face (the fillet) bulges out past
+    the shared tangent plane by more than `bulge` mm (measured at its
+    centre) while the other doesn't. That leaves out convex roundings (the
+    fins' rounded edges), faces split along one surface (cylinder seams,
+    the nose's ogive steps) and the inside of bores (both faces bulge)."""
+    emap = EdgeFaceMap()
+    TopExp.MapShapesAndAncestors_s(solid.wrapped, TopAbs_EDGE, TopAbs_FACE, emap)
+    out = []
+    for i in range(1, emap.Extent() + 1):
+        faces = []
+        for f in emap.FindFromIndex(i):
+            if not any(f.IsSame(g.wrapped) for g in faces):
+                faces.append(Face(f))
+        if len(faces) != 2:
+            continue
+        e = Edge(emap.FindKey(i))
+        if e.length < min_len:
+            continue
+        a, b = faces
+        pt = e.position_at(0.5)
+        na, nb = a.normal_at(pt), b.normal_at(pt)
+        if na.get_angle(nb) > tangent_deg:
+            continue
+        n = (na + nb).normalized()
+        da, db = (a.center() - pt).dot(n), (b.center() - pt).dot(n)
+        if not (max(da, db) > bulge and min(da, db) < bulge / 2):
+            continue
+        k = max(2, math.ceil(e.length / step))
+        line = []
+        for j in range(k + 1):
+            p = e.position_at(j / k)
+            q = a.normal_at(p)
+            line.append([round(v, 3) for v in (p.X, p.Y, p.Z, q.X, q.Y, q.Z)])
+        out.append(line)
+    return out
+
+
 def build(key: str, spec: dict) -> None:
     params = spec["params"]
     if spec["overall"]:
@@ -52,7 +101,9 @@ def build(key: str, spec: dict) -> None:
     d, t = rocket.derived, rocket.derived.thread
     scene = trimesh.Scene()
     parts = []
+    edges = {}
     for p in rocket.parts:
+        edges[p.name] = fillet_edges(p.assembled)
         scene.add_geometry(mesh(p.assembled), node_name=p.name, geom_name=p.name)
         bb = p.assembled.bounding_box()
         parts.append({"name": p.name, "placement_z": p.placement_z, "zmin": bb.min.Z, "zmax": bb.max.Z,
@@ -90,11 +141,13 @@ def build(key: str, spec: dict) -> None:
         "nose": {"placement_z": nose.placement_z, "tie_bar_z": nose.placement_z + 1.0,
                  "tip_z": nose.assembled.bounding_box().max.Z},
         "parts": parts,
+        "fillet_edges": edges,
         "notes": rocket.notes,
         "summary": rocket.summary(),
     }
     (OUT / f"{key}.json").write_text(json.dumps(info, indent=2))
-    print(key, [p["name"] for p in parts], f"length {info['nose']['tip_z'] - min(p['zmin'] for p in parts):.0f} mm")
+    print(key, [p["name"] for p in parts], f"length {info['nose']['tip_z'] - min(p['zmin'] for p in parts):.0f} mm",
+          "fillet edges", {k: len(v) for k, v in edges.items()})
 
 
 if __name__ == "__main__":

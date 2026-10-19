@@ -96,3 +96,10 @@ Set with `fly secrets set -a rocket-fevergeon NAME=value …` (never in chat or 
 - [ ] Leading-edge root fillet still doesn't build on the kit designs (known; `geometry/report.md`).
 - [ ] **(owner)** Print a test strap and nose (M18) and thread your elastic before the next kit batch; a PETG scrap-joint pull test with medium CA.
 - [x] ~~Fonts self-hosted~~ (2026-10-18). Still open: 3D part colours use the old palette.
+
+## Lessons (/learn, 2026-10-19)
+
+- [x] Two tracks around the Washington standards: elementary (3–5, paper rockets) and middle school (6–8, printed rocket with an adult); `/learn/teachers` standards page; old `/learn/day-NN` addresses redirect
+- [ ] **(owner)** Read both tracks, especially the elementary wording and the optional instructor demo (Lesson 8: a printed rocket flown by an experienced adult with under-12 students as spectators behind a 30 ft line). Keep it, or limit the elementary demo to show-and-tell plus a club-launch visit?
+- [ ] **(owner)** A teacher or two in Washington to try a lesson from each track and say what to cut
+- [ ] When OSPI finally adopts WA Science 2026 (expected before June 2027), check the PE wording and switch the lesson codes to the new `S.3.PS2.1` form (the crosswalk is already on `/learn/teachers`); from 2027–28 also lead with the WA Math/ELA 2026 codes
