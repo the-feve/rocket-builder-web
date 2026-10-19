@@ -177,6 +177,11 @@ def test_parachute_suggestion():
     z = zipfile.ZipFile(io.BytesIO(client.get(f"/api/builds/{r['id']}/rocket.zip").content))
     assert f"Parachute: {c['size_in']} in" in z.read("build_notes.txt").decode()
     assert parachute(400)["size_in"] > parachute(60)["size_in"] and parachute(5000)["size_in"] is None
+    # Narrow, light rockets get a streamer (Apogee: a packed chute snags the strap).
+    assert parachute(30, 13.4)["streamer_recommended"] and not parachute(30, 18.4)["streamer_recommended"]
+    assert not parachute(60, 13.4)["streamer_recommended"]
+    mini = client.post("/api/build", json={"motor": "M13", "overall_length": 190}).json()
+    assert mini["parachute"]["streamer_recommended"]
 
 
 def test_launch_field_size():

@@ -252,8 +252,11 @@ def _stability(st) -> dict:
 
 def _chute_text(c: dict) -> str:
     if c["size_in"]:
-        return (f"Parachute: {c['size_in']} in (at least {c['min_diameter_in']:g} in): about {c['descent_ms']} m/s down "
+        text = (f"Parachute: {c['size_in']} in (at least {c['min_diameter_in']:g} in): about {c['descent_ms']} m/s down "
                 f"with {c['descent_mass_g']:g} g after the motor burns.")
+        if c.get("streamer_recommended"):
+            text += " Better, a streamer: in a body this narrow a packed parachute can catch on the shock-cord strap."
+        return text
     return f"Parachute: at least {c['min_diameter_in']:.0f} in for {c['descent_mass_g']:g} g (bigger than the usual hobby sizes)."
 
 
@@ -442,7 +445,7 @@ def build(req: BuildRequest, request: Request):
     # Parachute for the rocket after the motor has burned: the recommended
     # motor's empty casing (else the chosen or heaviest motor's).
     m = motors.get(flights["recommended"]) or motors.get(req.flight_motor) or heaviest(req.motor)
-    chute = parachute(bal.printed_mass_g + st["recovery_mass_g"] + m.mass_g - m.prop_g)
+    chute = parachute(bal.printed_mass_g + st["recovery_mass_g"] + m.mass_g - m.prop_g, bal.body_od - 2 * req.wall)
     chute["links"] = supplies.parachute_links().get(chute["size_in"], [])
     best = next((r for r in flights["rows"] if r["code"] == flights["recommended"]), None)
     field = field_size(best["cls"], best["apogee_m"], chute["descent_ms"]) if best else None

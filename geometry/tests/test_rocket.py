@@ -552,3 +552,14 @@ def test_shoulder_chamfer():
         mid = as_shape(part.intersect(Solid.make_box(100, 100, 0.1).translate((-50, -50, z0 + 2))))
         assert bottom.bounding_box().size.X == pytest.approx(sh_od - 0.8, abs=0.05), name  # top of the 0.1 mm slab
         assert mid.bounding_box().size.X == pytest.approx(sh_od, abs=0.05), name
+
+
+def test_ejection_delay_rounds_down():
+    """The suggested delay is the longest one that isn't longer than the
+    coast (Apogee, Peak of Flight #520: late ejection is the dangerous one)."""
+    from rocketgen.flight import motors_for, simulate
+    for size in ("M13", "M18", "M24"):
+        for m in motors_for(size):
+            f = simulate(m, 40 if size != "M24" else 70, 18)
+            shorter = [d for d in m.delays if d <= f.coast + 1e-9]
+            assert f.delay == (max(shorter) if shorter else min(m.delays)), m.code

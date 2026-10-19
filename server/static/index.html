@@ -2087,7 +2087,9 @@ function chuteHtml(c, kid) {
   const size = c.size_in
     ? `<b>${c.size_in}-inch</b> parachute (${Math.round(c.size_in * 2.54)} cm across). Your rocket weighs about <b>${Math.round(c.descent_mass_g)} g</b> on the way down, so it lands at about <b>${c.descent_ms} m/s</b> (${fts(c.descent_ms)} ft/s), a gentle landing.`
     : `parachute at least <b>${Math.round(c.min_diameter_in)} inches</b> across (bigger than the usual hobby sizes) for ${Math.round(c.descent_mass_g)} g.`;
-  const streamer = c.streamer_ok ? ' A rocket this light can use a streamer instead: it comes down faster but drifts less.' : '';
+  const streamer = c.streamer_recommended
+    ? ' <b>Better: a streamer.</b> This body is narrow, and a packed parachute can catch on the shock-cord strap at ejection; a streamer slides out. It comes down a little faster but drifts less.'
+    : c.streamer_ok ? ' A rocket this light can use a streamer instead: it comes down faster but drifts less.' : '';
   return kid ? `<p>Use a ${size}${streamer}${c.size_in ? ' A smaller one lands too hard; a much bigger one drifts far away.' : ''}</p>${buy}`
              : `<li>Parachute: ${c.size_in ? `${c.size_in} in (at least ${c.min_diameter_in} in needed), about ${c.descent_ms} m/s down` : `at least ${Math.round(c.min_diameter_in)} in`} with ${c.descent_mass_g} g after the motor burns (flat chute, Cd 0.75, for ≤ 4.5 m/s).${streamer}</li>`;
 }

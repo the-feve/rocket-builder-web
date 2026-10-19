@@ -120,7 +120,11 @@ def simulate(m: Motor, rocket_mass_g: float, diameter_mm: float, cd: float = 0.6
         if t > m.burn and v <= 0:
             break
     coast = max(0.0, t - m.burn)
-    delay = min(m.delays, key=lambda d: abs(d - coast))
+    # The longest delay that isn't longer than the coast: ejecting a little
+    # early (still climbing slowly) is gentle, a late one comes down fast and
+    # can strip the chute. Apogee, Peak of Flight #520: beginners' rockets
+    # coast less than predicted (wind, rough finish), so round the delay down.
+    delay = max((d for d in m.delays if d <= coast + 1e-9), default=min(m.delays))
     tw = m.avg_thrust / (m0 * G0)
     problems = []
     if tw < MIN_THRUST_TO_WEIGHT:
@@ -151,16 +155,25 @@ def descent_rate(mass_g: float, diameter_in: float) -> float:
     return math.sqrt(2 * mass_g / 1000 * 9.81 / (AIR_DENSITY * CHUTE_CD * area))
 
 
-def parachute(descent_mass_g: float) -> dict:
+def parachute(descent_mass_g: float, bore_mm: float | None = None) -> dict:
     """The smallest standard chute that brings `descent_mass_g` (the rocket
     after the motor has burned) down at a safe speed, and how fast. Light
-    rockets can use a streamer instead."""
+    rockets can use a streamer instead; a light rocket with a narrow body
+    (`bore_mm`, the body's inside diameter, under STREAMER_BORE_MM) should."""
     need_in = math.sqrt(8 * descent_mass_g / 1000 * 9.81 / (math.pi * AIR_DENSITY * CHUTE_CD * SAFE_DESCENT_MS ** 2)) / 0.0254
     size = next((s for s in CHUTE_SIZES_IN if s >= need_in), None)
     return {"descent_mass_g": round(descent_mass_g, 1), "min_diameter_in": round(need_in, 1), "size_in": size,
             "descent_ms": round(descent_rate(descent_mass_g, size), 1) if size else None,
-            "streamer_ok": descent_mass_g < 40}
+            "streamer_ok": descent_mass_g < 40,
+            "streamer_recommended": descent_mass_g < 40 and bore_mm is not None and bore_mm < STREAMER_BORE_MM}
 
+
+# Opening faster than about 50 mph strips shroud lines and zippers tubes
+# (Apogee, Peak of Flight #625).
+MAX_EJECT_MS = 22.0
+# A narrow body leaves little room past the shock-cord strap (58 % of the
+# bore open on M13): a packed chute snags, a streamer slides out.
+STREAMER_BORE_MM = 16.0
 
 WIND_MS = 4.5  # about 10 mph: a typical launch-day breeze (the NAR code's limit is 20 mph)
 
@@ -301,7 +314,7 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
     warnings = []
     if eject and apo["h"] and eject["h"] < 0.5 * apo["h"] and eject["t"] > events["apogee"]["t"]:
         warnings.append("The ejection comes late, well after the top: pick a shorter delay.")
-    if eject and eject["speed_ms"] > 25:
+    if eject and eject["speed_ms"] > MAX_EJECT_MS:
         warnings.append(f"The parachute opens at {eject['speed_ms']:.0f} m/s, which can tear it or zip the body tube: "
                         "a delay closer to the coast time is gentler.")
     if wind_ms > MAX_WIND_MPH * MPH + 1e-9:
