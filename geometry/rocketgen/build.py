@@ -14,7 +14,7 @@ from .aft import build_aft
 from .body import body_segment, nose_cone, nose_recess
 from .fins import fin_dimensions
 from .geom import GeometryError
-from .anchor import add_anchor_strap, anchor_strap_geometry
+from .anchor import add_anchor_strap, anchor_strap_geometry, strap_shift
 from .lugs import add_lug, lug_geometry, plan_forward_lug, rod_standoff
 from .params import LUG_OPTIONS, MATERIALS, NOSE_SHAPES, DesignParams, Derived, compute_derived, shock_cord
 from .thread import threaded_cap
@@ -44,6 +44,9 @@ class Rocket:
     parts: list[Part]
     seg_lens: list[float]
     notes: list[str] = field(default_factory=list)
+    # Where the shock-cord strap is: {"part", "angle_deg", "z_bot", "z_top"}
+    # (assembled z of its spring line and its top).
+    strap: dict = field(default_factory=dict)
 
     def mass_g(self) -> dict[str, float]:
         rho = MATERIALS[self.params.material] / 1000.0  # g/mm3
@@ -58,30 +61,44 @@ class Rocket:
 
 
 def seg_part_name(i: int, n_parts: int) -> str:
-    return "Anchor_Seg" if i == n_parts - 1 else f"Seg_{i + 1}"
+    """Body parts from the tail up: "Aft" (the fin can), "Seg_2"... in the
+    middle, "Top_Seg" on top (it carries the shock-cord strap). A one-piece
+    body is just "Aft", with the strap in its top. Until 2026-10-19 the top
+    piece was always a separate short "Anchor_Seg"."""
+    if i == 0:
+        return "Aft"
+    return "Top_Seg" if i == n_parts - 1 else f"Seg_{i + 1}"
 
 
 def plan_segments(params: DesignParams, d: Derived) -> list[float]:
-    """Base segment is the printer's usable height; the rest of the body is
-    split the same way, ending in the short anchor section under the nose.
-    A leftover too short to be a segment is folded into the anchor section."""
+    """Printed lengths of the body parts, aft first; they add up to
+    body_length. A body that fits the printer is one piece: the fin can,
+    with the shock-cord strap in its top (plan_rocket checks it is long
+    enough). A longer one has the printer's usable height as its aft part
+    and the rest split the same way; the top piece carries the strap, so it
+    is at least the strap's sec_len, taken from the piece below if the
+    leftover is shorter.
+
+    (Before 2026-10-19 the body always ended in a separate short anchor
+    section holding the strap, so a body that fitted the printer was still
+    two prints and one more joint.)"""
     zmax = d.zmax
-    joint_len = d.shoulder_len + d.joint_rise
     sec_len = anchor_strap_geometry(d)["sec_len"]
-    remaining = params.body_length - sec_len
-    if remaining < 10:
-        raise GeometryError("Body length is too short for the aft segment plus the anchor section under the nose. Increase body length.")
+    remaining = params.body_length
+    if remaining <= zmax + 1e-9:
+        return [remaining]
+    if sec_len > zmax:
+        raise GeometryError("The top body section (the shock-cord strap under the nose's socket) would be taller than "
+                            "the printer's usable Z height. Raise the printer max height.")
     seg_lens = []
-    while remaining > 1e-9:
-        this = min(remaining, zmax)
-        seg_lens.append(this)
-        remaining -= this
-    anchor_len = sec_len
-    if len(seg_lens) > 1 and seg_lens[-1] < d.shoulder_len + d.inner_taper_rise + joint_len + 5:
-        anchor_len += seg_lens.pop()
-        if anchor_len > zmax:
-            raise GeometryError("The anchor section under the nose would be taller than the printer's usable Z height. Adjust body length or printer max height.")
-    seg_lens.append(anchor_len)
+    while remaining > zmax + 1e-9:
+        seg_lens.append(zmax)
+        remaining -= zmax
+    seg_lens.append(remaining)
+    if seg_lens[-1] < sec_len:
+        short = sec_len - seg_lens[-1]
+        seg_lens[-2] -= short
+        seg_lens[-1] = sec_len
     return seg_lens
 
 
@@ -102,17 +119,23 @@ def body_length_for(params: DesignParams, overall: float) -> float:
     """The body_length that makes the rocket `overall` mm long (the
     website's beginner mode asks for overall height). The number of body
     segments depends on the body length, so step until it settles."""
+    too_short = GeometryError(f"An overall height of {overall:.0f} mm is too short for the {params.motor} motor bay "
+                              "and nose. Make the rocket taller.")
     b = params.body_length
     for _ in range(12):
         try:
             nb = b + overall - overall_length(params.with_(body_length=b))
         except GeometryError:
-            raise GeometryError(f"An overall height of {overall:.0f} mm is too short for the {params.motor} motor bay "
-                                "and nose. Make the rocket taller.") from None
+            raise too_short from None
         if abs(nb - b) < 0.05:
-            return round(nb, 1)
+            break
         b = nb
-    return round(b, 1)
+    # overall_length no longer raises for a body too short to hold anything
+    # (it did while the body always ended in an anchor section; 2026-10-19):
+    # refuse nonsense here, and leave a near miss to plan_rocket's message.
+    if nb < 10:
+        raise too_short
+    return round(nb, 1)
 
 
 @dataclass
@@ -144,9 +167,12 @@ def plan_rocket(params: DesignParams) -> Plan:
     joint_len = d.shoulder_len + d.joint_rise
     seg_len = seg_lens[0]
     fin = fin_dimensions(params, d.cal)
+    if len(seg_lens) == 1 and seg_len < anchor_strap_geometry(d)["aft_len"] - 1e-9:
+        raise GeometryError("Aft segment is too short for the motor bay plus the shock-cord strap and the nose's "
+                            "socket above it. Increase body length.")
     if seg_len < fin.root + 10:
         raise GeometryError("Aft segment is too short for this fin root chord. Increase body length, shorten the fins, or raise the printer max height.")
-    if seg_len < d.aft_socket_base + joint_len:
+    if len(seg_lens) > 1 and seg_len < d.aft_socket_base + joint_len:
         raise GeometryError("Aft segment is too short for the motor bay plus a full-depth socket above it. Increase body length or raise the printer max height.")
 
     # Every body part's id and exposed z-range, planned up front so the
@@ -245,29 +271,38 @@ def build_rocket(params: DesignParams) -> Rocket:
     n_parts = len(seg_lens)
     top_z = body_parts[-1]["hi"]
 
-    # Lugs between fins 0 and 1, on one line; the anchor strap at 90 degrees.
+    # Lugs between fins 0 and 1, on one line; the cord strap at 90 degrees.
     lug_angle = 180 / params.fin_count
     anchor_angle = 90.0
+    strap = anchor_strap_geometry(d)
 
     aft = build_aft(d, seg_len, fin, params.fin_count)
     notes = list(aft.notes)
     solid = aft.solid
+    if n_parts == 1:  # one-piece body: the strap goes in the fin can's top
+        solid = add_anchor_strap(solid, d, strap, anchor_angle, strap_shift(strap, seg_len))
     if lug:
         solid = add_lug(solid, d, lug, 0.0, lug["len"], False, lug_angle)
     if fwd and fwd["index"] == 0:
         solid = add_lug(solid, d, lug, fwd["z0"], fwd["z1"], True, lug_angle)
     parts = [Part("Aft", solid, 0.0)]
 
-    strap = anchor_strap_geometry(d)
     for i in range(1, n_parts):
         solid = body_segment(d, seg_lens[i])
         if i == n_parts - 1:
-            solid = add_anchor_strap(solid, d, strap, anchor_angle, seg_lens[i] - strap["sec_len"])
+            solid = add_anchor_strap(solid, d, strap, anchor_angle, strap_shift(strap, seg_lens[i]))
         placement_z = body_parts[i]["placement_z"]
         solid = solid.translate((0, 0, placement_z))
         if fwd and fwd["index"] == i:
             solid = add_lug(solid, d, lug, fwd["z0"], fwd["z1"], True, lug_angle)
         parts.append(Part(seg_part_name(i, n_parts), solid, placement_z))
+
+    top = parts[-1]
+    z_bot = top.placement_z + strap["z_spring"] + strap_shift(strap, seg_lens[-1])
+    strap_at = {"part": top.name, "angle_deg": anchor_angle, "z_bot": z_bot, "z_top": z_bot + strap["height"]}
+    notes.append(f"Shock-cord strap: inside the top of {top.name}, its bar {top_z - strap_at['z_top']:.0f} mm below the "
+                 "top edge (just under the nose's shoulder). With the nose off, clip the cord on with a snap swivel "
+                 "or tie it round the bar.")
 
     nose_len, nose_joint = plan.nose_len, plan.nose_joint
     nose_z = top_z - nose_joint
@@ -284,4 +319,4 @@ def build_rocket(params: DesignParams) -> Rocket:
         if not p.assembled.is_valid:
             raise GeometryError(f"The {p.name} part came out as an unsound solid (geometry-engine bug); "
                                 "try slightly different settings and report this design.")
-    return Rocket(params, d, parts, seg_lens, notes)
+    return Rocket(params, d, parts, seg_lens, notes, strap_at)

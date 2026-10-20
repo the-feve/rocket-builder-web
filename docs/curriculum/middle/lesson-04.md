@@ -37,6 +37,8 @@ Straw-rocket supplies, a squeeze-bottle launcher (bottle + straw sealed into the
 
 ### 2. Nose-cone test (20 minutes)
 
+<!-- figure: squeeze-launcher -->
+
 1. Three identical straw rockets: **flat**, **cone** and **round** noses, same mass (add tape to the lighter ones).
 2. Same launcher, same angle. 3 trials each. Mean and bar graph on W4.
 
@@ -71,3 +73,4 @@ Which design had the best features? Could you combine them?
 - **What to expect:** flat noses go shortest; cone and round are often close, so small differences may be luck. More trials or a fairer launcher (a book dropped on the bottle from a set height) help.
 - **Extension (Advanced mode):** drag = ½ × 1.2 × speed² × Cd × area. A 30 mm rocket (area ≈ 0.00071 m²), Cd 0.65 at 50 m/s: ≈ 0.7 N, about its own weight. In **Advanced → Flight**, set the drag coefficient to 0.5 and then 0.8, build each time and compare the predicted altitude.
 - **Further resources:** Apogee Components' free lesson *Rocket Optimization* (apogeerockets.com/downloads/PDFs/58-2.pdf).
+- **Change one thing:** the launch simulator's change-one-thing experiments fly the same rocket with one setting changed (drag coefficient, nose, fins) and compare the flights.

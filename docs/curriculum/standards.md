@@ -2,6 +2,22 @@
 
 _For teachers, parents and administrators. Checked against OSPI's published documents on 2026-10-19._
 
+## Printable guides and worksheets
+
+| Track | Teacher guide | Student worksheets |
+|---|---|---|
+| Elementary, grades 3–5 | [Teacher guide (PDF)](/learn/elementary/teacher-guide.pdf) | [Worksheets (PDF)](/learn/elementary/worksheets.pdf) |
+| Middle school, grades 6–8 | [Teacher guide (PDF)](/learn/middle/teacher-guide.pdf) | [Worksheets (PDF)](/learn/middle/worksheets.pdf) |
+
+Each teacher guide has a cover, how to use it, the standards map and the full PE text, the safety page, and every lesson as a ready-to-teach plan with its diagrams, answer keys and teacher notes. US Letter; prints in black and white too.
+
+## Tools in Rocket Builder
+
+- **Designer** (https://rocket.quiverdesignworks.net): Beginner and Advanced modes; the stability score with the blue CG and red CP dots; *How high will it go?*, *Which parachute?* and launch-field cards; **Nose weight (clay)** in Advanced. The ▾ download menu has a one-page **mission card** per design (`/mission/<build id>`), with the predicted flight, to print for launch day.
+- **Launch simulator** (▶ Watch it launch, `/launch?build=<id>`): **Simple mode** for projectors (`&simple=1`), force arrows, flight graphs with **Download flight data (CSV)**, change-one-thing experiments, parachute vs streamer, a launch angle of 0–30°, and a **Predict, fly, compare** log (**Download log (CSV)**).
+- **Altitude calculator** (https://rocket.quiverdesignworks.net/tools/altitude): height from an angle and a distance, with the working shown, the 45° rule and the average of two tracking stations.
+- **Class codes** (https://rocket.quiverdesignworks.net/classes): the teacher signs in and makes a class code; students hand in designs with the code and a nickname, with no student accounts.
+
 ## Which science standards apply
 
 - **In force now:** the **Washington State K–12 Science Learning Standards (WSSLS)**, adopted in 2013. They are the Next Generation Science Standards (NGSS) word for word, built on three dimensions: science and engineering practices (SEPs), disciplinary core ideas (DCIs) and crosscutting concepts (CCCs). Every code in these lessons is a 2013 WSSLS/NGSS performance expectation (PE).

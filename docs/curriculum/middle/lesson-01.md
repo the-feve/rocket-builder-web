@@ -46,6 +46,8 @@ Let go of an untied balloon. *What do this, a firework and a space rocket have i
 
 ### 3. Investigate (30 minutes)
 
+<!-- figure: balloon-setup -->
+
 1. Thread the straw on the string; tie the string level and tight, at least 4 m long.
 2. Blow a balloon to a measured circumference (e.g. 50 cm). Hold it shut with the binder clip; tape it to the straw.
 3. Release from the start line and measure the distance. **3 trials**, same circumference each time.

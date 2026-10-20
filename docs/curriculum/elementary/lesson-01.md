@@ -48,6 +48,8 @@ Blow up a balloon, hold it up, and let it go without tying it. Ask: *Which way d
 
 ### 3. Do: balloon rockets on a string (20 minutes)
 
+<!-- figure: balloon-steps -->
+
 1. Thread the string through the straw. Tie the string tight between two chairs, at least 4 m apart.
 2. Blow up a balloon **a little** (small). Hold the end shut with the clip. Tape the balloon to the straw, opening toward the start.
 3. Pull the straw back to the start. Take off the clip. Measure how far it went. Do it **3 times**.
@@ -55,6 +57,8 @@ Blow up a balloon, hold it up, and let it go without tying it. Ask: *Which way d
 5. Circle the farthest try for each size on E1. Colour a bar for each one.
 
 **Fair test:** only the amount of air changes. Same string, same straw, same balloon, same start line.
+
+<!-- figure: balloon-setup -->
 
 ### 4. Wrap up (10 minutes)
 
@@ -84,3 +88,4 @@ Talk about it:
 - **Rocket Builder (optional, 3 minutes):** on the projector, open the app in Beginner mode, build any rocket and press **▶ Watch it launch**. Point out the flame at the bottom: hot gas going down, rocket going up, the same idea as the balloon.
 - **Real rocket fact:** a rocket does not push against the air or the ground. It pushes on its own gas, which is why rockets work in space.
 - **Safety:** nobody stands at the end of the string. Watch for latex allergies.
+- **Projector tip:** after **Build my rocket**, open the launch simulator in **Simple mode** (big buttons and text, made for a projector): press **▶ Watch it launch**, or add `&simple=1` to the launch page's address.

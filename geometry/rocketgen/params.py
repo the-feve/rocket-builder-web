@@ -107,6 +107,10 @@ class DesignParams:
     thread_clearance: float | None = None  # motor cap thread, radial (crest to cap bore); None = 0.25
     thread_pitch: float | None = None  # None = 2.5 mm under 21 mm motors, else 3 mm
     thread_turns: int | None = None  # None = 3
+    # Nose weight (modelling clay pressed into the nose cone), g. Not geometry:
+    # only the mass and CG (stability.Balance) see it. Website (Advanced, 0-50);
+    # the stability lessons add clay and watch the score and CG move.
+    nose_weight_g: float = 0.0
 
     def with_(self, **kw) -> "DesignParams":
         return replace(self, **kw)
@@ -119,10 +123,23 @@ class DesignParams:
 # loose on M18-M29, so 0.18. Nose: 0.15 on M18-M29. M13's short shoulders
 # (nose shoulder under SHORT_NOSE_SHOULDER) grip harder per mm: joint 0.16
 # just right; nose 0.12 too tight, 0.15 too loose, so 0.14.
-WEB_FIT_JOINT = 0.18
-WEB_FIT_NOSE = 0.15
-WEB_FIT_JOINT_SHORT = 0.16
-WEB_FIT_NOSE_SHORT = 0.14
+# Round 2 (owner, 2026-10-19, M13/M18/M24 kit prints): every body joint and
+# nose still a bit tight. Measured worst case: sockets print 0.21-0.35 mm
+# under on diameter, shoulders 0.10-0.20 mm over, so the parts touch or
+# overlap by up to ~0.2 mm on diameter at the seam. All four gaps +20 %
+# (owner's call): 0.18 -> 0.22, 0.15 -> 0.18, 0.16 -> 0.19, 0.14 -> 0.17.
+# Round 3 (owner, 2026-10-20, fit-check plates on a P1S, Sunlu PLA+ 2.0,
+# 0.16 mm layers): every body joint "right" at 0.22 (M13 0.19); every nose
+# still tight. The nose's socket (the top of the body, where the cord strap
+# is fused to the wall) prints 0.1-0.2 mm smaller than a plain joint socket:
+# measured shoulder OD - socket ID was 0.12 / 0.23 / 0.17 / 0.05 mm on
+# M13 / M18 / M24 / M29 against -0.12 / 0.06 / 0.00 / 0.04 for the joints
+# that felt right. A nose has to come off at ejection, so it gets more than
+# that: 0.27 per side on every size (+0.09 to +0.10).
+WEB_FIT_JOINT = 0.22
+WEB_FIT_NOSE = 0.27
+WEB_FIT_JOINT_SHORT = 0.19
+WEB_FIT_NOSE_SHORT = 0.27
 SHORT_NOSE_SHOULDER = 8.0
 
 

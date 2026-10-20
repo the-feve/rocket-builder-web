@@ -9,6 +9,8 @@ except the brand fonts.
 import math
 import sys
 
+import diagrams  # tools/diagrams.py: the shared labelled drawings
+
 pages = []
 TRACK = {"name": "middle", "line": "Grades 6–8"}
 
@@ -19,7 +21,7 @@ def page(code, title, body, sub="", kind="ws", track="all"):
            "older": '<span class="trk">Extension</span>', "adult": '<span class="trk">Teachers</span>'}.get(track, "")
     name = '' if kind != "ws" else '<div class="name">Name <span class="blank w3"></span> Date <span class="blank w15"></span></div>'
     pages.append(f'''<section class="page {kind}">
-<header class="ph"><div class="brandline"><span class="mark">{fletch_svg()}</span>Rocket Builder · Rockets &amp; Model Rocketry · {TRACK["line"]}</div>{name}</header>
+<header class="ph"><div class="brandline"><span class="mark">{fletch_svg()}</span>Rocket Builder <small>by Quiver Design Works</small></div><div class="unit">Rockets &amp; Model Rocketry · {TRACK["line"]}</div></header>{name}
 <h2>{badge}{title}{tag if code else ""}</h2>{f'<p class="sub">{sub}</p>' if sub else ''}
 {body}
 <footer class="pf"><span>Rocket Builder by Quiver Design Works · rocket.quiverdesignworks.net/learn</span><span class="pn"></span></footer>
@@ -176,7 +178,7 @@ def stability_svg(pid="s", gap_cal=2):
 def motor_svg(pid="m"):
     x0, y0, h = 40, 50, 60
     segs = [("nozzle", 60, "#C9C2B5"), ("propellant", 200, "#F9C9B3"), ("delay", 110, "#DDE6F5"), ("ejection charge", 50, "#9AA3B5"), ("cap", 30, "#C9C2B5")]
-    out = [f'<svg class="fig" viewBox="0 0 600 185" style="width:4.3in" aria-label="inside a model rocket motor">{arrow_defs(pid)}']
+    out = [f'<svg class="fig" viewBox="0 0 600 185" style="width:3.6in" aria-label="inside a model rocket motor">{arrow_defs(pid)}']
     x = x0
     for i, (name, w, col) in enumerate(segs):
         out.append(f'<rect x="{x}" y="{y0}" width="{w}" height="{h}" fill="{col}" stroke="{NIGHT}" stroke-width="1.5"/>')
@@ -362,7 +364,7 @@ def middle():
 
     # ---------------- W3 ----------------
     w3 = f'''{vocab(["stable", "unstable", "balance point (CG)", "push point (CP)", "caliber", "stability score"])}
-    {stability_svg("sa")}
+    {diagrams.cg_cp_calibers()}
     <p class="hint">The blue dot (balance point) must be <b>in front of</b> the red dot (push point). Score (cal) = (push point distance − balance point distance) ÷ body width. 1–2 cal is just right.</p>
     <p><b>Body width</b> of my test rocket: <span class="blank w15"></span> cm &nbsp;(= 1 cal)</p>
     {table(["Version", "Change", "Balance point from tip (cm)", "Push point from tip (cm)", "Gap (cm)", "Score (cal)", "Swing test: stable, wobbly or tumbles?"],
@@ -465,7 +467,7 @@ def middle():
     page("W7", "Parachutes and landing energy", w7, "Lesson 7 · Parachutes and landing energy")
 
     # ---------------- W8 ----------------
-    w8 = f'''<div class="row"><div class="col">{triangle_svg("ta")}</div><div class="col fixed">{tan_table()}</div></div>
+    w8 = f'''<div class="row"><div class="col">{diagrams.inclinometer_trig()}</div><div class="col fixed">{tan_table()}</div></div>
     <p class="formula">height = baseline × multiplier + eye height</p>
     <h3>1. How tall is it? (tree, flagpole or house)</h3>
     {table(["Object", "Baseline (m)", "Angle 1", "Angle 2", "Angle 3", "Average angle", "Multiplier", "Eye height (m)", "Height (m)"], 2, ["1.1in"] + [None]*8, cls="tall")}
@@ -671,13 +673,19 @@ h1,h2,h3,.badge,.brandline,.formula{font-family:"Space Grotesk",Inter,system-ui,
 .page{width:8.5in;height:11in;margin:.3in auto;padding:.5in .55in .45in;background:#fff;position:relative;overflow:hidden;
  box-shadow:0 2px 14px rgba(18,32,58,.14);display:flex;flex-direction:column}
 .page>*{flex-shrink:0}
-.ph{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--night);padding-bottom:5px;margin-bottom:8px;font-size:9pt}
-.brandline{display:flex;align-items:center;gap:6px;font-weight:600;letter-spacing:.02em}
+.ph{display:flex;justify-content:space-between;align-items:center;background:var(--night);color:var(--paper);margin:-.5in -.55in 0;padding:.13in .55in .11in;font-size:9pt;
+ border-bottom:5px solid var(--orange);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.brandline{display:flex;align-items:center;gap:7px;font:700 11pt "Space Grotesk",sans-serif;letter-spacing:.01em}
+.brandline small{font:600 6.5pt "Space Grotesk",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#A9B4C8;margin-left:4px}
+.ph .mark svg path:first-child{stroke:#F6F1E7}
+.ph .unit{font:600 7.5pt "Space Grotesk",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#A9B4C8}
+.name{display:flex;justify-content:flex-end;gap:6px;margin:8px 0 6px;font-size:9.5pt}
+.dgw svg.dg{display:block;width:100%;height:auto;margin:4px 0}
 .name{color:var(--night)}
 .blank{display:inline-block;border-bottom:1px solid var(--night);height:1em;vertical-align:baseline}
 .blank.w15{width:.9in}.blank.w2{width:1.3in}.blank.w3{width:2in}.blank.w4{width:2.8in}.blank.w5{width:4.2in}
 h2{font-size:19pt;margin:2px 0 0;display:flex;align-items:center;gap:10px;line-height:1.15}
-.badge{background:var(--orange);color:#fff;font-size:12pt;padding:2px 9px;border-radius:6px;font-weight:700}
+.badge{background:var(--orange);color:var(--night);font-size:12pt;padding:3px 9px;font-weight:700;clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px)}
 .trk{margin-left:auto;font:600 8.5pt Inter,sans-serif;color:var(--night);border:1.5px solid var(--sky);border-radius:20px;padding:1px 9px;white-space:nowrap}
 .trk.t12{border-color:var(--orange);background:var(--otint);color:var(--night)}
 .pagebreak-hint{margin:8px 0 2px;padding:3px 8px;border-top:2px dashed var(--orange);font-size:9pt;color:var(--grey)}
@@ -889,11 +897,11 @@ def elementary():
     page("", "", cover, kind="cover")
 
     e1 = f'''<div class="words"><b>force</b>: a push or a pull · <b>thrust</b>: the push that moves a rocket</div>
-    {balloon_svg()}
+    <div class="dgw" style="max-width:5.2in;margin:0 auto">{diagrams.balloon_setup()}</div>
     <p class="big"><b>My guess:</b> which balloon will go farther? {circle_one("small balloon", "big balloon")}</p>
     {table(["Balloon", "Try 1", "Try 2", "Try 3", "Farthest"], [["<b>Small</b>", "", "", "", ""], ["<b>Big</b>", "", "", "", ""]], ["1.3in", None, None, None, None], cls="etab")}
     <p class="big">Colour a bar for the <b>farthest</b> try.</p>
-    {bars(["small", "big"], "metres", 6, 4.6, 2.6)}
+    {bars(["small", "big"], "metres", 6, 4.4, 2.0)}
     <p class="big">The air pushes {circle_one("forward", "backward")}. The balloon goes {circle_one("forward", "backward")}.</p>
     <p class="big">Holding it still, the pushes are {circle_one("balanced", "unbalanced")}.</p>'''
     page("E1", "Balloon rocket", e1, "Lesson 1 · Every push has a push back")
@@ -987,7 +995,7 @@ def elementary():
     <div class="note warn" style="margin-top:.3in">Model rocket motors and kits are rated 12+. In our class we fly paper and air rockets.</div>'''
     page("S", "Safety pledge", sp, "Lesson 1 · Read it together, then sign")
 
-    cards = '<div class="cards">' + card45_svg() * 4 + "</div>"
+    cards = '<div class="cards">' + card45_svg() * 2 + "</div>" + f'<div class="dgw">{diagrams.sight45()}</div>'
     c45 = f'''<p class="big">Cut out a square and fold it corner to corner. Hold the bottom edge <b>level</b> and look up the folded edge: that line goes up at <b>45°</b>.</p>
     {cards}
     <p class="big">If you stand <b>10 m</b> from the launcher and the rocket goes <b>above</b> your 45° line, it went higher than 10 m.</p>'''
@@ -1063,7 +1071,7 @@ def build(track: str) -> str:
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../brand/tokens.css">
-<style>{CSS}{cfg["css"]}</style>
+<style>{CSS}{diagrams.DG_CSS}{cfg["css"]}</style>
 </head>
 <body class="{track}">
 {chr(10).join(pages)}

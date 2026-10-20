@@ -70,7 +70,10 @@ def nose_recess(d: Derived) -> tuple[float, float]:
     inner_sh_r = d.nose_shoulder_od / 2 - d.wall
     pass_d = shock_cord(d.mtr_d)["pass_d"]
     rd = max(min(0.8 * inner_sh_r, inner_sh_r - 1.8), 1.0 + pass_d)
-    rd = min(rd, inner_sh_r - 0.5)
+    # A 0.4 mm ledge inside the shoulder wall at least (0.5 until 2026-10-20:
+    # the looser nose fit, 0.27 mm, left the M13 recess 0.07 mm short of an
+    # elastic cord's pass).
+    rd = min(rd, inner_sh_r - 0.4)
     hr = max(0.8 * rd, 2.0 + pass_d)
     return rd, hr
 

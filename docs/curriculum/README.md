@@ -26,15 +26,18 @@ _Two tracks built on Washington's K–12 Science Learning Standards. Goes with *
 | `elementary/README.md`, `middle/README.md` | Each track's overview: lessons at a glance, the standards map (lesson × PE, SEP, CCC), materials, Rocket Builder use |
 | `elementary/lesson-01.md` … `lesson-08.md`, `middle/lesson-01.md` … `lesson-09.md` | One lesson plan each: standards, "I can…" objectives, words, materials, steps, a check for understanding with answers, and teacher notes |
 | `elementary/safety.md`, `middle/safety.md` | Paper-rocket safety; the NAR code summary and launch day rules |
-| `elementary/worksheets.html`, `middle/worksheets.html` | Printable worksheets (US Letter). Built by `tools/gen_ws.py` |
+| `elementary/worksheets.html` / `.pdf`, `middle/worksheets.html` / `.pdf` | Printable student worksheets (US Letter). Built by `tools/gen_ws.py` |
+| `elementary/teacher-guide.html` / `.pdf`, `middle/teacher-guide.html` / `.pdf` | The printable teacher guide per track: cover, how to use, standards map and full PE text, safety, every lesson with its diagrams, answer keys and teacher notes. Built by `tools/build_site.py` from the .md files (edit those, not the HTML) |
+| `tools/diagrams.py` | The labelled line drawings (inline SVG, brand style, black-and-white safe). Put `<!-- figure: name -->` on its own line in a lesson; `python3 docs/curriculum/tools/diagrams.py out.html` makes a gallery of all of them |
 | `tools/gen_ws.py` | Builds the worksheets: `python3 docs/curriculum/tools/gen_ws.py elementary docs/curriculum/elementary/worksheets.html` (and `middle`) |
-| `tools/build_site.py` | Builds the web pages in `server/static/learn/` from these files, and runs `gen_ws.py` for both tracks. `pip install markdown`, then `python3 docs/curriculum/tools/build_site.py --pdf` from the repo root (`--pdf` also renders `server/static/learn/elementary/worksheets.pdf` and `…/middle/worksheets.pdf` with Playwright: needs node, the `playwright` package on `NODE_PATH` and `PLAYWRIGHT_BROWSERS_PATH`). Commit the generated files. |
+| `tools/build_site.py` | Builds the web pages in `server/static/learn/` from these files, and runs `gen_ws.py` for both tracks. `pip install markdown`, then `python3 docs/curriculum/tools/build_site.py --pdf` from the repo root (`--pdf` also renders both tracks' `worksheets.pdf` and `teacher-guide.pdf` into `server/static/learn/<track>/` and copies them next to the .md files, with Playwright: needs node, the `playwright` package on `NODE_PATH` and `PLAYWRIGHT_BROWSERS_PATH`). Commit the generated files. |
 | `tools/worksheets_pdf.js` | The Playwright step behind `--pdf` |
 
 ## Web addresses
 
-`/learn/` (chooser) · `/learn/teachers` · `/learn/elementary/` and `/learn/elementary/lesson-01` … `lesson-08`, `safety`, `worksheets`, `worksheets.pdf` · `/learn/middle/` and `/learn/middle/lesson-01` … `lesson-09`, `safety`, `worksheets`, `worksheets.pdf`. The old 10-day unit's addresses redirect to the middle-school track: `/learn/day-01` … `day-08` → `lesson-01` … `lesson-08`, `day-09` → `lesson-08`, `day-10` → `lesson-09`; `/learn/safety` and `/learn/worksheets(.pdf)` → the middle-school pages.
+`/learn/` (chooser) · `/learn/teachers` · `/learn/elementary/` and `/learn/elementary/lesson-01` … `lesson-08`, `safety`, `worksheets`, `worksheets.pdf`, `teacher-guide.pdf` · `/learn/middle/` and `/learn/middle/lesson-01` … `lesson-09`, `safety`, `worksheets`, `worksheets.pdf`, `teacher-guide.pdf`. The old 10-day unit's addresses redirect to the middle-school track: `/learn/day-01` … `day-08` → `lesson-01` … `lesson-08`, `day-09` → `lesson-08`, `day-10` → `lesson-09`; `/learn/safety` and `/learn/worksheets(.pdf)` → the middle-school pages.
 
 ## History
 
 - 2026-10-19: restructured into an elementary and a middle-school track around the Washington standards (owner's request), replacing the 2026-10-18 10-day unit for grades 3–8. The middle-school track is that unit, simplified and tightened from 10 days to 9 lessons.
+- 2026-10-19 (later): printable teacher guides per track, labelled diagrams in the lessons (`tools/diagrams.py`), worksheets restyled with the navy header band.

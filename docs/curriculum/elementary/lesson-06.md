@@ -38,6 +38,8 @@
 
 ### 2. Plan a fair test (5 minutes)
 
+<!-- figure: stomp-launcher -->
+
 Agree as a class: the same launcher, the same stomper, the same kind of stomp (a "one-foot jump"), and the rocket always starts at the bottom of the pipe.
 
 ### 3. Test (15 minutes)
@@ -76,3 +78,4 @@ Share one fix that worked. Make a class list: "Things that make paper rockets fl
 - **Safety:** glasses on; only the stomper goes near the launcher; nobody stands in front of or over the pipe; fetch rockets only on "clear".
 - **Rocket Builder link (optional):** the app does the same thing on screen: change one thing, build, check the score. Show students that engineers test on a computer model before they build.
 - **Keep the improved rockets** for Lesson 8 (launch day).
+- **Change one thing, on screen:** the launch simulator's change-one-thing experiments fly the same rocket twice with one setting changed. It's a quick way to show a fair test on the projector.

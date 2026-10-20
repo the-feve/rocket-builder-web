@@ -51,6 +51,10 @@ Drop a flat sheet of paper and a crumpled one at the same time. Ask: *Which one 
 
 ### 3. Do: the drop test (25 minutes)
 
+<!-- figure: parachute-build -->
+
+<!-- figure: drop-test -->
+
 1. Cut two squares from a plastic bag: **small (20 cm)** and **big (40 cm)**.
 2. Tape a 30 cm string to each corner. Tie the 4 strings together to the washers.
 3. The adult drops each parachute from the same height. A student times it from "drop!" until it lands.
@@ -85,3 +89,4 @@ Drop a flat sheet of paper and a crumpled one at the same time. Ask: *Which one 
 - **Streamers:** very light real rockets use a streamer instead of a parachute. It falls faster than a parachute but drifts less in the wind.
 - **Further resources:** Apogee Components' free lesson *The Optimum Descent Challenge* (apogeerockets.com/downloads/PDFs/58-4.pdf, written for grades 5–8 with kit rockets) has more drop-test ideas for grade 5.
 - **Keep the best parachute** to fly on launch day, taped into a paper rocket's nose.
+- **Parachute or streamer, on screen:** the launch simulator can fly the class rocket with a parachute or a streamer. Compare how fast each comes down and how far it drifts.

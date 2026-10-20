@@ -37,6 +37,8 @@ Plastic bags, string, tape, identical washers, stopwatches, a tape measure, a 2�
 
 ### 2. Drop test (25 minutes)
 
+<!-- figure: drop-test -->
+
 1. Make 20, 30 and 40 cm parachutes with 30 cm lines and the same washers.
 2. An adult drops each from the same height; time 3 trials each; also the washers alone (and a streamer, if you made one).
 3. Mean time and descent rate (height ÷ mean time) for each. Graph canopy size vs time.
@@ -73,3 +75,4 @@ Why does landing at 16 m/s break a rocket when 4 m/s doesn't?
 - **Extension:** descent speed = √(2mg ÷ (1.2 × Cd × area)), Cd ≈ 0.75. A 76 g rocket under a 15-inch chute: ≈ 3.8 m/s, the app's number. Doubling the chute's width halves the speed.
 - **12+ track:** get the parachute size the app says (or make one), and practise folding it: in half twice, lines wrapped loosely, rolled to slide easily into the body tube. Flame-resistant wadding goes below it on launch day.
 - **Further resources:** Apogee Components' free lesson *The Optimum Descent Challenge* (apogeerockets.com/downloads/PDFs/58-4.pdf).
+- **Parachute or streamer:** the launch simulator flies the rocket with either, showing descent speed and drift. Its descent graph is a clean terminal-speed curve for the KE discussion.

@@ -98,6 +98,8 @@ def page() -> str:
 <p class="lede">The rockets you design here are yours to print and fly. The files aren't free to share: please don't upload them, or remixes of them, to MakerWorld, Printables, Thingiverse or any other site. Send friends a link to Rocket Builder instead, so they can design their own.</p>
 <div class="box"><span class="rb-label">LICENSE.txt</span><pre>{escape(LICENSE_TEXT)}</pre></div>
 <p class="lede">The same text is in LICENSE.txt in every download.</p>
+<h2 id="classes">Class sharing (students)</h2>
+<p>Teachers with an account can make a class code. Students hand in a rocket with that code and a first name or nickname only: no account, email or password, and the form asks them not to use their full name. We keep the nickname, the rocket's settings and its numbers, and nothing else about the student: no IP address, device or other detail is stored with it. Only the class's teacher can see what was handed in. Classes and everything handed in are deleted automatically 180 days after the class is made, or as soon as the teacher deletes them.</p>
 </main>
 <footer class="rb-footer"><a href="/">Rocket Builder</a> by <a href="https://quiverdesignworks.net/">Quiver Design Works</a></footer>
 </body>

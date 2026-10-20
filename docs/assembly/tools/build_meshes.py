@@ -34,11 +34,14 @@ from rocketgen.stability import build_stable
 
 OUT = Path(__file__).resolve().parent / ".build"
 
-# The rockets drawn in the guide. "m18": the app's Beginner default (M18,
-# trapezoid fins, 200 mm printer, default height). "m24": an M24 tall enough
-# for two body sections plus the anchor section.
+# The rockets drawn in the guide. "m18": the Starter kit (M18, 300 mm,
+# 256 mm printer, trapezoid fins, tangent ogive): a one-piece body, the fin
+# can D with the shock-cord strap inside its top, like the kits. "m24": an M24
+# at 480 mm on a 200 mm printer, so its body is three prints (Aft, Seg_2 and
+# Top_Seg, the top one carrying the strap), for the joint and glue steps.
 ROCKETS = {
-    "m18": dict(params=DesignParams(motor="M18", fin_shape=FinShape.TRAPEZOID), overall=None),
+    "m18": dict(params=DesignParams(motor="M18", fin_shape=FinShape.TRAPEZOID, nose_shape="tangent_ogive",
+                                    print_max_height=256), overall=300),
     "m24": dict(params=DesignParams(motor="M24", fin_shape=FinShape.TRAPEZOID, nose_shape="tangent_ogive"), overall=480),
 }
 
@@ -111,11 +114,9 @@ def build(key: str, spec: dict) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     scene.export(OUT / f"{key}.glb")
 
-    # Where the shock cord attaches.
+    # Where the shock cord attaches: rocket.strap (the part and the bar's
+    # spring line and top), plus the bar's cross-section from anchor_strap_geometry.
     strap = anchor_strap_geometry(d)
-    anchor = next(p for p in rocket.parts if p.name == "Anchor_Seg")
-    seg_len = rocket.seg_lens[-1]
-    z_shift = seg_len - strap["sec_len"]
     nose = next(p for p in rocket.parts if p.name == "Nose")
     info = {
         "key": key,
@@ -132,11 +133,10 @@ def build(key: str, spec: dict) -> None:
         "lug": {k: v for k, v in lug_geometry(d, params.rod_diameter, params.rod_standoff, params.pad_clearance).items()},
         "rod_diameter": params.rod_diameter,
         "strap": {
-            "angle_deg": 90.0,
+            "part": rocket.strap["part"], "angle_deg": rocket.strap["angle_deg"],
             "front": strap["front"], "t": strap["t"], "hole_depth": strap["hole_depth"],
             "cord_width": strap["cord_width"], "spring": strap["spring"],
-            "z_bot": anchor.placement_z + strap["z_spring"] + z_shift,
-            "z_top": anchor.placement_z + strap["z_out_top"] + z_shift,
+            "z_bot": rocket.strap["z_bot"], "z_top": rocket.strap["z_top"],
         },
         "nose": {"placement_z": nose.placement_z, "tie_bar_z": nose.placement_z + 1.0,
                  "tip_z": nose.assembled.bounding_box().max.Z},

@@ -47,6 +47,8 @@ Ask: *If you want to throw a ball as far as you can, do you throw it flat, strai
 
 ### 3. Do: the angle test (25 minutes)
 
+<!-- figure: squeeze-launcher -->
+
 1. Put the rocket on the bottle's straw. Hold the straw along the protractor at **30°**.
 2. Squeeze the bottle hard, the same way each time. Mark where the rocket lands. Measure the distance.
 3. Do **2 tries** at 30°, then 2 at **45°**, then 2 at **60°**.
@@ -56,6 +58,8 @@ Ask: *If you want to throw a ball as far as you can, do you throw it flat, strai
 **Fair test:** the same rocket, the same launcher, the same squeeze. Only the angle changes.
 
 ### 4. Wrap up (10 minutes)
+
+<!-- figure: angle-paths -->
 
 - What pattern did you see? (Going from 30° up to about 45°, the rocket went farther; steeper than that, it went shorter.)
 - Was your 75° prediction right? How did the pattern help you guess?
@@ -79,3 +83,4 @@ Ask: *If you want to throw a ball as far as you can, do you throw it flat, strai
 - **Grade 3:** use only 30°, 45° and 60°, and compare by marking the landing spots with sticky notes (no measuring). **Grade 5:** do 3 tries and find the average.
 - **Protractor help:** many students read the wrong scale. Show them which zero to start from.
 - **Safety:** glasses on. Launch in one direction only, with nobody downrange. Students fetch rockets only when you say "clear".
+- **Rocket Builder link:** the launch simulator has a launch-angle setting (0–30°). Show 0° and 30° on the projector: real rockets launch close to straight up so they land near the pad.

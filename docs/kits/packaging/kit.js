@@ -6,10 +6,12 @@
 // <div class="k-hero" data-kit="starter" data-angle="0" data-scene="tall"></div>
 
 const KITS = {
-  // L overall, od body, nose (showing), anchor (showing), fin root/tip/span/sweep
-  mini:    { L: 190, od: 16.4, nose: 51, anchor: 28, root: 45, tip: 22, span: 22, sweep: 22 },
-  starter: { L: 300, od: 21.4, nose: 66, anchor: 31, root: 49, tip: 24, span: 25, sweep: 24 },
-  big:     { L: 360, od: 27.4, nose: 83, anchor: 36, root: 76, tip: 38, span: 38, sweep: 38 },
+  // L overall, od body, nose (showing), top (the top body section B showing, 0 when
+  // the body is one print: no joint line), chev (where the chevron decals sit,
+  // below the nose), fin root/tip/span/sweep
+  mini:    { L: 190, od: 16.4, nose: 51, top: 0, chev: 28, root: 45, tip: 22, span: 22, sweep: 22 },
+  starter: { L: 300, od: 21.4, nose: 66, top: 0, chev: 31, root: 49, tip: 24, span: 25, sweep: 24 },
+  big:     { L: 360, od: 27.4, nose: 83, top: 38, chev: 38, root: 76, tip: 38, span: 38, sweep: 38 },
 };
 const C = { night: '#12203A', paper: '#FFFDF8', orange: '#F2652B', sky: '#3D8BFD', grey: '#6E6E73' };
 
@@ -23,12 +25,12 @@ function rocketPath(k) {
     <path d="${fin(1)} ${fin(-1)}" fill="${C.orange}" stroke="${C.night}" stroke-width="1.6" stroke-linejoin="round" ${ln}/>
     <path d="M0 0C${R * 0.42} ${n * 0.22} ${R} ${n * 0.55} ${R} ${n}V${yE}H${-R}V${n}C${-R} ${n * 0.55} ${-R * 0.42} ${n * 0.22} 0 0Z"
       fill="${C.paper}" stroke="${C.night}" stroke-width="1.6" stroke-linejoin="round" ${ln}/>
-    <path d="M${-R} ${n}H${R}M${-R} ${n + k.anchor}H${R}" stroke="${C.night}" stroke-width=".8" ${ln}/>
+    <path d="M${-R} ${n}H${R}${k.top ? `M${-R} ${n + k.top}H${R}` : ''}" stroke="${C.night}" stroke-width=".8" ${ln}/>
     <path d="M0 ${n + 6}V${yE - 4}" stroke="${C.grey}" stroke-width=".6" stroke-dasharray="7 2 1.5 2" ${ln}/>
     <rect x="${-R * 0.78}" y="${yE}" width="${R * 1.56}" height="${cap}" rx="1" fill="${C.paper}" stroke="${C.night}" stroke-width="1.4" ${ln}/>
     <path d="M${-R * 0.78} ${yE + cap * 0.5}H${R * 0.78}" stroke="${C.night}" stroke-width=".7" ${ln}/>
-    <path d="M${-R * 0.55} ${n + k.anchor + 14}l${R * 0.55} -6l${R * 0.55} 6v4l${-R * 0.55} -6l${-R * 0.55} 6z
-             M${-R * 0.55} ${n + k.anchor + 22}l${R * 0.55} -6l${R * 0.55} 6v4l${-R * 0.55} -6l${-R * 0.55} 6z" fill="${C.orange}"/>`;
+    <path d="M${-R * 0.55} ${n + k.chev + 14}l${R * 0.55} -6l${R * 0.55} 6v4l${-R * 0.55} -6l${-R * 0.55} 6z
+             M${-R * 0.55} ${n + k.chev + 22}l${R * 0.55} -6l${R * 0.55} 6v4l${-R * 0.55} -6l${-R * 0.55} 6z" fill="${C.orange}"/>`;
 }
 
 function puffs(x, y, s) {

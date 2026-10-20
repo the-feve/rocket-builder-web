@@ -37,8 +37,9 @@ from rocketgen.fins import FinShape, fin_dimensions
 from rocketgen.geom import GeometryError
 from rocketgen.params import (LUG_OPTIONS, MATERIALS, NOSE_SHAPES, SHORT_NOSE_SHOULDER, WEB_FIT_JOINT, WEB_FIT_JOINT_SHORT,
                              WEB_FIT_NOSE, WEB_FIT_NOSE_SHORT, DesignParams, compute_derived, load_motors)
-from rocketgen.flight import (CHUTE_SIZES_IN, FIELD_M, MAX_WIND_MPH, MPH, field_size, heaviest, launch_profile,
-                              motors_for, parachute, pick, simulate)
+from rocketgen.flight import (CHUTE_SIZES_IN, FIELD_M, MAX_LAUNCH_ANGLE, MAX_WIND_MPH, MPH, descent_rate, field_size,
+                              heaviest, launch_profile, motors_for, parachute, pick, simulate, streamer_descent_rate,
+                              streamer_size)
 from rocketgen.build import body_length_for, height_ranges, min_printer_height, overall_length
 from rocketgen.stability import MAX_FIN_SCALE, Balance, advice, build_stable, recovery_allowance_g
 
@@ -53,7 +54,7 @@ import fit_mount
 import trebuchet_mount
 
 STATIC = Path(__file__).resolve().parent / "static"
-GENERATOR_VERSION = "0.2.0"
+GENERATOR_VERSION = "0.3.0"
 SCHEMA_VERSION = 1
 MAX_CACHED = 40  # geometry builds kept in memory
 
@@ -100,6 +101,9 @@ class BuildRequest(BaseModel):
     target_altitude_m: float = Field(150.0, ge=10, le=3000)
     drag_cd: float = Field(0.65, ge=0.2, le=1.5)
     launch_rod_m: float = Field(0.91, ge=0.3, le=3)
+    # Nose weight (clay in the nose cone), g: Advanced; Beginner sends 0. Not
+    # geometry: it moves the CG (stability.Balance.with_nose_weight) and adds mass.
+    nose_weight_g: float = Field(0.0, ge=0, le=50)
     # Critical fit dimensions (Advanced; blank = Rocket Builder's computed
     # value). For typing in a result from a fit-test print.
     joint_clearance: float | None = Field(None, ge=0, le=0.5)
@@ -128,7 +132,7 @@ def resolved_od(motor: str, offset: float, override: float | None, wall: float |
     return stock_od(motor, wall) + 2 * offset if offset else override
 
 
-FLIGHT_FIELDS = ("flight_motor", "recovery_mass_g", "target_altitude_m", "drag_cd", "launch_rod_m")
+FLIGHT_FIELDS = ("flight_motor", "recovery_mass_g", "target_altitude_m", "drag_cd", "launch_rod_m", "nose_weight_g")
 
 
 log = logging.getLogger("rocketbuilder")
@@ -252,8 +256,11 @@ def _stability(st) -> dict:
 
 def _chute_text(c: dict) -> str:
     if c["size_in"]:
-        return (f"Parachute: {c['size_in']} in (at least {c['min_diameter_in']:g} in): about {c['descent_ms']} m/s down "
+        text = (f"Parachute: {c['size_in']} in (at least {c['min_diameter_in']:g} in): about {c['descent_ms']} m/s down "
                 f"with {c['descent_mass_g']:g} g after the motor burns.")
+        if c.get("streamer_recommended"):
+            text += " Better, a streamer: in a body this narrow a packed parachute can catch on the shock-cord strap."
+        return text
     return f"Parachute: at least {c['min_diameter_in']:.0f} in for {c['descent_mass_g']:g} g (bigger than the usual hobby sizes)."
 
 
@@ -270,6 +277,10 @@ def _zip(stls: dict[str, bytes], report: dict, stab: dict, params: dict, flights
                   f"(motor {stab['motor_mass_g']} g, recovery {stab['recovery_mass_g']} g).",
                   "  Check it in OpenRocket with your actual motor, recovery and paint before flying.",
                   "  Follow the NAR Model Rocket Safety Code."]
+        if params.get("nose_weight_g"):
+            lines += ["", f"Nose weight: {params['nose_weight_g']:g} g of modelling clay, pressed into the nose cone as far "
+                          "toward the tip as it goes, before the first flight. Fix it in (a drop of glue or tape over it) so "
+                          "ejection can't throw it out. The stability score above counts it; without it the rocket is less stable."]
         if chute:
             lines += ["", _chute_text(chute)]
         if field:
@@ -432,9 +443,12 @@ def build(req: BuildRequest, request: Request):
     geo_params = {k: v for k, v in params.items() if k not in FLIGHT_FIELDS}
     geo_params["body_od_override"] = od
     geo = _geometry(geo_params, req, request)
-    bal: Balance = _geo[geo]["balance"]
+    bal: Balance = _geo[geo]["balance"].with_nose_weight(req.nose_weight_g)
     chk = bal.check(motors.get(req.flight_motor), req.recovery_mass_g)
     st = _stability(chk)
+    st["nose_weight_g"] = req.nose_weight_g
+    if req.nose_weight_g:
+        st["message"] += f" Includes {req.nose_weight_g:g} g of nose weight (clay in the nose cone)."
     # Outside the 1-2 cal sweet spot: what to change, with predicted scores.
     st["advice"] = advice(bal, chk, list(motors.values()), beginner=req.overall_length is not None,
                           motor=motors.get(req.flight_motor), stock_od=stock_od(req.motor, req.wall))
@@ -442,7 +456,7 @@ def build(req: BuildRequest, request: Request):
     # Parachute for the rocket after the motor has burned: the recommended
     # motor's empty casing (else the chosen or heaviest motor's).
     m = motors.get(flights["recommended"]) or motors.get(req.flight_motor) or heaviest(req.motor)
-    chute = parachute(bal.printed_mass_g + st["recovery_mass_g"] + m.mass_g - m.prop_g)
+    chute = parachute(bal.printed_mass_g + st["recovery_mass_g"] + m.mass_g - m.prop_g, bal.body_od - 2 * req.wall)
     chute["links"] = supplies.parachute_links().get(chute["size_in"], [])
     best = next((r for r in flights["rows"] if r["code"] == flights["recommended"]), None)
     field = field_size(best["cls"], best["apogee_m"], chute["descent_ms"]) if best else None
@@ -481,14 +495,24 @@ def _get(build_id: str) -> tuple[dict, dict]:
 
 
 @app.get("/api/builds/{build_id}/launch")
-def launch(build_id: str, request: Request, wind_mph: float = 10.0, motor: str | None = None, delay: int | None = None):
+def launch(build_id: str, request: Request, wind_mph: float = 10.0, motor: str | None = None, delay: int | None = None,
+           angle_deg: float = 0.0, recovery: str | None = None, chute_in: int | None = None):
     """A simulated flight for the launch page: liftoff, ejection, the
-    parachute ride down in this much wind, and the field it needs."""
+    parachute ride down in this much wind, and the field it needs.
+    Classroom options: `angle_deg` tilts the rod (+ downwind, - into the wind,
+    up to 30°), `recovery` is "chute" or "streamer" (default: the app's
+    recommendation for this rocket) and `chute_in` a standard chute size."""
     _rate_limit(request, "launch", 120, 600)
     if not 0 <= wind_mph <= 30:
         raise HTTPException(422, "Wind speed must be between 0 and 30 mph.")
+    if not -MAX_LAUNCH_ANGLE <= angle_deg <= MAX_LAUNCH_ANGLE:
+        raise HTTPException(422, "The launch rod must be within 30° of vertical (NAR Safety Code).")
+    if recovery not in (None, "chute", "streamer"):
+        raise HTTPException(422, 'Recovery must be "chute" or "streamer".')
+    if chute_in is not None and chute_in not in CHUTE_SIZES_IN:
+        raise HTTPException(422, f"Parachutes come in {', '.join(map(str, CHUTE_SIZES_IN))} in.")
     b, g = _get(build_id)
-    p, bal = b["params"], g["balance"]
+    p, bal = b["params"], g["balance"].with_nose_weight(b["params"].get("nose_weight_g") or 0)
     motors = {m.code: m for m in motors_for(p["motor"])}
     rows = b["flights"]["rows"]
     # With no safe motor, fly the closest one anyway: the page shows why it's unsafe.
@@ -500,16 +524,25 @@ def launch(build_id: str, request: Request, wind_mph: float = 10.0, motor: str |
     if delay is not None and delay not in m.delays:
         raise HTTPException(422, f"The {m.code} comes with delays of {', '.join(map(str, m.delays))} s.")
     rec = b["stability"]["recovery_mass_g"]
-    chute = parachute(bal.printed_mass_g + rec + m.mass_g - m.prop_g)
+    descent_g = bal.printed_mass_g + rec + m.mass_g - m.prop_g
+    chute = parachute(descent_g, bal.body_od - 2 * p["wall"] if p.get("wall") else None)
     row = next((r for r in rows if r["code"] == m.code), None)
     margin = row["margin_cal"] if row else None
-    out = launch_profile(m, bal.printed_mass_g + rec, bal.body_od, chute["size_in"] or max(CHUTE_SIZES_IN),
-                         wind_mph * MPH, delay, p["drag_cd"], p["launch_rod_m"], margin_cal=margin, length_mm=bal.length)
+    kind = recovery or ("streamer" if chute["streamer_recommended"] else "chute")
+    size = chute_in or chute["size_in"] or max(CHUTE_SIZES_IN)
+    streamer = streamer_size(p["motor"]) if kind == "streamer" else None
+    out = launch_profile(m, bal.printed_mass_g + rec, bal.body_od, size,
+                         wind_mph * MPH, delay, p["drag_cd"], p["launch_rod_m"], margin_cal=margin, length_mm=bal.length,
+                         streamer_in=streamer, angle_deg=angle_deg)
+    out["recovery"] = {"kind": kind, "chute_in": None if streamer else size, "streamer_in": list(streamer) if streamer else None,
+                       "descent_ms": round(streamer_descent_rate(descent_g, streamer) if streamer else descent_rate(descent_g, size), 1),
+                       "recommended": "streamer" if chute["streamer_recommended"] else "chute",
+                       "chute_sizes_in": list(CHUTE_SIZES_IN), "streamer_size_in": list(streamer_size(p["motor"]))}
     unsafe = bool(not row or row["problems"] or any(d["level"] == "danger" for d in out["dangers"]))
     out.update(wind_mph=wind_mph, max_wind_mph=MAX_WIND_MPH, motors=[
         {"code": r["code"], "delays": list(motors[r["code"]].delays), "ok": not r["problems"], "problems": r["problems"]}
         for r in rows], recommended=b["flights"]["recommended"], safe=not unsafe, margin_cal=margin,
-        problems=row["problems"] if row else [], parachute=chute, shape=_shape(bal))
+        problems=row["problems"] if row else [], parachute=chute, shape=_shape(bal), max_angle_deg=MAX_LAUNCH_ANGLE)
     return out
 
 
@@ -916,13 +949,13 @@ def learn_track_index(track: str):
 
 @app.get("/learn/{track}/{page}")
 def learn_track_page(track: str, page: str):
-    """A lesson (`lesson-01` …), `safety`, `worksheets` or `worksheets.pdf` of one track."""
+    """A lesson (`lesson-01` …), `safety`, `worksheets`, `worksheets.pdf` or `teacher-guide.pdf` of one track."""
     pages = LEARN_PAGES.get(track)
     if pages is None:
         raise HTTPException(404, "There's no lesson page with that name.")
-    if page == "worksheets.pdf":
-        return FileResponse(STATIC / "learn" / track / "worksheets.pdf", media_type="application/pdf",
-                            filename=f"rocketry-worksheets-{track}.pdf", content_disposition_type="inline",
+    if page in ("worksheets.pdf", "teacher-guide.pdf"):
+        return FileResponse(STATIC / "learn" / track / page, media_type="application/pdf",
+                            filename=f"rocketry-{page.removesuffix('.pdf')}-{track}.pdf", content_disposition_type="inline",
                             headers=PAGE_HEADERS)
     name = pages.get(page.removesuffix(".html"))
     if not name:
@@ -1008,6 +1041,11 @@ def shared(design_id: str):
     """A share link: the page loads the design and builds it."""
     return FileResponse(STATIC / "index.html", headers=PAGE_HEADERS)
 
+
+# Classroom (classroom.py): /tools/altitude, /mission/<build id>, class codes and /classes.
+import classroom  # noqa: E402
+app.include_router(classroom.router(current_user=current_user, rate_limit=_rate_limit, get_build=_get,
+                                    shape=_shape, page_headers=PAGE_HEADERS))
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 

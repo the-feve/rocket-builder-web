@@ -49,11 +49,19 @@ Show an arrow, a dart or a badminton shuttle (or a picture). Ask: *Why does it f
 >
 > Fins at the back move the push point back. Clay in the nose moves the balance point forward. Both help.
 
+<!-- figure: balance-point -->
+
+<!-- figure: weathervane -->
+
 **On the projector:** build a rocket in Rocket Builder. Find the **blue dot** (balance point) and the **red dot** (push point). Change the fin shape and build again. Watch the red dot move. If the score is green, it's stable.
 
 ### 3. Do: the swing test (20 minutes)
 
 Go outside or to a big open room. Nobody stands within 3 m of the swinger.
+
+<!-- figure: swing-test -->
+
+<!-- figure: rocket-versions -->
 
 1. Build the rocket with **no fins**. Balance it on a finger to find the balance point. Tie the string there and tape it.
 2. Swing it in a circle beside you. Does the nose lead? Tick **straight**, **wobbly** or **tumbles** on E4.
@@ -85,3 +93,4 @@ Go outside or to a big open room. Nobody stands within 3 m of the swinger.
 - **Swing safety:** a short string (about 1 m), a clear space, one swinger at a time.
 - **Optional instructor demo, a 3D-printed rocket:** show a printed Rocket Builder rocket with **no motor in it**. Balance it on one finger to find its balance point, point at the fins, and compare it with the blue and red dots on the screen. Students can hold and look at it. Motors are rated 12+ and only adults handle them, so the demo never includes a motor or igniter.
 - **Further resources:** Apogee Components' free *Rocketry Reservoir* (apogeerockets.com/downloads/PDFs/Rocketry_Education_Pack.pdf) has printable pages on the parts of a rocket and on centre of gravity and centre of pressure that you can project or hand out.
+- **Clay in the nose, on screen:** in Rocket Builder's **Advanced** mode, **Nose weight (clay)** adds grams to the nose. Add some, build again, and the class watches the blue dot move forward and the score go up: the same thing their clay did.

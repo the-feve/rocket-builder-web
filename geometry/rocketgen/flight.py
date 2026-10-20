@@ -120,7 +120,11 @@ def simulate(m: Motor, rocket_mass_g: float, diameter_mm: float, cd: float = 0.6
         if t > m.burn and v <= 0:
             break
     coast = max(0.0, t - m.burn)
-    delay = min(m.delays, key=lambda d: abs(d - coast))
+    # The longest delay that isn't longer than the coast: ejecting a little
+    # early (still climbing slowly) is gentle, a late one comes down fast and
+    # can strip the chute. Apogee, Peak of Flight #520: beginners' rockets
+    # coast less than predicted (wind, rough finish), so round the delay down.
+    delay = max((d for d in m.delays if d <= coast + 1e-9), default=min(m.delays))
     tw = m.avg_thrust / (m0 * G0)
     problems = []
     if tw < MIN_THRUST_TO_WEIGHT:
@@ -151,16 +155,25 @@ def descent_rate(mass_g: float, diameter_in: float) -> float:
     return math.sqrt(2 * mass_g / 1000 * 9.81 / (AIR_DENSITY * CHUTE_CD * area))
 
 
-def parachute(descent_mass_g: float) -> dict:
+def parachute(descent_mass_g: float, bore_mm: float | None = None) -> dict:
     """The smallest standard chute that brings `descent_mass_g` (the rocket
     after the motor has burned) down at a safe speed, and how fast. Light
-    rockets can use a streamer instead."""
+    rockets can use a streamer instead; a light rocket with a narrow body
+    (`bore_mm`, the body's inside diameter, under STREAMER_BORE_MM) should."""
     need_in = math.sqrt(8 * descent_mass_g / 1000 * 9.81 / (math.pi * AIR_DENSITY * CHUTE_CD * SAFE_DESCENT_MS ** 2)) / 0.0254
     size = next((s for s in CHUTE_SIZES_IN if s >= need_in), None)
     return {"descent_mass_g": round(descent_mass_g, 1), "min_diameter_in": round(need_in, 1), "size_in": size,
             "descent_ms": round(descent_rate(descent_mass_g, size), 1) if size else None,
-            "streamer_ok": descent_mass_g < 40}
+            "streamer_ok": descent_mass_g < 40,
+            "streamer_recommended": descent_mass_g < 40 and bore_mm is not None and bore_mm < STREAMER_BORE_MM}
 
+
+# Opening faster than about 50 mph strips shroud lines and zippers tubes
+# (Apogee, Peak of Flight #625).
+MAX_EJECT_MS = 22.0
+# A narrow body leaves little room past the shock-cord strap (58 % of the
+# bore open on M13): a packed chute snags, a streamer slides out.
+STREAMER_BORE_MM = 16.0
 
 WIND_MS = 4.5  # about 10 mph: a typical launch-day breeze (the NAR code's limit is 20 mph)
 
@@ -200,9 +213,35 @@ TUMBLE_RATE = 2.5 * 2 * math.pi  # rad/s, a tumble's full spin
 CD_SIDE = 1.2
 
 
+# Streamers (the launch page's recovery choice). Assumption: a crepe-paper or
+# Mylar streamer acts as a drag device of Cd ~0.6 on its flat area (width x
+# length) once it flutters. That figure is chosen so the usual sizes give the
+# 6-9 m/s descent (20-30 ft/s) that Apogee Components and Estes quote for light
+# rockets on streamers: 1 x 24 in brings a 30 g M13/M18 rocket down at about
+# 7 m/s, 2 x 36 in an 80 g M24 rocket at about 7 m/s. Typical kit sizes: 1 x 24 in
+# for 13 and 18 mm motor bays, 2 x 36 in for 24 and 29 mm.
+STREAMER_CD = 0.6
+MAX_LAUNCH_ANGLE = 30.0  # degrees from vertical: the NAR Safety Code's limit for the launcher
+
+
+def streamer_size(bay: str) -> tuple[int, int]:
+    """Typical streamer (width, length) in inches for a motor bay size."""
+    return (1, 24) if bay.startswith(("M13", "M18")) else (2, 36)
+
+
+def streamer_descent_rate(mass_g: float, streamer_in: tuple[float, float]) -> float:
+    """Steady descent speed (m/s) under a streamer (STREAMER_CD on its flat area)."""
+    area = streamer_in[0] * 0.0254 * streamer_in[1] * 0.0254
+    return math.sqrt(2 * mass_g / 1000 * 9.81 / (AIR_DENSITY * STREAMER_CD * area))
+
+
+SAMPLE_COLS = ("speed_ms", "accel_ms2", "thrust_n", "drag_x_n", "drag_h_n", "weight_n", "mass_g")
+
+
 def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in: float | None,
                    wind_ms: float = WIND_MS, delay: int | None = None, cd: float = 0.65, rod_m: float = 0.91,
-                   margin_cal: float | None = None, length_mm: float | None = None) -> dict:
+                   margin_cal: float | None = None, length_mm: float | None = None, *,
+                   streamer_in: tuple[float, float] | None = None, angle_deg: float = 0.0) -> dict:
     """A whole flight in two dimensions, for the launch page: up the rod,
     boost and coast, the ejection charge at burnout + delay, then down under
     the parachute, with the wind blowing along +x.
@@ -219,9 +258,22 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
     unsafe, in plain words, for the page to show.
 
     `margin_cal` (with that motor loaded) under 1 switches on the pitch model
-    above; None or 1 and over flies the stable model."""
+    above; None or 1 and over flies the stable model.
+
+    `streamer_in` (width, length in inches) flies a streamer instead of the
+    parachute. `angle_deg` tilts the launch rod from vertical (+ downwind,
+    - into the wind; the NAR code allows up to 30°). `samples`, parallel to
+    `path`, carries SAMPLE_COLS per point: speed over the ground, vertical
+    acceleration (+ up), the thrust along the rocket, the drag force (x, h
+    components, against the airflow; chute or streamer included), the weight
+    and the mass, for the page's graphs and force arrows."""
     area = math.pi * (diameter_mm / 2000) ** 2
     chute_area = math.pi * (chute_in * 0.0254 / 2) ** 2 if chute_in else 0.0
+    rec_cda = (STREAMER_CD * streamer_in[0] * streamer_in[1] * 0.0254 ** 2 if streamer_in
+               else CHUTE_CD * chute_area)
+    if streamer_in:
+        chute_in = None
+    rod_ux, rod_uh = math.sin(math.radians(angle_deg)), math.cos(math.radians(angle_deg))
     m0, prop = (rocket_mass_g + m.mass_g) / 1000, m.prop_g / 1000
     thrust = thrust_fn(m)
     if delay is None:
@@ -230,7 +282,7 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
     dt, every = 0.002, 25
     t = x = h = vx = vh = burnt = 0.0
     chute_open = 0.0  # 0 → 1 over half a second after ejection
-    on_rod, path, events = True, [], {}
+    on_rod, path, events, samples = True, [], {}, []
     step = 0
     pitch = margin_cal is not None and margin_cal < 1.0
     side_area = (length_mm or 15 * diameter_mm) / 1000 * diameter_mm / 1000
@@ -244,7 +296,7 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
         th_air = math.atan2(ax_air, ah_air) if speed_air > 1e-6 else 0.0
         off = 0.0  # angle between the rocket and its airflow
         if on_rod:
-            ux, uh, th = 0.0, 1.0, 0.0
+            ux, uh, th = rod_ux, rod_uh, math.radians(angle_deg)
         elif pitch and t < t_eject:
             off = math.remainder(th - th_air, 2 * math.pi) if speed_air > 1e-6 else 0.0
             if margin_cal < 0:  # tumbling: the air flips it, the spin builds up
@@ -261,14 +313,16 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
             ux, uh = 0.0, 1.0
         if t >= t_eject:
             chute_open = min(1.0, (t - t_eject) / 0.5)
-        cda = cd * area + CD_SIDE * side_area * abs(math.sin(off)) + (CHUTE_CD * chute_area * chute_open)
+        cda = cd * area + CD_SIDE * side_area * abs(math.sin(off)) + rec_cda * chute_open
         drag = 0.5 * RHO * cda * speed_air
         ax = f * ux / mass - drag * ax_air / mass
         ah = f * uh / mass - drag * ah_air / mass - G0
-        if on_rod:
-            ax = vx = 0.0
-            if h <= 0 and ah < 0:  # waiting for thrust to beat weight
-                ah = vh = 0.0
+        if on_rod:  # slides along the rod: only the push along it counts
+            a_par, v_par = ax * rod_ux + ah * rod_uh, vx * rod_ux + vh * rod_uh
+            if h <= 0 and a_par < 0:  # waiting for thrust to beat weight
+                a_par = v_par = 0.0
+            ax, ah, vx, vh = a_par * rod_ux, a_par * rod_uh, v_par * rod_ux, v_par * rod_uh
+        sample = (f, -drag * ax_air, -drag * ah_air, mass, ah)
         vx += ax * dt
         vh += ah * dt
         x += vx * dt
@@ -276,9 +330,9 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
         burnt += f * dt
         t += dt
         step += 1
-        if on_rod and h >= rod_m:
+        if on_rod and h >= rod_m * rod_uh:
             on_rod = False
-            events["rod"] = {"t": round(t, 2), "speed_ms": round(vh, 1)}
+            events["rod"] = {"t": round(t, 2), "speed_ms": round(math.hypot(vx, vh), 1)}
             if pitch:
                 om = TIP_OFF
         if "burnout" not in events and t >= m.burn:
@@ -291,17 +345,21 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
         phase = "rod" if on_rod else "boost" if t < m.burn else "coast" if t < t_eject else "chute"
         if step % every == 0:
             path.append([round(t, 2), round(x, 2), round(max(h, 0.0), 2), phase, round(math.degrees(th), 1)])
+            fs, dx, dh, ms, acc = sample
+            samples.append([round(math.hypot(vx, vh), 2), round(acc, 2), round(fs, 3), round(dx, 3), round(dh, 3),
+                            round(ms * G0, 3), round(ms * 1000, 1)])
         if t > 0.1 and h <= 0 and not on_rod:
             break
     landing = {"t": round(t, 1), "x": round(x, 1), "speed_ms": round(abs(vh), 1)}
     path.append([round(t, 2), round(x, 2), 0.0, "landed", 90.0])
+    samples.append([0.0, 0.0, 0.0, 0.0, 0.0, round(mass * G0, 3), round(mass * 1000, 1)])
     events["landing"] = landing
     eject = events.get("eject")
     apo = events.get("apogee", {"h": 0.0})
     warnings = []
     if eject and apo["h"] and eject["h"] < 0.5 * apo["h"] and eject["t"] > events["apogee"]["t"]:
         warnings.append("The ejection comes late, well after the top: pick a shorter delay.")
-    if eject and eject["speed_ms"] > 25:
+    if eject and eject["speed_ms"] > MAX_EJECT_MS:
         warnings.append(f"The parachute opens at {eject['speed_ms']:.0f} m/s, which can tear it or zip the body tube: "
                         "a delay closer to the coast time is gentler.")
     if wind_ms > MAX_WIND_MPH * MPH + 1e-9:
@@ -309,7 +367,9 @@ def launch_profile(m: Motor, rocket_mass_g: float, diameter_mm: float, chute_in:
     tw = m.avg_thrust / (m0 * G0)
     dangers = flight_dangers(margin_cal, tw, events, wind_ms, spun / (2 * math.pi))
     return {"motor": f"{m.code}-{delay}", "code": m.code, "cls": m.cls, "delay_s": delay, "wind_ms": round(wind_ms, 2),
-            "chute_in": chute_in, "apogee_m": round(apo["h"], 1), "events": events, "path": path,
+            "chute_in": chute_in, "streamer_in": list(streamer_in) if streamer_in else None,
+            "angle_deg": angle_deg, "apogee_m": round(apo["h"], 1), "events": events, "path": path,
+            "samples": samples, "sample_cols": list(SAMPLE_COLS),
             "landing_m": landing["x"], "field": launch_field(m.cls, path), "warnings": warnings,
             "dangers": dangers, "turns": round(spun / (2 * math.pi), 1)}
 

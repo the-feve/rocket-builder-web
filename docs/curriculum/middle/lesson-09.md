@@ -34,9 +34,11 @@
 
 ### 1. Predict (before you go)
 
-Write Rocket Builder's predicted altitude, the motor, and the time to apogee on the flight log. Each student writes their own guess too.
+Write Rocket Builder's predicted altitude, the motor, and the time to apogee on the flight log. Each student writes their own guess too. (The rocket's mission card and the simulator's **Predict, fly, compare** log have these numbers.)
 
 ### 2. Launch (adult-run, students on jobs)
+
+<!-- figure: launch-site -->
 
 1. Check wind (under 20 mph), the field and the pad area (no dry grass).
 2. RSO check: rocket sound, preflight done in Lesson 8.
@@ -51,7 +53,7 @@ Write Rocket Builder's predicted altitude, the motor, and the time to apogee on 
 
 ### 3. Compare (on the field or back in class)
 
-1. Altitude = baseline × multiplier + eye height; average the trackers.
+1. Altitude = baseline × multiplier + eye height; average the trackers. Check with the altitude calculator ([rocket.quiverdesignworks.net/tools/altitude](https://rocket.quiverdesignworks.net/tools/altitude)).
 2. Percent difference from the prediction.
 3. Why different? Mass, paint and glue drag, wind tilt, tracking error, motor variation.
 
@@ -83,3 +85,4 @@ Poster, slides, written report or a 3–5 minute talk with the parts on planner 
 - **No field or bad weather?** Fly at a local NAR club launch (nar.org), or use Rocket Builder's simulated launch and do the report with the predicted numbers and the stomp-rocket data.
 - **Rubric:** five rows (science, design process, data and math, explaining results, communication and safety), 1–4 each, 20 points. It's on planner C.
 - **Further resources:** Apogee Components' free Flight Record data sheet (apogeerockets.com/Rocket_Books_Videos/Data_Sheets/Flight_Record_Data_Sheet) is another flight log format.
+- **Launch-day kit from Rocket Builder:** print each rocket's **mission card** (designer ▾ download menu → *Mission card*) for the clipboard; use the simulator's **Predict, fly, compare** log to record the prediction before the flight and the measured altitude after (**Download log (CSV)** for the report); and check tracker maths with the altitude calculator ([rocket.quiverdesignworks.net/tools/altitude](https://rocket.quiverdesignworks.net/tools/altitude)).

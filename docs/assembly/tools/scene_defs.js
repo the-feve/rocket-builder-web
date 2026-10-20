@@ -42,7 +42,8 @@ export function defineScenes(h) {
     return pts;
   }
 
-  // The cord at the anchor strap: the long part comes down the slot behind
+  // The cord at the strap (inside the top of the top body piece: the fin can
+  // D on a one-piece body, B otherwise): the long part comes down the slot behind
   // the bar, under it, up in front, and the end is tied round the long part
   // just above the bar. `top`: how far above the bar the long part is drawn.
   // Returns the group and the points the labels and other cords need.
@@ -115,6 +116,77 @@ export function defineScenes(h) {
     return { group: g, points: pts };
   }
 
+  // A snap swivel clipped round the cord at (x, ys, z0) (size 14, about
+  // 20 mm long): the snap's wire loop round the cord, the barrel, then the
+  // eye, hanging down and out along d. The parachute's lines are hitched to
+  // the eye. state: 'clip' (swivel on, lines' loop held next to the eye),
+  // 'through' (loop through the eye, parachute pushed through the loop),
+  // 'snug'. far: where the lines go (the parachute).
+  function swivelRig(x, ys, z0, state, far) {
+    const g = new THREE.Group();
+    const d = V(0.62, 0.15, -0.77).normalize(), yv = V(0, 1, 0).sub(d.clone().multiplyScalar(d.y)).normalize();
+    const wire = 0.32, a = cordR + 0.9, L = 8.5, b = 0.8;
+    const c0 = V(x, ys, z0);
+    // Snap: a stadium of wire, round the cord at one end.
+    const loop = [];
+    for (let i = 0; i <= 24; i++) { const t = Math.PI / 2 + i / 24 * Math.PI; loop.push(c0.clone().addScaledVector(d, a * Math.cos(t)).addScaledVector(yv, a * Math.sin(t))); }
+    const c1 = c0.clone().addScaledVector(d, L);
+    for (let i = 0; i <= 16; i++) { const t = -Math.PI / 2 + i / 16 * Math.PI; loop.push(c1.clone().addScaledVector(d, b * Math.cos(t)).addScaledVector(yv, b * Math.sin(t))); }
+    const lc = new THREE.CatmullRomCurve3(loop, true, 'centripetal');
+    g.add(mesh(new THREE.TubeGeometry(lc, 160, wire, 10, true), COL.steel));
+    // Barrel and eye.
+    const b0 = c1.clone().addScaledVector(d, b + 0.2), b1 = b0.clone().addScaledVector(d, 3.0);
+    const bar = new THREE.CylinderGeometry(0.85, 0.85, 3.0, 20);
+    const bm = mesh(bar, COL.steel);
+    bm.position.copy(b0.clone().lerp(b1, 0.5));
+    bm.quaternion.setFromUnitVectors(V(0, 1, 0), d);
+    g.add(bm);
+    const er = 1.25;
+    const ec = b1.clone().addScaledVector(d, er + 0.2);
+    const eye = new THREE.TorusGeometry(er, wire, 10, 40);
+    const em = mesh(eye, COL.steel);
+    em.position.copy(ec);
+    em.quaternion.setFromUnitVectors(V(0, 0, 1), d.clone().cross(yv).normalize());
+    g.add(em);
+    const E = ec.clone().addScaledVector(d, er);   // the eye's far end: the lines go round here
+    const pts = { swivel: c0.clone().lerp(c1, 0.6), eye: E.clone() };
+    const lr = lineR, ry = wire + lr + 0.05;
+    // The hitch round the eye's wire (it runs along yv at E): two snug turns either side, legs out along d.
+    const turn = (off) => { const q = []; for (let i = 0; i <= 20; i++) { const t = i / 20 * Math.PI * 2; q.push(E.clone().addScaledVector(yv, off).addScaledVector(d, ry * Math.cos(t)).add(V(0, 0, 0).addScaledVector(d.clone().cross(yv).normalize(), ry * Math.sin(t)))); } return q; };
+    const legsTo = (from, off) => [from, from.clone().addScaledVector(d, 3).addScaledVector(yv, off * 0.5), far.clone().addScaledVector(yv, off * 0.3)];
+    if (state === 'snug') {
+      for (const off of [-0.55, 0.55]) {
+        const t = turn(off);
+        g.add(line([...t.slice(0, 18), ...legsTo(E.clone().addScaledVector(d, ry * 1.4).addScaledVector(yv, off), off)]));
+      }
+      pts.hitch = E.clone();
+    } else if (state === 'through') {
+      // The loop's end has gone through the eye and hangs open below it; the
+      // parachute (at far, below) goes up through it.
+      const n = d.clone().cross(yv).normalize();
+      const drop = 13, w = 6.5;
+      const side = (o) => [E.clone().addScaledVector(d, 1.6).addScaledVector(yv, o).add(V(0, 0, -0.8)),
+        E.clone().addScaledVector(n, -ry).addScaledVector(yv, o), E.clone().addScaledVector(d, -ry * 0.6).addScaledVector(yv, o).add(V(0, 0, 0.3)),
+        E.clone().addScaledVector(n, ry).addScaledVector(yv, o).add(V(-0.6, 0.6, -2.2))];
+      const A = [far.clone().add(V(0.3, 0, 0)), E.clone().add(V(1.2, 0.5, -9)), ...side(0.45),
+                 E.clone().add(V(-w * 0.62, 2.2, -drop * 0.5)), E.clone().add(V(-w * 0.5, 2.8, -drop * 0.93)), E.clone().add(V(-w * 0.15, 3.0, -drop))];
+      const B = [far.clone().add(V(-0.3, 0, 0)), E.clone().add(V(0.6, -0.5, -9)), ...side(-0.45),
+                 E.clone().add(V(w * 0.25, 1.6, -drop * 0.5)), E.clone().add(V(w * 0.3, 2.6, -drop * 0.9)), E.clone().add(V(0, 3.0, -drop - 0.15))];
+      g.add(line([...A, ...B.reverse()]));
+      pts.loop = E.clone().add(V(-w * 0.55, 2.6, -drop * 0.7));
+      pts.loopMid = E.clone().add(V(-w * 0.2, 2.6, -drop * 0.6));
+    } else {
+      // The lines' loop, its end held just below the eye, about to go through it.
+      const T = E.clone().add(V(-0.4, 0.6, -3.4));
+      const A = [far.clone().add(V(0.3, 0.2, 0)), T.clone().add(V(1.6, 0, -9)), T.clone().add(V(1.0, 0, -3)), T.clone().add(V(0.5, 0, -0.5)), T.clone().add(V(0, 0, 0.1))];
+      const B = [far.clone().add(V(-0.3, -0.2, 0)), T.clone().add(V(-2.4, 0, -9)), T.clone().add(V(-1.6, 0, -3)), T.clone().add(V(-0.6, 0, -0.5))];
+      g.add(line([...A, ...B.reverse()]));
+      pts.loop = T.clone().add(V(-2.0, 0, -6));
+      pts.arrowFrom = T.clone().add(V(-4.5, 1, -2.5));
+    }
+    return { group: g, points: pts, E, d };
+  }
+
   // A cord break mark: two short slanted bars across a gap at p (the cord
   // runs along `dir`), meaning "longer than drawn".
   function breakMark(p, dir, { len = 7, gap = 3.2, t = 0.9 } = {}) {
@@ -174,29 +246,30 @@ export function defineScenes(h) {
   }
 
   return {
-    // Cover: the M24 rocket, assembled.
+    // Cover: the Starter rocket (one-piece body), assembled.
     hero: {
       build(root) {
-        const k = 'm24';
-        for (const p of ['Aft', 'Seg_2', 'Anchor_Seg', 'Nose', 'Motor_Cap']) root.add(part(k, p, { rot: 200 }));
+        const k = 'm18';
+        for (const p of ['Aft', 'Nose', 'Motor_Cap']) root.add(part(k, p, { rot: 200 }));
         return { dir: viewDir(-75, 12), up: V(0, 0, 1), W: 420, line: 2.0 };
       },
     },
 
-    // Parts layout (A–F): every printed part pulled apart along the axis.
+    // Parts layout: every printed part of the Starter rocket (one-piece body:
+    // A, D, E, F) pulled apart along the axis. Taller rockets add B and C.
     layout: {
       build(root) {
-        const k = 'm24', I = R[k].info;
+        const k = 'm18', I = R[k].info;
         const g = sideways(root);
-        const rot = 48, gap = 34;
-        const dz = { Aft: 0, Seg_2: gap, Anchor_Seg: 2 * gap, Nose: 3 * gap, Motor_Cap: -gap * 0.9, Rod_Standoff: -gap * 2.2 };
+        const rot = 48, gap = 30;
+        const dz = { Aft: 0, Nose: gap, Motor_Cap: -gap * 0.9, Rod_Standoff: -gap * 2.2 };
         for (const p of Object.keys(dz)) g.add(part(k, p, { dz: dz[p], rot }));
         const at = (name, f = 0.5, x = -I.body_od / 2) => { const p = P(k, name); return mark(g, x, 0, p.zmin + dz[name] + (p.zmax - p.zmin) * f); };
         const lr = I.lug.center_r, la = deg(I.lug_angle_deg + rot);
         return {
           dir: V(0.28, 1, 0.42), up: V(0, 0, 1), W: 2400, line: 2.4,
           points: {
-            A: at('Nose', 0.45), B: at('Anchor_Seg', 0.6), C: at('Seg_2', 0.5), D: at('Aft', 0.62),
+            A: at('Nose', 0.45), D: at('Aft', 0.55),
             E: at('Motor_Cap', 0.5, -I.thread.r_cap_out),
             F: mark(g, lr * Math.cos(la) - 3, lr * Math.sin(la), -I.lug.standoff_h / 2 + dz.Rod_Standoff),
           },
@@ -289,12 +362,12 @@ export function defineScenes(h) {
         const g = sideways(root);
         const rot = 0;
         const gap = 30;
-        const dz = { Aft: 0, Seg_2: gap, Anchor_Seg: 2 * gap };
+        const dz = { Aft: 0, Seg_2: gap, Top_Seg: 2 * gap };
         for (const p of Object.keys(dz)) g.add(part(k, p, { dz: dz[p], rot }));
         const la = deg(I.lug_angle_deg + rot), lr = I.lug.center_r;
-        const rodTop = P(k, 'Anchor_Seg').zmax + 2 * gap + 10;
+        const rodTop = P(k, 'Top_Seg').zmax + 2 * gap + 10;
         g.add(cyl(I.rod_diameter / 2, -25, rodTop, COL.steel).translateX(lr * Math.cos(la)).translateY(lr * Math.sin(la)));
-        const seg = P(k, 'Seg_2'), anc = P(k, 'Anchor_Seg');
+        const seg = P(k, 'Seg_2'), anc = P(k, 'Top_Seg');
         return {
           dir: V(0.15, 1, 0.75), up: V(0, 0, 1), W: 2400, line: 2.4, margin: 4,
           points: {
@@ -306,13 +379,14 @@ export function defineScenes(h) {
       },
     },
 
-    // Step 4: the shock cord through the anchor strap. The near half of the
-    // anchor section is cut away; we look at the bar face-on.
-    anchor_cord: {
+    // Step 4: the shock cord through the strap inside the top of the body
+    // (the Starter's fin can D). The near half of the tube is cut away; we
+    // look at the bar face-on.
+    strap_cord: {
       build(root) {
         const k = 'm18', I = R[k].info, S = I.strap;
         const clip = cutPlane(root, V(0, 1, 0), 1);
-        root.add(part(k, 'Anchor_Seg', { clip }));
+        root.add(part(k, S.part, { clip }));
         const c = strapRig(I, { top: 26 });
         root.add(c.group);
         return {
@@ -366,26 +440,29 @@ export function defineScenes(h) {
           mg.scale.x = -1;
           g.add(mg);
           mg.updateMatrixWorld(true);
-          const far = st === 'through' ? V(-13, c.ys + cordR + 16, z0 - 25) : V(15, c.ys + 2, z0 - 36);
-          const h = larks(0, c.ys, z0, st, far);
+          const far = st === 'through' ? V(1, c.ys + 3, z0 - 34) : V(10, c.ys + 2, z0 - 40);
+          const h = swivelRig(0, c.ys, z0, st === 'loop' ? 'clip' : st, far);
           mg.add(h.group);
           if (st === 'through') {
-            // The parachute (bundled up) being pulled away through the loop.
+            // The parachute, bundled up, on its way up through the loop.
             const rg = new THREE.Group();
-            rg.add(chuteRolled(0, 13, 3.0, { wrap: false }));
-            rg.quaternion.setFromUnitVectors(V(0, 0, 1), V(-0.45, 0.35, -0.82).normalize());
+            rg.add(chuteRolled(-12, 12, 3.2, { wrap: false }));
             rg.position.copy(far);
+            rg.quaternion.setFromUnitVectors(V(0, 0, 1), V(-0.35, 0.1, 1).normalize());
             mg.add(rg);
-            mg.add(curvedArrow([far.clone().add(V(-4.5, 1, 4)), far.clone().add(V(-7.5, 2, -3)), far.clone().add(V(-8, 2.5, -9))], 0.6));
+            const lm = h.points.loopMid;
+            mg.add(curvedArrow([far.clone().add(V(-5, 2, 1)), lm.clone().add(V(-6, 1, -6)), lm.clone().add(V(-1.5, 1, -0.5))], 0.55));
           }
+          if (st === 'loop') mg.add(curvedArrow([h.points.arrowFrom, h.points.arrowFrom.clone().add(V(0.5, 0, 3)), h.E.clone().add(V(-1.3, 1, 0.2))], 0.45));
           mg.updateMatrixWorld(true);
           const at = p => p.clone().applyMatrix4(mg.matrixWorld);
           pts[`n${i + 1}`] = V(9, 0, nz + 6).applyMatrix4(g.matrixWorld);
           if (h.points.loop) pts[`loop${i + 1}`] = at(h.points.loop);
           if (h.points.hitch) pts.hitch = at(h.points.hitch);
           pts[`knot${i + 1}`] = c.knot.clone().applyMatrix4(g.matrixWorld);
-          if (st === 'snug') pts.lines = at(V(9, c.ys + 1, z0 - 16));
-          if (st === 'through') pts.chute = at(far.clone().add(V(1, 0, -4)));
+          if (st === 'snug') pts.lines = at(V(11, c.ys + 1, z0 - 24));
+          if (st === 'loop') pts.swivel = at(h.points.swivel);
+          if (st === 'through') pts.chute = at(h.points.loopMid.clone().add(V(-7, 1, -8)));
         });
         return {
           dir: viewDir(62, -14), up: V(0, 0, 1), W: 2400, line: 2.6, margin: 2,
@@ -398,13 +475,13 @@ export function defineScenes(h) {
     // Overview: how it all hangs under the parachute. Nose on top, the lines
     // girth-hitched to the cord just under the nose, the cord (shortened, with
     // a break mark) down to the strap in the top of the body. The nose and the
-    // anchor section are cut open to show the tie bar and the strap.
+    // top of the body (D, one piece) are cut open to show the tie bar and the strap.
     recovery: {
       build(root) {
         const k = 'm18', I = R[k].info, S = I.strap;
         const lift = 92;
-        root.add(part(k, 'Anchor_Seg', { clip: cutPlane(root, V(0, 1, 0), 1) }));
-        root.add(part(k, 'Aft', { rot: 30 }));
+        // Only the top of the body is cut open: a window above z = S.z_bot - 14.
+        root.add(part(k, S.part, { clip: [new THREE.Plane(V(0, 1, 0), 1), new THREE.Plane(V(0, 0, -1), S.z_bot - 14)], clipAnd: true }));
         root.add(part(k, 'Nose', { dz: lift, clip: cutPlane(root, V(0, 1, 0), 1.3) }));
         const nz = I.nose.placement_z + lift;
         const sr = strapRig(I, { top: 9 });
@@ -421,8 +498,9 @@ export function defineScenes(h) {
         root.add(breakMark(mid, dir, { len: 13, gap: gap + 3, t: 1.6 }));
         // The parachute: canopy above, its lines down round the nose to the hitch.
         const z0 = nr.below - 1.4;
-        const conf = V(nr.x + 4, nr.ys, z0 - 2);
-        const h = larks(nr.x, nr.ys, z0, 'snug', conf.clone());
+        const E = swivelRig(nr.x, nr.ys, z0, 'snug', V(0, 0, 0)).E;   // where the swivel's eye hangs
+        const conf = E.clone().add(V(0.6, 0, -1.2));
+        const h = swivelRig(nr.x, nr.ys, z0, 'snug', conf);
         root.add(h.group);
         const rc = 96, apex = nz + 178;
         root.add(chuteOpen(V(0, 0, apex), rc, conf, { gores: 8, depth: 0.32 }));
@@ -432,7 +510,7 @@ export function defineScenes(h) {
           points: {
             nose: V(-I.body_od / 2, 0, nz + 32), body: V(-I.body_od / 2, 0, S.z_bot - 6),
             chute: V(-rc * 0.55, 0, apex - 12), cord: mid.clone().add(V(0, 0, -14)), lines: V(-38, 0, nz + 80), brk: mid,
-            tiebar: V(-3, 0, nz + 1), strap: V(-S.spring * 0.4, S.front, S.z_top - 1.5), hitch: V(nr.x, nr.ys, z0),
+            tiebar: V(-3, 0, nz + 1), strap: V(-S.spring * 0.4, S.front, S.z_top - 1.5), hitch: h.points.swivel,
           },
         };
       },
@@ -440,7 +518,7 @@ export function defineScenes(h) {
 
     // Step 7: folding the parachute, four pictures: flat (fold line), half
     // (fold line), thin wedge with the lines laid back along it (side fold
-    // lines), rolled next to the anchor section B for size.
+    // lines), rolled next to the top of the body tube for size.
     chute_fold: {
       build(root) {
         const pts = {};
@@ -498,7 +576,8 @@ export function defineScenes(h) {
         row2.add(curvedArrow([V(ax - 3, wy + 9, 1), V(ax + 2, wy + 6, 1), V(ax + 3, wy * 0.45, 1)], 0.9));
         row2.add(curvedArrow([V(ax - 3, -wy - 9, 1), V(ax + 2, -wy - 6, 1), V(ax + 3, -wy * 0.45, 1)], 0.9));
         pts.f3 = V(x3 + 8, -wy - 4 + dy2, 0);
-        // 4. rolled, lines wrapped, beside B (anchor section, cut open) for size: real scale
+        // 4. rolled, lines wrapped, beside the top of the body tube (D of the
+        // Starter, cut open, its open top toward the roll) for size: real scale
         const x4 = 120;
         const I = R.m18.info, ri = I.body_id / 2;
         const rollLen = 46, rollR = ri * 0.74;
@@ -506,16 +585,17 @@ export function defineScenes(h) {
         roll.rotation.y = Math.PI / 2;
         roll.position.set(x4, 0, 0);
         row2.add(roll);
+        const aft = P('m18', 'Aft'), win = 62;
         const tubeG = new THREE.Group();
-        tubeG.rotation.y = Math.PI / 2;
+        tubeG.rotation.y = -Math.PI / 2;   // rocket z -> -x: the top end faces the roll
+        tubeG.position.set(x4 + rollLen + 26 + aft.zmax, 0, 0);
         row2.add(tubeG);
-        const anc = P('m18', 'Anchor_Seg');
-        tubeG.position.set(x4 + rollLen + 26 - anc.zmin, 0, 0);
         tubeG.updateMatrixWorld(true);
-        tubeG.add(part('m18', 'Anchor_Seg', { clip: [new THREE.Plane(V(0, 0, -1), 0)] }));
+        tubeG.add(part('m18', 'Aft', { clip: [...cutPlane(tubeG, V(0, 0, 1), -(aft.zmax - win)), new THREE.Plane(V(0, 0, -1), 0)] }));
         row2.add(arrow(V(x4 + rollLen + 4, 0, 4), V(x4 + rollLen + 22, 0, 4), 1.0));
+        row2.add(ball(V(x4 + rollLen + 26 + win + 2, 0, 0), 0.01, COL.paper, { outline: false }));  // frame the cut end (it has no vertices)
         pts.f4 = V(x4 + 6, -rollR + dy2, 0);
-        pts.B = V(x4 + rollLen + 26 + (anc.zmax - anc.zmin) * 0.55, -I.body_od / 2 + dy2, 0);
+        pts.B = V(x4 + rollLen + 26 + win * 0.45, -I.body_od / 2 + dy2, 0);
         return { dir: V(0, 0, 1), up: V(0, 1, 0), W: 2400, line: 3.0, margin: 4, points: pts };
       },
     },
@@ -527,7 +607,6 @@ export function defineScenes(h) {
         const g = sideways(root);
         const clip = cutPlane(g);
         g.add(part(k, 'Aft', { clip }));
-        g.add(part(k, 'Anchor_Seg', { clip }));
         const lift = 34;
         g.add(part(k, 'Nose', { dz: lift, clip }));
         g.add(part(k, 'Motor_Cap', { clip }));
@@ -552,7 +631,7 @@ export function defineScenes(h) {
         g.add(rope(zz, cordR, { ends: [false, false] }));
         // The parachute's lines, from the roll up to their hitch under the nose.
         const zh = nr.below - 1.4;
-        const h = larks(nr.x, nr.ys, zh, 'snug', V(2, 2, rollZ + rollL + 1));
+        const h = swivelRig(nr.x, nr.ys, zh, 'snug', V(2, 2, rollZ + rollL + 1));
         g.add(h.group);
         g.add(arrow(V(0, I.body_od / 2 + 9, I.nose.placement_z + lift + 18), V(0, I.body_od / 2 + 9, I.nose.placement_z + 4), 1.1));
         return {
@@ -630,7 +709,7 @@ export function defineScenes(h) {
         const la = deg(I.lug_angle_deg + rot), lr = I.lug.center_r;
         const rx = lr * Math.cos(la), ry = lr * Math.sin(la);
         const base = -I.lug.standoff_h;
-        for (const p of ['Aft', 'Motor_Cap', 'Anchor_Seg', 'Nose']) root.add(part(k, p, { rot }));
+        for (const p of ['Aft', 'Motor_Cap', 'Nose']) root.add(part(k, p, { rot }));
         root.add(part(k, 'Rod_Standoff', { rot, color: COL.focus }));
         root.add(cyl(I.rod_diameter / 2, base - 4, 360, COL.steel).translateX(rx).translateY(ry));
         const plate = new THREE.BoxGeometry(110, 110, 2);

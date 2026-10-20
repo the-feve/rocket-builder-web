@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Rockets and Model Rocketry: teacher guide, grades 3–5</title>
+<style>
+@font-face{font-family:"Inter";src:url(/static/fonts/inter.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:"Space Grotesk";src:url(/static/fonts/space-grotesk.woff2) format("woff2");font-weight:300 700}
+:root{--night:#12203A;--paper:#F6F1E7;--white:#FFFDF8;--orange:#F2652B;--sky:#3D8BFD;--red:#E5484D;--green:#2FB67C;--grey:#5E5E63;
+ --line:#D9CFBA;--card:#F3EEE3;--sky-100:#E6EFFE;--red-100:#FCE6E6;--green-100:#E3F4EA;--amber-100:#FBF1DC;
+ --chamfer:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px)}
+@page{size:Letter;margin:.6in .62in .7in;
+ @bottom-left{content:"Rocket Builder · Rockets & Model Rocketry · Teacher guide, grades 3–5";font:500 7.5pt Inter,sans-serif;color:#5E5E63}
+ @bottom-right{content:"Page " counter(page);font:600 7.5pt "Space Grotesk",sans-serif;color:#5E5E63}}
+@page cover{margin:0;@bottom-left{content:none}@bottom-right{content:none}}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:var(--night)}
+body{font:9.6pt/1.45 Inter,system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+h1,h2,h3,h4,.kicker,.sec{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.01em;line-height:1.15}
+h2{font-size:13pt;margin:14pt 0 5pt;padding-bottom:3pt;border-bottom:1.5px solid var(--night);break-after:avoid}
+h3{font-size:11pt;margin:10pt 0 4pt;break-after:avoid}
+p{margin:0 0 5pt}ul,ol{margin:0 0 6pt;padding-left:1.25em}li{margin:0 0 2pt}
+b,strong{font-weight:650}
+a{color:inherit;text-decoration:none}
+table{border-collapse:collapse;width:100%;font-size:8.6pt;margin:3pt 0 8pt;break-inside:auto}
+th,td{text-align:left;vertical-align:top;padding:3pt 5pt;border-bottom:1px solid var(--line)}
+th{font:700 7.4pt/1.2 "Space Grotesk",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);border-bottom:1.5px solid var(--night)}
+tr{break-inside:avoid}
+/* Cover */
+.cover{page:cover;width:8.5in;height:11in;position:relative;overflow:hidden;background:var(--white);display:flex;flex-direction:column}
+.cover .band{margin:0;padding:.42in .62in .34in;display:flex;align-items:center;gap:12pt}
+.cover .band svg{width:46pt;height:46pt;color:var(--paper)}
+.cover .band .lock b{display:block;font:700 21pt/1 "Space Grotesk",sans-serif;color:var(--paper)}
+.cover .band .lock small{font:600 7.5pt/1 "Space Grotesk",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#A9B4C8}
+.cover .inner{padding:.45in .62in 0;flex:1;display:flex;flex-direction:column}
+.cover .kicker{font:700 10pt/1 "Space Grotesk",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#B8471B}
+.cover h1{font-size:40pt;margin:10pt 0 6pt;line-height:1.02}
+.cover .sub{font-size:13pt;max-width:5.8in;margin-bottom:12pt}
+.cover svg.arc{width:100%;height:1.6in;margin:4pt 0 10pt}
+.cover .chips{display:flex;flex-wrap:wrap;gap:5pt;margin:4pt 0 12pt}
+.cover .chips span{font:700 8.5pt/1 "Space Grotesk",sans-serif;border:1.5px solid var(--night);padding:4pt 6pt;border-radius:3px}
+.cover .inside{display:grid;grid-template-columns:1fr 1fr;gap:2pt 20pt;font-size:9pt;padding-left:1.1em;margin-top:4pt}
+.cover .toc{columns:2;column-gap:20pt;font-size:9.4pt;padding:0;list-style:none}
+.cover .toc li{break-inside:avoid;margin:0 0 4pt;display:flex;gap:6pt}
+.cover .toc .tag{min-width:20pt}
+.cover .foot{margin-top:auto;padding:12pt .62in .35in;font-size:8pt;color:var(--grey);border-top:1px solid var(--line)}
+.cover .warn{margin-top:8pt}
+/* Header band for each part and lesson */
+.band{background:var(--night);color:var(--paper);display:flex;align-items:center;gap:10pt;padding:9pt 12pt;margin:0 0 0;border-radius:4px 4px 0 0}
+.band svg{width:24pt;height:24pt;color:var(--paper);flex:none}
+.band .t{flex:1}
+.band .t small{display:block;font:600 7pt/1 "Space Grotesk",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#A9B4C8;margin-bottom:3pt}
+.band .t h1{font-size:17pt;margin:0;color:var(--paper)}
+.band .badge{font:700 11pt/1 "Space Grotesk",sans-serif;background:var(--orange);color:var(--night);padding:6pt 9pt;clip-path:var(--chamfer)}
+.fletch{height:12px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 40 48'%3E%3Cpath d='M1 4L17 24L1 44H10L26 24L10 4Z' fill='%23F2652B'/%3E%3Cpath d='M15 4L31 24L15 44H24L40 24L24 4Z' fill='%2312203A'/%3E%3C/svg%3E") repeat-x left center/12px 14px;margin:0 0 10pt}
+.part,.lesson{break-before:page}
+.meta{font-size:9pt;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:5pt 8pt;margin-bottom:8pt}
+/* Steps, callouts, boxes */
+h3.step{display:flex;align-items:center;gap:7pt}
+h3.step .n{display:inline-grid;place-items:center;width:19pt;height:19pt;background:var(--orange);color:var(--night);font:700 11pt/1 "Space Grotesk",sans-serif;clip-path:var(--chamfer);flex:none}
+.tag{display:inline-grid;place-items:center;height:15pt;padding:0 4pt;background:var(--night);color:var(--paper);font:700 8.5pt/1 "Space Grotesk",sans-serif;clip-path:var(--chamfer)}
+.stdbox{border:1.5px solid var(--night);border-radius:4px;padding:2pt 8pt 4pt;margin:0 0 8pt;break-inside:avoid}
+.stdbox h2{border:0;margin:4pt 0 2pt;font-size:10.5pt;text-transform:uppercase;letter-spacing:.08em}
+.stdbox td:first-child{white-space:nowrap;font-weight:650}
+.call{border-left:4px solid;padding:5pt 9pt 3pt;border-radius:0 4px 4px 0;margin:4pt 0 8pt;break-inside:avoid}
+.call .lab,blockquote .lab{display:block;font:700 7.2pt/1 "Space Grotesk",sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3pt}
+.call.safety{background:var(--red-100);border-color:var(--red)}.call.safety .lab{color:#C22E33}
+.call.tip{background:var(--sky-100);border-color:var(--sky)}.call.tip .lab{color:#1D5BC4}
+section.call.notes{background:var(--sky-100);border-color:var(--night);border-left-width:5px;padding-top:2pt;break-inside:auto}
+section.call.notes h2{border:0;margin:4pt 0 3pt;font-size:10.5pt;text-transform:uppercase;letter-spacing:.08em}
+section.call.rules h2{border:0;margin:4pt 0}
+blockquote{margin:3pt 0 8pt;padding:6pt 10pt 2pt;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:0 4px 4px 0;background:var(--white);font-size:9.8pt;break-inside:avoid}
+blockquote .lab{color:#B8471B}
+.answers{border:1.5px dashed var(--night);border-radius:4px;padding:3pt 9pt 1pt;margin:2pt 0 8pt;break-inside:avoid}
+.answers .lab{display:block;font:700 7.2pt/1 "Space Grotesk",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin:3pt 0}
+figure.dg{margin:4pt 0 9pt;break-inside:avoid;text-align:center}
+figure.dg svg{width:100%;max-width:6.9in;height:auto;display:block;margin:0 auto}
+figure.dg figcaption{font-size:8pt;color:var(--grey);text-align:left;margin-top:2pt}
+.endnote{margin-top:14pt}
+
+.dg-o{fill:none;stroke:#12203A;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.dg-w{fill:#FFFDF8;stroke:#12203A;stroke-width:2.4;stroke-linejoin:round}
+.dg-f{fill:#DDEAFF;stroke:#12203A;stroke-width:2.4;stroke-linejoin:round}
+.dg-p{fill:#FDE3D6;stroke:#12203A;stroke-width:2.4;stroke-linejoin:round}
+.dg-g{fill:#E2D9C6;stroke:#12203A;stroke-width:2.4;stroke-linejoin:round}
+.dg-n{fill:#12203A}
+.dg-thin{fill:none;stroke:#12203A;stroke-width:1.4}
+.dg-lead{fill:none;stroke:#6E6E73;stroke-width:1.3}
+.dg-dash{fill:none;stroke:#3D8BFD;stroke-width:2.4;stroke-dasharray:9 7;stroke-linecap:round}
+.dg-arc{fill:none;stroke:#12203A;stroke-width:2;stroke-dasharray:9 7;stroke-linecap:round}
+.dg-t{font:500 15px Inter,system-ui,sans-serif;fill:#12203A}
+.dg-tb{font:700 15px Inter,system-ui,sans-serif;fill:#12203A}
+.dg-ts{font:500 12.5px Inter,system-ui,sans-serif;fill:#6E6E73}
+.dg-th{font:700 17px "Space Grotesk",Inter,sans-serif;fill:#12203A}
+.dg-cl{font:700 14px "Space Grotesk",Inter,sans-serif;fill:#FFFDF8}
+</style></head>
+<body>
+<!-- Generated by docs/curriculum/tools/build_site.py from docs/curriculum/elementary/*.md. -->
+<section class="cover">
+<div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="lock"><b>Rocket Builder</b><small>by Quiver Design Works</small></div></div>
+<div class="fletch" style="margin:0"></div>
+<div class="inner">
+<p class="kicker">Teacher guide · Grades 3–5 · 8 lessons</p>
+<h1>Rockets &amp; Model Rocketry</h1>
+<p class="sub">Elementary track. Lesson plans built on the Washington State K–12 Science Learning Standards (NGSS), with standards, "I can…" goals, materials, steps, checks with answers and teacher notes.</p>
+<svg class="arc" viewBox="0 0 700 150" aria-hidden="true"><path d="M20 140 Q300 -60 680 120" fill="none" stroke="#12203A" stroke-width="3" stroke-dasharray="10 8"/>
+<g transform="translate(250 50) rotate(-6)"><path d="M150 -9 C170 -9 186 -4 196 0 C186 4 170 9 150 9 Z" fill="#F2652B"/><rect x="40" y="-9" width="110" height="18" fill="#12203A"/><path d="M62 -9 L40 -30 L28 -30 L40 -9 Z M62 9 L40 30 L28 30 L40 9 Z" fill="#3D8BFD"/></g></svg>
+<div class="chips"><span>3-5-ETS1-1</span><span>3-5-ETS1-2</span><span>3-5-ETS1-3</span><span>3-PS2-1</span><span>3-PS2-2</span><span>4-PS3-1</span><span>5-PS2-1</span></div>
+<h2>The lessons</h2>
+<ol class="toc"><li><span class="tag">1</span>Push and go: balloon rockets</li><li><span class="tag">2</span>Up and down: forces on a straw rocket</li><li><span class="tag">3</span>Find the pattern: launch angles</li><li><span class="tag">4</span>Fins and balance: why rockets fly straight</li><li><span class="tag">5</span>Be an engineer: design a stomp rocket</li><li><span class="tag">6</span>Test it, fix it: fair tests and improvements</li><li><span class="tag">7</span>Parachutes: coming down gently</li><li><span class="tag">8</span>Launch day: how high did it go?</li></ol>
+<h2>Inside this guide</h2>
+<ul class="inside"><li>How to use this guide: lessons at a glance, materials, Rocket Builder</li><li>Standards map and the full standards text</li>
+<li>Safety rules for paper rockets</li><li>8 lesson plans with diagrams, answer keys and teacher notes</li></ul>
+<div class="call safety warn"><span class="lab">Safety</span><p>Paper and air rockets only for students. Model rocket motors and kits are rated 12+ and only adults handle them.</p></div>
+</div>
+<div class="foot">Free lessons from Rocket Builder by Quiver Design Works · rocket.quiverdesignworks.net/learn/elementary · Worksheets: a separate PDF at the same address. Free to copy for classrooms, co-ops and home school.</div>
+</section><section class="part"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Teacher guide · Grades 3–5</small><h1>How to use this guide</h1></div></div><div class="fletch"></div><p><em>Eight 45-minute lessons with paper rockets. Built on the Washington State K–12 Science Learning Standards (the NGSS). Goes with <strong>Rocket Builder by Quiver Design Works</strong> (<a href="https://rocket.quiverdesignworks.net/">rocket.quiverdesignworks.net</a>), used on a projector or tablets.</em></p>
+<p>Students build and fly balloon, straw and stomp rockets, test fins and parachutes like engineers, and finish with a launch day. Rocket Builder is a class tool: the teacher (or a student "driver") designs rockets on the projector, shows the balance point and push point, and plays the simulated launch. A 3D-printed rocket can appear as an optional instructor demo. <strong>No motors for students:</strong> model rocket motors and kits are rated 12+.</p><h2>Lessons at a glance</h2><div><table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>Big idea</th>
+<th>Hands-on</th>
+<th>Rocket Builder</th>
+<th>Worksheet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Every push has a push back</td>
+<td>Balloon rockets on a string</td>
+<td>Optional: ▶ Watch it launch</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Forces on a rocket; gravity pulls down</td>
+<td>Build and fly straw rockets</td>
+<td>Call out the parts of the flight</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Patterns help us predict</td>
+<td>Launch-angle test with a squeeze launcher</td>
+<td></td>
+<td>E3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Fins and balance</td>
+<td>Swing test: no fins, fins, clay in the nose</td>
+<td>Find the blue and red dots</td>
+<td>E4</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Criteria and constraints</td>
+<td>Design and build a stomp rocket</td>
+<td>Compare two designs</td>
+<td>E5</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Test, find the failure, improve</td>
+<td>Stomp-rocket fair tests</td>
+<td>Optional: change one thing, build</td>
+<td>E6</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Parachutes and gravity</td>
+<td>Parachute drop test</td>
+<td>Which parachute? card</td>
+<td>E7</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Launch day</td>
+<td>Stomp launches, 45° tracking, parachute rocket</td>
+<td>Compare with the app's predicted height</td>
+<td>E8, 45° card, certificate</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Short on time?</strong> Lessons 1, 2, 4, 7 and 8 make a 5-lesson unit. Lessons 5 and 6 can be one longer block (about 90 minutes).</p><h2>Materials</h2><p>Most of it is classroom or household stuff. Rough 2026 US prices for a class of about 25:</p>
+<div><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Lessons</th>
+<th>About</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Safety glasses, one per student (kids' sizes)</td>
+<td>2, 3, 6, 8</td>
+<td>$40–75 for a class set</td>
+</tr>
+<tr>
+<td>Long balloons (latex-free if needed), string or fishing line, straws</td>
+<td>1, 2, 3</td>
+<td>$10</td>
+</tr>
+<tr>
+<td>Paper, cardstock, index cards, tape, scissors, paper-towel tubes, modeling clay</td>
+<td>2–6</td>
+<td>on hand</td>
+</tr>
+<tr>
+<td>Empty 500 ml bottles for squeeze launchers</td>
+<td>3</td>
+<td>free</td>
+</tr>
+<tr>
+<td>Protractors</td>
+<td>3, 8</td>
+<td>$1–3 each</td>
+</tr>
+<tr>
+<td>Stomp-rocket launcher (kit) or DIY: 2-litre bottle, 1 m of ¾-inch (about 2 cm) PVC pipe, duct tape</td>
+<td>5, 6, 8</td>
+<td>$15–25 kit, $5–8 DIY</td>
+</tr>
+<tr>
+<td>Plastic bags, thread, washers or binder clips, stopwatches</td>
+<td>7</td>
+<td>on hand</td>
+</tr>
+<tr>
+<td>A projector or tablets with Rocket Builder</td>
+<td>1, 2, 4, 5, 7, 8</td>
+<td>free app, no account needed</td>
+</tr>
+</tbody>
+</table></div><h2>Using Rocket Builder with grades 3–5</h2><ul>
+<li>Open <a href="https://rocket.quiverdesignworks.net/">rocket.quiverdesignworks.net</a> in <strong>Beginner</strong> mode on the projector. No account, download or install.</li>
+<li><strong>Build my rocket</strong>, then point at the <strong>blue dot</strong> (balance point) and the <strong>red dot</strong> (push point), and the stability score (green is good).</li>
+<li><strong>▶ Watch it launch</strong> plays the flight: liftoff, push, coast, top, parachute, landing.</li>
+<li>On tablets, groups can try their own designs. Keep it on screen: no downloads, prints or orders in this track.</li>
+</ul><h2>Optional: the 3D-printed rocket as an instructor demo</h2><ul>
+<li><strong>Lesson 4, show-and-tell:</strong> a printed Rocket Builder rocket with no motor. Students hold it, find its balance point and compare it with the app.</li>
+<li><strong>Lesson 8, flight demo:</strong> only if an adult experienced with model rockets runs it under the NAR Model Rocket Safety Code, on a big enough field, with students behind a spectator line. Or visit a local NAR club launch. See the <a href="/learn/elementary/safety">safety page</a>.</li>
+</ul><h2>Worksheets</h2><p>The <a href="/learn/elementary/worksheets">elementary worksheets</a> (US Letter, big type, lots of pictures, little writing): E1–E8 (one per lesson), a parts-of-a-rocket page, the paper-rocket safety pledge, 45° sighting cards, a Rocket Scientist certificate and the answer key. Print at 100%.</p><h2>Further resources</h2><ul>
+<li>Apogee Components, <a href="https://www.apogeerockets.com/Teach-with-Model-Rockets">Teach with Model Rockets</a>: their free <em>Rocketry Reservoir</em> handout pack (parts of a rocket, flight phases, colouring pages, certificates) and lessons for grades 5–8, including <em>The Optimum Descent Challenge</em> (a parachute lesson). They are written for kit rockets with motors, so use the ideas, not the motor flights.</li>
+<li>National Association of Rocketry: <a href="https://www.nar.org/">nar.org</a> for the safety code and local club launches.</li>
+</ul></section><section class="part"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Teacher guide · Grades 3–5</small><h1>Standards</h1></div></div><div class="fletch"></div><h2>Standards map</h2><p>Codes are the Washington State K–12 Science Learning Standards adopted in 2013 (the NGSS performance expectations); see <a href="/learn/teachers">Standards</a> for the full text, the sources, and the matching codes in the new WA Science 2026 draft.</p>
+<div><table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>Performance expectations</th>
+<th>Science and engineering practice</th>
+<th>Crosscutting concept</th>
+<th>Math / ELA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Balloon rockets</td>
+<td>3-PS2-1</td>
+<td>Planning and carrying out investigations</td>
+<td>Cause and effect</td>
+<td>3.MD.B.3</td>
+</tr>
+<tr>
+<td>2 Straw rockets</td>
+<td>3-PS2-1, 5-PS2-1</td>
+<td>Engaging in argument from evidence</td>
+<td>Cause and effect</td>
+<td></td>
+</tr>
+<tr>
+<td>3 Launch angles</td>
+<td>3-PS2-2</td>
+<td>Planning and carrying out investigations</td>
+<td>Patterns</td>
+<td>4.MD.C.6, 3.MD.B.3</td>
+</tr>
+<tr>
+<td>4 Fins and balance</td>
+<td>3-5-ETS1-3, 3-PS2-1</td>
+<td>Planning and carrying out investigations</td>
+<td>Structure and function</td>
+<td></td>
+</tr>
+<tr>
+<td>5 Design a stomp rocket</td>
+<td>3-5-ETS1-1, 3-5-ETS1-2</td>
+<td>Asking questions and defining problems; designing solutions</td>
+<td>Influence of engineering on people</td>
+<td></td>
+</tr>
+<tr>
+<td>6 Test and improve</td>
+<td>3-5-ETS1-3, 3-5-ETS1-2</td>
+<td>Planning and carrying out investigations</td>
+<td>Cause and effect</td>
+<td></td>
+</tr>
+<tr>
+<td>7 Parachutes</td>
+<td>5-PS2-1, 3-PS2-1, 3-5-ETS1-3</td>
+<td>Planning and carrying out investigations</td>
+<td>Cause and effect</td>
+<td>3.MD.B.3</td>
+</tr>
+<tr>
+<td>8 Launch day</td>
+<td>3-PS2-2, 4-PS3-1, 3-5-ETS1-3</td>
+<td>Carrying out investigations; constructing explanations</td>
+<td>Patterns; energy and matter</td>
+<td>4.MD.C.6, SL.3.4–SL.5.4</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Disciplinary core ideas:</strong> PS2.A Forces and motion (Lessons 1–4, 7), PS2.B Types of interactions: gravity (2, 7), PS3.A Definitions of energy (8), ETS1.A–C Engineering design (4–8).</p>
+<p><strong>WA Science 2026 key experiences:</strong> student-led investigations (Lessons 1, 3, 7), student-led engineering design (5, 6) and science outdoors (3, 6, 8).</p><h2>The performance expectations, in full</h2><div><table>
+<thead>
+<tr>
+<th>PE</th>
+<th>WA 2026 code</th>
+<th>Official text</th>
+<th>Tags</th>
+<th>Lessons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-PS2-1</strong></td>
+<td>S.3.PS2.1</td>
+<td>Plan and conduct an investigation to provide evidence of the effects of balanced and unbalanced forces on the motion of an object.</td>
+<td>INV; priority</td>
+<td>1, 2, 4, 7</td>
+</tr>
+<tr>
+<td><strong>3-PS2-2</strong></td>
+<td>S.3.PS2.2</td>
+<td>Make observations and/or measurements of an object's motion to provide evidence that a pattern can be used to predict future motion.</td>
+<td></td>
+<td>3, 8</td>
+</tr>
+<tr>
+<td><strong>4-PS3-1</strong></td>
+<td>S.4.PS3.1</td>
+<td>Use evidence to construct an explanation relating the speed of an object to the energy of that object.</td>
+<td></td>
+<td>8</td>
+</tr>
+<tr>
+<td><strong>5-PS2-1</strong></td>
+<td>S.5.PS2.1</td>
+<td>Support an argument that the gravitational force exerted by Earth on objects is directed down.</td>
+<td></td>
+<td>2, 7</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-1</strong></td>
+<td>S.3-5.ETS1.1</td>
+<td>Define a simple design problem reflecting a need or a want that includes specified criteria for success and constraints on materials, time, or cost.</td>
+<td>ENG</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-2</strong></td>
+<td>S.3-5.ETS1.2</td>
+<td>Generate and compare multiple possible solutions to a problem based on how well each is likely to meet the criteria and constraints of the problem.</td>
+<td>ENG</td>
+<td>5, 6</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-3</strong></td>
+<td>S.3-5.ETS1.3</td>
+<td>Plan and carry out fair tests in which variables are controlled and failure points are considered to identify aspects of a model or prototype that can be improved.</td>
+<td>ENG</td>
+<td>4, 6, 7, 8</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not used: K-2-ETS1 (the K–2 engineering PEs). The elementary track starts at grade 3; a younger sibling can join the balloon, straw and parachute activities, which also fit K-2-ETS1-1 to K-2-ETS1-3.</p><p>Sources, the new WA Science 2026 codes and the math and ELA crosswalks: rocket.quiverdesignworks.net/learn/teachers.</p></section><section class="part"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Teacher guide · Grades 3–5</small><h1>Safety</h1></div></div><div class="fletch"></div><p>Read this page before Lesson 1, and again before launch day (Lesson 8).</p>
+<h2 id="the-big-rules">The big rules</h2>
+<ol>
+<li><strong>Paper rockets only.</strong> In the elementary track, students fly balloon, straw and stomp (air-pressure) rockets. Model rocket motors and Rocket Builder kits are rated <strong>12+</strong>, and students under 12 don't handle or fly them.</li>
+<li><strong>Glasses on</strong> for straw and stomp rockets, for everyone nearby.</li>
+<li><strong>Never aim</strong> a rocket at a person, an animal or a window.</li>
+<li><strong>Wait for "launch!"</strong> Count down out loud. Nobody blows, squeezes or stomps until "launch!", and only when everyone is behind the line.</li>
+<li><strong>Never chase a rocket</strong> into a road, a tree, a power line or a neighbour's yard. Tell an adult.</li>
+</ol>
+<h2 id="rules-for-each-activity">Rules for each activity</h2>
+<ul>
+<li><strong>Balloon rockets (Lesson 1):</strong> nobody stands at the end of the string. Use latex-free balloons if anyone has a latex allergy.</li>
+<li><strong>Straw rockets (Lessons 2, 3):</strong> glasses on. One straw per person. Launch in one direction only, and fetch rockets only when the adult says "clear".</li>
+<li><strong>Swing test (Lesson 4):</strong> outdoors or in a big room, a string about 1 m long, nobody within 3 m, one swinger at a time.</li>
+<li><strong>Stomp rockets (Lessons 5, 6, 8):</strong> glasses on. Only the stomper goes near the launcher. Nobody stands in front of or leans over the pipe. Load the rocket only when the stomper is off the bottle.</li>
+<li><strong>Parachute drops (Lesson 7):</strong> an adult does any dropping from a height. Students stay off chairs and tables.</li>
+<li><strong>Tracking (Lesson 8):</strong> never look at the sun.</li>
+</ul>
+<h2 id="launch-team-jobs">Launch team jobs</h2>
+<div><table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Who</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Countdown caller</td>
+<td>A student</td>
+</tr>
+<tr>
+<td>Stomper</td>
+<td>A student (one at a time)</td>
+</tr>
+<tr>
+<td>Trackers (45° cards)</td>
+<td>Two students</td>
+</tr>
+<tr>
+<td>Recorder (launch log)</td>
+<td>A student</td>
+</tr>
+<tr>
+<td>Recovery crew</td>
+<td>Students, only when the adult says "clear"</td>
+</tr>
+<tr>
+<td>Launch boss: checks the area and says "clear"</td>
+<td>An adult</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="about-the-3d-printed-rocket-demo">About the 3D-printed rocket demo</h2>
+<p>Rocket Builder's printed rockets fly on real model rocket motors, which are rated 12+. In this track the printed rocket is <strong>optional and run by the instructor</strong>:</p>
+<ul>
+<li><strong>Show-and-tell (Lesson 4):</strong> a printed rocket with <strong>no motor</strong> in it. Students can hold it and find its balance point.</li>
+<li><strong>Flight demo (Lesson 8, optional):</strong> only an adult experienced with model rockets, following the <a href="/learn/middle/safety">NAR Model Rocket Safety Code</a>, on a field big enough for the motor. Students watch from behind a spectator line at least 30 feet (10 m) from the pad, never handle motors, igniters or the launch key, and never go to the pad. Visiting a local NAR club launch as spectators is an easy alternative.</li>
+</ul>
+<p>Rocket Builder itself is safe for any age: in the elementary track it is used on a projector or tablet only, with no downloads, prints or orders.</p></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 1 of 8 · Grades 3–5</small><h1>Push and go: balloon rockets</h1></div><span class="badge">Lesson 1</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E1 Balloon rocket. <strong>Rocket Builder:</strong> optional, on the projector at the end.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-PS2-1</strong></td>
+<td>Test how even (balanced) and uneven (unbalanced) pushes change the way something moves.</td>
+</tr>
+<tr>
+<td><strong>3.MD.B.3</strong> (math)</td>
+<td>Show results on a bar graph.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> planning and carrying out investigations. <strong>Crosscutting concept:</strong> cause and effect.</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can explain that a rocket pushes air or gas out the back, and the air pushes the rocket forward.</li>
+<li>I can tell an even push (nothing changes) from an uneven push (it starts, stops, speeds up or turns).</li>
+<li>I can run a fair test where I change only one thing.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Force</strong>: a push or a pull.</li>
+<li><strong>Balanced forces</strong>: pushes that are even. Nothing changes.</li>
+<li><strong>Unbalanced forces</strong>: pushes that are not even. Something starts moving, stops, speeds up or turns.</li>
+<li><strong>Thrust</strong>: the push that moves a rocket forward.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<p>For each group of 3–4:</p>
+<ul>
+<li>2 long balloons (latex-free if anyone has an allergy)</li>
+<li>4–5 m of string or fishing line, tied between two chairs</li>
+<li>1 drinking straw, tape, a binder clip or clothespin (to hold the balloon shut)</li>
+<li>A tape measure or metre stick</li>
+<li>Worksheet E1 and a pencil</li>
+</ul>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<p>Blow up a balloon, hold it up, and let it go without tying it. Ask: <em>Which way did the air go? Which way did the balloon go?</em></p>
+<h3 id="2-learn-10-minutes" class="step"><span class="n">2</span> Learn (10 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p>When you let go of the balloon, the air rushed out the back. The air pushed back on the balloon, and the balloon zoomed forward. Every push has a push back. A real rocket does the same thing: it pushes hot gas out the back, and the gas pushes the rocket up. That push is called <strong>thrust</strong>.</p>
+<p>Before you let go, your fingers held the balloon still. The pushes were <strong>even</strong>, or <strong>balanced</strong>, so nothing moved. When you let go, the push was <strong>uneven</strong>, or <strong>unbalanced</strong>, so the balloon moved.</p>
+</blockquote>
+<h3 id="3-do-balloon-rockets-on-a-string-20-minutes" class="step"><span class="n">3</span> Do: balloon rockets on a string (20 minutes)</h3>
+<figure class="dg" id="fig-balloon-steps"><svg class="dg" viewBox="0 0 760 210" role="img" aria-label="Four steps to set up a balloon rocket" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="178" height="196" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M22 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="32.0" y="36.0" text-anchor="middle" class="dg-th">1</text><text x="54.0" y="36.0" text-anchor="start" class="dg-th">Thread</text><text x="97.0" y="190.0" text-anchor="middle" class="dg-ts">string through the straw</text><line x1="22" y1="110" x2="172" y2="110" class="dg-thin" style="stroke-width:2"/><rect x="57" y="103" width="80" height="14" rx="4" class="dg-w"/><line x1="147.0" y1="90.0" x2="156.4" y2="90.0" stroke="#F2652B" stroke-width="3.5"/><path d="M171.0 90.0L156.4 98.2L156.4 81.8Z" fill="#F2652B"/><rect x="196" y="6" width="178" height="196" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M210 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="220.0" y="36.0" text-anchor="middle" class="dg-th">2</text><text x="242.0" y="36.0" text-anchor="start" class="dg-th">Tie</text><text x="285.0" y="190.0" text-anchor="middle" class="dg-ts">string tight, 4 m or more</text><path d="M218 168L218 123.0L263.0 123.0L263.0 168M218 123.0L218 78" class="dg-o" style="stroke-width:5"/><path d="M352 168L352 123.0L307.0 123.0L307.0 168M352 123.0L352 78" class="dg-o" style="stroke-width:5"/><line x1="218" y1="96" x2="352" y2="96" class="dg-thin" style="stroke-width:2"/><rect x="384" y="6" width="178" height="196" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M398 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="408.0" y="36.0" text-anchor="middle" class="dg-th">3</text><text x="430.0" y="36.0" text-anchor="start" class="dg-th">Blow up</text><text x="473.0" y="190.0" text-anchor="middle" class="dg-ts">pinch or clip the end</text><ellipse cx="479" cy="112" rx="52" ry="24" class="dg-p"/><path d="M427 112 L415 104 L415 120 Z" class="dg-p"/><rect x="401" y="104" width="14" height="16" rx="3" class="dg-g"/><rect x="572" y="6" width="178" height="196" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M586 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="596.0" y="36.0" text-anchor="middle" class="dg-th">4</text><text x="618.0" y="36.0" text-anchor="start" class="dg-th">Tape</text><text x="661.0" y="190.0" text-anchor="middle" class="dg-ts">balloon to the straw</text><line x1="586" y1="78" x2="736" y2="78" class="dg-thin" style="stroke-width:2"/><rect x="621" y="71" width="80" height="14" rx="4" class="dg-w"/><ellipse cx="661" cy="122" rx="56" ry="26" class="dg-p"/><rect x="633" y="84" width="9" height="22" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><rect x="680" y="84" width="9" height="22" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/></svg><figcaption>Setting up, step by step.</figcaption></figure>
+
+<ol>
+<li>Thread the string through the straw. Tie the string tight between two chairs, at least 4 m apart.</li>
+<li>Blow up a balloon <strong>a little</strong> (small). Hold the end shut with the clip. Tape the balloon to the straw, opening toward the start.</li>
+<li>Pull the straw back to the start. Take off the clip. Measure how far it went. Do it <strong>3 times</strong>.</li>
+<li>Now blow the balloon up <strong>a lot</strong> (big). Do it 3 times again.</li>
+<li>Circle the farthest try for each size on E1. Colour a bar for each one.</li>
+</ol>
+<p><strong>Fair test:</strong> only the amount of air changes. Same string, same straw, same balloon, same start line.</p>
+<figure class="dg" id="fig-balloon-setup"><svg class="dg" viewBox="0 0 760 330" role="img" aria-label="Balloon rocket on a string between two chairs" xmlns="http://www.w3.org/2000/svg"><path d="M40 270L40 195.0L115.0 195.0L115.0 270M40 195.0L40 120" class="dg-o" style="stroke-width:5"/><path d="M720 270L720 195.0L645.0 195.0L645.0 270M720 195.0L720 120" class="dg-o" style="stroke-width:5"/><line x1="10" y1="270" x2="750" y2="270" class="dg-o"/><line x1="20" y1="270" x2="12" y2="278" class="dg-lead"/><line x1="42" y1="270" x2="34" y2="278" class="dg-lead"/><line x1="64" y1="270" x2="56" y2="278" class="dg-lead"/><line x1="86" y1="270" x2="78" y2="278" class="dg-lead"/><line x1="108" y1="270" x2="100" y2="278" class="dg-lead"/><line x1="130" y1="270" x2="122" y2="278" class="dg-lead"/><line x1="152" y1="270" x2="144" y2="278" class="dg-lead"/><line x1="174" y1="270" x2="166" y2="278" class="dg-lead"/><line x1="196" y1="270" x2="188" y2="278" class="dg-lead"/><line x1="218" y1="270" x2="210" y2="278" class="dg-lead"/><line x1="240" y1="270" x2="232" y2="278" class="dg-lead"/><line x1="262" y1="270" x2="254" y2="278" class="dg-lead"/><line x1="284" y1="270" x2="276" y2="278" class="dg-lead"/><line x1="306" y1="270" x2="298" y2="278" class="dg-lead"/><line x1="328" y1="270" x2="320" y2="278" class="dg-lead"/><line x1="350" y1="270" x2="342" y2="278" class="dg-lead"/><line x1="372" y1="270" x2="364" y2="278" class="dg-lead"/><line x1="394" y1="270" x2="386" y2="278" class="dg-lead"/><line x1="416" y1="270" x2="408" y2="278" class="dg-lead"/><line x1="438" y1="270" x2="430" y2="278" class="dg-lead"/><line x1="460" y1="270" x2="452" y2="278" class="dg-lead"/><line x1="482" y1="270" x2="474" y2="278" class="dg-lead"/><line x1="504" y1="270" x2="496" y2="278" class="dg-lead"/><line x1="526" y1="270" x2="518" y2="278" class="dg-lead"/><line x1="548" y1="270" x2="540" y2="278" class="dg-lead"/><line x1="570" y1="270" x2="562" y2="278" class="dg-lead"/><line x1="592" y1="270" x2="584" y2="278" class="dg-lead"/><line x1="614" y1="270" x2="606" y2="278" class="dg-lead"/><line x1="636" y1="270" x2="628" y2="278" class="dg-lead"/><line x1="658" y1="270" x2="650" y2="278" class="dg-lead"/><line x1="680" y1="270" x2="672" y2="278" class="dg-lead"/><line x1="702" y1="270" x2="694" y2="278" class="dg-lead"/><line x1="724" y1="270" x2="716" y2="278" class="dg-lead"/><line x1="746" y1="270" x2="738" y2="278" class="dg-lead"/><line x1="40" y1="120" x2="720" y2="120" class="dg-thin" style="stroke-width:2"/><rect x="300" y="113" width="120" height="14" rx="4" class="dg-w"/><ellipse cx="360" cy="168" rx="92" ry="34" class="dg-p"/><path d="M268 168 L252 158 L252 178 Z" class="dg-p"/><rect x="318" y="122" width="12" height="28" fill="#E2D9C6" stroke="#12203A" stroke-width="1.5"/><rect x="392" y="122" width="12" height="28" fill="#E2D9C6" stroke="#12203A" stroke-width="1.5"/><rect x="232" y="160" width="18" height="16" rx="3" class="dg-g"/><rect x="96" y="112" width="8" height="16" fill="#F2652B"/><line x1="230.0" y1="210.0" x2="135.4" y2="210.0" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M120.0 210.0L135.4 201.4L135.4 218.6Z" fill="#3D8BFD"/><text x="175.0" y="236.0" text-anchor="middle" class="dg-tb" style="fill:#3D8BFD">air rushes out</text><line x1="470.0" y1="210.0" x2="591.4" y2="210.0" stroke="#F2652B" stroke-width="6"/><path d="M610.0 210.0L591.4 220.4L591.4 199.6Z" fill="#F2652B"/><text x="540.0" y="236.0" text-anchor="middle" class="dg-tb" style="fill:#F2652B">thrust</text><line x1="113.0" y1="296.0" x2="291.0" y2="296.0" stroke="#12203A" stroke-width="1.6"/><path d="M300.0 296.0L291.0 300.5L291.0 291.5Z" fill="#12203A"/><path d="M104.0 296.0L113.0 300.5L113.0 291.5Z" fill="#12203A"/><text x="202.0" y="320.0" text-anchor="middle" class="dg-ts">measure from the start line</text><line x1="70.0" y1="120.0" x2="70.0" y2="70.0" class="dg-lead"/><circle cx="70.0" cy="120.0" r="3" class="dg-n"/><circle cx="70.0" cy="70.0" r="12" class="dg-n"/><text x="70.0" y="75.0" text-anchor="middle" class="dg-cl">A</text><line x1="360.0" y1="113.0" x2="360.0" y2="66.0" class="dg-lead"/><circle cx="360.0" cy="113.0" r="3" class="dg-n"/><circle cx="360.0" cy="66.0" r="12" class="dg-n"/><text x="360.0" y="71.0" text-anchor="middle" class="dg-cl">B</text><line x1="400.0" y1="190.0" x2="470.0" y2="166.0" class="dg-lead"/><circle cx="400.0" cy="190.0" r="3" class="dg-n"/><circle cx="470.0" cy="166.0" r="12" class="dg-n"/><text x="470.0" y="171.0" text-anchor="middle" class="dg-cl">C</text><line x1="320.0" y1="136.0" x2="286.0" y2="66.0" class="dg-lead"/><circle cx="320.0" cy="136.0" r="3" class="dg-n"/><circle cx="286.0" cy="66.0" r="12" class="dg-n"/><text x="286.0" y="71.0" text-anchor="middle" class="dg-cl">D</text><line x1="241.0" y1="160.0" x2="222.0" y2="116.0" class="dg-lead"/><circle cx="241.0" cy="160.0" r="3" class="dg-n"/><circle cx="222.0" cy="116.0" r="12" class="dg-n"/><text x="222.0" y="121.0" text-anchor="middle" class="dg-cl">E</text><line x1="100.0" y1="112.0" x2="140.0" y2="70.0" class="dg-lead"/><circle cx="100.0" cy="112.0" r="3" class="dg-n"/><circle cx="140.0" cy="70.0" r="12" class="dg-n"/><text x="140.0" y="75.0" text-anchor="middle" class="dg-cl">F</text></svg><figcaption>The setup. A string tied tight between two chairs · B straw on the string · C balloon · D tape · E clip holds the air in · F start line.</figcaption></figure>
+
+<h3 id="4-wrap-up-10-minutes" class="step"><span class="n">4</span> Wrap up (10 minutes)</h3>
+<p>Talk about it:</p>
+<ul>
+<li>Which balloon went farther? Why? (More air means a longer push.)</li>
+<li>Where were the forces balanced? (Before letting go; at the very end, when it stopped.)</li>
+<li>Where were they unbalanced? (While the air rushed out.)</li>
+</ul>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>A balloon pushes air out the back. Which way does the balloon go?</li>
+<li>A balloon is held still on the string. Are the forces balanced or unbalanced?</li>
+<li>In our test, what was the one thing we changed?</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>Forward: the opposite way to the air.</li>
+<li>Balanced (nothing is changing).</li>
+<li>The amount of air in the balloon.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>Set up before class:</strong> tie the strings, and pre-cut tape strips. Long balloons work best; round ones work too.</li>
+<li><strong>Grade 3:</strong> compare which balloon went farther; skip measuring if time is short. <strong>Grade 5:</strong> find the average of the 3 tries (add them and divide by 3).</li>
+<li><strong>What to expect:</strong> big balloons usually go farther. If every balloon reaches the end of the string, make the string longer.</li>
+<li><strong>Rocket Builder (optional, 3 minutes):</strong> on the projector, open the app in Beginner mode, build any rocket and press <strong>▶ Watch it launch</strong>. Point out the flame at the bottom: hot gas going down, rocket going up, the same idea as the balloon.</li>
+<li><strong>Real rocket fact:</strong> a rocket does not push against the air or the ground. It pushes on its own gas, which is why rockets work in space.</li>
+<li><strong>Safety:</strong> nobody stands at the end of the string. Watch for latex allergies.</li>
+<li><strong>Projector tip:</strong> after <strong>Build my rocket</strong>, open the launch simulator in <strong>Simple mode</strong> (big buttons and text, made for a projector): press <strong>▶ Watch it launch</strong>, or add <code>&amp;simple=1</code> to the launch page's address.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 2 of 8 · Grades 3–5</small><h1>Up and down: forces on a straw rocket</h1></div><span class="badge">Lesson 2</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E2 Straw rocket forces. <strong>Rocket Builder:</strong> on the projector.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-PS2-1</strong></td>
+<td>Test how balanced and unbalanced pushes change the way something moves.</td>
+</tr>
+<tr>
+<td><strong>5-PS2-1</strong></td>
+<td>Use evidence to show that Earth's gravity pulls things down.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> engaging in argument from evidence. <strong>Crosscutting concept:</strong> cause and effect.</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can build a paper straw rocket.</li>
+<li>I can name the forces on a rocket: thrust, gravity (weight) and drag.</li>
+<li>I can use what I saw to explain why every rocket comes back down.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Gravity</strong>: the pull of the Earth. It always pulls things <strong>down</strong>, toward the middle of the Earth.</li>
+<li><strong>Weight</strong>: how hard gravity pulls on something.</li>
+<li><strong>Drag</strong>: air pushing back on something moving through it.</li>
+<li><strong>Apogee</strong>: the highest point of a flight.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<p>For each student:</p>
+<ul>
+<li>A strip of paper about 8 cm × 20 cm, a pencil, a drinking straw</li>
+<li>Tape, scissors, a small piece of cardstock for fins</li>
+<li><strong>Safety glasses</strong></li>
+<li>Worksheet E2</li>
+</ul>
+<p>For the class: a projector with Rocket Builder open (Beginner mode).</p>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<p>Toss a ball straight up. Ask: <em>Why does it always come back down? Would it come down in Australia too?</em></p>
+<h3 id="2-learn-10-minutes" class="step"><span class="n">2</span> Learn (10 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p>Three forces act on a rocket. <strong>Thrust</strong> pushes it up. <strong>Gravity</strong> pulls it down: that pull is its <strong>weight</strong>. <strong>Drag</strong> is the air pushing back, like when you put your hand out of a car window.</p>
+<p>When thrust is bigger than weight and drag, the rocket speeds up. When the push stops, gravity and drag slow it down. At the very top, called <strong>apogee</strong>, it stops going up for a moment. Then gravity pulls it back down. Everywhere on Earth, "down" means toward the middle of the Earth.</p>
+</blockquote>
+<figure class="dg" id="fig-straw-forces"><svg class="dg" viewBox="0 0 760 330" role="img" aria-label="Forces on a straw rocket in four parts of its flight" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="178" height="316" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="20.0" y="32.0" text-anchor="start" class="dg-th">1. Launch</text><path d="M86.0 138.6L97 110L108.0 138.6Z" class="dg-w"/><rect x="86.0" y="138.6" width="22" height="81.4" class="dg-w"/><path d="M86.0 184.8L68.4 217L68.4 229L86.0 220Z" class="dg-f"/><path d="M108.0 184.8L125.6 217L125.6 229L108.0 220Z" class="dg-f"/><line x1="97" y1="188.8" x2="97" y2="224" class="dg-o"/><rect x="94" y="200" width="6" height="90" class="dg-g"/><line x1="143.0" y1="230.0" x2="143.0" y2="138.6" stroke="#F2652B" stroke-width="6"/><path d="M143.0 120.0L153.4 138.6L132.6 138.6Z" fill="#F2652B"/><text x="143.0" y="112.0" text-anchor="middle" class="dg-tb" style="fill:#F2652B">thrust</text><line x1="51.0" y1="150.0" x2="51.0" y2="221.4" stroke="#12203A" stroke-width="6"/><path d="M51.0 240.0L40.6 221.4L61.4 221.4Z" fill="#12203A"/><text x="51.0" y="262.0" text-anchor="middle" class="dg-tb" style="fill:#12203A">gravity</text><rect x="196" y="6" width="178" height="316" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="208.0" y="32.0" text-anchor="start" class="dg-th">2. Going up</text><path d="M274.0 128.6L285 100L296.0 128.6Z" class="dg-w"/><rect x="274.0" y="128.6" width="22" height="81.4" class="dg-w"/><path d="M274.0 174.8L256.4 207L256.4 219L274.0 210Z" class="dg-f"/><path d="M296.0 174.8L313.6 207L313.6 219L296.0 210Z" class="dg-f"/><line x1="285" y1="178.8" x2="285" y2="214" class="dg-o"/><line x1="239.0" y1="150.0" x2="239.0" y2="221.4" stroke="#12203A" stroke-width="6"/><path d="M239.0 240.0L228.6 221.4L249.4 221.4Z" fill="#12203A"/><text x="239.0" y="262.0" text-anchor="middle" class="dg-tb" style="fill:#12203A">gravity</text><line x1="331.0" y1="90.0" x2="331.0" y2="133.0" stroke="#6E6E73" stroke-width="5" stroke-dasharray="8 6"/><path d="M331.0 150.0L321.5 133.0L340.5 133.0Z" fill="#6E6E73"/><text x="331.0" y="172.0" text-anchor="middle" class="dg-tb" style="fill:#6E6E73">drag</text><text x="285.0" y="300.0" text-anchor="middle" class="dg-ts">slowing down</text><rect x="384" y="6" width="178" height="316" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="396.0" y="32.0" text-anchor="start" class="dg-th">3. Top (apogee)</text><g transform="rotate(90 473 165.0)"><path d="M462.0 138.6L473 110L484.0 138.6Z" class="dg-w"/><rect x="462.0" y="138.6" width="22" height="81.4" class="dg-w"/><path d="M462.0 184.8L444.4 217L444.4 229L462.0 220Z" class="dg-f"/><path d="M484.0 184.8L501.6 217L501.6 229L484.0 220Z" class="dg-f"/><line x1="473" y1="188.8" x2="473" y2="224" class="dg-o"/></g><line x1="473.0" y1="200.0" x2="473.0" y2="251.4" stroke="#12203A" stroke-width="6"/><path d="M473.0 270.0L462.6 251.4L483.4 251.4Z" fill="#12203A"/><text x="473.0" y="292.0" text-anchor="middle" class="dg-tb" style="fill:#12203A">gravity</text><text x="473.0" y="70.0" text-anchor="middle" class="dg-ts">stops for a moment</text><rect x="572" y="6" width="178" height="316" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="584.0" y="32.0" text-anchor="start" class="dg-th">4. Coming down</text><g transform="rotate(180 661 165.0)"><path d="M650.0 138.6L661 110L672.0 138.6Z" class="dg-w"/><rect x="650.0" y="138.6" width="22" height="81.4" class="dg-w"/><path d="M650.0 184.8L632.4 217L632.4 229L650.0 220Z" class="dg-f"/><path d="M672.0 184.8L689.6 217L689.6 229L672.0 220Z" class="dg-f"/><line x1="661" y1="188.8" x2="661" y2="224" class="dg-o"/></g><line x1="615.0" y1="150.0" x2="615.0" y2="221.4" stroke="#12203A" stroke-width="6"/><path d="M615.0 240.0L604.6 221.4L625.4 221.4Z" fill="#12203A"/><text x="615.0" y="262.0" text-anchor="middle" class="dg-tb" style="fill:#12203A">gravity</text><line x1="707.0" y1="240.0" x2="707.0" y2="187.0" stroke="#6E6E73" stroke-width="5" stroke-dasharray="8 6"/><path d="M707.0 170.0L716.5 187.0L697.5 187.0Z" fill="#6E6E73"/><text x="707.0" y="160.0" text-anchor="middle" class="dg-tb" style="fill:#6E6E73">drag</text></svg><figcaption>The forces in each part of the flight. Orange: thrust. Navy: gravity (weight). Dashed grey: drag.</figcaption></figure>
+
+<h3 id="3-do-build-and-fly-straw-rockets-20-minutes" class="step"><span class="n">3</span> Do: build and fly straw rockets (20 minutes)</h3>
+<figure class="dg" id="fig-straw-build"><svg class="dg" viewBox="0 0 760 230" role="img" aria-label="How to build a straw rocket" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M22 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="32.0" y="36.0" text-anchor="middle" class="dg-th">1</text><text x="54.0" y="36.0" text-anchor="start" class="dg-th">Roll</text><text x="97.0" y="210.0" text-anchor="middle" class="dg-ts">paper strip around a pencil</text><g transform="rotate(-20 97 120)"><rect x="27" y="96" width="140" height="44" class="dg-w"/><rect x="21" y="112" width="152" height="12" rx="3" fill="#F0B44C" stroke="#12203A" stroke-width="2"/><path d="M21 112 L7 118 L21 124 Z" class="dg-g"/></g><line x1="117.0" y1="168.0" x2="81.6" y2="168.0" stroke="#F2652B" stroke-width="3.5"/><path d="M67.0 168.0L81.6 159.8L81.6 176.2Z" fill="#F2652B"/><rect x="196" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M210 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="220.0" y="36.0" text-anchor="middle" class="dg-th">2</text><text x="242.0" y="36.0" text-anchor="start" class="dg-th">Close</text><text x="285.0" y="210.0" text-anchor="middle" class="dg-ts">fold the top twice, tape</text><rect x="273" y="78" width="24" height="100" class="dg-w"/><path d="M273 78 L297 78 L297 66 L273 72 Z" class="dg-w"/><rect x="269" y="70" width="32" height="10" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><text x="307.0" y="76.0" text-anchor="start" class="dg-ts">tape</text><text x="307.0" y="92.0" text-anchor="start" class="dg-ts">airtight</text><rect x="384" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M398 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="408.0" y="36.0" text-anchor="middle" class="dg-th">3</text><text x="430.0" y="36.0" text-anchor="start" class="dg-th">Fins</text><text x="473.0" y="210.0" text-anchor="middle" class="dg-ts">tape 3 small fins</text><path d="M461.0 87.2L473 56L485.0 87.2Z" class="dg-w"/><rect x="461.0" y="87.2" width="24" height="88.8" class="dg-w"/><path d="M461.0 137.6L441.8 173L441.8 185L461.0 176Z" class="dg-f"/><path d="M485.0 137.6L504.2 173L504.2 185L485.0 176Z" class="dg-f"/><line x1="473" y1="141.6" x2="473" y2="180" class="dg-o"/><rect x="572" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M586 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="596.0" y="36.0" text-anchor="middle" class="dg-th">4</text><text x="618.0" y="36.0" text-anchor="start" class="dg-th">Launch</text><text x="661.0" y="210.0" text-anchor="middle" class="dg-ts">slide on a straw, one puff</text><path d="M650.0 74.6L661 46L672.0 74.6Z" class="dg-w"/><rect x="650.0" y="74.6" width="22" height="81.4" class="dg-w"/><path d="M650.0 120.8L632.4 153L632.4 165L650.0 156Z" class="dg-f"/><path d="M672.0 120.8L689.6 153L689.6 165L672.0 156Z" class="dg-f"/><line x1="661" y1="124.8" x2="661" y2="160" class="dg-o"/><rect x="658" y="120" width="6" height="64" class="dg-g"/><line x1="687.0" y1="116.0" x2="687.0" y2="70.6" stroke="#F2652B" stroke-width="3.5"/><path d="M687.0 56.0L695.1 70.6L678.9 70.6Z" fill="#F2652B"/></svg><figcaption>Building a straw rocket.</figcaption></figure>
+
+<ol>
+<li>Roll the paper strip tightly around a pencil. Tape the seam. Slide the pencil out.</li>
+<li>Fold the top over twice and tape it shut. This is the nose. It must be airtight.</li>
+<li>Cut 3 small fins (about 3 cm long) from cardstock. Tape them around the bottom.</li>
+<li><strong>Glasses on.</strong> Slide the rocket onto a straw. Aim up and away from people. Blow one sharp puff.</li>
+<li>Watch: does it go up, slow down, stop and come back down every time?</li>
+<li>On E2, draw an arrow for each force: on the launch, going up, and coming down.</li>
+</ol>
+<h3 id="4-wrap-up-with-rocket-builder-10-minutes" class="step"><span class="n">4</span> Wrap up with Rocket Builder (10 minutes)</h3>
+<p>On the projector, press <strong>▶ Watch it launch</strong>. Call out each part as the class watches: <strong>liftoff, push (boost), coast, top (apogee), parachute, landing.</strong> Ask: <em>What pulled it back down?</em></p>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>Which way does gravity always pull?</li>
+<li>Your rocket flew up and then came down. What is your evidence that gravity pulled it?</li>
+<li>Which force pushes a rocket up?</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>Down, toward the middle of the Earth.</li>
+<li>It slowed down, stopped at the top and fell back to the ground, every time. Nothing was pushing it down except gravity.</li>
+<li>Thrust.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>Safety:</strong> glasses on for everyone in the room. Launch only on your signal ("3, 2, 1, launch!"). Never aim at a person, pet or window. Straws are for one person only.</li>
+<li><strong>Make it easier:</strong> pre-roll the tubes for grade 3, or use a paper template with a line to roll along.</li>
+<li><strong>Grade 5 argument:</strong> ask students to write a claim ("Gravity pulls things down") and two pieces of evidence (their rocket, a dropped ball, people in other countries see things fall too).</li>
+<li><strong>Common mix-up:</strong> some students think the rocket "runs out of push" and that is why it falls. Gravity is pulling the whole time; it just wins once the push stops.</li>
+<li><strong>Keep the rockets</strong> for Lesson 3.</li>
+<li><strong>Force arrows:</strong> in the launch simulator (Simple mode on the projector), turn on the force arrows. Students see thrust, gravity and drag change size through the flight, the same arrows as on E2.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 3 of 8 · Grades 3–5</small><h1>Find the pattern: launch angles</h1></div><span class="badge">Lesson 3</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E3 Launch angles.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-PS2-2</strong></td>
+<td>Measure how something moves, find a pattern, and use it to predict what happens next.</td>
+</tr>
+<tr>
+<td><strong>4.MD.C.6</strong> (math)</td>
+<td>Measure angles with a protractor.</td>
+</tr>
+<tr>
+<td><strong>3.MD.B.3</strong> (math)</td>
+<td>Show results on a bar graph.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> planning and carrying out investigations. <strong>Crosscutting concept:</strong> patterns.</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can set a launch angle with a protractor.</li>
+<li>I can measure how far my rocket goes and record it.</li>
+<li>I can find a pattern in my results and use it to predict a new angle.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Angle</strong>: how much something is tilted. We measure it in <strong>degrees</strong> (°).</li>
+<li><strong>Pattern</strong>: something that happens the same way again and again.</li>
+<li><strong>Predict</strong>: say what you think will happen, using what you already know.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<p>For each group:</p>
+<ul>
+<li>Straw rockets from Lesson 2 (or new ones)</li>
+<li>A squeeze launcher: an empty plastic bottle with a straw pushed through a hole in the cap, sealed with modeling clay</li>
+<li>A protractor taped to the edge of a box or a book</li>
+<li>A tape measure, sticky notes to mark landing spots</li>
+<li><strong>Safety glasses</strong></li>
+<li>Worksheet E3</li>
+</ul>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<p>Ask: <em>If you want to throw a ball as far as you can, do you throw it flat, straight up, or in between?</em> Let students show with their arm.</p>
+<h3 id="2-learn-5-minutes" class="step"><span class="n">2</span> Learn (5 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p>Scientists look for <strong>patterns</strong>. If something happens the same way each time, we can <strong>predict</strong> what will happen next. Today we'll test which tilt, or <strong>angle</strong>, sends a rocket farthest, and look for the pattern.</p>
+</blockquote>
+<h3 id="3-do-the-angle-test-25-minutes" class="step"><span class="n">3</span> Do: the angle test (25 minutes)</h3>
+<figure class="dg" id="fig-squeeze-launcher"><svg class="dg" viewBox="0 0 760 370" role="img" aria-label="A squeeze-bottle launcher held at 45 degrees on a protractor" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 64)"><line x1="10" y1="262" x2="750" y2="262" class="dg-o"/><line x1="20" y1="262" x2="12" y2="270" class="dg-lead"/><line x1="42" y1="262" x2="34" y2="270" class="dg-lead"/><line x1="64" y1="262" x2="56" y2="270" class="dg-lead"/><line x1="86" y1="262" x2="78" y2="270" class="dg-lead"/><line x1="108" y1="262" x2="100" y2="270" class="dg-lead"/><line x1="130" y1="262" x2="122" y2="270" class="dg-lead"/><line x1="152" y1="262" x2="144" y2="270" class="dg-lead"/><line x1="174" y1="262" x2="166" y2="270" class="dg-lead"/><line x1="196" y1="262" x2="188" y2="270" class="dg-lead"/><line x1="218" y1="262" x2="210" y2="270" class="dg-lead"/><line x1="240" y1="262" x2="232" y2="270" class="dg-lead"/><line x1="262" y1="262" x2="254" y2="270" class="dg-lead"/><line x1="284" y1="262" x2="276" y2="270" class="dg-lead"/><line x1="306" y1="262" x2="298" y2="270" class="dg-lead"/><line x1="328" y1="262" x2="320" y2="270" class="dg-lead"/><line x1="350" y1="262" x2="342" y2="270" class="dg-lead"/><line x1="372" y1="262" x2="364" y2="270" class="dg-lead"/><line x1="394" y1="262" x2="386" y2="270" class="dg-lead"/><line x1="416" y1="262" x2="408" y2="270" class="dg-lead"/><line x1="438" y1="262" x2="430" y2="270" class="dg-lead"/><line x1="460" y1="262" x2="452" y2="270" class="dg-lead"/><line x1="482" y1="262" x2="474" y2="270" class="dg-lead"/><line x1="504" y1="262" x2="496" y2="270" class="dg-lead"/><line x1="526" y1="262" x2="518" y2="270" class="dg-lead"/><line x1="548" y1="262" x2="540" y2="270" class="dg-lead"/><line x1="570" y1="262" x2="562" y2="270" class="dg-lead"/><line x1="592" y1="262" x2="584" y2="270" class="dg-lead"/><line x1="614" y1="262" x2="606" y2="270" class="dg-lead"/><line x1="636" y1="262" x2="628" y2="270" class="dg-lead"/><line x1="658" y1="262" x2="650" y2="270" class="dg-lead"/><line x1="680" y1="262" x2="672" y2="270" class="dg-lead"/><line x1="702" y1="262" x2="694" y2="270" class="dg-lead"/><line x1="724" y1="262" x2="716" y2="270" class="dg-lead"/><line x1="746" y1="262" x2="738" y2="270" class="dg-lead"/><rect x="40" y="196" width="230" height="66" class="dg-g"/><path d="M156 196 A70 70 0 0 1 296 196 Z" fill="#FFFDF8" stroke="#12203A" stroke-width="1.6"/><line x1="296.0" y1="196.0" x2="278.0" y2="196.0" class="dg-thin"/><line x1="293.6" y1="177.9" x2="284.0" y2="180.5" class="dg-thin"/><line x1="286.6" y1="161.0" x2="278.0" y2="166.0" class="dg-thin"/><line x1="275.5" y1="146.5" x2="262.8" y2="159.2" class="dg-thin"/><line x1="261.0" y1="135.4" x2="256.0" y2="144.0" class="dg-thin"/><line x1="244.1" y1="128.4" x2="241.5" y2="138.0" class="dg-thin"/><line x1="226.0" y1="126.0" x2="226.0" y2="144.0" class="dg-thin"/><line x1="207.9" y1="128.4" x2="210.5" y2="138.0" class="dg-thin"/><line x1="191.0" y1="135.4" x2="196.0" y2="144.0" class="dg-thin"/><line x1="176.5" y1="146.5" x2="189.2" y2="159.2" class="dg-thin"/><line x1="165.4" y1="161.0" x2="174.0" y2="166.0" class="dg-thin"/><line x1="158.4" y1="177.9" x2="168.0" y2="180.5" class="dg-thin"/><line x1="156.0" y1="196.0" x2="174.0" y2="196.0" class="dg-thin"/><path d="M70 192 L70 150 L180 150 Q196 150 204 162 L214 162 L214 180 L204 180 Q196 192 180 192 Z" class="dg-f"/><rect x="214" y="160" width="12" height="22" rx="2" class="dg-g"/><line x1="226" y1="171" x2="332.1" y2="64.9" stroke="#E2D9C6" stroke-width="7"/><line x1="226" y1="171" x2="332.1" y2="64.9" class="dg-thin"/><g transform="rotate(45 350.06601717798213 32.43398282201788)"><path d="M341.06601717798213 8.333982822017884L350.06601717798213 -15.066017177982118L359.06601717798213 8.333982822017884Z" class="dg-w"/><rect x="341.06601717798213" y="8.333982822017884" width="18" height="71.6" class="dg-w"/><path d="M341.06601717798213 49.533982822017876L326.66601717798216 76.93398282201788L326.66601717798216 88.93398282201788L341.06601717798213 79.93398282201788Z" class="dg-f"/><path d="M359.06601717798213 49.533982822017876L373.4660171779821 76.93398282201788L373.4660171779821 88.93398282201788L359.06601717798213 79.93398282201788Z" class="dg-f"/><line x1="350.06601717798213" y1="53.533982822017876" x2="350.06601717798213" y2="83.93398282201788" class="dg-o"/></g><text x="272.0" y="169.0" text-anchor="start" class="dg-tb">45°</text><path d="M392 25 Q560 -60 735 255" class="dg-dash"/><text x="600.0" y="60.0" text-anchor="middle" class="dg-ts">flight path</text><line x1="235.0" y1="288.0" x2="726.0" y2="288.0" stroke="#12203A" stroke-width="1.6"/><path d="M735.0 288.0L726.0 292.5L726.0 283.5Z" fill="#12203A"/><path d="M226.0 288.0L235.0 292.5L235.0 283.5Z" fill="#12203A"/><text x="480.0" y="280.0" text-anchor="middle" class="dg-ts">distance: launch spot to where it first lands</text><line x1="120.0" y1="170.0" x2="100.0" y2="110.0" class="dg-lead"/><circle cx="120.0" cy="170.0" r="3" class="dg-n"/><circle cx="100.0" cy="110.0" r="12" class="dg-n"/><text x="100.0" y="115.0" text-anchor="middle" class="dg-cl">A</text><line x1="282.0" y1="183.0" x2="330.0" y2="170.0" class="dg-lead"/><circle cx="282.0" cy="183.0" r="3" class="dg-n"/><circle cx="330.0" cy="170.0" r="12" class="dg-n"/><text x="330.0" y="175.0" text-anchor="middle" class="dg-cl">B</text><line x1="342.1" y1="24.9" x2="262.1" y2="-5.1" class="dg-lead"/><circle cx="342.1" cy="24.9" r="3" class="dg-n"/><circle cx="262.1" cy="-5.1" r="12" class="dg-n"/><text x="262.1" y="-0.1" text-anchor="middle" class="dg-cl">C</text><text x="60.0" y="240.0" text-anchor="start" class="dg-ts">box</text></g></svg><figcaption>The angle test. A squeeze bottle with a straw sealed into the cap · B protractor on a box · C straw rocket.</figcaption></figure>
+
+<ol>
+<li>Put the rocket on the bottle's straw. Hold the straw along the protractor at <strong>30°</strong>.</li>
+<li>Squeeze the bottle hard, the same way each time. Mark where the rocket lands. Measure the distance.</li>
+<li>Do <strong>2 tries</strong> at 30°, then 2 at <strong>45°</strong>, then 2 at <strong>60°</strong>.</li>
+<li>Colour a bar for the farthest try at each angle on E3.</li>
+<li><strong>Predict:</strong> look at your bars. Will <strong>75°</strong> go farther or shorter than 60°? Write your guess, then test it.</li>
+</ol>
+<p><strong>Fair test:</strong> the same rocket, the same launcher, the same squeeze. Only the angle changes.</p>
+<h3 id="4-wrap-up-10-minutes" class="step"><span class="n">4</span> Wrap up (10 minutes)</h3>
+<figure class="dg" id="fig-angle-paths"><svg class="dg" viewBox="0 0 760 270" role="img" aria-label="Flight paths at 30, 45, 60 and 75 degrees" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="230" x2="750" y2="230" class="dg-o"/><line x1="20" y1="230" x2="12" y2="238" class="dg-lead"/><line x1="42" y1="230" x2="34" y2="238" class="dg-lead"/><line x1="64" y1="230" x2="56" y2="238" class="dg-lead"/><line x1="86" y1="230" x2="78" y2="238" class="dg-lead"/><line x1="108" y1="230" x2="100" y2="238" class="dg-lead"/><line x1="130" y1="230" x2="122" y2="238" class="dg-lead"/><line x1="152" y1="230" x2="144" y2="238" class="dg-lead"/><line x1="174" y1="230" x2="166" y2="238" class="dg-lead"/><line x1="196" y1="230" x2="188" y2="238" class="dg-lead"/><line x1="218" y1="230" x2="210" y2="238" class="dg-lead"/><line x1="240" y1="230" x2="232" y2="238" class="dg-lead"/><line x1="262" y1="230" x2="254" y2="238" class="dg-lead"/><line x1="284" y1="230" x2="276" y2="238" class="dg-lead"/><line x1="306" y1="230" x2="298" y2="238" class="dg-lead"/><line x1="328" y1="230" x2="320" y2="238" class="dg-lead"/><line x1="350" y1="230" x2="342" y2="238" class="dg-lead"/><line x1="372" y1="230" x2="364" y2="238" class="dg-lead"/><line x1="394" y1="230" x2="386" y2="238" class="dg-lead"/><line x1="416" y1="230" x2="408" y2="238" class="dg-lead"/><line x1="438" y1="230" x2="430" y2="238" class="dg-lead"/><line x1="460" y1="230" x2="452" y2="238" class="dg-lead"/><line x1="482" y1="230" x2="474" y2="238" class="dg-lead"/><line x1="504" y1="230" x2="496" y2="238" class="dg-lead"/><line x1="526" y1="230" x2="518" y2="238" class="dg-lead"/><line x1="548" y1="230" x2="540" y2="238" class="dg-lead"/><line x1="570" y1="230" x2="562" y2="238" class="dg-lead"/><line x1="592" y1="230" x2="584" y2="238" class="dg-lead"/><line x1="614" y1="230" x2="606" y2="238" class="dg-lead"/><line x1="636" y1="230" x2="628" y2="238" class="dg-lead"/><line x1="658" y1="230" x2="650" y2="238" class="dg-lead"/><line x1="680" y1="230" x2="672" y2="238" class="dg-lead"/><line x1="702" y1="230" x2="694" y2="238" class="dg-lead"/><line x1="724" y1="230" x2="716" y2="238" class="dg-lead"/><line x1="746" y1="230" x2="738" y2="238" class="dg-lead"/><path d="M60 230 Q328 145 597 230" fill="none" stroke="#3D8BFD" stroke-width="3.5"/><text x="328.5" y="179.4" text-anchor="middle" class="dg-tb" style="fill:#3D8BFD">30°</text><path d="M60 230 Q370 60 680 230" fill="none" stroke="#F2652B" stroke-width="3.5"/><text x="370.0" y="136.8" text-anchor="middle" class="dg-tb" style="fill:#F2652B">45°</text><path d="M60 230 Q328 -26 597 230" fill="none" stroke="#2FB67C" stroke-width="3.5" stroke-dasharray="9 6"/><text x="328.5" y="94.1" text-anchor="middle" class="dg-tb" style="fill:#2FB67C">60°</text><path d="M60 230 Q215 -88 370 230" fill="none" stroke="#12203A" stroke-width="3.5" stroke-dasharray="9 6"/><text x="215.0" y="62.9" text-anchor="middle" class="dg-tb">75°</text><text x="700.0" y="40.0" text-anchor="end" class="dg-tb">45° goes farthest.</text><text x="700.0" y="60.0" text-anchor="end" class="dg-ts">30° and 60° land near the same spot;</text><text x="700.0" y="76.0" text-anchor="end" class="dg-ts">steeper goes higher but shorter.</text></svg><figcaption>What to expect: the paths at each angle.</figcaption></figure>
+
+<ul>
+<li>What pattern did you see? (Going from 30° up to about 45°, the rocket went farther; steeper than that, it went shorter.)</li>
+<li>Was your 75° prediction right? How did the pattern help you guess?</li>
+</ul>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>What one thing did we change in our test?</li>
+<li>Which angle went farthest for most groups?</li>
+<li>Finish the sentence: "If I launch at 80°, I predict it will go ______, because ______."</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>The launch angle.</li>
+<li>Usually around 45° (often a bit less, about 40°).</li>
+<li>Shorter, because past about 45° the rockets went shorter each time we tilted up more (it goes high but not far).</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>Make the squeeze launcher before class.</strong> A 500 ml bottle and clay to seal the straw works well. For an even push, drop a heavy book on the bottle from the same height each time, or have the same student squeeze every time.</li>
+<li><strong>Real rockets fly almost straight up</strong>, not at 45°, so they land close by, inside the field, away from people. Point this out so no one thinks 45° is how real rockets launch.</li>
+<li><strong>Grade 3:</strong> use only 30°, 45° and 60°, and compare by marking the landing spots with sticky notes (no measuring). <strong>Grade 5:</strong> do 3 tries and find the average.</li>
+<li><strong>Protractor help:</strong> many students read the wrong scale. Show them which zero to start from.</li>
+<li><strong>Safety:</strong> glasses on. Launch in one direction only, with nobody downrange. Students fetch rockets only when you say "clear".</li>
+<li><strong>Rocket Builder link:</strong> the launch simulator has a launch-angle setting (0–30°). Show 0° and 30° on the projector: real rockets launch close to straight up so they land near the pad.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 4 of 8 · Grades 3–5</small><h1>Fins and balance: why rockets fly straight</h1></div><span class="badge">Lesson 4</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E4 Swing test. <strong>Rocket Builder:</strong> on the projector. <strong>Optional instructor demo:</strong> a 3D-printed rocket (no motor).</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-5-ETS1-3</strong></td>
+<td>Run fair tests to find where a model fails and what to improve.</td>
+</tr>
+<tr>
+<td><strong>3-PS2-1</strong></td>
+<td>Test how balanced and unbalanced pushes change the way something moves.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> planning and carrying out investigations. <strong>Crosscutting concept:</strong> structure and function (the shape of the fins does a job).</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can find a rocket's balance point.</li>
+<li>I can test a rocket with no fins, with fins, and with weight in the nose, and say which flies straight.</li>
+<li>I can explain the rule: the balance point goes in front of the push point.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Fins</strong>: the flat wings at the back of a rocket. They work like the feathers on an arrow.</li>
+<li><strong>Balance point</strong>: where the rocket balances on your finger. Rocket Builder shows it as a <strong>blue dot</strong>.</li>
+<li><strong>Push point</strong>: where the air pushes on the rocket. Rocket Builder shows it as a <strong>red dot</strong>.</li>
+<li><strong>Stable</strong>: flies straight, nose first.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<p>For each group:</p>
+<ul>
+<li>A paper-towel tube, a cardstock cone for a nose, cardstock for 3 fins (about 6 cm × 5 cm), tape</li>
+<li>A walnut-sized lump of modeling clay</li>
+<li>About 1.5 m of string</li>
+<li>Worksheet E4</li>
+</ul>
+<p>For the class: Rocket Builder on the projector. <strong>Optional:</strong> a printed Rocket Builder rocket (no motor) for the instructor to show.</p>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<p>Show an arrow, a dart or a badminton shuttle (or a picture). Ask: <em>Why does it fly point-first? What would happen without the feathers?</em></p>
+<h3 id="2-learn-10-minutes" class="step"><span class="n">2</span> Learn (10 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p><strong>Fins are a rocket's feathers.</strong> They keep the nose pointing forward.</p>
+<p>Every rocket has a <strong>balance point</strong>, where it balances on your finger. And it has a <strong>push point</strong>, where the air pushes on it. Here's the rule: <strong>the balance point must be in front of the push point.</strong> Then if the rocket tips, the air pushes the tail back in line, like a weathervane.</p>
+<p>Fins at the back move the push point back. Clay in the nose moves the balance point forward. Both help.</p>
+</blockquote>
+<figure class="dg" id="fig-balance-point"><svg class="dg" viewBox="0 0 760 230" role="img" aria-label="Balancing a rocket on a finger; the blue balance point in front of the red push point" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="360" height="218" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="18.0" y="32.0" text-anchor="start" class="dg-th">Find the balance point</text><rect x="392" y="6" width="362" height="218" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="404.0" y="32.0" text-anchor="start" class="dg-th">Blue in front of red</text><g transform="rotate(90 186 140.0)"><path d="M172.0 76.4L186 40L200.0 76.4Z" class="dg-w"/><rect x="172.0" y="76.4" width="28" height="163.6" class="dg-w"/><path d="M172.0 196L149.6 237L149.6 249L172.0 240Z" class="dg-f"/><path d="M200.0 196L222.4 237L222.4 249L200.0 240Z" class="dg-f"/><line x1="186" y1="200" x2="186" y2="244" class="dg-o"/></g><path d="M186 156 l-12 44 h24 Z" class="dg-w"/><text x="186.0" y="214.0" text-anchor="middle" class="dg-ts">your finger</text><circle cx="186" cy="140" r="7" fill="#3D8BFD" stroke="#12203A" stroke-width="1.5"/><text x="186.0" y="76.0" text-anchor="middle" class="dg-tb" style="fill:#1D5BC4">balance point (blue dot)</text><line x1="186.0" y1="82.0" x2="186.0" y2="132.0" class="dg-lead"/><g transform="rotate(90 573 120.0)"><path d="M559.0 56.4L573 20L587.0 56.4Z" class="dg-w"/><rect x="559.0" y="56.4" width="28" height="163.6" class="dg-w"/><path d="M559.0 176L536.6 217L536.6 229L559.0 220Z" class="dg-f"/><path d="M587.0 176L609.4 217L609.4 229L587.0 220Z" class="dg-f"/><line x1="573" y1="180" x2="573" y2="224" class="dg-o"/><circle cx="573" cy="120.0" r="7" fill="#3D8BFD" stroke="#12203A" stroke-width="1.5"/><circle cx="573" cy="164.0" r="7" fill="#E5484D" stroke="#12203A" stroke-width="1.5"/><path d="M569 160.0l8 8M577 160.0l-8 8" stroke="#fff" stroke-width="1.6"/></g><text x="690.0" y="176.0" text-anchor="middle" class="dg-ts">nose →</text><line x1="573.0" y1="140.0" x2="573.0" y2="176.0" class="dg-lead"/><text x="573.0" y="192.0" text-anchor="middle" class="dg-tb" style="fill:#1D5BC4">balance point</text><line x1="529.0" y1="140.0" x2="520.0" y2="86.0" class="dg-lead"/><text x="520.0" y="78.0" text-anchor="middle" class="dg-tb" style="fill:#C22E33">push point</text></svg><figcaption>Find the balance point on a finger. The blue dot (balance point) must be in front of the red dot (push point).</figcaption></figure>
+
+<figure class="dg" id="fig-weathervane"><svg class="dg" viewBox="0 0 760 270" role="img" aria-label="When the push point is behind the balance point, air swings the tail back in line" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="370" height="258" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="18.0" y="32.0" text-anchor="start" class="dg-th">Stable: tail swings back</text><rect x="386" y="6" width="368" height="258" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="398.0" y="32.0" text-anchor="start" class="dg-th">Unstable: it tumbles</text><g transform="rotate(-25 190 135)"><path d="M177.0 88.80000000000001L190 55L203.0 88.80000000000001Z" class="dg-w"/><rect x="177.0" y="88.80000000000001" width="26" height="126.19999999999999" class="dg-w"/><path d="M177.0 171L156.2 212L156.2 224L177.0 215Z" class="dg-f"/><path d="M203.0 171L223.8 212L223.8 224L203.0 215Z" class="dg-f"/><line x1="190" y1="175" x2="190" y2="219" class="dg-o"/><circle cx="190" cy="110" r="7" fill="#3D8BFD" stroke="#12203A" stroke-width="1.5"/><circle cx="190" cy="165" r="7" fill="#E5484D" stroke="#12203A" stroke-width="1.5"/></g><line x1="340.0" y1="196.0" x2="275.4" y2="196.0" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M260.0 196.0L275.4 187.4L275.4 204.6Z" fill="#3D8BFD"/><text x="300.0" y="226.0" text-anchor="middle" class="dg-tb" style="fill:#3D8BFD">air from the side</text><text x="40.0" y="60.0" text-anchor="start" class="dg-ts">blue in front of red</text><g transform="rotate(-25 570 135)"><path d="M557.0 88.80000000000001L570 55L583.0 88.80000000000001Z" class="dg-w"/><rect x="557.0" y="88.80000000000001" width="26" height="126.19999999999999" class="dg-w"/><path d="M557.0 171L536.2 212L536.2 224L557.0 215Z" class="dg-f"/><path d="M583.0 171L603.8 212L603.8 224L583.0 215Z" class="dg-f"/><line x1="570" y1="175" x2="570" y2="219" class="dg-o"/><circle cx="570" cy="165" r="7" fill="#3D8BFD" stroke="#12203A" stroke-width="1.5"/><circle cx="570" cy="110" r="7" fill="#E5484D" stroke="#12203A" stroke-width="1.5"/></g><line x1="720.0" y1="196.0" x2="655.4" y2="196.0" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M640.0 196.0L655.4 187.4L655.4 204.6Z" fill="#3D8BFD"/><text x="680.0" y="226.0" text-anchor="middle" class="dg-tb" style="fill:#3D8BFD">air from the side</text><text x="420.0" y="60.0" text-anchor="start" class="dg-ts">red in front of blue</text><text x="190.0" y="252.0" text-anchor="middle" class="dg-ts">air pushes the tail back in line</text><text x="570.0" y="252.0" text-anchor="middle" class="dg-ts">air swings the nose away</text></svg><figcaption>Why the rule works: if the push point is behind the balance point, the air swings the tail back in line, like a weathervane.</figcaption></figure>
+
+<p><strong>On the projector:</strong> build a rocket in Rocket Builder. Find the <strong>blue dot</strong> (balance point) and the <strong>red dot</strong> (push point). Change the fin shape and build again. Watch the red dot move. If the score is green, it's stable.</p>
+<h3 id="3-do-the-swing-test-20-minutes" class="step"><span class="n">3</span> Do: the swing test (20 minutes)</h3>
+<p>Go outside or to a big open room. Nobody stands within 3 m of the swinger.</p>
+<figure class="dg" id="fig-swing-test"><svg class="dg" viewBox="0 0 760 350" role="img" aria-label="Swing test: swing the rocket in a circle on a string tied at its balance point" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="300" x2="750" y2="300" class="dg-o"/><line x1="20" y1="300" x2="12" y2="308" class="dg-lead"/><line x1="42" y1="300" x2="34" y2="308" class="dg-lead"/><line x1="64" y1="300" x2="56" y2="308" class="dg-lead"/><line x1="86" y1="300" x2="78" y2="308" class="dg-lead"/><line x1="108" y1="300" x2="100" y2="308" class="dg-lead"/><line x1="130" y1="300" x2="122" y2="308" class="dg-lead"/><line x1="152" y1="300" x2="144" y2="308" class="dg-lead"/><line x1="174" y1="300" x2="166" y2="308" class="dg-lead"/><line x1="196" y1="300" x2="188" y2="308" class="dg-lead"/><line x1="218" y1="300" x2="210" y2="308" class="dg-lead"/><line x1="240" y1="300" x2="232" y2="308" class="dg-lead"/><line x1="262" y1="300" x2="254" y2="308" class="dg-lead"/><line x1="284" y1="300" x2="276" y2="308" class="dg-lead"/><line x1="306" y1="300" x2="298" y2="308" class="dg-lead"/><line x1="328" y1="300" x2="320" y2="308" class="dg-lead"/><line x1="350" y1="300" x2="342" y2="308" class="dg-lead"/><line x1="372" y1="300" x2="364" y2="308" class="dg-lead"/><line x1="394" y1="300" x2="386" y2="308" class="dg-lead"/><line x1="416" y1="300" x2="408" y2="308" class="dg-lead"/><line x1="438" y1="300" x2="430" y2="308" class="dg-lead"/><line x1="460" y1="300" x2="452" y2="308" class="dg-lead"/><line x1="482" y1="300" x2="474" y2="308" class="dg-lead"/><line x1="504" y1="300" x2="496" y2="308" class="dg-lead"/><line x1="526" y1="300" x2="518" y2="308" class="dg-lead"/><line x1="548" y1="300" x2="540" y2="308" class="dg-lead"/><line x1="570" y1="300" x2="562" y2="308" class="dg-lead"/><line x1="592" y1="300" x2="584" y2="308" class="dg-lead"/><line x1="614" y1="300" x2="606" y2="308" class="dg-lead"/><line x1="636" y1="300" x2="628" y2="308" class="dg-lead"/><line x1="658" y1="300" x2="650" y2="308" class="dg-lead"/><line x1="680" y1="300" x2="672" y2="308" class="dg-lead"/><line x1="702" y1="300" x2="694" y2="308" class="dg-lead"/><line x1="724" y1="300" x2="716" y2="308" class="dg-lead"/><line x1="746" y1="300" x2="738" y2="308" class="dg-lead"/><circle cx="250" cy="145.3" r="15.299999999999999" class="dg-w"/><path d="M250 160.6L250 223.5M250 223.5L226.2 300M250 223.5L273.8 300" class="dg-o"/><path d="M250 174.2L272 96.19999999999999M250 174.2L222.8 208.2" class="dg-o"/><ellipse cx="272" cy="126.19999999999999" rx="230" ry="46" class="dg-dash"/><line x1="272" y1="96.19999999999999" x2="442" y2="164.2" class="dg-thin" style="stroke-width:1.8"/><g transform="rotate(-90 442 166.2)"><path d="M432.0 132.2L442 106.19999999999999L452.0 132.2Z" class="dg-w"/><rect x="432.0" y="132.2" width="20" height="94.0" class="dg-w"/><path d="M432.0 187.79999999999998L416.0 223.2L416.0 235.2L432.0 226.2Z" class="dg-f"/><path d="M452.0 187.79999999999998L468.0 223.2L468.0 235.2L452.0 226.2Z" class="dg-f"/><line x1="442" y1="191.79999999999998" x2="442" y2="230.2" class="dg-o"/></g><line x1="372.0" y1="136.2" x2="326.6" y2="136.2" stroke="#F2652B" stroke-width="3.5"/><path d="M312.0 136.2L326.6 128.0L326.6 144.3Z" fill="#F2652B"/><text x="342.0" y="124.2" text-anchor="middle" class="dg-tb">nose leads</text><text x="442.0" y="206.2" text-anchor="middle" class="dg-ts">string about 1 m long</text><line x1="259.0" y1="326.0" x2="531.0" y2="326.0" stroke="#12203A" stroke-width="1.6"/><path d="M540.0 326.0L531.0 330.5L531.0 321.5Z" fill="#12203A"/><path d="M250.0 326.0L259.0 330.5L259.0 321.5Z" fill="#12203A"/><text x="395.0" y="346.0" text-anchor="middle" class="dg-ts">nobody within 3 m</text><rect x="560" y="130" width="192" height="150" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="572.0" y="156.0" text-anchor="start" class="dg-th">Tie it here</text><g transform="rotate(90 656 215.0)"><path d="M645.0 168.6L656 140L667.0 168.6Z" class="dg-w"/><rect x="645.0" y="168.6" width="22" height="121.4" class="dg-w"/><path d="M645.0 246L627.4 287L627.4 299L645.0 290Z" class="dg-f"/><path d="M667.0 246L684.6 287L684.6 299L667.0 290Z" class="dg-f"/><line x1="656" y1="250" x2="656" y2="294" class="dg-o"/></g><line x1="656" y1="216" x2="656" y2="168" class="dg-thin" style="stroke-width:2"/><circle cx="656" cy="216" r="6" fill="#3D8BFD" stroke="#12203A" stroke-width="1.5"/><text x="656.0" y="268.0" text-anchor="middle" class="dg-ts">at the balance point</text></svg><figcaption>The swing test: string tied at the balance point, swing it in a circle, watch the nose.</figcaption></figure>
+
+<figure class="dg" id="fig-rocket-versions"><svg class="dg" viewBox="0 0 760 270" role="img" aria-label="Four test rockets: A no fins, B fins, C clay in the nose, D clay in the tail" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="178" height="256" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><circle cx="32.0" cy="30.0" r="12" class="dg-n"/><text x="32.0" y="35.0" text-anchor="middle" class="dg-cl">A</text><text x="52.0" y="35.0" text-anchor="start" class="dg-tb">no fins</text><path d="M82.0 95.0L97 56L112.0 95.0Z" class="dg-w"/><rect x="82.0" y="95.0" width="30" height="131.0" class="dg-w"/><rect x="196" y="6" width="178" height="256" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><circle cx="220.0" cy="30.0" r="12" class="dg-n"/><text x="220.0" y="35.0" text-anchor="middle" class="dg-cl">B</text><text x="240.0" y="35.0" text-anchor="start" class="dg-tb">fins</text><path d="M270.0 95.0L285 56L300.0 95.0Z" class="dg-w"/><rect x="270.0" y="95.0" width="30" height="131.0" class="dg-w"/><path d="M270.0 182L246.0 223L246.0 235L270.0 226Z" class="dg-f"/><path d="M300.0 182L324.0 223L324.0 235L300.0 226Z" class="dg-f"/><line x1="285" y1="186" x2="285" y2="230" class="dg-o"/><rect x="384" y="6" width="178" height="256" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><circle cx="408.0" cy="30.0" r="12" class="dg-n"/><text x="408.0" y="35.0" text-anchor="middle" class="dg-cl">C</text><text x="428.0" y="35.0" text-anchor="start" class="dg-tb">fins + clay in nose</text><path d="M458.0 95.0L473 56L488.0 95.0Z" class="dg-w"/><rect x="458.0" y="95.0" width="30" height="131.0" class="dg-w"/><path d="M458.0 182L434.0 223L434.0 235L458.0 226Z" class="dg-f"/><path d="M488.0 182L512.0 223L512.0 235L488.0 226Z" class="dg-f"/><line x1="473" y1="186" x2="473" y2="230" class="dg-o"/><ellipse cx="473" cy="92.0" rx="8.4" ry="9.0" fill="#9A6B3F" stroke="#12203A" stroke-width="1.5"/><rect x="572" y="6" width="178" height="256" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><circle cx="596.0" cy="30.0" r="12" class="dg-n"/><text x="596.0" y="35.0" text-anchor="middle" class="dg-cl">D</text><text x="616.0" y="35.0" text-anchor="start" class="dg-tb">fins + clay in tail</text><path d="M646.0 95.0L661 56L676.0 95.0Z" class="dg-w"/><rect x="646.0" y="95.0" width="30" height="131.0" class="dg-w"/><path d="M646.0 182L622.0 223L622.0 235L646.0 226Z" class="dg-f"/><path d="M676.0 182L700.0 223L700.0 235L676.0 226Z" class="dg-f"/><line x1="661" y1="186" x2="661" y2="230" class="dg-o"/><ellipse cx="661" cy="214" rx="9.6" ry="9.0" fill="#9A6B3F" stroke="#12203A" stroke-width="1.5"/></svg><figcaption>The four test rockets.</figcaption></figure>
+
+<ol>
+<li>Build the rocket with <strong>no fins</strong>. Balance it on a finger to find the balance point. Tie the string there and tape it.</li>
+<li>Swing it in a circle beside you. Does the nose lead? Tick <strong>straight</strong>, <strong>wobbly</strong> or <strong>tumbles</strong> on E4.</li>
+<li>Tape on <strong>3 fins</strong>. Find the new balance point, move the string there, and swing again.</li>
+<li>Press <strong>clay inside the nose</strong>. Find the balance point again and swing.</li>
+<li><strong>Bonus:</strong> move the clay to the <strong>tail</strong>. What happens?</li>
+</ol>
+<h3 id="4-wrap-up-10-minutes" class="step"><span class="n">4</span> Wrap up (10 minutes)</h3>
+<ul>
+<li>Which version flew straight? Which one failed?</li>
+<li>Why did clay in the tail make it worse? (It pulled the balance point back, behind the push point.)</li>
+</ul>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>What do fins do for a rocket?</li>
+<li>Which dot must be in front: the blue balance point or the red push point?</li>
+<li>Your rocket tumbles. Name one thing you could change.</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>They keep it flying straight, nose first (like the feathers on an arrow).</li>
+<li>The blue balance point.</li>
+<li>Add fins or make them bigger; add a little clay to the nose.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>What to expect:</strong> no fins usually tumbles; fins help; fins plus nose clay flies straight; tail clay wobbles or tumbles.</li>
+<li><strong>Grade 3:</strong> test only "no fins" and "fins plus nose clay". <strong>Grade 5:</strong> measure the balance point from the nose tip each time and write it down.</li>
+<li><strong>Swing safety:</strong> a short string (about 1 m), a clear space, one swinger at a time.</li>
+<li><strong>Optional instructor demo, a 3D-printed rocket:</strong> show a printed Rocket Builder rocket with <strong>no motor in it</strong>. Balance it on one finger to find its balance point, point at the fins, and compare it with the blue and red dots on the screen. Students can hold and look at it. Motors are rated 12+ and only adults handle them, so the demo never includes a motor or igniter.</li>
+<li><strong>Further resources:</strong> Apogee Components' free <em>Rocketry Reservoir</em> (apogeerockets.com/downloads/PDFs/Rocketry_Education_Pack.pdf) has printable pages on the parts of a rocket and on centre of gravity and centre of pressure that you can project or hand out.</li>
+<li><strong>Clay in the nose, on screen:</strong> in Rocket Builder's <strong>Advanced</strong> mode, <strong>Nose weight (clay)</strong> adds grams to the nose. Add some, build again, and the class watches the blue dot move forward and the score go up: the same thing their clay did.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 5 of 8 · Grades 3–5</small><h1>Be an engineer: design a stomp rocket</h1></div><span class="badge">Lesson 5</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E5 Design plan. <strong>Rocket Builder:</strong> on the projector or tablets.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-5-ETS1-1</strong></td>
+<td>Say what a design must do (criteria) and what limits it has (constraints: materials, time, cost).</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-2</strong></td>
+<td>Come up with more than one design and compare how well each might work.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> asking questions and defining problems; designing solutions. <strong>Crosscutting concept:</strong> influence of engineering on people (engineers improve designs to meet a need).</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can name the criteria (what my rocket must do) and the constraints (my limits).</li>
+<li>I can draw two different designs and pick one, giving a reason.</li>
+<li>I can build my rocket from my plan.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Engineer</strong>: someone who designs things to solve problems.</li>
+<li><strong>Criteria</strong>: what the design must do to succeed.</li>
+<li><strong>Constraints</strong>: the limits, like how much paper, tape or time you have.</li>
+<li><strong>Prototype</strong>: a first version you build to test.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<p>For each student:</p>
+<ul>
+<li>1 sheet of paper, 1 index card, 50 cm of tape (that's the constraint!)</li>
+<li>A tube to roll around that fits the stomp launcher (a 2 cm PVC pipe or a marker)</li>
+<li>Scissors, pencil, worksheet E5</li>
+</ul>
+<p>For the class: a stomp-rocket launcher (a kit, or a DIY one: a 2-litre bottle, a 1 m length of 2 cm PVC pipe and duct tape), and Rocket Builder on the projector or tablets.</p>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p>NASA engineers get a problem: "Build a rocket that can carry this, and land it here." Today you get a problem too.</p>
+</blockquote>
+<h3 id="2-define-the-problem-10-minutes" class="step"><span class="n">2</span> Define the problem (10 minutes)</h3>
+<p>Write it on the board and on E5:</p>
+<ul>
+<li><strong>Problem:</strong> design a paper rocket that flies straight off the stomp launcher and lands in the target zone.</li>
+<li><strong>Criteria:</strong> it flies nose-first · it lands in the zone · it still works after 3 launches.</li>
+<li><strong>Constraints:</strong> 1 sheet of paper, 1 index card, 50 cm of tape, 15 minutes to build.</li>
+</ul>
+<p><strong>Rocket Builder check (3 minutes):</strong> on the projector, show two rocket designs side by side (change only the fins, then build). Ask: <em>Which one meets the criterion "flies straight"? How can we tell?</em> (The score is green; the blue dot is in front of the red dot.)</p>
+<h3 id="3-imagine-and-plan-10-minutes" class="step"><span class="n">3</span> Imagine and plan (10 minutes)</h3>
+<ol>
+<li>On E5, draw <strong>two different</strong> rocket ideas. Change the fins, the nose or the length.</li>
+<li>Tick which criteria each one might meet. Pick one. Write why.</li>
+</ol>
+<h3 id="4-build-15-minutes" class="step"><span class="n">4</span> Build (15 minutes)</h3>
+<figure class="dg" id="fig-stomp-build"><svg class="dg" viewBox="0 0 760 230" role="img" aria-label="How to build a stomp rocket" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M22 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="32.0" y="36.0" text-anchor="middle" class="dg-th">1</text><text x="54.0" y="36.0" text-anchor="start" class="dg-th">Roll</text><text x="97.0" y="210.0" text-anchor="middle" class="dg-ts">paper around the pipe</text><rect x="88" y="56" width="18" height="130" fill="#E2D9C6" stroke="#12203A" stroke-width="2"/><rect x="63" y="80" width="68" height="90" class="dg-w" opacity=".9"/><line x1="141.0" y1="120.0" x2="141.0" y2="135.4" stroke="#F2652B" stroke-width="3.5"/><path d="M141.0 150.0L132.8 135.4L149.2 135.4Z" fill="#F2652B"/><rect x="196" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M210 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="220.0" y="36.0" text-anchor="middle" class="dg-th">2</text><text x="242.0" y="36.0" text-anchor="start" class="dg-th">Nose</text><text x="285.0" y="210.0" text-anchor="middle" class="dg-ts">twist and tape airtight</text><rect x="269" y="90" width="32" height="96" class="dg-w"/><path d="M269 90 L285 58 L301 90 Z" class="dg-w"/><rect x="267" y="70" width="36" height="10" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><rect x="384" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M398 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="408.0" y="36.0" text-anchor="middle" class="dg-th">3</text><text x="430.0" y="36.0" text-anchor="start" class="dg-th">Fins</text><text x="473.0" y="210.0" text-anchor="middle" class="dg-ts">cut from the index card</text><rect x="413" y="60" width="120" height="76" class="dg-w"/><path d="M423 128 L423 76 L463 128 Z M483 128 L483 76 L523 128 Z" class="dg-f" style="stroke-dasharray:5 4"/><text x="473.0" y="160.0" text-anchor="middle" class="dg-tb">cut 3</text><rect x="572" y="6" width="178" height="216" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M586 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="596.0" y="36.0" text-anchor="middle" class="dg-th">4</text><text x="618.0" y="36.0" text-anchor="start" class="dg-th">Name</text><text x="661.0" y="210.0" text-anchor="middle" class="dg-ts">write it, then test</text><path d="M647.0 86.4L661 50L675.0 86.4Z" class="dg-w"/><rect x="647.0" y="86.4" width="28" height="103.6" class="dg-w"/><path d="M647.0 146L624.6 187L624.6 199L647.0 190Z" class="dg-f"/><path d="M675.0 146L697.4 187L697.4 199L675.0 190Z" class="dg-f"/><line x1="661" y1="150" x2="661" y2="194" class="dg-o"/><text x="661.0" y="140.0" text-anchor="middle" class="dg-tb">ZOE</text></svg><figcaption>Building a stomp rocket.</figcaption></figure>
+
+<ol>
+<li>Roll the paper around the tube and tape it. Close the top into a nose and tape it airtight.</li>
+<li>Cut fins from the index card. Tape them on evenly.</li>
+<li>Write your name on it. Testing is next lesson!</li>
+</ol>
+<h3 id="5-wrap-up-5-minutes" class="step"><span class="n">5</span> Wrap up (5 minutes)</h3>
+<p>Pairs share: <em>What did you pick, and why?</em></p>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>What is the difference between a criterion and a constraint?</li>
+<li>Name one constraint in today's challenge.</li>
+<li>Why do engineers draw more than one idea?</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>A criterion is what the design must do; a constraint is a limit you must work within.</li>
+<li>1 sheet of paper, 1 index card, 50 cm of tape, or 15 minutes.</li>
+<li>So they can compare and pick the one most likely to meet the criteria.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>Target zone:</strong> mark a zone with cones about 5–10 m from the launcher. Adjust to your space.</li>
+<li><strong>Grade 3:</strong> give a fin template and let students choose between 2 shapes. <strong>Grade 5:</strong> let students add their own criterion (for example "goes higher than the basketball hoop").</li>
+<li><strong>Rocket Builder as a class tool:</strong> in Beginner mode it takes a few seconds per build. Have one student "drive" on the projector while the class decides what to change. On tablets, groups can build their own; no account or download is needed.</li>
+<li><strong>No downloads or printing for this age group.</strong> Rocket Builder's printed rockets fly on real motors, which are rated 12+.</li>
+<li><strong>DIY stomp launcher:</strong> tape the PVC pipe into the bottle's mouth airtight. Students stomp on the bottle; the air shoots up the pipe and launches the paper rocket.</li>
+</ul>
+<figure class="dg" id="fig-stomp-launcher"><svg class="dg" viewBox="0 0 760 300" role="img" aria-label="Stomp-rocket launcher: a bottle taped to a pipe" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="270" x2="750" y2="270" class="dg-o"/><line x1="20" y1="270" x2="12" y2="278" class="dg-lead"/><line x1="42" y1="270" x2="34" y2="278" class="dg-lead"/><line x1="64" y1="270" x2="56" y2="278" class="dg-lead"/><line x1="86" y1="270" x2="78" y2="278" class="dg-lead"/><line x1="108" y1="270" x2="100" y2="278" class="dg-lead"/><line x1="130" y1="270" x2="122" y2="278" class="dg-lead"/><line x1="152" y1="270" x2="144" y2="278" class="dg-lead"/><line x1="174" y1="270" x2="166" y2="278" class="dg-lead"/><line x1="196" y1="270" x2="188" y2="278" class="dg-lead"/><line x1="218" y1="270" x2="210" y2="278" class="dg-lead"/><line x1="240" y1="270" x2="232" y2="278" class="dg-lead"/><line x1="262" y1="270" x2="254" y2="278" class="dg-lead"/><line x1="284" y1="270" x2="276" y2="278" class="dg-lead"/><line x1="306" y1="270" x2="298" y2="278" class="dg-lead"/><line x1="328" y1="270" x2="320" y2="278" class="dg-lead"/><line x1="350" y1="270" x2="342" y2="278" class="dg-lead"/><line x1="372" y1="270" x2="364" y2="278" class="dg-lead"/><line x1="394" y1="270" x2="386" y2="278" class="dg-lead"/><line x1="416" y1="270" x2="408" y2="278" class="dg-lead"/><line x1="438" y1="270" x2="430" y2="278" class="dg-lead"/><line x1="460" y1="270" x2="452" y2="278" class="dg-lead"/><line x1="482" y1="270" x2="474" y2="278" class="dg-lead"/><line x1="504" y1="270" x2="496" y2="278" class="dg-lead"/><line x1="526" y1="270" x2="518" y2="278" class="dg-lead"/><line x1="548" y1="270" x2="540" y2="278" class="dg-lead"/><line x1="570" y1="270" x2="562" y2="278" class="dg-lead"/><line x1="592" y1="270" x2="584" y2="278" class="dg-lead"/><line x1="614" y1="270" x2="606" y2="278" class="dg-lead"/><line x1="636" y1="270" x2="628" y2="278" class="dg-lead"/><line x1="658" y1="270" x2="650" y2="278" class="dg-lead"/><line x1="680" y1="270" x2="672" y2="278" class="dg-lead"/><line x1="702" y1="270" x2="694" y2="278" class="dg-lead"/><line x1="724" y1="270" x2="716" y2="278" class="dg-lead"/><line x1="746" y1="270" x2="738" y2="278" class="dg-lead"/><path d="M40 268 L40 222 Q40 214 48 214 L170 214 Q186 214 196 230 L212 234 L212 252 L196 256 Q186 268 170 268 Z" class="dg-f"/><path d="M212 236 L420 236 L420 120" fill="none" stroke="#E2D9C6" stroke-width="18" stroke-linejoin="round"/><path d="M212 227 L411 227 L411 120 M212 245 L429 245 L429 120" class="dg-o"/><rect x="204" y="224" width="22" height="24" fill="#B8B0A0" stroke="#12203A" stroke-width="1.5"/><path d="M407.0 63.800000000000004L420 30L433.0 63.800000000000004Z" class="dg-w"/><rect x="407.0" y="63.800000000000004" width="26" height="76.19999999999999" class="dg-w"/><path d="M407.0 104.8L386.2 137L386.2 149L407.0 140Z" class="dg-f"/><path d="M433.0 104.8L453.8 137L453.8 149L433.0 140Z" class="dg-f"/><line x1="420" y1="108.8" x2="420" y2="144" class="dg-o"/><line x1="300.0" y1="236.0" x2="379.6" y2="236.0" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M395.0 236.0L379.6 244.6L379.6 227.4Z" fill="#3D8BFD"/><line x1="420.0" y1="210.0" x2="420.0" y2="167.4" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M420.0 152.0L428.6 167.4L411.4 167.4Z" fill="#3D8BFD"/><path d="M80 178 l12 26 M110 172 l0 30 M140 178 l-12 26" stroke="#F2652B" stroke-width="4"/><text x="110.0" y="164.0" text-anchor="middle" class="dg-tb">stomp!</text><line x1="600.0" y1="150.0" x2="495.5" y2="80.3" stroke="#F2652B" stroke-width="6"/><path d="M480.0 70.0L501.2 71.7L489.7 89.0Z" fill="#F2652B"/><text x="560.0" y="170.0" text-anchor="middle" class="dg-tb" style="fill:#F2652B">the rocket shoots up</text><line x1="110.0" y1="240.0" x2="70.0" y2="140.0" class="dg-lead"/><circle cx="110.0" cy="240.0" r="3" class="dg-n"/><circle cx="70.0" cy="140.0" r="12" class="dg-n"/><text x="70.0" y="145.0" text-anchor="middle" class="dg-cl">A</text><line x1="320.0" y1="245.0" x2="320.0" y2="290.0" class="dg-lead"/><circle cx="320.0" cy="245.0" r="3" class="dg-n"/><circle cx="320.0" cy="290.0" r="12" class="dg-n"/><text x="320.0" y="295.0" text-anchor="middle" class="dg-cl">B</text><line x1="215.0" y1="236.0" x2="236.0" y2="190.0" class="dg-lead"/><circle cx="215.0" cy="236.0" r="3" class="dg-n"/><circle cx="236.0" cy="190.0" r="12" class="dg-n"/><text x="236.0" y="195.0" text-anchor="middle" class="dg-cl">D</text><line x1="420.0" y1="100.0" x2="360.0" y2="60.0" class="dg-lead"/><circle cx="420.0" cy="100.0" r="3" class="dg-n"/><circle cx="360.0" cy="60.0" r="12" class="dg-n"/><text x="360.0" y="65.0" text-anchor="middle" class="dg-cl">C</text></svg><figcaption>The stomp launcher. A 2-litre bottle · B pipe · C paper rocket slid over the pipe · D duct tape, airtight.</figcaption></figure>
+<ul>
+<li><strong>Class codes (optional):</strong> sign in and make a class code at <a href="https://rocket.quiverdesignworks.net/classes">rocket.quiverdesignworks.net/classes</a>. Groups on tablets hand in their Rocket Builder design with the code and a nickname (no student accounts), and you see every design in one list for the class discussion.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 6 of 8 · Grades 3–5</small><h1>Test it, fix it: fair tests and improvements</h1></div><span class="badge">Lesson 6</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E6 Test and improve.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-5-ETS1-3</strong></td>
+<td>Run fair tests to find where a model fails and what to improve.</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-2</strong></td>
+<td>Compare designs by how well they meet the criteria.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> planning and carrying out investigations. <strong>Crosscutting concept:</strong> cause and effect.</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can test my rocket fairly, with the same stomp each time.</li>
+<li>I can find what went wrong (the failure point) and fix it.</li>
+<li>I can test again and tell if my change helped.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Fair test</strong>: a test where only one thing changes.</li>
+<li><strong>Failure point</strong>: the part of the design that didn't work.</li>
+<li><strong>Improve</strong>: change the design to make it work better.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<ul>
+<li>Rockets from Lesson 5, spare paper, index cards and tape</li>
+<li>The stomp launcher, cones for the target zone</li>
+<li><strong>Safety glasses</strong> for everyone</li>
+<li>Worksheet E6</li>
+</ul>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p>Real engineers almost never get it right the first time. They test, find what failed, fix it and test again. That loop is how all rockets get better.</p>
+</blockquote>
+<h3 id="2-plan-a-fair-test-5-minutes" class="step"><span class="n">2</span> Plan a fair test (5 minutes)</h3>
+<figure class="dg" id="fig-stomp-launcher"><svg class="dg" viewBox="0 0 760 300" role="img" aria-label="Stomp-rocket launcher: a bottle taped to a pipe" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="270" x2="750" y2="270" class="dg-o"/><line x1="20" y1="270" x2="12" y2="278" class="dg-lead"/><line x1="42" y1="270" x2="34" y2="278" class="dg-lead"/><line x1="64" y1="270" x2="56" y2="278" class="dg-lead"/><line x1="86" y1="270" x2="78" y2="278" class="dg-lead"/><line x1="108" y1="270" x2="100" y2="278" class="dg-lead"/><line x1="130" y1="270" x2="122" y2="278" class="dg-lead"/><line x1="152" y1="270" x2="144" y2="278" class="dg-lead"/><line x1="174" y1="270" x2="166" y2="278" class="dg-lead"/><line x1="196" y1="270" x2="188" y2="278" class="dg-lead"/><line x1="218" y1="270" x2="210" y2="278" class="dg-lead"/><line x1="240" y1="270" x2="232" y2="278" class="dg-lead"/><line x1="262" y1="270" x2="254" y2="278" class="dg-lead"/><line x1="284" y1="270" x2="276" y2="278" class="dg-lead"/><line x1="306" y1="270" x2="298" y2="278" class="dg-lead"/><line x1="328" y1="270" x2="320" y2="278" class="dg-lead"/><line x1="350" y1="270" x2="342" y2="278" class="dg-lead"/><line x1="372" y1="270" x2="364" y2="278" class="dg-lead"/><line x1="394" y1="270" x2="386" y2="278" class="dg-lead"/><line x1="416" y1="270" x2="408" y2="278" class="dg-lead"/><line x1="438" y1="270" x2="430" y2="278" class="dg-lead"/><line x1="460" y1="270" x2="452" y2="278" class="dg-lead"/><line x1="482" y1="270" x2="474" y2="278" class="dg-lead"/><line x1="504" y1="270" x2="496" y2="278" class="dg-lead"/><line x1="526" y1="270" x2="518" y2="278" class="dg-lead"/><line x1="548" y1="270" x2="540" y2="278" class="dg-lead"/><line x1="570" y1="270" x2="562" y2="278" class="dg-lead"/><line x1="592" y1="270" x2="584" y2="278" class="dg-lead"/><line x1="614" y1="270" x2="606" y2="278" class="dg-lead"/><line x1="636" y1="270" x2="628" y2="278" class="dg-lead"/><line x1="658" y1="270" x2="650" y2="278" class="dg-lead"/><line x1="680" y1="270" x2="672" y2="278" class="dg-lead"/><line x1="702" y1="270" x2="694" y2="278" class="dg-lead"/><line x1="724" y1="270" x2="716" y2="278" class="dg-lead"/><line x1="746" y1="270" x2="738" y2="278" class="dg-lead"/><path d="M40 268 L40 222 Q40 214 48 214 L170 214 Q186 214 196 230 L212 234 L212 252 L196 256 Q186 268 170 268 Z" class="dg-f"/><path d="M212 236 L420 236 L420 120" fill="none" stroke="#E2D9C6" stroke-width="18" stroke-linejoin="round"/><path d="M212 227 L411 227 L411 120 M212 245 L429 245 L429 120" class="dg-o"/><rect x="204" y="224" width="22" height="24" fill="#B8B0A0" stroke="#12203A" stroke-width="1.5"/><path d="M407.0 63.800000000000004L420 30L433.0 63.800000000000004Z" class="dg-w"/><rect x="407.0" y="63.800000000000004" width="26" height="76.19999999999999" class="dg-w"/><path d="M407.0 104.8L386.2 137L386.2 149L407.0 140Z" class="dg-f"/><path d="M433.0 104.8L453.8 137L453.8 149L433.0 140Z" class="dg-f"/><line x1="420" y1="108.8" x2="420" y2="144" class="dg-o"/><line x1="300.0" y1="236.0" x2="379.6" y2="236.0" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M395.0 236.0L379.6 244.6L379.6 227.4Z" fill="#3D8BFD"/><line x1="420.0" y1="210.0" x2="420.0" y2="167.4" stroke="#3D8BFD" stroke-width="4" stroke-dasharray="7 6"/><path d="M420.0 152.0L428.6 167.4L411.4 167.4Z" fill="#3D8BFD"/><path d="M80 178 l12 26 M110 172 l0 30 M140 178 l-12 26" stroke="#F2652B" stroke-width="4"/><text x="110.0" y="164.0" text-anchor="middle" class="dg-tb">stomp!</text><line x1="600.0" y1="150.0" x2="495.5" y2="80.3" stroke="#F2652B" stroke-width="6"/><path d="M480.0 70.0L501.2 71.7L489.7 89.0Z" fill="#F2652B"/><text x="560.0" y="170.0" text-anchor="middle" class="dg-tb" style="fill:#F2652B">the rocket shoots up</text><line x1="110.0" y1="240.0" x2="70.0" y2="140.0" class="dg-lead"/><circle cx="110.0" cy="240.0" r="3" class="dg-n"/><circle cx="70.0" cy="140.0" r="12" class="dg-n"/><text x="70.0" y="145.0" text-anchor="middle" class="dg-cl">A</text><line x1="320.0" y1="245.0" x2="320.0" y2="290.0" class="dg-lead"/><circle cx="320.0" cy="245.0" r="3" class="dg-n"/><circle cx="320.0" cy="290.0" r="12" class="dg-n"/><text x="320.0" y="295.0" text-anchor="middle" class="dg-cl">B</text><line x1="215.0" y1="236.0" x2="236.0" y2="190.0" class="dg-lead"/><circle cx="215.0" cy="236.0" r="3" class="dg-n"/><circle cx="236.0" cy="190.0" r="12" class="dg-n"/><text x="236.0" y="195.0" text-anchor="middle" class="dg-cl">D</text><line x1="420.0" y1="100.0" x2="360.0" y2="60.0" class="dg-lead"/><circle cx="420.0" cy="100.0" r="3" class="dg-n"/><circle cx="360.0" cy="60.0" r="12" class="dg-n"/><text x="360.0" y="65.0" text-anchor="middle" class="dg-cl">C</text></svg><figcaption>The stomp launcher. A 2-litre bottle · B pipe · C paper rocket slid over the pipe · D duct tape, airtight.</figcaption></figure>
+
+<p>Agree as a class: the same launcher, the same stomper, the same kind of stomp (a "one-foot jump"), and the rocket always starts at the bottom of the pipe.</p>
+<h3 id="3-test-15-minutes" class="step"><span class="n">3</span> Test (15 minutes)</h3>
+<ol>
+<li><strong>Glasses on.</strong> Everyone stands behind the line.</li>
+<li>Countdown: "3, 2, 1, launch!" The stomper stomps only on "launch!"</li>
+<li>On E6, tick what happened: <strong>straight or wobbly</strong>, <strong>in the zone or not</strong>, <strong>still works or broken</strong>.</li>
+<li>Each rocket flies 2 times.</li>
+</ol>
+<h3 id="4-improve-and-retest-15-minutes" class="step"><span class="n">4</span> Improve and retest (15 minutes)</h3>
+<ol>
+<li>Look at your ticks. Circle the <strong>failure point</strong> on your drawing (fins loose? nose leaked? too heavy?).</li>
+<li>Change <strong>one thing</strong> to fix it.</li>
+<li>Fly 2 more times. Did it help?</li>
+</ol>
+<h3 id="5-wrap-up-5-minutes" class="step"><span class="n">5</span> Wrap up (5 minutes)</h3>
+<p>Share one fix that worked. Make a class list: "Things that make paper rockets fly better."</p>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>Why should the stomp be the same each time?</li>
+<li>A rocket's nose came open and air leaked out. What is the failure point? How would you fix it?</li>
+<li>You changed the fins and the nose at the same time, and it flew better. Do you know which change helped?</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>So the only difference is the rocket, and the test is fair.</li>
+<li>The nose. Fold and tape it shut so it is airtight.</li>
+<li>No. Change one thing at a time to know.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>What to expect:</strong> common failures are leaky noses, crooked or floppy fins, and fins taped too high up the body. A rocket that tumbles usually needs bigger fins or fins farther back.</li>
+<li><strong>Grade 3:</strong> focus on "what broke and how did you fix it". <strong>Grade 5:</strong> record the landing distance and compare before and after.</li>
+<li><strong>Safety:</strong> glasses on; only the stomper goes near the launcher; nobody stands in front of or over the pipe; fetch rockets only on "clear".</li>
+<li><strong>Rocket Builder link (optional):</strong> the app does the same thing on screen: change one thing, build, check the score. Show students that engineers test on a computer model before they build.</li>
+<li><strong>Keep the improved rockets</strong> for Lesson 8 (launch day).</li>
+<li><strong>Change one thing, on screen:</strong> the launch simulator's change-one-thing experiments fly the same rocket twice with one setting changed. It's a quick way to show a fair test on the projector.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 7 of 8 · Grades 3–5</small><h1>Parachutes: coming down gently</h1></div><span class="badge">Lesson 7</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45 minutes. <strong>Worksheet:</strong> E7 Parachute drop. <strong>Rocket Builder:</strong> on the projector.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>5-PS2-1</strong></td>
+<td>Use evidence to show that Earth's gravity pulls things down.</td>
+</tr>
+<tr>
+<td><strong>3-PS2-1</strong></td>
+<td>Test how balanced and unbalanced pushes change the way something moves.</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-3</strong></td>
+<td>Run fair tests to find what to improve.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> planning and carrying out investigations. <strong>Crosscutting concept:</strong> cause and effect.</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can build a parachute.</li>
+<li>I can test small and big parachutes fairly and time how long they take to fall.</li>
+<li>I can explain that a parachute makes drag that pushes up against gravity.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Parachute</strong>: a canopy that catches air to slow a fall.</li>
+<li><strong>Canopy</strong>: the cloth or plastic part.</li>
+<li><strong>Recovery</strong>: bringing a rocket down safely so it can fly again.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<p>For each group:</p>
+<ul>
+<li>Plastic grocery bags (or trash bags), string or thread, tape, scissors, a ruler</li>
+<li>2 washers or binder clips per parachute (the <strong>same</strong> weight for every parachute)</li>
+<li>A stopwatch (or a tablet)</li>
+<li>Worksheet E7</li>
+</ul>
+<p>For the class: a safe drop spot about 2 m high (an adult stands on a sturdy step stool, or uses a balcony or stairs).</p>
+<h2 id="steps">Steps</h2>
+<h3 id="1-hook-5-minutes" class="step"><span class="n">1</span> Hook (5 minutes)</h3>
+<p>Drop a flat sheet of paper and a crumpled one at the same time. Ask: <em>Which one landed first? Why?</em></p>
+<h3 id="2-learn-5-minutes" class="step"><span class="n">2</span> Learn (5 minutes)</h3>
+<blockquote class="aloud"><span class="lab">Read aloud</span>
+<p>Gravity pulls everything down. As something falls, air pushes up on it: that's <strong>drag</strong>. A parachute catches lots of air, so it makes lots of drag. Soon the drag up is as big as the pull down. The forces are <strong>balanced</strong>, so the parachute stops speeding up and floats down slowly.</p>
+<p>Real model rockets pop out a parachute near the top of the flight, so they land gently and can fly again.</p>
+</blockquote>
+<p><strong>On the projector:</strong> in Rocket Builder, press <strong>▶ Watch it launch</strong> and watch the parachute open and drift down.</p>
+<h3 id="3-do-the-drop-test-25-minutes" class="step"><span class="n">3</span> Do: the drop test (25 minutes)</h3>
+<figure class="dg" id="fig-parachute-build"><svg class="dg" viewBox="0 0 760 250" role="img" aria-label="How to make a parachute" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="178" height="236" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M22 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="32.0" y="36.0" text-anchor="middle" class="dg-th">1</text><text x="54.0" y="36.0" text-anchor="start" class="dg-th">Cut</text><text x="97.0" y="230.0" text-anchor="middle" class="dg-ts">a square of plastic bag</text><rect x="47" y="60" width="100" height="100" class="dg-p"/><line x1="56.0" y1="176.0" x2="138.0" y2="176.0" stroke="#12203A" stroke-width="1.6"/><path d="M147.0 176.0L138.0 180.5L138.0 171.5Z" fill="#12203A"/><path d="M47.0 176.0L56.0 180.5L56.0 171.5Z" fill="#12203A"/><text x="97.0" y="198.0" text-anchor="middle" class="dg-ts">20, 30 or 40 cm</text><rect x="196" y="6" width="178" height="236" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M210 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="220.0" y="36.0" text-anchor="middle" class="dg-th">2</text><text x="242.0" y="36.0" text-anchor="start" class="dg-th">Tape</text><text x="285.0" y="230.0" text-anchor="middle" class="dg-ts">a string to each corner</text><rect x="235" y="60" width="100" height="100" class="dg-p"/><rect x="228" y="53" width="14" height="14" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><line x1="235" y1="60" x2="221" y2="90" class="dg-thin"/><rect x="328" y="53" width="14" height="14" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><line x1="335" y1="60" x2="349" y2="90" class="dg-thin"/><rect x="228" y="153" width="14" height="14" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><line x1="235" y1="160" x2="221" y2="190" class="dg-thin"/><rect x="328" y="153" width="14" height="14" fill="#E2D9C6" stroke="#12203A" stroke-width="1.3"/><line x1="335" y1="160" x2="349" y2="190" class="dg-thin"/><rect x="384" y="6" width="178" height="236" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M398 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="408.0" y="36.0" text-anchor="middle" class="dg-th">3</text><text x="430.0" y="36.0" text-anchor="start" class="dg-th">Tie</text><text x="473.0" y="230.0" text-anchor="middle" class="dg-ts">4 strings to the washers</text><path d="M413 90 Q473 50 533 90 Z" class="dg-p"/><line x1="413" y1="90" x2="473" y2="170" class="dg-thin"/><line x1="453" y1="90" x2="473" y2="170" class="dg-thin"/><line x1="493" y1="90" x2="473" y2="170" class="dg-thin"/><line x1="533" y1="90" x2="473" y2="170" class="dg-thin"/><circle cx="473" cy="178" r="9" class="dg-g"/><circle cx="473" cy="188" r="9" class="dg-g"/><text x="489.0" y="192.0" text-anchor="start" class="dg-ts">washers</text><rect x="572" y="6" width="178" height="236" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><path d="M586 16h20l4 4v20l-4 4h-20l-4-4v-20Z" fill="#F2652B"/><text x="596.0" y="36.0" text-anchor="middle" class="dg-th">4</text><text x="618.0" y="36.0" text-anchor="start" class="dg-th">Drop</text><text x="661.0" y="230.0" text-anchor="middle" class="dg-ts">hold the middle, let go</text><path d="M611 102 Q661 52 711 102 Z" class="dg-p"/><line x1="611" y1="102" x2="661" y2="166" class="dg-thin"/><line x1="644" y1="102" x2="661" y2="166" class="dg-thin"/><line x1="678" y1="102" x2="661" y2="166" class="dg-thin"/><line x1="711" y1="102" x2="661" y2="166" class="dg-thin"/><circle cx="661" cy="172" r="8" class="dg-g"/><line x1="727.0" y1="120.0" x2="727.0" y2="177.4" stroke="#12203A" stroke-width="6"/><path d="M727.0 196.0L716.6 177.4L737.4 177.4Z" fill="#12203A"/><text x="727.0" y="214.0" text-anchor="middle" class="dg-tb" style="fill:#12203A">gravity</text><line x1="595.0" y1="150.0" x2="595.0" y2="89.0" stroke="#6E6E73" stroke-width="5" stroke-dasharray="8 6"/><path d="M595.0 72.0L604.5 89.0L585.5 89.0Z" fill="#6E6E73"/><text x="595.0" y="64.0" text-anchor="middle" class="dg-tb" style="fill:#6E6E73">drag</text></svg><figcaption>Making a parachute.</figcaption></figure>
+
+<figure class="dg" id="fig-drop-test"><svg class="dg" viewBox="0 0 760 320" role="img" aria-label="Parachute drop test: an adult drops it, a student times it" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="296" x2="750" y2="296" class="dg-o"/><line x1="20" y1="296" x2="12" y2="304" class="dg-lead"/><line x1="42" y1="296" x2="34" y2="304" class="dg-lead"/><line x1="64" y1="296" x2="56" y2="304" class="dg-lead"/><line x1="86" y1="296" x2="78" y2="304" class="dg-lead"/><line x1="108" y1="296" x2="100" y2="304" class="dg-lead"/><line x1="130" y1="296" x2="122" y2="304" class="dg-lead"/><line x1="152" y1="296" x2="144" y2="304" class="dg-lead"/><line x1="174" y1="296" x2="166" y2="304" class="dg-lead"/><line x1="196" y1="296" x2="188" y2="304" class="dg-lead"/><line x1="218" y1="296" x2="210" y2="304" class="dg-lead"/><line x1="240" y1="296" x2="232" y2="304" class="dg-lead"/><line x1="262" y1="296" x2="254" y2="304" class="dg-lead"/><line x1="284" y1="296" x2="276" y2="304" class="dg-lead"/><line x1="306" y1="296" x2="298" y2="304" class="dg-lead"/><line x1="328" y1="296" x2="320" y2="304" class="dg-lead"/><line x1="350" y1="296" x2="342" y2="304" class="dg-lead"/><line x1="372" y1="296" x2="364" y2="304" class="dg-lead"/><line x1="394" y1="296" x2="386" y2="304" class="dg-lead"/><line x1="416" y1="296" x2="408" y2="304" class="dg-lead"/><line x1="438" y1="296" x2="430" y2="304" class="dg-lead"/><line x1="460" y1="296" x2="452" y2="304" class="dg-lead"/><line x1="482" y1="296" x2="474" y2="304" class="dg-lead"/><line x1="504" y1="296" x2="496" y2="304" class="dg-lead"/><line x1="526" y1="296" x2="518" y2="304" class="dg-lead"/><line x1="548" y1="296" x2="540" y2="304" class="dg-lead"/><line x1="570" y1="296" x2="562" y2="304" class="dg-lead"/><line x1="592" y1="296" x2="584" y2="304" class="dg-lead"/><line x1="614" y1="296" x2="606" y2="304" class="dg-lead"/><line x1="636" y1="296" x2="628" y2="304" class="dg-lead"/><line x1="658" y1="296" x2="650" y2="304" class="dg-lead"/><line x1="680" y1="296" x2="672" y2="304" class="dg-lead"/><line x1="702" y1="296" x2="694" y2="304" class="dg-lead"/><line x1="724" y1="296" x2="716" y2="304" class="dg-lead"/><line x1="746" y1="296" x2="738" y2="304" class="dg-lead"/><path d="M150 296 L170 220 L230 220 L250 296 M162 258 H238" class="dg-o" style="stroke-width:4"/><text x="200.0" y="312.0" text-anchor="middle" class="dg-ts">step stool</text><circle cx="200" cy="83.5" r="13.5" class="dg-w"/><path d="M200 97.0L200 152.5M200 152.5L179.0 220M200 152.5L221.0 220" class="dg-o"/><path d="M200 109.0L240 49.0M200 109.0L176.0 139.0" class="dg-o"/><path d="M196 75.0 Q240 35.0 284 75.0 Z" class="dg-p"/><line x1="196" y1="75.0" x2="240" y2="127.0" class="dg-thin"/><line x1="226" y1="75.0" x2="240" y2="127.0" class="dg-thin"/><line x1="254" y1="75.0" x2="240" y2="127.0" class="dg-thin"/><line x1="284" y1="75.0" x2="240" y2="127.0" class="dg-thin"/><circle cx="240" cy="133.0" r="7" class="dg-g"/><line x1="310.0" y1="142.0" x2="310.0" y2="287.0" stroke="#12203A" stroke-width="1.6"/><path d="M310.0 296.0L305.5 287.0L314.5 287.0Z" fill="#12203A"/><path d="M310.0 133.0L305.5 142.0L314.5 142.0Z" fill="#12203A"/><text x="320.0" y="214.5" text-anchor="start" class="dg-tb">drop height:</text><text x="320.0" y="232.5" text-anchor="start" class="dg-t">about 2 m</text><circle cx="560" cy="186.8" r="10.799999999999999" class="dg-w"/><path d="M560 197.6L560 242.0M560 242.0L543.2 296M560 242.0L576.8 296" class="dg-o"/><path d="M560 207.2L534 213.2M560 207.2L540.8 231.2" class="dg-o"/><rect x="520" y="203.2" width="20" height="26" rx="4" class="dg-g"/><text x="560.0" y="150.0" text-anchor="middle" class="dg-ts">timer: start on “drop!”,</text><text x="560.0" y="166.0" text-anchor="middle" class="dg-ts">stop when it lands</text><rect x="20" y="20" width="250" height="34" rx="6" fill="#FCE3E3" stroke="#E5484D" stroke-width="2"/><text x="145.0" y="42.0" text-anchor="middle" class="dg-tb">An adult does the dropping</text></svg><figcaption>The drop test.</figcaption></figure>
+
+<ol>
+<li>Cut two squares from a plastic bag: <strong>small (20 cm)</strong> and <strong>big (40 cm)</strong>.</li>
+<li>Tape a 30 cm string to each corner. Tie the 4 strings together to the washers.</li>
+<li>The adult drops each parachute from the same height. A student times it from "drop!" until it lands.</li>
+<li>Do 2 drops each. Also time the washers with <strong>no</strong> parachute.</li>
+<li><strong>Streamer (if time):</strong> tape a paper or plastic strip (5 cm × 60 cm) to the same washers and drop it too. Is it faster or slower than the parachutes?</li>
+<li>Record the times on E7. Circle the slowest fall.</li>
+</ol>
+<h3 id="4-wrap-up-10-minutes" class="step"><span class="n">4</span> Wrap up (10 minutes)</h3>
+<ul>
+<li>Which fell slowest? Why? (The bigger canopy catches more air: more drag.)</li>
+<li>What pulled every one of them down? (Gravity.)</li>
+<li>Why might a <strong>huge</strong> parachute be a problem for a real rocket? (The wind carries it a long way: into trees or roads.)</li>
+</ul>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>Which force pulls a parachute down? Which force pushes up?</li>
+<li>Big parachute or small parachute: which falls slower?</li>
+<li>Why did every parachute get the same washers?</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>Gravity pulls down; drag (air) pushes up.</li>
+<li>The big one.</li>
+<li>To keep the test fair, so only the canopy size changes.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>Safety:</strong> an adult does any dropping from a height. Students stay off chairs and tables.</li>
+<li><strong>What to expect:</strong> no parachute lands in under a second; the small chute takes a little longer; the big chute is slowest. From 2 m the times are close, so good timing matters. A higher drop gives clearer results.</li>
+<li><strong>Grade 3:</strong> compare by watching (which landed last?) instead of timing. <strong>Grade 5:</strong> add a medium (30 cm) parachute, or try 1, 2 and 4 washers on one parachute.</li>
+<li><strong>Rocket Builder:</strong> the report's <strong>Which parachute?</strong> card shows the size the app picks for a real rocket (often 12–18 inches) and how fast it comes down (about 4 m/s, a jogging speed).</li>
+<li><strong>Streamers:</strong> very light real rockets use a streamer instead of a parachute. It falls faster than a parachute but drifts less in the wind.</li>
+<li><strong>Further resources:</strong> Apogee Components' free lesson <em>The Optimum Descent Challenge</em> (apogeerockets.com/downloads/PDFs/58-4.pdf, written for grades 5–8 with kit rockets) has more drop-test ideas for grade 5.</li>
+<li><strong>Keep the best parachute</strong> to fly on launch day, taped into a paper rocket's nose.</li>
+<li><strong>Parachute or streamer, on screen:</strong> the launch simulator can fly the class rocket with a parachute or a streamer. Compare how fast each comes down and how far it drifts.</li>
+</ul></section></section><section class="lesson"><div class="band"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><mask id="rb-learn-cut" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80"><rect x="-40" y="-40" width="80" height="80" fill="#fff"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="none" stroke="#000" stroke-width="2.6" stroke-linejoin="round"/><path d="M-8 -16H8" stroke="#000" stroke-width="1.6"/></mask></defs><g transform="translate(32 32) scale(1.23) translate(.35 -.35) rotate(45)"><path d="M0 -34C4.2 -29.6 6 -23.5 6 -16V12L3.5 16H-3.5L-6 12V-16C-6 -23.5 -4.2 -29.6 0 -34Z" fill="currentColor" mask="url(#rb-learn-cut)"/><path d="M-13 6L0 -9L13 6V11L0 -4L-13 11ZM-13 17L0 2L13 17V22L0 7L-13 22Z" fill="#F2652B"/></g></svg><div class="t"><small>Lesson 8 of 8 · Grades 3–5</small><h1>Launch day: how high did it go?</h1></div><span class="badge">Lesson 8</span></div><div class="fletch"></div><p class="meta"><strong>Time:</strong> about 45–60 minutes outside. <strong>Worksheets:</strong> E8 Launch log, the 45° sighting card, and the Rocket Scientist certificate. <strong>Rocket Builder:</strong> on a tablet or projector. <strong>Optional instructor demo:</strong> a 3D-printed rocket.</p><section class="stdbox"><h2 id="standards">Standards</h2>
+<div><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>In plain words</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3-PS2-2</strong></td>
+<td>Use a pattern in how things move to predict what will happen next.</td>
+</tr>
+<tr>
+<td><strong>4-PS3-1</strong></td>
+<td>Explain that a faster object has more energy.</td>
+</tr>
+<tr>
+<td><strong>3-5-ETS1-3</strong></td>
+<td>Test a model and decide what to improve.</td>
+</tr>
+<tr>
+<td><strong>4.MD.C.6</strong> (math)</td>
+<td>Measure angles.</td>
+</tr>
+<tr>
+<td><strong>SL.3.4 / SL.4.4 / SL.5.4</strong> (ELA)</td>
+<td>Tell about an experience in order, with facts and details.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Practice:</strong> planning and carrying out investigations; constructing explanations. <strong>Crosscutting concepts:</strong> patterns; energy and matter.</p>
+</section><h2 id="i-can">I can…</h2>
+<ul>
+<li>I can follow the launch rules and do my launch-team job.</li>
+<li>I can use a 45° sighting card to tell if a rocket went higher than my distance from the launcher.</li>
+<li>I can explain that a harder stomp makes the rocket go faster, so it has more energy and goes higher.</li>
+</ul>
+<h2 id="words-to-know">Words to know</h2>
+<ul>
+<li><strong>Energy</strong>: what makes things move. A faster rocket has more energy.</li>
+<li><strong>Tracker</strong>: the person who watches the rocket to measure how high it goes.</li>
+<li><strong>Countdown</strong>: "5, 4, 3, 2, 1, launch!" Everyone knows when it will go.</li>
+</ul>
+<h2 id="materials">Materials</h2>
+<ul>
+<li>Improved stomp rockets (Lesson 6) and the parachute rocket (Lesson 7)</li>
+<li>The stomp launcher, cones, <strong>safety glasses for everyone</strong></li>
+<li>45° sighting cards (on the worksheets; cut out and fold), a tape measure</li>
+<li>Worksheet E8 on a clipboard, pencils</li>
+<li>A tablet or projector with Rocket Builder</li>
+</ul>
+<h2 id="steps">Steps</h2>
+<h3 id="1-before-you-go-out-10-minutes" class="step"><span class="n">1</span> Before you go out (10 minutes)</h3>
+<p>Read the launch rules together (see the <a href="/learn/elementary/safety">safety page</a>). Give out jobs: <strong>countdown caller, stomper, two trackers, recorder, recovery crew.</strong> Everyone takes a turn.</p>
+<p><strong>How the 45° card works:</strong> fold a square of paper corner to corner to make a triangle. Hold the long edge level and sight up the slanted edge. That line goes up at 45°. If you stand <strong>10 m</strong> from the launcher and the rocket goes <strong>above</strong> your 45° line, it went <strong>higher than 10 m</strong>. Below the line? Lower than 10 m.</p>
+<figure class="dg" id="fig-sight45"><svg class="dg" viewBox="0 0 760 420" role="img" aria-label="A 45 degree sighting card: if the rocket goes above the line, it is higher than your distance" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="390" x2="750" y2="390" class="dg-o"/><line x1="20" y1="390" x2="12" y2="398" class="dg-lead"/><line x1="42" y1="390" x2="34" y2="398" class="dg-lead"/><line x1="64" y1="390" x2="56" y2="398" class="dg-lead"/><line x1="86" y1="390" x2="78" y2="398" class="dg-lead"/><line x1="108" y1="390" x2="100" y2="398" class="dg-lead"/><line x1="130" y1="390" x2="122" y2="398" class="dg-lead"/><line x1="152" y1="390" x2="144" y2="398" class="dg-lead"/><line x1="174" y1="390" x2="166" y2="398" class="dg-lead"/><line x1="196" y1="390" x2="188" y2="398" class="dg-lead"/><line x1="218" y1="390" x2="210" y2="398" class="dg-lead"/><line x1="240" y1="390" x2="232" y2="398" class="dg-lead"/><line x1="262" y1="390" x2="254" y2="398" class="dg-lead"/><line x1="284" y1="390" x2="276" y2="398" class="dg-lead"/><line x1="306" y1="390" x2="298" y2="398" class="dg-lead"/><line x1="328" y1="390" x2="320" y2="398" class="dg-lead"/><line x1="350" y1="390" x2="342" y2="398" class="dg-lead"/><line x1="372" y1="390" x2="364" y2="398" class="dg-lead"/><line x1="394" y1="390" x2="386" y2="398" class="dg-lead"/><line x1="416" y1="390" x2="408" y2="398" class="dg-lead"/><line x1="438" y1="390" x2="430" y2="398" class="dg-lead"/><line x1="460" y1="390" x2="452" y2="398" class="dg-lead"/><line x1="482" y1="390" x2="474" y2="398" class="dg-lead"/><line x1="504" y1="390" x2="496" y2="398" class="dg-lead"/><line x1="526" y1="390" x2="518" y2="398" class="dg-lead"/><line x1="548" y1="390" x2="540" y2="398" class="dg-lead"/><line x1="570" y1="390" x2="562" y2="398" class="dg-lead"/><line x1="592" y1="390" x2="584" y2="398" class="dg-lead"/><line x1="614" y1="390" x2="606" y2="398" class="dg-lead"/><line x1="636" y1="390" x2="628" y2="398" class="dg-lead"/><line x1="658" y1="390" x2="650" y2="398" class="dg-lead"/><line x1="680" y1="390" x2="672" y2="398" class="dg-lead"/><line x1="702" y1="390" x2="694" y2="398" class="dg-lead"/><line x1="724" y1="390" x2="716" y2="398" class="dg-lead"/><line x1="746" y1="390" x2="738" y2="398" class="dg-lead"/><circle cx="180" cy="271.7" r="11.7" class="dg-w"/><path d="M180 283.4L180 331.5M180 331.5L161.8 390M180 331.5L198.2 390" class="dg-o"/><path d="M180 293.79999999999995L204 285.79999999999995M180 293.79999999999995L159.2 319.79999999999995" class="dg-o"/><path d="M192 271.7 L226 271.7 L226 237.7 Z" class="dg-w"/><line x1="192" y1="271.7" x2="432" y2="31.69999999999999" stroke="#F2652B" stroke-width="2.5" stroke-dasharray="10 7"/><text x="312.0" y="121.7" text-anchor="end" class="dg-tb" style="fill:#B8471B">45° line</text><text x="172.0" y="231.7" text-anchor="end" class="dg-ts">card: bottom edge level</text><rect x="374" y="378" width="36" height="12" class="dg-g"/><text x="418.0" y="376.0" text-anchor="start" class="dg-ts">launcher</text><line x1="392" y1="378" x2="392" y2="20" class="dg-lead" style="stroke-dasharray:4 5"/><path d="M384.0 24.8L392 4L400.0 24.8Z" class="dg-w"/><rect x="384.0" y="24.8" width="16" height="21.2" class="dg-w"/><path d="M384.0 32.56L371.2 43L371.2 55L384.0 46Z" class="dg-f"/><path d="M400.0 32.56L412.8 43L412.8 55L400.0 46Z" class="dg-f"/><line x1="392" y1="36.56" x2="392" y2="50" class="dg-o"/><text x="414.0" y="26.0" text-anchor="start" class="dg-tb">above the line:</text><text x="414.0" y="44.0" text-anchor="start" class="dg-t">higher than 10 m</text><path d="M385.0 139.89999999999998L392 121.69999999999999L399.0 139.89999999999998Z" class="dg-w"/><rect x="385.0" y="139.89999999999998" width="14" height="31.80000000000001" class="dg-w"/><path d="M385.0 155.7L373.8 168.7L373.8 180.7L385.0 171.7Z" class="dg-f"/><path d="M399.0 155.7L410.2 168.7L410.2 180.7L399.0 171.7Z" class="dg-f"/><line x1="392" y1="159.7" x2="392" y2="175.7" class="dg-o"/><text x="414.0" y="145.7" text-anchor="start" class="dg-tb">below the line:</text><text x="414.0" y="163.7" text-anchor="start" class="dg-t">lower than 10 m</text><line x1="189.0" y1="408.0" x2="363.0" y2="408.0" stroke="#12203A" stroke-width="1.6"/><path d="M372.0 408.0L363.0 412.5L363.0 403.5Z" fill="#12203A"/><path d="M180.0 408.0L189.0 412.5L189.0 403.5Z" fill="#12203A"/><text x="286.0" y="382.0" text-anchor="middle" class="dg-tb">10 m (measure it)</text><rect x="540" y="230" width="210" height="140" rx="10" fill="#FFFDF8" stroke="#E2D9C6" stroke-width="2"/><text x="552.0" y="256.0" text-anchor="start" class="dg-th">Fold a square</text><rect x="560" y="266" width="70" height="70" class="dg-w"/><line x1="560" y1="336" x2="630" y2="266" stroke="#F2652B" stroke-width="3" stroke-dasharray="7 5"/><line x1="640.0" y1="302.0" x2="649.4" y2="302.0" stroke="#F2652B" stroke-width="3.5"/><path d="M664.0 302.0L649.4 310.1L649.4 293.9Z" fill="#F2652B"/><path d="M674 336 L674 270 L734 336 Z" class="dg-w"/><text x="645.0" y="360.0" text-anchor="middle" class="dg-ts">corner to corner</text></svg><figcaption>Tracking with a 45° card: stand 10 m from the launcher and look up the folded edge.</figcaption></figure>
+
+<h3 id="2-launch-25-minutes" class="step"><span class="n">2</span> Launch! (25 minutes)</h3>
+<ol>
+<li>Trackers stand 10 m from the launcher (measure it), off to the side.</li>
+<li><strong>Predict:</strong> before each launch, the recorder writes a guess. <em>Higher or lower than the 45° line?</em></li>
+<li>Countdown, stomp. Trackers call "above!" or "below!"</li>
+<li>Try a <strong>soft</strong>, a <strong>medium</strong> and a <strong>hard</strong> stomp with the same rocket. Record each.</li>
+<li>Fly the parachute rocket. Does the parachute open?</li>
+</ol>
+<h3 id="3-rocket-builder-and-the-real-thing-5-minutes" class="step"><span class="n">3</span> Rocket Builder and the real thing (5 minutes)</h3>
+<p>On the tablet or projector, open a Rocket Builder design and press <strong>▶ Watch it launch</strong> (Simple mode on a projector). Read the predicted height. Compare: the app's rocket flies on a real motor, which pushes for about a second. A stomp pushes for a split second. That's why the app's rocket goes much higher.</p>
+<h3 id="4-wrap-up-10-minutes" class="step"><span class="n">4</span> Wrap up (10 minutes)</h3>
+<ul>
+<li>What pattern did you see between the stomp and the height? (Harder stomp, faster rocket, higher flight.)</li>
+<li>Tell a partner the story of your best flight, in order: before, during, after.</li>
+<li>Hand out the Rocket Scientist certificates.</li>
+</ul>
+<h2 id="check-for-understanding">Check for understanding</h2>
+<ol>
+<li>A rocket goes above the 45° line. The tracker stood 10 m away. Did it go higher or lower than 10 m?</li>
+<li>A hard stomp sends the rocket higher than a soft stomp. Which rocket was moving faster when it left the launcher? Which had more energy?</li>
+<li>Why do we count down out loud?</li>
+</ol>
+<div class="answers"><span class="lab">Answer key</span><ol>
+<li>Higher than 10 m.</li>
+<li>The hard-stomp rocket: it was faster, so it had more energy.</li>
+<li>So everyone knows exactly when the rocket will launch and is watching and ready.</li>
+</ol></div>
+<section class="call notes"><h2 id="teacher-notes">Teacher notes</h2>
+<ul>
+<li><strong>Safety:</strong> glasses on. Nobody stands in front of or over the launcher. Stomp only on "launch!" Never chase a rocket into a road, tree or power line.</li>
+<li><strong>Grade 3:</strong> use only "above or below the line". <strong>Grade 5:</strong> use a protractor inclinometer (from the middle-school worksheets) and the shortcut: at 30° the height is about half the distance; at 45° it equals the distance; at 60° it's about 1.7 times the distance. Add about 1.3 m for eye height.</li>
+<li><strong>Optional instructor demo, a printed rocket on a real motor:</strong> only if an adult experienced with model rockets runs it, following the NAR Model Rocket Safety Code, on a field big enough for the motor (see the middle-school safety page), with students behind a spectator line at least 30 feet (10 m) from the pad. Students never handle motors, igniters or the launch key, and never go to the pad. A simpler option: watch a local NAR club launch as spectators, or show a video of one. Kits and motor flights are rated 12+.</li>
+<li><strong>Rain or wind?</strong> Do launch day in a gym with straw rockets, and use Rocket Builder's simulated launch.</li>
+<li><strong>Further resources:</strong> Apogee Components' free <em>Rocketry Reservoir</em> (apogeerockets.com/downloads/PDFs/Rocketry_Education_Pack.pdf) has rocket colouring pages and certificates you can print. The NAR (nar.org) lists clubs that welcome school groups at their launches.</li>
+<li><strong>Rocket Builder tools for launch day:</strong> the <strong>altitude calculator</strong> (<a href="https://rocket.quiverdesignworks.net/tools/altitude">rocket.quiverdesignworks.net/tools/altitude</a>) turns an angle and a distance into a height, shows the working, the 45° rule and the average of two trackers (good for grade 5). Each design also has a one-page <strong>mission card</strong> (designer ▾ download menu → <em>Mission card</em>) with its predicted height, to print for the clipboard. The simulator's <strong>Predict, fly, compare</strong> log keeps the class's guesses and results.</li>
+</ul></section></section>
+</body></html>

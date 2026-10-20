@@ -517,7 +517,7 @@
   .dlsplit { flex:1; display:flex; min-width:0; position:relative; }
   .dlsplit #zip { flex:1; min-width:0; }
   body:not(.beginner) .actions #build { flex:0 1 38%; }
-  body:not(.beginner) .dlsplit #zip { border-top-right-radius:0; border-bottom-right-radius:0; }
+  .dlsplit #zip { border-top-right-radius:0; border-bottom-right-radius:0; }
   #dlmorebtn { flex:none; width:38px; padding:0; border:1px solid var(--line); border-left:0; border-radius:0 8px 8px 0; background:transparent; color:var(--ink); font-size:12px; }
   #dlmorebtn:hover, #dlmorebtn[aria-expanded=true] { background:var(--hover); }
   .menu a.btn.off { opacity:.45; }
@@ -625,7 +625,7 @@
       <button type="button" id="save">Save</button>
       <!-- Everything else about the file sits in one menu (a disclosure: Esc closes it). -->
       <div class="menuwrap">
-        <button type="button" id="filemenubtn" class="menubtn" aria-expanded="false" aria-controls="filemenu" aria-label="More: share, files and my rockets" title="Share, files and my rockets">⋯</button>
+        <button type="button" id="filemenubtn" class="menubtn" aria-expanded="false" aria-controls="filemenu" aria-label="More: share, files, my rockets and classroom" title="Share, files, my rockets and classroom">⋯</button>
         <div id="filemenu" class="menu" hidden>
           <button type="button" id="share">Copy link<span class="beg"> to share</span></button>
           <button type="button" id="saveas" class="adv">Save as new</button>
@@ -636,6 +636,13 @@
           <label class="mlabel" for="mine">My rockets</label>
           <select id="mine" aria-label="My rockets"></select>
           <div id="acctlinks" hidden><a href="#" id="myorders">My orders</a><span data-admin hidden> · <a href="https://quiverdesignworks.net/admin/orders" target="_blank" rel="noopener" title="All orders: shop and printed rockets (owner only)">Order desk ↗</a></span></div>
+          <!-- Classroom (static/classroom.js, server/classroom.py) -->
+          <div class="sep"></div>
+          <span class="mlabel">Classroom</span>
+          <button type="button" id="classjoin" title="Students: send this rocket to your teacher with a class code">Hand in to my class</button>
+          <a href="/classes" id="myclasses" target="_blank" rel="noopener" title="Teachers: make a class code and see the rockets students hand in">My classes (teachers) ↗</a>
+          <button type="button" id="altcalc" title="How high did it fly? Work it out from an angle and a distance">Altitude calculator</button>
+          <a href="/launch" id="launchsim" class="btn off" target="_blank" rel="noopener" title="Fly this rocket in the launch simulator">Launch simulator ↗</a>
         </div>
       </div>
       <input type="file" id="filepick" accept=".json,application/json" hidden>
@@ -720,6 +727,8 @@
       <p class="why beg choice-why" id="nosewhy" data-tstep="6"></p>
       <label class="advshow">Shape <select name="nose_shape"></select></label>
       <label class="adv">Fineness (length ÷ OD) <input type="number" name="nose_fineness" min="2" max="5" step="0.1"></label>
+      <label class="adv">Nose weight (clay), g <input type="number" name="nose_weight_g" min="0" max="50" step="1"></label>
+      <div class="hint adv">Modelling clay pressed into the nose cone. It moves the balance point (blue dot) forward, so the score goes up; the rocket gets heavier and flies a little lower. 0 = none.</div>
     </fieldset>
     <fieldset class="adv"><legend>Launch lugs</legend>
       <label>Lugs <select name="launch_lugs"></select></label>
@@ -750,9 +759,10 @@
       <button id="build" type="submit"><span class="beg">Build my rocket</span><span class="adv">Build</span></button>
       <div class="dlsplit">
         <a id="zip" class="btn off" href="#" download><span class="beg">Download files to print</span><span class="adv">Download STLs</span></a>
-        <button type="button" id="dlmorebtn" class="menubtn adv" aria-expanded="false" aria-controls="dlmenu" aria-label="More downloads: STEP files" title="More downloads">▾</button>
-        <div id="dlmenu" class="menu up adv" hidden>
-          <a id="stepzip" class="btn off" href="#" download title="One STEP file per part, for editing in CAD">Download STEP (ZIP)</a>
+        <button type="button" id="dlmorebtn" class="menubtn" aria-expanded="false" aria-controls="dlmenu" aria-label="More downloads: mission card, STEP files" title="More downloads">▾</button>
+        <div id="dlmenu" class="menu up" hidden>
+          <a id="missioncard" class="btn off" href="#" target="_blank" rel="noopener" title="A one-page card to print: picture, key numbers, your prediction and blanks for the launch results">Mission card (print)</a>
+          <a id="stepzip" class="btn off adv" href="#" download title="One STEP file per part, for editing in CAD">Download STEP (ZIP)</a>
         </div>
       </div>
       <p class="fitrow"><a id="fitlink" class="fitlink" href="https://fit.quiverdesignworks.net/#rocket" target="_blank" rel="noopener">Print test-fit parts first ↗</a><span class="hint"> Small test pieces for this rocket's body joint, nose and motor-cap thread, at a few clearances. Check your printer's fit before printing the whole rocket.</span></p>
@@ -1028,6 +1038,7 @@
   <label class="prefrow"><input type="checkbox" id="prefskip"> Skip the tutorial when I sign in</label>
   <p class="hint">On: the site opens straight to the design steps. Off: it starts with the welcome and the tutorial.</p>
   <p><a href="#" id="acctorders">My orders</a></p>
+  <p><a href="/classes" target="_blank" rel="noopener">My classes ↗</a> <span class="hint">Teachers: a class code for students to hand in their rockets (no student accounts).</span></p>
   <div class="adminbox" data-admin hidden><b>Owner</b> <a href="https://quiverdesignworks.net/admin/orders" target="_blank" rel="noopener" title="All orders: shop and printed rockets (owner only)">Order desk ↗</a> <a href="/admin" title="Rocket Builder's print orders and their files">Printed-rocket orders</a></div>
   <menu><button type="button" id="acctclose">Close</button><button type="button" id="acctsignout">Sign out</button></menu>
 </dialog>
@@ -1273,8 +1284,8 @@ function fitPlaceholders() {
   const sh = Math.max(0.75 * od - 4, 10), shUsed = Number(f.shoulder_len.value) || sh;
   const noseSh = Number(f.nose_shoulder_len.value) || Math.max(0.7 * shUsed, 7);
   const short = noseSh < (fd.short_nose_shoulder ?? 8);  // short shoulders (M13) grip harder: rocketgen web_fits
-  f.joint_clearance.placeholder = (short ? fd.joint_clearance_short : fd.joint_clearance) ?? 0.18;
-  f.nose_clearance.placeholder = (short ? fd.nose_clearance_short : fd.nose_clearance) ?? 0.15;
+  f.joint_clearance.placeholder = (short ? fd.joint_clearance_short : fd.joint_clearance) ?? 0.22;
+  f.nose_clearance.placeholder = (short ? fd.nose_clearance_short : fd.nose_clearance) ?? 0.27;
   f.shoulder_len.placeholder = sh.toFixed(1);
   f.nose_shoulder_len.placeholder = Math.max(0.7 * shUsed, 7).toFixed(1);
   f.thread_clearance.placeholder = fd.thread_clearance ?? 0.25;
@@ -1372,8 +1383,8 @@ const HELP = {
     <dt>Wall thickness</dt><dd>The wall of the body tubes, nose cone and motor mount. Thicker is stronger and stiffer but heavier, which lowers the flight and needs more motor. Use a multiple of your nozzle width (1.2, 1.6 or 2.0 mm for a 0.4 mm nozzle) so the slicer prints whole perimeters.</dd>
     <dt>Body OD offset</dt><dd>Makes the rocket fatter: each 1 mm of offset adds 2 mm to the outside diameter. At 0 the motor fits the body itself (minimum diameter: lightest and fastest). With an offset, an inner motor mount holds the motor. A fatter body has more room for the parachute but more drag and weight.</dd></dl>`],
   'Fits and joints': ['Fits and joints', `<p>How tightly the printed parts go together. Leave a box empty to use Rocket Builder's value (shown in grey). Print the test parts from <i>Generate test fit parts</i> first, then type in the values your printer liked.</p><dl>
-    <dt>Joint clearance</dt><dd>The gap, per side, between a body section's shoulder and the tube it slides into. More clearance slides in more easily; too much is loose and wobbly. The default (0.18 mm, 0.16 on 13 mm rockets) came from fit-test prints in PLA.</dd>
-    <dt>Nose clearance</dt><dd>The same gap for the nose's shoulder. The nose has to come off at ejection, so it's a little looser than a body joint would need; too loose and it falls off in flight. Default 0.15 mm (0.14 on 13 mm rockets).</dd>
+    <dt>Joint clearance</dt><dd>The gap, per side, between a body section's shoulder and the tube it slides into. More clearance slides in more easily; too much is loose and wobbly. The default (0.22 mm, 0.19 on 13 mm rockets) came from fit-test and kit prints in PLA.</dd>
+    <dt>Nose clearance</dt><dd>The same gap for the nose's shoulder. The nose has to come off at ejection, so it's a little looser than a body joint would need; too loose and it falls off in flight. Default 0.27 mm: the nose's socket prints a little smaller than a body joint's, and the nose must come off easily.</dd>
     <dt>Body joint length</dt><dd>How far each body-to-body shoulder goes into the next section. Longer joints are stiffer and straighter but take height from every section.</dd>
     <dt>Nose joint length</dt><dd>How far the nose's shoulder goes into the body. Shorter lets the ejection charge push the nose off more easily; too short and it can fall off or tilt.</dd>
     <dt>Thread clearance</dt><dd>The gap in the motor cap's thread. More screws on more easily; too much and the cap can work loose.</dd>
@@ -2087,7 +2098,9 @@ function chuteHtml(c, kid) {
   const size = c.size_in
     ? `<b>${c.size_in}-inch</b> parachute (${Math.round(c.size_in * 2.54)} cm across). Your rocket weighs about <b>${Math.round(c.descent_mass_g)} g</b> on the way down, so it lands at about <b>${c.descent_ms} m/s</b> (${fts(c.descent_ms)} ft/s), a gentle landing.`
     : `parachute at least <b>${Math.round(c.min_diameter_in)} inches</b> across (bigger than the usual hobby sizes) for ${Math.round(c.descent_mass_g)} g.`;
-  const streamer = c.streamer_ok ? ' A rocket this light can use a streamer instead: it comes down faster but drifts less.' : '';
+  const streamer = c.streamer_recommended
+    ? ' <b>Better: a streamer.</b> This body is narrow, and a packed parachute can catch on the shock-cord strap at ejection; a streamer slides out. It comes down a little faster but drifts less.'
+    : c.streamer_ok ? ' A rocket this light can use a streamer instead: it comes down faster but drifts less.' : '';
   return kid ? `<p>Use a ${size}${streamer}${c.size_in ? ' A smaller one lands too hard; a much bigger one drifts far away.' : ''}</p>${buy}`
              : `<li>Parachute: ${c.size_in ? `${c.size_in} in (at least ${c.min_diameter_in} in needed), about ${c.descent_ms} m/s down` : `at least ${Math.round(c.min_diameter_in)} in`} with ${c.descent_mass_g} g after the motor burns (flat chute, Cd 0.75, for ≤ 4.5 m/s).${streamer}</li>`;
 }
@@ -2313,6 +2326,7 @@ async function runBuild() {
     rememberBuild(body);
     if (tutStep) tutEnd(true, '<b>You built your first rocket!</b> Check its stability score. Every step is unlocked now, so try changing things and building again.');
     showReport(body); showGuide(false); setLaunch(body);
+    dispatchEvent(new CustomEvent('rb:built', { detail: body }));  // classroom.js: mission card and launch links
     zipBtn.href = `/api/builds/${body.id}/rocket.zip`;
     zipBtn.classList.toggle('off', !body.stability.ok);
     zipBtn.title = body.stability.ok ? '' : 'Unstable designs can\'t be downloaded; see the stability message.';
@@ -2748,6 +2762,18 @@ else { showGuide(true); lockForm(); }
 markDirty('Press <b>Build</b> to make the 3D model and downloads.');
 renderMine();
 if (linked) openDesign(linked[1]);
+// Classroom tools (static/classroom.js) read the page through this hook.
+window.rbDesigner = {
+  report: () => lastReport, name: () => specName(nameEl.value), baseName: () => baseName(nameEl.value),
+  designId: () => current?.id || null, dirty: () => !dirtyEl.hidden, say,
+  unlock: () => { if (formLocked()) skipTut(); },
+  openParams: (p, name) => {  // a teacher opening a student's handed-in rocket: an unsaved copy
+    setForm(Object.fromEntries(Object.entries(p).filter(([k]) => k in opts.defaults)));
+    nameEl.value = baseName(name); current = null; shared = true;
+    history.replaceState(null, '', '/'); renderMine(); runBuild();
+  },
+};
+import('/static/classroom.js');
 </script>
 </body>
 </html>

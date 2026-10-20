@@ -140,17 +140,20 @@ function idMat(id, clip = []) {
 
 // ---------- scene-building helpers ----------
 let nextId = 1;
-function mesh(geometry, color, { clip = [], flat = false, outline = true, cut, rope } = {}) {
+// clipAnd: cut away only what is outside *every* clip plane (a window cut
+// into one corner of a part) instead of outside any of them.
+function mesh(geometry, color, { clip = [], flat = false, outline = true, cut, rope, clipAnd = false } = {}) {
   const m = new THREE.Mesh(geometry, null);
   const id = outline ? nextId++ : 0;
   m.userData = { color: rope ? ropeMat(color, rope, clip) : colorMat(color, clip, { flat, cut }), nd: ndMat(id, clip), id: idMat(id, clip) };
+  if (clipAnd) for (const k of ['color', 'nd', 'id']) m.userData[k].clipIntersection = true;
   return m;
 }
 // A printed part of rocket `key`, moved up by dz and turned by rot (degrees) about the axis.
-function part(key, name, { dz = 0, rot = 0, color = COL.part, clip = [], cut } = {}) {
+function part(key, name, { dz = 0, rot = 0, color = COL.part, clip = [], cut, clipAnd = false } = {}) {
   const g = R[key].geo[name];
   if (!g) throw new Error(`${key} has no part ${name}`);
-  const m = mesh(g, color, { clip, cut });
+  const m = mesh(g, color, { clip, cut, clipAnd });
   m.position.z = dz;
   m.rotation.z = THREE.MathUtils.degToRad(rot);
   m.userData.part = name;
@@ -411,7 +414,8 @@ function frameCamera(root, dir, up, margin, aspectFix, focus) {
     const planes = m.userData.color.clippingPlanes || [];
     for (let i = 0; i < pos.count; i += 1) {
       v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
-      if (planes.some(p => p.distanceToPoint(v) < -0.01)) continue;
+      const out = p => p.distanceToPoint(v) < -0.01;
+      if (planes.length && (m.userData.color.clipIntersection ? planes.every(out) : planes.some(out))) continue;
       if (focus && !focus.containsPoint(v)) continue;
       v.applyMatrix4(inv);
       box.expandByPoint(new THREE.Vector2(v.x, v.y));
@@ -538,7 +542,8 @@ function addDashes(root, cam, W, H, worldPerPx, line, opts = {}) {
     }
     if (!geos.length) continue;
     const clip = o.userData.dashClip ?? o.userData.color?.clippingPlanes ?? [];
-    const m = mesh(mergeGeometries(geos), o.userData.dashColor ?? COL.night, { flat: true, clip, cut: o.userData.dashColor ?? COL.night });
+    const m = mesh(mergeGeometries(geos), o.userData.dashColor ?? COL.night, { flat: true, clip, cut: o.userData.dashColor ?? COL.night,
+                                                                             clipAnd: !!o.userData.color?.clipIntersection });
     m.userData.dash = true;
     root.add(m);
   }

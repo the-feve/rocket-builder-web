@@ -47,7 +47,11 @@ Toss a ball straight up. Ask: *Why does it always come back down? Would it come 
 >
 > When thrust is bigger than weight and drag, the rocket speeds up. When the push stops, gravity and drag slow it down. At the very top, called **apogee**, it stops going up for a moment. Then gravity pulls it back down. Everywhere on Earth, "down" means toward the middle of the Earth.
 
+<!-- figure: straw-forces -->
+
 ### 3. Do: build and fly straw rockets (20 minutes)
+
+<!-- figure: straw-build -->
 
 1. Roll the paper strip tightly around a pencil. Tape the seam. Slide the pencil out.
 2. Fold the top over twice and tape it shut. This is the nose. It must be airtight.
@@ -79,3 +83,4 @@ On the projector, press **▶ Watch it launch**. Call out each part as the class
 - **Grade 5 argument:** ask students to write a claim ("Gravity pulls things down") and two pieces of evidence (their rocket, a dropped ball, people in other countries see things fall too).
 - **Common mix-up:** some students think the rocket "runs out of push" and that is why it falls. Gravity is pulling the whole time; it just wins once the push stops.
 - **Keep the rockets** for Lesson 3.
+- **Force arrows:** in the launch simulator (Simple mode on the projector), turn on the force arrows. Students see thrust, gravity and drag change size through the flight, the same arrows as on E2.

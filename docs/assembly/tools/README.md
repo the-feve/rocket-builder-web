@@ -16,11 +16,13 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
 
 ## How it works
 
-- `build_meshes.py`: the example rockets (`ROCKETS`: the Beginner default M18 with trapezoid fins,
-  and an M24 at 480 mm with two body sections) are built with `rocketgen.stability.build_stable`.
-  Each part goes into a GLB in its assembled position (named as in the app: `Aft`, `Seg_2`,
-  `Anchor_Seg`, `Nose`, `Motor_Cap`, `Rod_Standoff`), plus a JSON of the dimensions the drawings need
-  (anchor strap position and slot, nose tie bar, motor bay, thread, launch-lug line) and each part's
+- `build_meshes.py`: the example rockets (`ROCKETS`): `m18` is the Starter kit (M18, 300 mm, 256 mm
+  printer, trapezoid fins, tangent ogive), a one-print body: the fin can `Aft` (D) carries the cord strap
+  in its top; `m24` is an M24 at 480 mm on a 200 mm printer, a three-print body (`Aft`, `Seg_2`, `Top_Seg`,
+  the top one with the strap), used for the joint and glue steps. They are built with
+  `rocketgen.stability.build_stable`. Each part goes into a GLB in its assembled position (named as in the
+  app: `Aft`, `Seg_2`…, `Top_Seg`, `Nose`, `Motor_Cap`, `Rod_Standoff`), plus a JSON of the dimensions the drawings need
+  (the strap from `rocket.strap`: its part, angle and height, plus its slot from `anchor_strap_geometry`; nose tie bar, motor bay, thread, launch-lug line) and each part's
   **fillet edges** (`fillet_edges()`: the tangent edges where a fillet meets the body or fin, found in
   the B-rep: two faces meeting tangentially where one bulges out past the shared tangent plane, so
   convex roundings, split faces and bores are left out; edges under 4 mm are skipped). STL output
@@ -38,8 +40,10 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
   way (the parachute fold lines).
 - **Cord** (`rope()`): a smooth Catmull-Rom tube of constant radius with a braid pattern and flat cut
   ends; knots are drawn as two snug turns round the long part (`wraps()`), as tied in steps 4 and 5.
-  `strapRig`, `noseRig` and `larks` (the parachute's lark's head on the cord just under the nose knot)
-  are shared by steps 4–6, the overview and the packing drawing.
+  `strapRig`, `noseRig` and `swivelRig` (a size 14 snap swivel clipped round the cord just under the
+  nose knot, with the parachute's lines lark's-headed to its eye; states 'clip', 'through', 'snug')
+  are shared by steps 4–6, the overview and the packing drawing. (`larks` hitches the lines straight
+  onto the cord; no longer used.)
 - `scene_defs.js`: one entry per drawing (camera, which parts, how far each is pulled apart, and
   the labelled points). Labels are not baked into the PNGs: `render.mjs` writes each scene's
   points to `images/callouts.js`, and the guide draws the part tags over the images with
@@ -49,8 +53,8 @@ per page for checking the layout. Both use Playwright with the pre-installed Chr
   shading, nose to the left in step drawings, Night shock cord, orange canopy and motion arrows.
 
 Drawings are not to scale unless they say so: the overview (`recovery`) shortens the cord with a
-break mark, and in `chute_fold` only picture 4 (roll next to B) is real size. The parachute is
-hitched to the cord, not the tie bar, in the drawings (an 18 mm rocket): the M13/M18 tie-bar recess
+break mark, and in `chute_fold` only picture 4 (roll next to the top of the body) is real size. The swivel is
+clipped to the cord, not the tie bar, in the drawings (an 18 mm rocket): the M13/M18 tie-bar recess
 leaves room for one cord pass only (`body.nose_recess`); 24 mm and up have room for both.
 
 To check a render by eye, composite it onto paper (the PNGs are transparent): the page previews

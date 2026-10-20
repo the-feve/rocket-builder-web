@@ -37,6 +37,8 @@ Paper strips (8 × 20 cm), pencils, straws, cardstock, tape, scissors, a protrac
 
 ### 2. Model it (10 minutes)
 
+<!-- figure: flight-phases -->
+
 On W2, draw and label the forces in the four flight pictures. Longer arrow = bigger force. Mark which pictures are balanced.
 
 ### 3. Investigate: straw rockets and launch angle (25 minutes)
@@ -73,3 +75,4 @@ Why does the rocket keep going up after the motor stops? (Inertia: it's moving u
 - **Extension:** net force 4.5 N on a 0.1 kg rocket: a = 45 m/s², about 4½ times gravity. Draw arrows to scale (1 cm = 1 N).
 - **About MS-PS2-4:** this lesson only connects to it (weight = gravity on mass); the full PE needs an argument about masses and gravitational attraction.
 - **Safety:** glasses on for everyone; never aim at people; fetch only on "clear".
+- **Force arrows and graphs:** in the launch simulator, turn on the force arrows and open the flight graphs (altitude, speed and acceleration against time). Ask students to find boost, coast and apogee on the speed graph.
