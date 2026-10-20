@@ -1285,7 +1285,7 @@ function fitPlaceholders() {
   const noseSh = Number(f.nose_shoulder_len.value) || Math.max(0.7 * shUsed, 7);
   const short = noseSh < (fd.short_nose_shoulder ?? 8);  // short shoulders (M13) grip harder: rocketgen web_fits
   f.joint_clearance.placeholder = (short ? fd.joint_clearance_short : fd.joint_clearance) ?? 0.22;
-  f.nose_clearance.placeholder = (short ? fd.nose_clearance_short : fd.nose_clearance) ?? 0.18;
+  f.nose_clearance.placeholder = (short ? fd.nose_clearance_short : fd.nose_clearance) ?? 0.27;
   f.shoulder_len.placeholder = sh.toFixed(1);
   f.nose_shoulder_len.placeholder = Math.max(0.7 * shUsed, 7).toFixed(1);
   f.thread_clearance.placeholder = fd.thread_clearance ?? 0.25;
@@ -1384,7 +1384,7 @@ const HELP = {
     <dt>Body OD offset</dt><dd>Makes the rocket fatter: each 1 mm of offset adds 2 mm to the outside diameter. At 0 the motor fits the body itself (minimum diameter: lightest and fastest). With an offset, an inner motor mount holds the motor. A fatter body has more room for the parachute but more drag and weight.</dd></dl>`],
   'Fits and joints': ['Fits and joints', `<p>How tightly the printed parts go together. Leave a box empty to use Rocket Builder's value (shown in grey). Print the test parts from <i>Generate test fit parts</i> first, then type in the values your printer liked.</p><dl>
     <dt>Joint clearance</dt><dd>The gap, per side, between a body section's shoulder and the tube it slides into. More clearance slides in more easily; too much is loose and wobbly. The default (0.22 mm, 0.19 on 13 mm rockets) came from fit-test and kit prints in PLA.</dd>
-    <dt>Nose clearance</dt><dd>The same gap for the nose's shoulder. The nose has to come off at ejection, so it's a little looser than a body joint would need; too loose and it falls off in flight. Default 0.18 mm (0.17 on 13 mm rockets).</dd>
+    <dt>Nose clearance</dt><dd>The same gap for the nose's shoulder. The nose has to come off at ejection, so it's a little looser than a body joint would need; too loose and it falls off in flight. Default 0.27 mm: the nose's socket prints a little smaller than a body joint's, and the nose must come off easily.</dd>
     <dt>Body joint length</dt><dd>How far each body-to-body shoulder goes into the next section. Longer joints are stiffer and straighter but take height from every section.</dd>
     <dt>Nose joint length</dt><dd>How far the nose's shoulder goes into the body. Shorter lets the ejection charge push the nose off more easily; too short and it can fall off or tilt.</dd>
     <dt>Thread clearance</dt><dd>The gap in the motor cap's thread. More screws on more easily; too much and the cap can work loose.</dd>

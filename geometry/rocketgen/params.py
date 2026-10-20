@@ -128,10 +128,18 @@ class DesignParams:
 # under on diameter, shoulders 0.10-0.20 mm over, so the parts touch or
 # overlap by up to ~0.2 mm on diameter at the seam. All four gaps +20 %
 # (owner's call): 0.18 -> 0.22, 0.15 -> 0.18, 0.16 -> 0.19, 0.14 -> 0.17.
+# Round 3 (owner, 2026-10-20, fit-check plates on a P1S, Sunlu PLA+ 2.0,
+# 0.16 mm layers): every body joint "right" at 0.22 (M13 0.19); every nose
+# still tight. The nose's socket (the top of the body, where the cord strap
+# is fused to the wall) prints 0.1-0.2 mm smaller than a plain joint socket:
+# measured shoulder OD - socket ID was 0.12 / 0.23 / 0.17 / 0.05 mm on
+# M13 / M18 / M24 / M29 against -0.12 / 0.06 / 0.00 / 0.04 for the joints
+# that felt right. A nose has to come off at ejection, so it gets more than
+# that: 0.27 per side on every size (+0.09 to +0.10).
 WEB_FIT_JOINT = 0.22
-WEB_FIT_NOSE = 0.18
+WEB_FIT_NOSE = 0.27
 WEB_FIT_JOINT_SHORT = 0.19
-WEB_FIT_NOSE_SHORT = 0.17
+WEB_FIT_NOSE_SHORT = 0.27
 SHORT_NOSE_SHOULDER = 8.0
 
 

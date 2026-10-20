@@ -9,4 +9,4 @@ Short slices of the real parts, so a round of fit testing is a short print inste
 | 3 joint socket (NN-3) | the top of a lower body piece (taller rockets printed in pieces) | |
 | 4 joint shoulder (NN-4) | the bottom of the piece above it | push into 3: a snug slide you'd glue |
 
-Current fits (per side): body joint 0.22 mm, nose 0.18 mm; M13 0.19 / 0.17. Rebuild after a fit change with `python docs/kits/test-prints/tools/make_fit_checks.py`.
+Current fits (per side): body joint 0.22 mm (M13 0.19), nose 0.27 mm on every size. Rebuild after a fit change with `python docs/kits/test-prints/tools/make_fit_checks.py`.

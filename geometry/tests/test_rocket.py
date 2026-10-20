@@ -370,7 +370,7 @@ def test_nose_tie_bar_has_room_for_the_cord(motor):
     probe = top.fuse(*legs)
     hit = nose.intersect(probe)
     assert hit is None or as_shape(hit).volume < 0.01, f"cord probe hits the nose ({as_shape(hit).volume:.2f} mm3)"
-    sh_r_out, sh_r_in = d.shoulder_od / 2, d.shoulder_od / 2 - d.wall
+    sh_r_out, sh_r_in = d.nose_shoulder_od / 2, d.nose_shoulder_od / 2 - d.wall
     annulus = math.pi * (sh_r_out ** 2 - sh_r_in ** 2)
     for z in [0.5 + i * (d.nose_shoulder_len - 1) / 8 for i in range(9)]:
         assert slice_area(nose, z) > annulus - 0.05, f"nose shoulder slice at z = {z:.2f}"
@@ -592,7 +592,7 @@ def test_critical_fit_overrides():
     they reach the joint, the nose and the motor thread, and the parts build."""
     from rocketgen.geom import meshes
     base = compute_derived(DesignParams())
-    assert base.fit_slip == 0.22 and base.fit_nose == 0.18
+    assert base.fit_slip == 0.22 and base.fit_nose == 0.27
     assert base.thread["thread_clear"] == 0.25 and base.thread["p"] == 2.5
     r = rocket(joint_clearance=0.2, nose_clearance=0.17, shoulder_len=15.0, nose_shoulder_len=9.0,
                thread_clearance=0.35, thread_pitch=3.0, thread_turns=4)
@@ -687,7 +687,7 @@ def test_printed_fit_defaults():
     """Fits from the fit-test prints (owner, 2026-10-16/18: the CAD 0.02 mm
     printed far too tight). M13's short nose shoulder gets the short pair."""
     from rocketgen.params import web_fits
-    for motor, joint, nose in (("M13", 0.19, 0.17), ("M18", 0.22, 0.18), ("M24", 0.22, 0.18), ("M29", 0.22, 0.18)):
+    for motor, joint, nose in (("M13", 0.19, 0.27), ("M18", 0.22, 0.27), ("M24", 0.22, 0.27), ("M29", 0.22, 0.27)):
         d = compute_derived(DesignParams(motor=motor))
         assert (d.fit_slip, d.fit_nose) == (joint, nose), motor
         assert web_fits(d.nose_shoulder_len) == (joint, nose)

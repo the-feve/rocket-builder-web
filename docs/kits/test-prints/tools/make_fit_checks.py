@@ -36,6 +36,7 @@ from rocketgen.params import DesignParams, compute_derived  # noqa: E402
 
 SIZES = ("M13", "M18", "M24", "M29")
 EXTRA = 6.0  # mm of plain tube or cone kept past each fit, to hold and to see the joint
+BAND = 5.0  # plain wall kept under the strap / the socket, for the engraved code (owner: 24/29 pieces were taller than needed)
 GAP = 6.0  # between pieces on the plate
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 MARK_DEPTH = 0.5  # engraved label depth; the walls are 1.5 mm
@@ -87,13 +88,13 @@ def pieces(size: str) -> list[tuple[str, Solid]]:
     top_local = top.local
     h = top_local.bounding_box().max.Z
     strap_bot = r.strap["z_bot"] - top.placement_z - (top.assembled.translate((0, 0, -top.placement_z)).bounding_box().min.Z)
-    out.append(("2_top_section", engrave(slab(top_local, max(0.0, strap_bot - EXTRA), h, f"{size} top section"),
-                                         f"{num}-2", EXTRA / 2, ro, f"{size} top section")))
+    out.append(("2_top_section", engrave(slab(top_local, max(0.0, strap_bot - BAND), h, f"{size} top section"),
+                                         f"{num}-2", BAND / 2, ro, f"{size} top section")))
     a = aft.local
     ah = a.bounding_box().max.Z
-    socket = d.shoulder_len + d.inner_taper_rise
-    out.append(("3_joint_socket", engrave(slab(a, ah - socket - EXTRA, ah, f"{size} joint socket"), f"{num}-3",
-                                          EXTRA / 2, ro, f"{size} joint socket")))
+    socket = d.shoulder_len + 1.0  # the depth the shoulder goes in, plus a little
+    out.append(("3_joint_socket", engrave(slab(a, ah - socket - BAND, ah, f"{size} joint socket"), f"{num}-3",
+                                          BAND / 2, ro, f"{size} joint socket")))
     joint_fit = d.shoulder_len + d.joint_rise
     out.append(("4_joint_shoulder", engrave(slab(above.local, 0, joint_fit + EXTRA, f"{size} joint shoulder"),
                                             f"{num}-4", joint_fit + EXTRA / 2, ro, f"{size} joint shoulder")))

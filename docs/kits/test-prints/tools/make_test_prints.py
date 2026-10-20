@@ -55,6 +55,10 @@ FITS_4 = ("**2026-10-19 (round 4):** body joints and nose 20 % looser after the 
           "Reprint A, D and B/C if your rocket has them.")
 
 
+FITS_5 = ("**2026-10-20 (round 5):** nose 0.27 mm per side on every size (it was still tight on the fit-check "
+          "plates; body joints were right and stay). Reprint A.")
+
+
 def fits_note(joint: float, nose: float) -> str:
     return (f"**2026-10-19:** reprint everything. Joints from the fit tests (body {joint:.2f} mm, nose {nose:.2f} mm per "
             "side, 0.5 mm chamfer on each shoulder's bed edge; they were the CAD 0.02 mm and wouldn't go in). Motor cap: "
@@ -64,11 +68,11 @@ def fits_note(joint: float, nose: float) -> str:
 
 KITS = [
     {"dir": "starter-m18", "name": "Starter kit (M18, 18 mm motors)", "motor": "M18", "overall_length": 300,
-     "notes": [FITS_4, ROUND_3, fits_note(0.22, 0.18)]},
+     "notes": [FITS_5, FITS_4, ROUND_3, fits_note(0.22, 0.27)]},
     {"dir": "big-m24", "name": "Big kit (M24, 24 mm motors)", "motor": "M24", "overall_length": 360,
-     "notes": [FITS_4, ROUND_3, fits_note(0.22, 0.18)]},
+     "notes": [FITS_5, FITS_4, ROUND_3, fits_note(0.22, 0.27)]},
     {"dir": "mini-m13", "name": "Mini kit (M13, 13 mm motors)", "motor": "M13", "overall_length": 190,
-     "notes": [FITS_4, ROUND_3, fits_note(0.19, 0.17)]},
+     "notes": [FITS_5, FITS_4, ROUND_3, fits_note(0.19, 0.27)]},
 ]
 COMMON = {"print_max_height": 256, "fin_shape": "trapezoid", "nose_shape": "tangent_ogive", "fin_count": 3,
           "material": "PLA"}
