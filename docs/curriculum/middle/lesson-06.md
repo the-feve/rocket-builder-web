@@ -33,10 +33,14 @@ Computers or tablets with Rocket Builder (https://rocket.quiverdesignworks.net),
 
 ### 1. Define the problem (10 minutes)
 
+![The design cycle: a computer model lets you go round it many times before you print.](../art/design-cycle.svg)
+
 **Criteria:** score 1–2 cal (2–3 OK) · at least one motor gets **✓ Good** (5× thrust-to-weight, 15 m/s off the rod, 30 m high) · the predicted flight fits our field.
 **Constraints:** our printer's height · our field size · motor cost (the smallest motor that works) · safety: no people, roads, dry grass or trees near the pad.
 
 ### 2. Part A: one variable in Beginner mode (20 minutes)
+
+![Change one thing in Rocket Builder, compare the two versions, and choose with a decision table.](../art/m6-design-with-a-model.svg)
 
 1. Pick a motor size (M18 is common) and your printer height. Keep fins and nose fixed.
 2. Start at the shortest height; build; record height, score, best motor, altitude, power and "fins grew?" (Grown-up details → Build notes).

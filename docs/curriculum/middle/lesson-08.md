@@ -39,6 +39,8 @@ Read the [safety page](safety.md) together. For each rule, ask *why?* Do the "Is
 
 ### 2. Inclinometer and a tall object (30 minutes)
 
+![Height from a baseline and an angle, measured with a protractor inclinometer.](../art/m8-inclinometer.svg)
+
 1. Build the inclinometer from the template (straw on the top edge, weighted string at the pivot). Level = 0°.
 2. Measure a 20 m baseline from a tree or pole. Read the angle to the top 3 times; average.
 3. Height = baseline × multiplier (table on W8) + eye height. Check with a second baseline.

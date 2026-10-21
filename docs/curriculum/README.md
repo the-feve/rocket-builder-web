@@ -30,6 +30,9 @@ _Two tracks built on Washington's K–12 Science Learning Standards. Goes with *
 | `tools/gen_ws.py` | Builds the worksheets: `python3 docs/curriculum/tools/gen_ws.py elementary docs/curriculum/elementary/worksheets.html` (and `middle`) |
 | `tools/build_site.py` | Builds the web pages in `server/static/learn/` from these files, and runs `gen_ws.py` for both tracks. `pip install markdown`, then `python3 docs/curriculum/tools/build_site.py --pdf` from the repo root (`--pdf` also renders `server/static/learn/elementary/worksheets.pdf` and `…/middle/worksheets.pdf` with Playwright: needs node, the `playwright` package on `NODE_PATH` and `PLAYWRIGHT_BROWSERS_PATH`). Commit the generated files. |
 | `tools/worksheets_pdf.js` | The Playwright step behind `--pdf` |
+| `art/` | Hand-drawn SVG pictures of each lesson's activity, in the brand's line style (rules and list in `art/README.md`). A lesson shows one with a line like `![caption](../art/e1-balloon-rocket.svg)`; the web pages and worksheets inline them |
+| `tools/visuals.py` | The generated diagrams: the learning pathway on each track page, the "you are here" strip, time bar and at-a-glance chips on each lesson, the two-track map on /learn, the standards dot grid, the grade 3–5 → 6–8 progression on /learn/teachers, and the "My rocket journey" unit map in the worksheets. Phases, the short unit and the adult plan-ahead milestones are set there |
+| `tools/render_art.js` | Renders one picture to a PNG to check it by eye |
 
 ## Web addresses
 
@@ -37,4 +40,5 @@ _Two tracks built on Washington's K–12 Science Learning Standards. Goes with *
 
 ## History
 
+- 2026-10-21: made more visual (owner's request): activity pictures for every lesson, learning-pathway diagrams, a unit map page in each worksheet pack, and cards and checklists instead of plain lists.
 - 2026-10-19: restructured into an elementary and a middle-school track around the Washington standards (owner's request), replacing the 2026-10-18 10-day unit for grades 3–8. The middle-school track is that unit, simplified and tightened from 10 days to 9 lessons.

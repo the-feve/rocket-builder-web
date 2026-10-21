@@ -53,6 +53,8 @@ Show an arrow, a dart or a badminton shuttle (or a picture). Ask: *Why does it f
 
 ### 3. Do: the swing test (20 minutes)
 
+![The swing test: no fins tumbles; with fins the nose leads; clay in the nose flies straighter.](../art/e4-swing-test.svg)
+
 Go outside or to a big open room. Nobody stands within 3 m of the swinger.
 
 1. Build the rocket with **no fins**. Balance it on a finger to find the balance point. Tie the string there and tape it.

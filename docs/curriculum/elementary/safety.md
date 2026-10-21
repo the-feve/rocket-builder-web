@@ -21,6 +21,8 @@ Read this page before Lesson 1, and again before launch day (Lesson 8).
 
 ## Launch team jobs
 
+![Launch day jobs: launcher, trackers and everyone else behind the line.](../art/e8-launch-day.svg)
+
 | Job | Who |
 |---|---|
 | Countdown caller | A student |

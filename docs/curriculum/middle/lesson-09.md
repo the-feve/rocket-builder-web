@@ -38,6 +38,8 @@ Write Rocket Builder's predicted altitude, the motor, and the time to apogee on 
 
 ### 2. Launch (adult-run, students on jobs)
 
+![The launch site: an adult at the controller, everyone else behind the spectator line, trackers on the baseline.](../art/m9-launch-day.svg)
+
 1. Check wind (under 20 mph), the field and the pad area (no dry grass).
 2. RSO check: rocket sound, preflight done in Lesson 8.
 3. Wadding, parachute and cord in; nose on. (Students can help.)

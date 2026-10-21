@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="e4-swing-test-title">
+<title id="e4-swing-test-title">The swing test: a paper rocket on a string swung in a circle. With no fins it tumbles; with 3 fins it flies straight; with clay in the nose it flies straighter</title>
+<path d="M213 40V320M427 40V320" stroke="#EDE6D8" stroke-width="2"/>
+<circle cx="107" cy="196" r="74" fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8"/>
+<g fill="#F2652B" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M179 146A88 88 0 0 1 185 237" fill="none"/><path d="M178 250L179 234L191 241Z"/></g>
+<path d="M107 196L107 122" stroke="#12203A" stroke-width="1.5"/>
+<g transform="translate(107 122) rotate(-40)"><g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round" fill="#FFFDF8" stroke-width="2"><rect x="-50" y="-10" width="92" height="20"/><path d="M42 -10L72 0L42 10Z"/></g></g>
+<g fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round"><path d="M137 162Q159 152 163 130"/><path d="M73 80Q51 92 49 114"/></g>
+<circle cx="120.8" cy="110.4" r="5" fill="#E5484D" stroke="#12203A" stroke-width="1"/>
+<circle cx="107" cy="122" r="5" fill="#3D8BFD" stroke="#12203A" stroke-width="1"/>
+<circle cx="107" cy="196" r="10" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<text x="107" y="34" fill="#12203A" font-size="17" font-weight="600" text-anchor="middle">no fins</text>
+<text x="107" y="318" fill="#12203A" font-size="17" font-weight="600" text-anchor="middle">tumbles</text>
+<circle cx="320" cy="196" r="74" fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8"/>
+<g fill="#F2652B" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M392 146A88 88 0 0 1 398 237" fill="none"/><path d="M391 250L392 234L404 241Z"/></g>
+<path d="M320 196L320 122" stroke="#12203A" stroke-width="1.5"/>
+<g transform="translate(320 122)"><g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round" fill="#FFFDF8" stroke-width="2"><path d="M-36 -10L-56 -30H-62L-60 -10Z"/><path d="M-36 10L-56 30H-62L-60 10Z"/><rect x="-60" y="-10" width="92" height="20"/><path d="M32 -10L62 0L32 10Z"/><path d="M-60 -2.5H-36V2.5H-60Z"/></g></g>
+<circle cx="296" cy="122" r="5" fill="#E5484D" stroke="#12203A" stroke-width="1"/>
+<circle cx="320" cy="122" r="5" fill="#3D8BFD" stroke="#12203A" stroke-width="1"/>
+<circle cx="320" cy="196" r="10" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<text x="320" y="34" fill="#12203A" font-size="17" font-weight="600" text-anchor="middle">3 fins</text>
+<text x="332" y="318" fill="#12203A" font-size="17" font-weight="600" text-anchor="middle">straight</text>
+<path d="M269 309L275 315L287 303" fill="none" stroke="#2FB67C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="533" cy="196" r="74" fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8"/>
+<g fill="#F2652B" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M605 146A88 88 0 0 1 611 237" fill="none"/><path d="M604 250L605 234L617 241Z"/></g>
+<path d="M533 196L533 122" stroke="#12203A" stroke-width="1.5"/>
+<g transform="translate(533 122)"><g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round" fill="#FFFDF8" stroke-width="2"><path d="M-54 -10L-74 -30H-80L-78 -10Z"/><path d="M-54 10L-74 30H-80L-78 10Z"/><rect x="-78" y="-10" width="92" height="20"/><path d="M14 -10L44 0L14 10Z"/><path d="M10 -7Q26 -7 34 0Q26 7 10 7Q4 0 10 -7Z" fill="#EDE6D8" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M-78 -2.5H-54V2.5H-78Z"/></g></g>
+<circle cx="491" cy="122" r="5" fill="#E5484D" stroke="#12203A" stroke-width="1"/>
+<circle cx="533" cy="122" r="5" fill="#3D8BFD" stroke="#12203A" stroke-width="1"/>
+<circle cx="533" cy="196" r="10" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<text x="533" y="34" fill="#12203A" font-size="17" font-weight="600" text-anchor="middle">clay in nose</text>
+<text x="545" y="318" fill="#12203A" font-size="17" font-weight="600" text-anchor="middle">straighter</text>
+<path d="M473 309L479 315L491 303" fill="none" stroke="#2FB67C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="214" cy="346" r="6" fill="#3D8BFD" stroke="#12203A" stroke-width="1"/><circle cx="364" cy="346" r="6" fill="#E5484D" stroke="#12203A" stroke-width="1"/><g fill="#6E6E73" font-size="15" font-weight="600"><text x="226" y="351">balance point</text><text x="376" y="351">push point</text></g>
+</svg>

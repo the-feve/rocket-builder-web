@@ -34,6 +34,8 @@ Calculators, W5. Optional: a sealed motor pack (adult shows it, unopened). Optio
 
 ### 1. Teach: inside a motor (10 minutes)
 
+![Inside a model rocket motor, what its code means, and where the energy goes in a flight.](../art/m5-inside-a-motor.svg)
+
 > A model rocket motor is a factory-made paper tube: a **nozzle**, **propellant** that burns for about a second, a **delay** that makes a smoke trail while the rocket coasts, and an **ejection charge** that pops the nose and pushes out the parachute near apogee. Only adults handle motors and igniters.
 >
 > In **C6-5**: C is the impulse class (5.01–10 N·s), 6 is the average thrust in newtons, 5 is the delay in seconds.

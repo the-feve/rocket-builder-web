@@ -589,6 +589,23 @@ def test_learn_pages():
     assert "Paper rockets only" in client.get("/learn/elementary/safety").text
 
 
+def test_learn_pages_are_visual():
+    """Each lesson shows its activity picture (inlined from docs/curriculum/art), the "you are
+    here" strip and the at-a-glance chips; each track page has the learning pathway."""
+    import re
+    for track, count in (("elementary", 8), ("middle", 9)):
+        page = client.get(f"/learn/{track}/").text
+        assert 'class="path ' in page and 'class="smatrix"' in page, track
+        for n in range(1, count + 1):
+            text = client.get(f"/learn/{track}/lesson-{n:02d}").text
+            assert '<figure class="art"><svg' in text, (track, n)
+            assert 'class="minipath"' in text and 'class="glance"' in text, (track, n)
+            ids = re.findall(r'\sid="([^"]+)"', text)
+            assert len(ids) == len(set(ids)), (track, n, "duplicate ids")
+    assert 'class="tracksmap"' in client.get("/learn/").text
+    assert 'class="progression"' in client.get("/learn/teachers").text
+
+
 def test_learn_old_addresses_redirect_to_middle_school():
     """The first unit's /learn/day-NN, /learn/safety and /learn/worksheets(.pdf) still work."""
     for old, new in (("day-01", "lesson-01"), ("day-03", "lesson-03"), ("day-03.html", "lesson-03"), ("day-08", "lesson-08"),

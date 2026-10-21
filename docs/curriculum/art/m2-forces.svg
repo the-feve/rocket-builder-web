@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="m2-forces-title">
+<title id="m2-forces-title">Forces on a rocket during boost: thrust up is bigger than weight plus drag down, so the net force is up; inset: a straw rocket launched at 45 degrees and its flight path</title>
+
+<!-- ===== Free-body diagram: boost ===== -->
+<text x="24" y="34" font-size="17" font-weight="600" fill="#12203A">Boost: motor on</text>
+
+<!-- rocket, nose up -->
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8">
+  <path d="M168 238L146 262H154L168 252Z"/>
+  <path d="M192 238L214 262H206L192 252Z"/>
+  <path d="M168 104C168 84 174 66 180 56C186 66 192 84 192 104Z"/>
+  <rect x="168" y="104" width="24" height="148"/>
+  <path d="M174 252H186V258H174Z"/>
+</g>
+<path d="M180 104V252" stroke="#6E6E73" stroke-width="1" stroke-dasharray="14 4 2 4"/>
+<!-- exhaust flame -->
+<path d="M174 260Q180 312 186 260Z" fill="#F2652B"/>
+
+<!-- thrust -->
+<g stroke="#F2652B" fill="#F2652B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M236 270V98" fill="none"/><path d="M236 82L227 100H245Z"/>
+</g>
+<text x="250" y="150" font-size="16" font-weight="600" fill="#12203A">thrust</text>
+<text x="250" y="168" font-size="15" font-weight="600" fill="#6E6E73">6 N</text>
+
+<!-- weight (acts at the balance point) -->
+<g stroke="#12203A" fill="#12203A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M138 170V200" fill="none"/><path d="M138 216L129 198H147Z"/>
+</g>
+<text x="120" y="190" font-size="16" font-weight="600" fill="#12203A" text-anchor="end">weight</text>
+<text x="120" y="208" font-size="15" font-weight="600" fill="#6E6E73" text-anchor="end">1 N</text>
+
+<!-- drag (against the motion) -->
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M138 72V80" fill="none"/><path d="M138 96L129 78H147Z"/>
+</g>
+<text x="120" y="76" font-size="16" font-weight="600" fill="#12203A" text-anchor="end">drag</text>
+<text x="120" y="94" font-size="15" font-weight="600" fill="#6E6E73" text-anchor="end">0.5 N</text>
+
+
+<!-- net force -->
+<path d="M332 270V170H316L346 130L376 170H360V270Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<text x="346" y="296" font-size="16" font-weight="600" fill="#12203A" text-anchor="middle">net force</text>
+<text x="346" y="314" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">4.5 N up</text>
+<text x="346" y="334" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">6 − 1 − 0.5</text>
+<text x="24" y="334" font-size="14" font-weight="600" fill="#6E6E73">longer arrow = bigger force</text>
+
+<!-- ===== Inset: launch angle ===== -->
+<rect x="408" y="16" width="220" height="328" rx="10" fill="#DDEAFF"/>
+<text x="424" y="44" font-size="17" font-weight="600" fill="#12203A">Launch angle</text>
+<rect x="408" y="276" width="220" height="68" fill="#EDE6D8"/>
+<path d="M408 276H628" stroke="#12203A" stroke-width="2"/>
+
+<!-- flight path -->
+<path d="M478 236C520 194 580 150 612 276" fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8"/>
+
+<!-- launcher: protractor on a box, straw at 45 degrees -->
+<g stroke="#12203A" stroke-linejoin="round" fill="#FFFDF8">
+  <rect x="426" y="252" width="48" height="24" stroke-width="2"/>
+  <path d="M432 252A18 18 0 0 1 468 252Z" stroke-width="1.5"/>
+  <path d="M450 252L470 232" stroke-width="2"/>
+</g>
+<!-- straw rocket on the launch straw -->
+<g transform="translate(466 236) rotate(-45)" stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8">
+  <path d="M-4 -4L-12 -10V10L-4 4Z"/>
+  <path d="M-4 -5H22L30 0L22 5H-4Z"/>
+</g>
+<!-- 45 degree mark -->
+<path d="M486 252A36 36 0 0 0 475.5 226.5" fill="none" stroke="#6E6E73" stroke-width="1"/>
+<path d="M450 252H492" stroke="#6E6E73" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="494" y="246" font-size="15" font-weight="600" fill="#6E6E73">45°</text>
+
+<!-- distance -->
+<g stroke="#6E6E73" stroke-width="1" fill="none">
+  <path d="M450 284V312M612 278V312"/>
+  <path d="M454 304H492M570 304H608"/>
+</g>
+<g fill="#6E6E73"><path d="M450 304L460 300V308Z"/><path d="M612 304L602 300V308Z"/></g>
+<text x="531" y="309" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">distance</text>
+<text x="518" y="334" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">try 15° to 75°</text>
+</svg>

@@ -33,6 +33,8 @@ Paper strips (8 × 20 cm), pencils, straws, cardstock, tape, scissors, a protrac
 
 ### 1. Teach (10 minutes)
 
+![The forces in boost: thrust is bigger than weight plus drag, so the net force is up.](../art/m2-forces.svg)
+
 > On the pad, the weight pulls down and the pad pushes up: balanced, so nothing changes. At liftoff the thrust is far bigger than weight plus drag, so the rocket accelerates. Model rockets need thrust at least **5 times** their weight, so they leave the rod fast enough for the fins to steer. After burnout there's no thrust; weight and drag both slow it as it **coasts** to **apogee**. Under the parachute, drag up equals weight down: balanced again, so it falls at a steady speed.
 
 ### 2. Model it (10 minutes)

@@ -45,6 +45,8 @@ Not used: K-2-ETS1 (the K–2 engineering PEs). The elementary track starts at g
 
 ### Practices and crosscutting concepts
 
+![The engineering design cycle both tracks use (3-5-ETS1 and MS-ETS1).](art/design-cycle.svg)
+
 The SEP and CCC named in each lesson are the ones in that PE's NGSS foundation box, or, for the engineering PEs that list none, the one the activity uses most:
 
 - **3-PS2-1, 3-PS2-2, 3-5-ETS1-3, MS-PS2-2:** planning and carrying out investigations. **5-PS2-1, MS-ETS1-2:** engaging in argument from evidence. **3-5-ETS1-1, MS-ETS1-1:** asking questions and defining problems. **3-5-ETS1-2, 4-PS3-1, MS-PS2-1:** constructing explanations and designing solutions. **MS-PS3-1, MS-ETS1-3:** analyzing and interpreting data. **MS-PS3-2, MS-ETS1-4:** developing and using models.

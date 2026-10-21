@@ -37,6 +37,8 @@ Plastic bags, string, tape, identical washers, stopwatches, a tape measure, a 2�
 
 ### 2. Drop test (25 minutes)
 
+![Speed = height ÷ time. Kinetic energy grows with the square of the speed, so a slower landing is much gentler.](../art/m7-parachute-energy.svg)
+
 1. Make 20, 30 and 40 cm parachutes with 30 cm lines and the same washers.
 2. An adult drops each from the same height; time 3 trials each; also the washers alone (and a streamer, if you made one).
 3. Mean time and descent rate (height ÷ mean time) for each. Graph canopy size vs time.

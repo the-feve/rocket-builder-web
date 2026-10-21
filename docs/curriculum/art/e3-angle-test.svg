@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="e3-angle-test-title">
+<title id="e3-angle-test-title">The angle test: a squeeze-bottle launcher held along a protractor; rockets launched at 30, 45 and 60 degrees land at different spots, and 45 degrees goes farthest</title>
+
+<!-- ground -->
+<rect x="0" y="300" width="640" height="14" fill="#EDE6D8"/>
+<path d="M0 300H640" stroke="#12203A" stroke-width="1"/>
+
+<!-- flight paths -->
+<g fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8">
+  <path d="M222 148Q381 56 540 300"/>
+  <path d="M222 148Q411 -41 600 300"/>
+  <path d="M222 148Q361 -93 500 300"/>
+</g>
+
+<!-- box with the protractor taped to its edge -->
+<g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round">
+  <rect x="40" y="205" width="185" height="95" fill="#EDE6D8" stroke-width="1"/>
+  <path d="M105 205A60 60 0 0 1 225 205Z" fill="#FFFDF8" stroke-width="2"/>
+  <g stroke-width="1">
+    <path d="M216 175L223 171M208 163L214 157M195 153L199 146M165 145V153M135 153L131 146M122 163L116 157M114 175L107 171"/>
+  </g>
+  <path d="M165 205L233 166M165 205L204 137" stroke="#6E6E73" stroke-width="1.5"/>
+</g>
+
+<!-- bottle launcher at 45°, straw rocket on the straw -->
+<g transform="translate(165 205) rotate(-45)" stroke="#12203A" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M-108 -18H-34L-20 -8H-10V8H-20L-34 18H-108Q-114 18 -114 12V-12Q-114 -18 -108 -18Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M-96 -18V18M-46 -18V18" fill="none" stroke-width="1"/>
+  <rect x="-10" y="-9" width="10" height="18" rx="2" fill="#FFFDF8" stroke-width="2"/>
+  <rect x="0" y="-2.5" width="34" height="5" fill="#FFFDF8" stroke-width="1.5"/>
+  <rect x="12" y="-6" width="68" height="12" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M68 -6V6" fill="none" stroke-width="1"/>
+  <path d="M24 -6L12 -16H8L12 -6Z M24 6L12 16H8L12 6Z" fill="#FFFDF8" stroke-width="1.5"/>
+  <!-- squeeze -->
+  <g fill="#F2652B" stroke="#F2652B" stroke-width="2.5">
+    <path d="M-72 -52V-36" fill="none"/><path d="M-72 -22L-80 -38H-64Z"/>
+    <path d="M-72 52V36" fill="none"/><path d="M-72 22L-80 38H-64Z"/>
+  </g>
+</g>
+<g fill="#6E6E73" font-size="15" font-weight="600"><text x="240" y="182">30°</text><text x="176" y="128">60°</text></g>
+<text x="40" y="160" fill="#12203A" font-size="16" font-weight="600">squeeze!</text>
+
+<!-- landing marks (sticky notes) -->
+<g fill="#F2652B" stroke="#12203A" stroke-width="1">
+  <rect x="493" y="296" width="14" height="8"/>
+  <rect x="533" y="296" width="14" height="8"/>
+  <rect x="593" y="296" width="14" height="8"/>
+</g>
+<g fill="#12203A" font-size="16" font-weight="600" text-anchor="middle">
+  <text x="497" y="336">60°</text>
+  <text x="541" y="336">30°</text>
+  <text x="596" y="336">45°</text>
+</g>
+<!-- farthest -->
+<path d="M584 346L592 354L608 338" fill="none" stroke="#2FB67C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

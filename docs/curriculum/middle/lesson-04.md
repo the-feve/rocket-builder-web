@@ -37,6 +37,8 @@ Straw-rocket supplies, a squeeze-bottle launcher (bottle + straw sealed into the
 
 ### 2. Nose-cone test (20 minutes)
 
+![Nose shapes and drag: a blunt nose piles up the air; a pointed or rounded one lets it slide past.](../art/m4-nose-cone-test.svg)
+
 1. Three identical straw rockets: **flat**, **cone** and **round** noses, same mass (add tape to the lighter ones).
 2. Same launcher, same angle. 3 trials each. Mean and bar graph on W4.
 

@@ -42,6 +42,8 @@ Agree as a class: the same launcher, the same stomper, the same kind of stomp (a
 
 ### 3. Test (15 minutes)
 
+![A fair test: change one thing, launch, measure, then improve and test again.](../art/e6-fair-test.svg)
+
 1. **Glasses on.** Everyone stands behind the line.
 2. Countdown: "3, 2, 1, launch!" The stomper stomps only on "launch!"
 3. On E6, tick what happened: **straight or wobbly**, **in the zone or not**, **still works or broken**.

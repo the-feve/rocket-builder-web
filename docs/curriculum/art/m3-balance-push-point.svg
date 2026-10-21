@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="m3-balance-push-point-title">
+<title id="m3-balance-push-point-title">Finding the balance point (CG) on a finger, the push point (CP) by balancing a cardboard cut-out of the side view on a ruler edge, and the swing test: tied at the balance point, the rocket flies nose first when blue is in front of red</title>
+<path d="M29 20H45L50 25V39L45 44H29L24 39V25Z" fill="#F2652B"/><text x="37" y="38" font-size="16" font-weight="700" fill="#12203A" text-anchor="middle">1</text><text x="60" y="38" font-size="17" font-weight="600" fill="#12203A">Balance it on a finger</text>
+<g stroke="#6E6E73" stroke-width="1" fill="none"><path d="M36 72V100M149 72V98"/><path d="M40 80H145"/></g>
+<g fill="#6E6E73"><path d="M36 80L46 76V84Z"/><path d="M149 80L139 76V84Z"/></g>
+<text x="92.4" y="72" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">from the nose tip</text>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M232.8 107.0L264.0 87.2H276.0V107.0Z"/><path d="M232.8 129.0L264.0 148.8H276.0V129.0Z"/><path d="M79.2 107.0C55.4 107.0 40.3 113.6 36.0 118.0C40.3 122.4 55.4 129.0 79.2 129.0Z"/><rect x="79.2" y="107.0" width="196.8" height="22.0"/></g>
+<path d="M140 210V139A9 9 0 0 1 158 139V210" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="148.8" cy="118" r="7" fill="#3D8BFD" stroke="#FFFDF8" stroke-width="2"/>
+<path d="M157 126L175 162" stroke="#12203A" stroke-width="1" fill="none"/>
+<text x="178.8" y="166" font-size="15" font-weight="600" fill="#12203A">balance point</text><text x="178.8" y="184" font-size="15" font-weight="600" fill="#3D8BFD">(CG): blue</text>
+<path d="M345 20H361L366 25V39L361 44H345L340 39V25Z" fill="#F2652B"/><text x="353" y="38" font-size="16" font-weight="700" fill="#12203A" text-anchor="middle">2</text><text x="376" y="38" font-size="17" font-weight="600" fill="#12203A">Balance the cut-out</text>
+<text x="352" y="80" font-size="14" font-weight="600" fill="#6E6E73">side view cut from cardboard</text>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#EDE6D8"><path d="M548.8 107.0L580.0 87.2H592.0V107.0Z"/><path d="M548.8 129.0L580.0 148.8H592.0V129.0Z"/><path d="M395.2 107.0C371.4 107.0 356.3 113.6 352.0 118.0C356.3 122.4 371.4 129.0 395.2 129.0Z"/><rect x="395.2" y="107.0" width="196.8" height="22.0"/></g>
+<rect x="346" y="196" width="252" height="14" fill="#EDE6D8"/><path d="M346 196H598" stroke="#12203A" stroke-width="2"/>
+<path d="M507 130.0H513V196H507Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="510.4" cy="118" r="7" fill="#E5484D" stroke="#FFFDF8" stroke-width="2"/>
+<path d="M502 126L480 158" stroke="#12203A" stroke-width="1" fill="none"/>
+<text x="476.4" y="166" font-size="15" font-weight="600" fill="#12203A" text-anchor="end">push point</text><text x="476.4" y="184" font-size="15" font-weight="600" fill="#E5484D" text-anchor="end">(CP): red</text>
+<text x="522.4" y="172" font-size="14" font-weight="600" fill="#6E6E73">ruler on</text><text x="522.4" y="188" font-size="14" font-weight="600" fill="#6E6E73">its edge</text>
+<path d="M24 226H616" stroke="#EDE6D8" stroke-width="2"/>
+<path d="M29 240H45L50 245V259L45 264H29L24 259V245Z" fill="#F2652B"/><text x="37" y="258" font-size="16" font-weight="700" fill="#12203A" text-anchor="middle">3</text><text x="60" y="258" font-size="17" font-weight="600" fill="#12203A">Swing test (from above)</text>
+<circle cx="200" cy="354" r="58" fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8"/>
+<path d="M169.3 278.0A82 82 0 0 0 119.8 337.0" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M118.1 349.7L111.0 333.3L126.9 334.1Z" fill="#F2652B" stroke="#F2652B" stroke-width="2" stroke-linejoin="round"/>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><rect x="170" y="362" width="60" height="20" rx="10"/><circle cx="200" cy="372" r="13"/></g>
+<path d="M222 368L202 352" stroke="#12203A" stroke-width="9" stroke-linecap="round"/>
+<path d="M222 368L202 352" stroke="#FFFDF8" stroke-width="5" stroke-linecap="round"/>
+<path d="M201 350L200 296" stroke="#12203A" stroke-width="1.5"/>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M243.4 289.0L259.5 276.4H265.7V289.0Z"/><path d="M243.4 303.0L259.5 315.6H265.7V303.0Z"/><path d="M164.0 289.0C151.8 289.0 144.0 293.2 141.7 296.0C144.0 298.8 151.8 303.0 164.0 303.0Z"/><rect x="164.0" y="289.0" width="101.7" height="14.0"/></g>
+<circle cx="200" cy="296" r="6" fill="#3D8BFD" stroke="#FFFDF8" stroke-width="2"/><circle cx="223.56" cy="296" r="6" fill="#E5484D" stroke="#FFFDF8" stroke-width="2"/>
+<text x="270" y="340" font-size="14" font-weight="600" fill="#6E6E73">string tied</text><text x="270" y="356" font-size="14" font-weight="600" fill="#6E6E73">at the CG</text>
+<text x="370" y="288" font-size="16" font-weight="600" fill="#12203A">Does the nose lead?</text>
+<path d="M370 312L377 320L390 302" fill="none" stroke="#2FB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="400" y="318" font-size="15" font-weight="600" fill="#12203A">yes: stable</text>
+<text x="400" y="338" font-size="14" font-weight="600" fill="#6E6E73">tumbles: unstable</text>
+<rect x="360" y="356" width="256" height="40" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<circle cx="378" cy="376" r="7" fill="#3D8BFD" stroke="#FFFDF8" stroke-width="2"/><text x="390" y="381" font-size="15" font-weight="600" fill="#12203A">in front of</text><circle cx="478" cy="376" r="7" fill="#E5484D" stroke="#FFFDF8" stroke-width="2"/><text x="492" y="381" font-size="16" font-weight="700" fill="#2FB67C">= stable</text>
+</svg>

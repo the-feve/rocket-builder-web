@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="e2-straw-rocket-title">
+<title id="e2-straw-rocket-title">Making a straw rocket in four steps: roll paper around a pencil, fold the top, tape on 3 fins, slide it on a straw and puff</title>
+
+<!-- panel dividers -->
+<path d="M134 60V320M268 60V320M402 60V320" stroke="#EDE6D8" stroke-width="2"/>
+
+<!-- step tags -->
+<g fill="#F2652B">
+  <path d="M17 16H33L38 21V35L33 40H17L12 35V21Z"/>
+  <path d="M151 16H167L172 21V35L167 40H151L146 35V21Z"/>
+  <path d="M285 16H301L306 21V35L301 40H285L280 35V21Z"/>
+  <path d="M419 16H435L440 21V35L435 40H419L414 35V21Z"/>
+</g>
+<g fill="#12203A" font-size="17" font-weight="700" text-anchor="middle">
+  <text x="25" y="34">1</text><text x="159" y="34">2</text><text x="293" y="34">3</text><text x="427" y="34">4</text>
+</g>
+
+<g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 1: paper rolled around a pencil, seam taped -->
+  <path d="M61 300V96L67 78L73 96V300Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M65.5 84L67 78L68.5 84Z" fill="#12203A" stroke-width="1"/>
+  <path d="M61 96H73" fill="none" stroke-width="1"/>
+  <rect x="55" y="118" width="24" height="160" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M73 118V278" fill="none" stroke-width="1"/>
+  <rect x="62" y="140" width="22" height="9" fill="#FFFDF8" stroke-width="1"/>
+  <rect x="62" y="246" width="22" height="9" fill="#FFFDF8" stroke-width="1"/>
+
+  <!-- 2: fold the top over twice and tape (dashed = before the fold) -->
+  <rect x="190" y="88" width="24" height="34" fill="none" stroke-width="1" stroke-dasharray="4 3"/>
+  <rect x="190" y="122" width="24" height="168" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M190 122H214V146H190Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M190 134H214" fill="none" stroke-width="1"/>
+  <rect x="186" y="138" width="32" height="10" fill="#FFFDF8" stroke-width="1"/>
+
+  <!-- 3: three small fins at the bottom -->
+  <rect x="324" y="122" width="24" height="168" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M324 122H348V146H324Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M324 134H348" fill="none" stroke-width="1"/>
+  <rect x="320" y="138" width="32" height="10" fill="#FFFDF8" stroke-width="1"/>
+  <path d="M324 254L302 282V298L324 290Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M348 254L370 282V298L348 290Z" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M333 256H339V300H333Z" fill="#FFFDF8" stroke-width="2"/>
+</g>
+
+<!-- motion: roll around, fold over, fins on -->
+<g fill="#F2652B" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M46 204Q48 216 67 216Q84 216 88 206" fill="none"/><path d="M92 194L93 211L80 206Z"/>
+  <path d="M214 84Q238 84 236 112Q234 132 226 136" fill="none"/><path d="M216 142L222 126L232 136Z"/>
+</g>
+
+<!-- 4: kid with safety glasses, rocket on a straw, aimed up and away -->
+<path d="M578 66Q604 14 632 70" fill="none" stroke="#3D8BFD" stroke-width="2.5" stroke-dasharray="10 8"/>
+<g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round">
+  <g transform="translate(497 212) rotate(30)">
+    <rect x="-4" y="-34" width="8" height="86" fill="#FFFDF8" stroke-width="1.5"/>
+    <rect x="-11" y="-150" width="22" height="146" fill="#FFFDF8" stroke-width="2"/>
+    <path d="M-4 -4V-34H4V-4" fill="none" stroke-width="1" stroke-dasharray="4 3"/>
+    <path d="M-11 -150H11V-130H-11Z" fill="#FFFDF8" stroke-width="2"/>
+    <path d="M-11 -32L-28 -8V4L-11 -2Z" fill="#FFFDF8" stroke-width="2"/>
+    <path d="M11 -32L28 -8V4L11 -2Z" fill="#FFFDF8" stroke-width="2"/>
+    <path d="M-2.5 -30H2.5V6H-2.5Z" fill="#FFFDF8" stroke-width="2"/>
+  </g>
+  <path d="M404 330C404 296 418 278 446 276C474 278 486 296 488 330Z" fill="#FFFDF8" stroke-width="2"/>
+  <circle cx="446" cy="244" r="24" fill="#FFFDF8" stroke-width="2"/>
+  <rect x="452" y="228" width="20" height="13" rx="4" fill="#FFFDF8" stroke-width="2"/>
+  <path d="M452 233L426 236" fill="none" stroke-width="2"/>
+  <path d="M468 252Q474 258 467 263" fill="none" stroke-width="2"/>
+</g>
+<circle cx="464" cy="235" r="2.5" fill="#12203A"/>
+
+<!-- labels -->
+<g fill="#12203A" font-size="16" font-weight="600" text-anchor="middle">
+  <text x="67" y="330">roll + tape</text>
+  <text x="201" y="330">fold twice</text>
+  <text x="335" y="330">3 fins</text>
+  <text x="566" y="300">glasses on,</text>
+  <text x="566" y="320">one sharp puff</text>
+</g>
+</svg>

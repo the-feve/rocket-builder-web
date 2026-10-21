@@ -47,6 +47,8 @@ Ask: *If you want to throw a ball as far as you can, do you throw it flat, strai
 
 ### 3. Do: the angle test (25 minutes)
 
+![The angle test: the same squeeze at 30°, 45° and 60°. Which lands farthest?](../art/e3-angle-test.svg)
+
 1. Put the rocket on the bottle's straw. Hold the straw along the protractor at **30°**.
 2. Squeeze the bottle hard, the same way each time. Mark where the rocket lands. Measure the distance.
 3. Do **2 tries** at 30°, then 2 at **45°**, then 2 at **60°**.
