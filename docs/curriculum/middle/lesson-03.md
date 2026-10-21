@@ -39,6 +39,8 @@ Paper-towel tube, cardstock nose and fins, modeling clay, 1.5 m of string, scrap
 
 ### 2. Measure (15 minutes)
 
+![Find the balance point (CG) on a finger, the push point (CP) with a cut-out, then swing-test it.](../art/m3-balance-push-point.svg)
+
 1. Build a test rocket (tube, cone nose, 3–4 fins). Balance it on a finger: mark the CG (blue). Measure from the nose tip.
 2. Trace the rocket's side view on cardboard, cut it out and balance the cut-out: that's a cautious estimate of the CP (red). Mark it.
 3. Score = (CP − CG) ÷ body width.

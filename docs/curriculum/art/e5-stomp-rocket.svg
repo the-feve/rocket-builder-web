@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="e5-stomp-rocket-title">
+<title id="e5-stomp-rocket-title">A stomp rocket launcher: stomp on the empty 2-litre bottle and the air rushes up the pipe and pushes the paper rocket off the end</title>
+<rect x="0" y="310" width="640" height="14" fill="#EDE6D8"/><path d="M0 310H640" stroke="#12203A" stroke-width="1"/>
+<g stroke="#12203A" stroke-linejoin="round" stroke-linecap="round" fill="#FFFDF8" stroke-width="2">
+<rect x="180" y="284" width="126" height="12"/>
+<g transform="translate(300 290) rotate(20)"><rect x="-6" y="-190" width="12" height="196"/></g>
+<path d="M292 284H306V296H292Z" stroke="none"/>
+<rect x="270" y="268" width="62" height="42" fill="#EDE6D8" stroke-width="2"/>
+<path d="M46 272H136Q156 272 164 282H178V298H164Q156 308 136 308H46Q36 308 36 298V282Q36 272 46 272Z"/>
+<path d="M58 272V308M120 272V308" fill="none" stroke-width="1"/>
+<rect x="166" y="279" width="26" height="22" stroke-width="1.5"/>
+<g transform="translate(300 290) rotate(20)"><path d="M-10 -178L-28 -152V-140L-10 -146Z"/><path d="M10 -178L28 -152V-140L10 -146Z"/><rect x="-10" y="-250" width="20" height="104"/><path d="M-6 -146V-190H6V-146" fill="none" stroke-width="1" stroke-dasharray="4 3"/><path d="M-10 -250L0 -284L10 -250Z"/><path d="M-2.5 -178H2.5V-140H-2.5Z"/></g>
+<path d="M84 0V218M118 0V218" fill="none"/>
+<path d="M80 218H122V236L156 244Q164 248 160 258H64Q60 258 60 252V238Q60 226 80 218Z"/>
+<path d="M62 250H160" fill="none" stroke-width="1"/>
+</g>
+<g fill="#F2652B" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M190 170L190 242" fill="none"/><path d="M190 256L183 242L197 242Z"/><path d="M336 261L364 185" fill="none"/><path d="M369 171L371 187L357 182Z"/></g>
+<g fill="#12203A" font-size="17" font-weight="600"><text x="138" y="160">stomp!</text><text x="361" y="222">air</text></g>
+<g stroke="#12203A" stroke-width="1" fill="none"><path d="M470 110L380 105"/><path d="M266 226L313 232"/></g><circle cx="380" cy="105" r="2.5" fill="#12203A"/><circle cx="313" cy="232" r="2.5" fill="#12203A"/>
+<g fill="#12203A" font-size="17" font-weight="600"><text x="476" y="116">rocket</text><text x="224" y="232">pipe</text><text x="74" y="346">bottle</text></g>
+<text x="476" y="138" fill="#6E6E73" font-size="15" font-weight="600">paper + 3 fins</text>
+<text x="350" y="346" fill="#6E6E73" font-size="15" font-weight="600">about 1 m of 2 cm pipe</text>
+</svg>

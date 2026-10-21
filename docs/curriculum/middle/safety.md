@@ -19,6 +19,8 @@ Read this page before Lesson 1, and again before launch day (Lesson 9).
 
 ## The NAR Model Rocket Safety Code (a plain summary)
 
+![A launch site laid out by the safety code.](../art/m9-launch-day.svg)
+
 The National Association of Rocketry's code is what every launch in this unit follows. Read the official code at nar.org before launch day.
 
 1. **Materials.** Light materials such as paper, wood, rubber and plastic. No metal for the nose, body or fins. (Printed PLA is fine.)

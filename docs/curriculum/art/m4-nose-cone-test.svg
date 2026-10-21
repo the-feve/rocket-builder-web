@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="m4-nose-cone-test-title">
+<title id="m4-nose-cone-test-title">Nose-cone drag test: flat, cone and round noses on straw rockets of the same mass; air piles up in front of the flat nose; each is launched from the same squeeze-bottle launcher at the same angle, three trials each, and the mean distances are compared</title>
+<text x="20" y="34" font-size="17" font-weight="600" fill="#12203A">Same mass, three noses</text>
+<text x="20" y="98" font-size="16" font-weight="600" fill="#12203A">flat</text><text x="20" y="116" font-size="14" font-weight="600" fill="#6E6E73">most drag</text>
+<path d="M396 96H304Q284 96 280 85L246 85H144M396 89H298Q284 89 280 79L246 79H144M396 104H304Q284 104 280 115L246 115H144M396 111H298Q284 111 280 121L246 121H144" fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M286 91Q292 100 286 109M292 90Q299 100 292 110M298 90Q306 100 298 110" fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round"/>
+<text x="326" y="144" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">air piles up</text>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M130 92L106 80H100V92Z"/><path d="M130 108L106 120H100V108Z"/><rect x="100" y="92" width="176" height="16"/><path d="M276 92H280V108H276Z"/></g>
+<text x="20" y="178" font-size="16" font-weight="600" fill="#12203A">cone</text><text x="20" y="196" font-size="14" font-weight="600" fill="#6E6E73">less drag</text>
+<path d="M396 176H316C294 176 270 163 236 163H144M396 168H316C294 168 270 153 236 153H144M396 184H316C294 184 270 197 236 197H144M396 192H316C294 192 270 207 236 207H144" fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M130 172L106 160H100V172Z"/><path d="M130 188L106 200H100V188Z"/><rect x="100" y="172" width="176" height="16"/><path d="M276 172L310 180L276 188Z"/></g>
+<text x="20" y="258" font-size="16" font-weight="600" fill="#12203A">round</text><text x="20" y="276" font-size="14" font-weight="600" fill="#6E6E73">less drag</text>
+<path d="M396 256H302C280 256 270 243 236 243H144M396 248H302C280 248 270 233 236 233H144M396 264H302C280 264 270 277 236 277H144M396 272H302C280 272 270 287 236 287H144" fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M130 252L106 240H100V252Z"/><path d="M130 268L106 280H100V268Z"/><rect x="100" y="252" width="176" height="16"/><path d="M276 252A20 8 0 0 1 276 268Z"/></g>
+<g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M300 54H346" fill="none"/><path d="M360 54L344 46V62Z"/></g>
+<text x="292" y="59" font-size="14" font-weight="600" fill="#12203A" text-anchor="end">flies this way</text>
+<path d="M412 20V340" stroke="#EDE6D8" stroke-width="2"/>
+<text x="430" y="34" font-size="17" font-weight="600" fill="#12203A">The fair test</text>
+<rect x="426" y="128" width="200" height="10" fill="#EDE6D8"/><path d="M426 128H626" stroke="#12203A" stroke-width="2"/>
+<g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M440 104H500Q514 104 518 112H524V120H518Q514 128 500 128H440Q434 128 434 116Q434 104 440 104Z"/><path d="M524 112H530V124H524Z" fill="#EDE6D8"/></g>
+<g transform="translate(530 118) rotate(-30)" stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8"><path d="M0 -2H30V2H0Z" stroke-width="1.5"/><path d="M10 -5H58L68 0L58 5H10Z"/><path d="M10 -5V-13L24 -5ZM10 5V13L24 5Z"/></g>
+<path d="M530 118H584" stroke="#6E6E73" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M578 118A48 48 0 0 0 571.6 94" fill="none" stroke="#6E6E73" stroke-width="1"/>
+<text x="584" y="112" font-size="14" font-weight="600" fill="#6E6E73">30°</text>
+<g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M470 68V88" fill="none"/><path d="M470 100L462 86H478Z"/></g>
+<text x="484" y="80" font-size="14" font-weight="600" fill="#12203A">squeeze</text>
+<text x="430" y="160" font-size="14" font-weight="600" fill="#6E6E73">same launcher, same angle</text>
+<text x="430" y="190" font-size="14" font-weight="600" fill="#12203A">3 trials each: mean distance</text>
+<rect x="470" y="260" width="34" height="58" fill="#EDE6D8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<text x="487" y="336" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">flat</text>
+<rect x="520" y="218" width="34" height="100" fill="#DDEAFF" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<text x="537" y="336" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">cone</text>
+<rect x="570" y="224" width="34" height="94" fill="#DDEAFF" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<text x="587" y="336" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">round</text>
+<path d="M460 206V318H620" fill="none" stroke="#6E6E73" stroke-width="1.5"/>
+<path d="M530 210l6 6l12 -14" fill="none" stroke="#2FB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

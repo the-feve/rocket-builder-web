@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="m5-inside-a-motor-title">
+<title id="m5-inside-a-motor-title">A cut-away model rocket motor (nozzle, propellant, delay, ejection charge, cap inside a paper casing), the code C6-5 decoded, and the energy story of a flight: chemical, kinetic, potential, then kinetic and heat</title>
+<rect x="96" y="74" width="60" height="56" fill="#C9C2B5" stroke="#12203A" stroke-width="1"/>
+<rect x="156" y="74" width="200" height="56" fill="#F9C9B3" stroke="#12203A" stroke-width="1"/>
+<rect x="356" y="74" width="110" height="56" fill="#DDE6F5" stroke="#12203A" stroke-width="1"/>
+<rect x="466" y="74" width="50" height="56" fill="#9AA3B5" stroke="#12203A" stroke-width="1"/>
+<rect x="516" y="74" width="30" height="56" fill="#C9C2B5" stroke="#12203A" stroke-width="1"/>
+<path d="M96 88L124 98L156 90V114L124 106L96 116Z" fill="#FFFDF8" stroke="#12203A" stroke-width="1" stroke-linejoin="round"/>
+<g fill="#12203A"><circle cx="476" cy="86" r="1.6"/><circle cx="490" cy="94" r="1.6"/><circle cx="504" cy="84" r="1.6"/><circle cx="480" cy="106" r="1.6"/><circle cx="498" cy="110" r="1.6"/><circle cx="486" cy="120" r="1.6"/><circle cx="506" cy="122" r="1.6"/><circle cx="474" cy="124" r="1.6"/><circle cx="502" cy="100" r="1.6"/></g>
+<rect x="96" y="74" width="450" height="56" fill="none" stroke="#12203A" stroke-width="3" stroke-linejoin="round"/>
+<path d="M96 142H546" stroke="#6E6E73" stroke-width="1"/><path d="M96 136V148M546 136V148" stroke="#6E6E73" stroke-width="1"/>
+<text x="321.0" y="162" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">casing: a strong paper tube</text>
+<text x="256.0" y="107.0" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">burns about 1 s</text>
+<text x="411.0" y="107.0" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">smoke trail</text>
+<path d="M126.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="126.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">nozzle</text>
+<path d="M256.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="256.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">propellant</text>
+<path d="M411.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="411.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">delay</text>
+<path d="M531.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="531.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">cap</text>
+<path d="M491.0 34V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="491.0" y="28" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">ejection charge</text>
+<g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M88 102.0H44" fill="none"/><path d="M30 102.0L46 94.0V110.0Z"/></g>
+<text x="24" y="88.0" font-size="14" font-weight="600" fill="#6E6E73">hot gas</text>
+<text x="556" y="100.0" font-size="14" font-weight="600" fill="#6E6E73">nose</text><text x="556" y="116.0" font-size="14" font-weight="600" fill="#6E6E73">end</text>
+<path d="M24 186H616" stroke="#EDE6D8" stroke-width="2"/>
+<text x="24" y="214" font-size="14" font-weight="600" fill="#6E6E73">The code</text>
+<text x="24" y="254" font-size="40" font-weight="700" fill="#12203A">C6-5</text>
+<path d="M175 218H195L200 223V243L195 248H175L170 243V223Z" fill="#12203A"/>
+<text x="185" y="240" font-size="18" font-weight="700" fill="#F6F1E7" text-anchor="middle">C</text>
+<text x="210" y="230" font-size="15" font-weight="600" fill="#12203A">impulse class</text><text x="210" y="248" font-size="14" font-weight="600" fill="#6E6E73">5.01–10 N·s</text>
+<path d="M331 218H351L356 223V243L351 248H331L326 243V223Z" fill="#12203A"/>
+<text x="341" y="240" font-size="18" font-weight="700" fill="#F6F1E7" text-anchor="middle">6</text>
+<text x="366" y="230" font-size="15" font-weight="600" fill="#12203A">average thrust</text><text x="366" y="248" font-size="14" font-weight="600" fill="#6E6E73">6 N</text>
+<path d="M487 218H507L512 223V243L507 248H487L482 243V223Z" fill="#12203A"/>
+<text x="497" y="240" font-size="18" font-weight="700" fill="#F6F1E7" text-anchor="middle">5</text>
+<text x="522" y="230" font-size="15" font-weight="600" fill="#12203A">delay</text><text x="522" y="248" font-size="14" font-weight="600" fill="#6E6E73">5 s, then pop</text>
+<g stroke="#6E6E73" stroke-width="1.5" fill="#6E6E73" stroke-linecap="round"><path d="M134 240H156" fill="none"/><path d="M164 240L154 235V245Z"/></g>
+<path d="M24 276H616" stroke="#EDE6D8" stroke-width="2"/>
+<text x="24" y="302" font-size="14" font-weight="600" fill="#6E6E73">The energy story</text>
+<rect x="24" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="88.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">chemical</text><text x="88.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">on the pad</text>
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M156 360.0H170" fill="none"/><path d="M178 360.0L168 354.0V366.0Z"/></g>
+<rect x="180" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="244.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">kinetic</text><text x="244.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">boost</text>
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M312 360.0H326" fill="none"/><path d="M334 360.0L324 354.0V366.0Z"/></g>
+<rect x="336" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="400.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">potential</text><text x="400.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">apogee (top)</text>
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M468 360.0H482" fill="none"/><path d="M490 360.0L480 354.0V366.0Z"/></g>
+<rect x="492" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="556.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">kinetic + heat</text><text x="556.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">descent</text>
+<path d="M58.0 366H118.0" stroke="#12203A" stroke-width="2"/><path d="M98.0 324V366" stroke="#6E6E73" stroke-width="1.5"/>
+<g stroke="#12203A" stroke-width="1.5" stroke-linejoin="round" fill="#FFFDF8"><path d="M83.0 340Q83.0 332 88.0 330Q93.0 332 93.0 340Z"/><rect x="83.0" y="340" width="10" height="24"/><path d="M83.0 354L77.0 364H83.0ZM93.0 354L99.0 364H93.0Z"/></g>
+<path d="M230.0 356Q234.0 372 238.0 356Z" fill="#F2652B"/><g stroke="#12203A" stroke-width="1.5" stroke-linejoin="round" fill="#FFFDF8"><path d="M229.0 332Q229.0 324 234.0 322Q239.0 324 239.0 332Z"/><rect x="229.0" y="332" width="10" height="24"/><path d="M229.0 346L223.0 356H229.0ZM239.0 346L245.0 356H239.0Z"/></g>
+<g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M262.0 362V336" fill="none"/><path d="M262.0 324L254.0 338H270.0Z"/></g>
+<path d="M350.0 372Q400.0 298 450.0 372" fill="none" stroke="#3D8BFD" stroke-width="2" stroke-dasharray="10 8"/>
+<g transform="translate(0 5) rotate(90 400.0 335)"><g stroke="#12203A" stroke-width="1.5" stroke-linejoin="round" fill="#FFFDF8"><path d="M395.0 328Q395.0 320 400.0 318Q405.0 320 405.0 328Z"/><rect x="395.0" y="328" width="10" height="24"/><path d="M395.0 342L389.0 352H395.0ZM405.0 342L411.0 352H405.0Z"/></g></g>
+<path d="M530.0 340Q556.0 314 582.0 340Z" fill="#F2652B" stroke="#12203A" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M530.0 340L556.0 354M582.0 340L556.0 354M547.0 340L556.0 354M565.0 340L556.0 354" stroke="#12203A" stroke-width="1" fill="none"/>
+<path d="M552.0 354h8v18h-8Z" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+</svg>

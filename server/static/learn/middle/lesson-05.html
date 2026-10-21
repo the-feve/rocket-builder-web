@@ -27,9 +27,10 @@
 <main id="main">
 <article class="lesson middle">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> <a href="/learn/middle/">Grades 6–8</a> <span aria-hidden="true">›</span> Lesson 5 of 9</nav>
+<nav class="minipath" aria-label="Where this lesson sits"><ol><li class="done p0"><a href="/learn/middle/lesson-01" title="Lesson 1: Newton&#x27;s laws and the balloon rocket"><span>1</span></a></li><li class="done p0"><a href="/learn/middle/lesson-02" title="Lesson 2: The forces in a rocket flight"><span>2</span></a></li><li class="done p1"><a href="/learn/middle/lesson-03" title="Lesson 3: Stability: the balance point and the push point"><span>3</span></a></li><li class="done p1"><a href="/learn/middle/lesson-04" title="Lesson 4: Drag and shape"><span>4</span></a></li><li class="here p2"><a href="/learn/middle/lesson-05" aria-current="step" title="Lesson 5: Motors, impulse and energy"><span>5</span></a></li><li class=" p2"><a href="/learn/middle/lesson-06" title="Lesson 6: Design with a computer model"><span>6</span></a></li><li class=" p3"><a href="/learn/middle/lesson-07" title="Lesson 7: Parachutes and landing energy"><span>7</span></a></li><li class=" p3"><a href="/learn/middle/lesson-08" title="Lesson 8: Launch prep: safety, tracking and preflight"><span>8</span></a></li><li class=" p3"><a href="/learn/middle/lesson-09" title="Lesson 9: Launch day and mission report"><span>9</span></a></li></ol><p><span class="phase p2">Energy and design</span> Lesson 5 of 9</p></nav>
 <p class="daytag"><span class="tag big">Lesson 5</span> <span class="tag grade">Grades 6–8</span></p>
 <h1>Motors, impulse and energy</h1>
-<p class="meta"><strong>Time:</strong> about 60 minutes. <strong>Worksheet:</strong> W5 Motor codes and impulse (W5b thrust curve for extension). <strong>Rocket Builder:</strong> Beginner mode, <em>How high will it go?</em></p>
+<ul class="glance"><li><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span><span class="lab">Time</span>about 60 minutes</span></li><li><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 2.5h9l4 4V21.5H6z"/><path d="M15 2.5v4h4M9 11h7M9 14.5h7M9 18h4"/></svg><span><span class="lab">Worksheet</span>W5 Motor codes and impulse (W5b thrust curve for extension)</span></li><li><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="11" rx="1.2"/><path d="M2 19.5h20l-2-4.5H4z"/><path d="M8 11.5 14.5 7l1 1.3-6.5 4.5z"/><circle cx="11" cy="10" r="1" fill="#3D8BFD" stroke="none"/></svg><span><span class="lab">Rocket Builder</span>Beginner mode, <em>How high will it go?</em></span></li></ul>
 <p class="tools"><a class="btn ink" href="/learn/middle/worksheets.pdf">Worksheets (PDF)</a> <a class="btn outline" href="https://rocket.quiverdesignworks.net/">Open Rocket Builder</a> <button class="btn outline" type="button" onclick="print()">Print this lesson</button></p>
 <details class="toc"><summary>On this page</summary><ol><li><a href="#standards">Standards</a></li><li><a href="#i-can">I can…</a></li><li><a href="#words-to-know">Words to know</a></li><li><a href="#materials">Materials</a></li><li><a href="#steps">Steps</a></li><li><a href="#check-for-understanding">Check for understanding</a></li><li><a href="#teacher-notes">Teacher notes</a></li></ol></details>
 <section class="stdbox"><h2 id="standards">Standards</h2>
@@ -61,29 +62,92 @@
 </table></div>
 <p><strong>Practice:</strong> using mathematics and computational thinking. <strong>Crosscutting concept:</strong> energy and matter.</p>
 </section><h2 id="i-can">I can…</h2>
-<ul>
+<ul class="ican">
 <li>I can name the parts of a model rocket motor and what each does.</li>
 <li>I can decode a motor code like <strong>C6-5</strong> and calculate total impulse.</li>
 <li>I can trace energy through a flight: stored in the propellant, moving (kinetic), height (potential), and lost to drag as heat.</li>
 </ul>
 <h2 id="words-to-know">Words to know</h2>
-<ul>
-<li><strong>Propellant, nozzle, delay, ejection charge</strong>: the parts of a motor, bottom to top.</li>
-<li><strong>Igniter</strong>: the wire that lights the motor. Adults only.</li>
-<li><strong>Total impulse (N·s)</strong>: average thrust × burn time; the class letter (A, B, C…) gives its range. Each letter is up to twice the one before.</li>
-<li><strong>Kinetic energy</strong>: energy of motion. <strong>Gravitational potential energy</strong>: energy stored by height.</li>
+<ul class="words">
+<li><strong>Propellant, nozzle, delay, ejection charge</strong> the parts of a motor, bottom to top.</li>
+<li><strong>Igniter</strong> the wire that lights the motor. Adults only.</li>
+<li><strong>Total impulse (N·s)</strong> average thrust × burn time; the class letter (A, B, C…) gives its range. Each letter is up to twice the one before.</li>
+<li><strong>Kinetic energy</strong> energy of motion. <strong>Gravitational potential energy</strong>: energy stored by height.</li>
 </ul>
 <h2 id="materials">Materials</h2>
 <p>Calculators, W5. Optional: a sealed motor pack (adult shows it, unopened). Optional adult-led demo: film canisters with inside-snap lids, effervescent tablets, water, safety glasses.</p>
-<h2 id="steps">Steps</h2>
-<h3 id="1-teach-inside-a-motor-10-minutes">1. Teach: inside a motor (10 minutes)</h3>
+<h2 id="steps">Steps</h2><figure class="flow"><ol aria-label="Lesson steps and minutes"><li class="learn" style="flex:10"><a href="#1-teach-inside-a-motor-10-minutes"><span class="n">1</span><span class="t">Teach: inside a motor</span><span class="m">10 min</span></a></li><li class="do" style="flex:20"><a href="#2-decode-and-calculate-20-minutes"><span class="n">2</span><span class="t">Decode and calculate</span><span class="m">20 min</span></a></li><li class="do" style="flex:15"><a href="#3-energy-through-a-flight-15-minutes"><span class="n">3</span><span class="t">Energy through a flight</span><span class="m">15 min</span></a></li><li class="do" style="flex:10"><a href="#4-rocket-builder-10-minutes"><span class="n">4</span><span class="t">Rocket Builder</span><span class="m">10 min</span></a></li><li class="wrap" style="flex:5"><a href="#5-wrap-up-5-minutes"><span class="n">5</span><span class="t">Wrap up</span><span class="m">5 min</span></a></li></ol><figcaption>60 minutes · <span class="k learn">learn</span> <span class="k plan">plan</span> <span class="k do">hands-on</span> <span class="k wrap">wrap up</span></figcaption></figure>
+<h3 id="1-teach-inside-a-motor-10-minutes" class="stephead"><span class="step">1</span><span class="sname">Teach: inside a motor</span><span class="mins">10 min</span></h3>
+<figure class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="m5-inside-a-motor-title" style="width:100%;height:auto">
+<title id="m5-inside-a-motor-title">A cut-away model rocket motor (nozzle, propellant, delay, ejection charge, cap inside a paper casing), the code C6-5 decoded, and the energy story of a flight: chemical, kinetic, potential, then kinetic and heat</title>
+<rect x="96" y="74" width="60" height="56" fill="#C9C2B5" stroke="#12203A" stroke-width="1"/>
+<rect x="156" y="74" width="200" height="56" fill="#F9C9B3" stroke="#12203A" stroke-width="1"/>
+<rect x="356" y="74" width="110" height="56" fill="#DDE6F5" stroke="#12203A" stroke-width="1"/>
+<rect x="466" y="74" width="50" height="56" fill="#9AA3B5" stroke="#12203A" stroke-width="1"/>
+<rect x="516" y="74" width="30" height="56" fill="#C9C2B5" stroke="#12203A" stroke-width="1"/>
+<path d="M96 88L124 98L156 90V114L124 106L96 116Z" fill="#FFFDF8" stroke="#12203A" stroke-width="1" stroke-linejoin="round"/>
+<g fill="#12203A"><circle cx="476" cy="86" r="1.6"/><circle cx="490" cy="94" r="1.6"/><circle cx="504" cy="84" r="1.6"/><circle cx="480" cy="106" r="1.6"/><circle cx="498" cy="110" r="1.6"/><circle cx="486" cy="120" r="1.6"/><circle cx="506" cy="122" r="1.6"/><circle cx="474" cy="124" r="1.6"/><circle cx="502" cy="100" r="1.6"/></g>
+<rect x="96" y="74" width="450" height="56" fill="none" stroke="#12203A" stroke-width="3" stroke-linejoin="round"/>
+<path d="M96 142H546" stroke="#6E6E73" stroke-width="1"/><path d="M96 136V148M546 136V148" stroke="#6E6E73" stroke-width="1"/>
+<text x="321.0" y="162" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">casing: a strong paper tube</text>
+<text x="256.0" y="107.0" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">burns about 1 s</text>
+<text x="411.0" y="107.0" font-size="14" font-weight="600" fill="#12203A" text-anchor="middle">smoke trail</text>
+<path d="M126.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="126.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">nozzle</text>
+<path d="M256.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="256.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">propellant</text>
+<path d="M411.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="411.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">delay</text>
+<path d="M531.0 58V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="531.0" y="52" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">cap</text>
+<path d="M491.0 34V74" stroke="#6E6E73" stroke-width="1"/>
+<text x="491.0" y="28" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">ejection charge</text>
+<g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M88 102.0H44" fill="none"/><path d="M30 102.0L46 94.0V110.0Z"/></g>
+<text x="24" y="88.0" font-size="14" font-weight="600" fill="#6E6E73">hot gas</text>
+<text x="556" y="100.0" font-size="14" font-weight="600" fill="#6E6E73">nose</text><text x="556" y="116.0" font-size="14" font-weight="600" fill="#6E6E73">end</text>
+<path d="M24 186H616" stroke="#EDE6D8" stroke-width="2"/>
+<text x="24" y="214" font-size="14" font-weight="600" fill="#6E6E73">The code</text>
+<text x="24" y="254" font-size="40" font-weight="700" fill="#12203A">C6-5</text>
+<path d="M175 218H195L200 223V243L195 248H175L170 243V223Z" fill="#12203A"/>
+<text x="185" y="240" font-size="18" font-weight="700" fill="#F6F1E7" text-anchor="middle">C</text>
+<text x="210" y="230" font-size="15" font-weight="600" fill="#12203A">impulse class</text><text x="210" y="248" font-size="14" font-weight="600" fill="#6E6E73">5.01–10 N·s</text>
+<path d="M331 218H351L356 223V243L351 248H331L326 243V223Z" fill="#12203A"/>
+<text x="341" y="240" font-size="18" font-weight="700" fill="#F6F1E7" text-anchor="middle">6</text>
+<text x="366" y="230" font-size="15" font-weight="600" fill="#12203A">average thrust</text><text x="366" y="248" font-size="14" font-weight="600" fill="#6E6E73">6 N</text>
+<path d="M487 218H507L512 223V243L507 248H487L482 243V223Z" fill="#12203A"/>
+<text x="497" y="240" font-size="18" font-weight="700" fill="#F6F1E7" text-anchor="middle">5</text>
+<text x="522" y="230" font-size="15" font-weight="600" fill="#12203A">delay</text><text x="522" y="248" font-size="14" font-weight="600" fill="#6E6E73">5 s, then pop</text>
+<g stroke="#6E6E73" stroke-width="1.5" fill="#6E6E73" stroke-linecap="round"><path d="M134 240H156" fill="none"/><path d="M164 240L154 235V245Z"/></g>
+<path d="M24 276H616" stroke="#EDE6D8" stroke-width="2"/>
+<text x="24" y="302" font-size="14" font-weight="600" fill="#6E6E73">The energy story</text>
+<rect x="24" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="88.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">chemical</text><text x="88.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">on the pad</text>
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M156 360.0H170" fill="none"/><path d="M178 360.0L168 354.0V366.0Z"/></g>
+<rect x="180" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="244.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">kinetic</text><text x="244.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">boost</text>
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M312 360.0H326" fill="none"/><path d="M334 360.0L324 354.0V366.0Z"/></g>
+<rect x="336" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="400.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">potential</text><text x="400.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">apogee (top)</text>
+<g stroke="#6E6E73" fill="#6E6E73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M468 360.0H482" fill="none"/><path d="M490 360.0L480 354.0V366.0Z"/></g>
+<rect x="492" y="312" width="128" height="96" rx="8" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+<text x="556.0" y="384" font-size="15" font-weight="600" fill="#12203A" text-anchor="middle">kinetic + heat</text><text x="556.0" y="400" font-size="13" font-weight="600" fill="#6E6E73" text-anchor="middle">descent</text>
+<path d="M58.0 366H118.0" stroke="#12203A" stroke-width="2"/><path d="M98.0 324V366" stroke="#6E6E73" stroke-width="1.5"/>
+<g stroke="#12203A" stroke-width="1.5" stroke-linejoin="round" fill="#FFFDF8"><path d="M83.0 340Q83.0 332 88.0 330Q93.0 332 93.0 340Z"/><rect x="83.0" y="340" width="10" height="24"/><path d="M83.0 354L77.0 364H83.0ZM93.0 354L99.0 364H93.0Z"/></g>
+<path d="M230.0 356Q234.0 372 238.0 356Z" fill="#F2652B"/><g stroke="#12203A" stroke-width="1.5" stroke-linejoin="round" fill="#FFFDF8"><path d="M229.0 332Q229.0 324 234.0 322Q239.0 324 239.0 332Z"/><rect x="229.0" y="332" width="10" height="24"/><path d="M229.0 346L223.0 356H229.0ZM239.0 346L245.0 356H239.0Z"/></g>
+<g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M262.0 362V336" fill="none"/><path d="M262.0 324L254.0 338H270.0Z"/></g>
+<path d="M350.0 372Q400.0 298 450.0 372" fill="none" stroke="#3D8BFD" stroke-width="2" stroke-dasharray="10 8"/>
+<g transform="translate(0 5) rotate(90 400.0 335)"><g stroke="#12203A" stroke-width="1.5" stroke-linejoin="round" fill="#FFFDF8"><path d="M395.0 328Q395.0 320 400.0 318Q405.0 320 405.0 328Z"/><rect x="395.0" y="328" width="10" height="24"/><path d="M395.0 342L389.0 352H395.0ZM405.0 342L411.0 352H405.0Z"/></g></g>
+<path d="M530.0 340Q556.0 314 582.0 340Z" fill="#F2652B" stroke="#12203A" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M530.0 340L556.0 354M582.0 340L556.0 354M547.0 340L556.0 354M565.0 340L556.0 354" stroke="#12203A" stroke-width="1" fill="none"/>
+<path d="M552.0 354h8v18h-8Z" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5"/>
+</svg><figcaption>Inside a model rocket motor, what its code means, and where the energy goes in a flight.</figcaption></figure>
 <blockquote class="aloud"><span class="lab">Read aloud</span>
 <p>A model rocket motor is a factory-made paper tube: a <strong>nozzle</strong>, <strong>propellant</strong> that burns for about a second, a <strong>delay</strong> that makes a smoke trail while the rocket coasts, and an <strong>ejection charge</strong> that pops the nose and pushes out the parachute near apogee. Only adults handle motors and igniters.</p>
 <p>In <strong>C6-5</strong>: C is the impulse class (5.01–10 N·s), 6 is the average thrust in newtons, 5 is the delay in seconds.</p>
 </blockquote>
-<h3 id="2-decode-and-calculate-20-minutes">2. Decode and calculate (20 minutes)</h3>
+<h3 id="2-decode-and-calculate-20-minutes" class="stephead"><span class="step">2</span><span class="sname">Decode and calculate</span><span class="mins">20 min</span></h3>
 <p>Work through W5: decode four codes, find impulse = average thrust × burn time and the class, and check thrust-to-weight (100 g weighs about 1 N; it must be 5 or more).</p>
-<h3 id="3-energy-through-a-flight-15-minutes">3. Energy through a flight (15 minutes)</h3>
+<h3 id="3-energy-through-a-flight-15-minutes" class="stephead"><span class="step">3</span><span class="sname">Energy through a flight</span><span class="mins">15 min</span></h3>
 <p>Draw a flight path. Label where energy is:</p>
 <ul>
 <li><strong>On the pad:</strong> stored in the propellant (chemical).</li>
@@ -92,19 +156,19 @@
 <li><strong>Apogee:</strong> the most potential energy, almost no kinetic.</li>
 <li><strong>Descent:</strong> the parachute's drag takes energy away, so it lands slowly.</li>
 </ul>
-<h3 id="4-rocket-builder-10-minutes">4. Rocket Builder (10 minutes)</h3>
+<h3 id="4-rocket-builder-10-minutes" class="stephead"><span class="step">4</span><span class="sname">Rocket Builder</span><span class="mins">10 min</span></h3>
 <p>Build your rocket. Find <strong>How high will it go?</strong>: the recommended motor and predicted altitude. Use the speed and altitude there for the energy story.</p>
-<h3 id="5-wrap-up-5-minutes">5. Wrap up (5 minutes)</h3>
+<h3 id="5-wrap-up-5-minutes" class="stephead"><span class="step">5</span><span class="sname">Wrap up</span><span class="mins">5 min</span></h3>
 <p>Why do bigger motors need bigger fields?</p>
 <h2 id="check-for-understanding">Check for understanding</h2>
-<ol>
+<ol class="qs">
 <li>In B6-4, what do the B, 6 and 4 mean?</li>
 <li>5 N average for 2 s: total impulse and class?</li>
 <li>Rocket + motor weighs 1.2 N; average thrust 5 N. Pass the 5× rule?</li>
 <li>During the coast the rocket slows down. Where does its kinetic energy go?</li>
 <li>Who puts the igniter in the motor?</li>
 </ol>
-<details class="answers"><summary>Answer key</summary><ol>
+<details class="answers"><summary>Answer key</summary><ol class="qs">
 <li>Class B (2.51–5 N·s), about 6 N average thrust, 4 s delay.</li>
 <li>10 N·s, class C.</li>
 <li>No: 5 ÷ 1.2 ≈ 4.2.</li>

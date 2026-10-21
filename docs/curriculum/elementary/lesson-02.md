@@ -49,6 +49,8 @@ Toss a ball straight up. Ask: *Why does it always come back down? Would it come 
 
 ### 3. Do: build and fly straw rockets (20 minutes)
 
+![Roll it, fold the nose, tape on 3 fins, then glasses on and one sharp puff.](../art/e2-straw-rocket.svg)
+
 1. Roll the paper strip tightly around a pencil. Tape the seam. Slide the pencil out.
 2. Fold the top over twice and tape it shut. This is the nose. It must be airtight.
 3. Cut 3 small fins (about 3 cm long) from cardstock. Tape them around the bottom.

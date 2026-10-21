@@ -7,7 +7,12 @@ build_site.py runs both. Static HTML for US Letter; inline SVG drawings, so noth
 except the brand fonts.
 """
 import math
+import re
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import visuals as vis  # noqa: E402
 
 pages = []
 TRACK = {"name": "middle", "line": "Grades 6–8"}
@@ -302,11 +307,35 @@ def checklist(items):
 
 
 
+def unit_map(track):
+    """The unit map: the lessons as stops on a flight path, with a box to tick after each."""
+    cur = Path(__file__).resolve().parent.parent / track
+    titles, times = {}, {}
+    for f in sorted(cur.glob("lesson-*.md")):
+        text = f.read_text(encoding="utf-8")
+        m = re.match(r"# Lesson (\d+): ([^:\n]+)", text)
+        titles[int(m.group(1))] = m.group(2).strip()
+        t = re.search(r"\*\*Time:\*\* ([^.]+)", text)
+        times[int(m.group(1))] = t.group(1) if t else ""
+    phases = "".join(f"<li><b>{name}</b>: Lessons {ns[0]}–{ns[-1]}</li>" if len(ns) > 1 else f"<li><b>{name}</b>: Lesson {ns[0]}</li>"
+                     for name, ns in vis.PHASES[track])
+    if track == "middle":
+        extra = box("Adult: plan ahead", "<ul>" + "".join(f"<li><b>By Lesson {n}:</b> {t}</li>" for n, t in vis.PREP["middle"].items()) + "</ul>")
+        sub = "Tick each stop when you finish it. Motors and launches are always run by an adult."
+    else:
+        extra = box("Short on time?", "<p>Lessons 1, 2, 4, 7 and 8 make a 5-lesson unit. Lessons 5 and 6 can be one longer block.</p>")
+        sub = "Colour in each box when you finish a lesson."
+    body = f'''<div class="center">{vis.journey_svg(track, titles)}</div>
+    <div class="row"><div class="col">{box("The big parts", f"<ul>{phases}</ul>")}</div><div class="col">{extra}</div></div>
+    <div class="center pic">{vis.art_svg("design-cycle.svg", "3.4in")}<p class="hint">Engineers go round this loop again and again: you will too.</p></div>'''
+    page("M", "My rocket journey", body, sub)
+
+
 def middle():
     """The middle-school (grades 6–8) worksheets."""
     # ---------------- COVER ----------------
     contents = [
-        ("W1", "Balloon rocket data", "Lesson 1"), ("W2", "Forces and launch angles", "Lesson 2"), ("W3", "Swing test", "Lesson 3"),
+        ("M", "My rocket journey (unit map)", "Lesson 1"), ("W1", "Balloon rocket data", "Lesson 1"), ("W2", "Forces and launch angles", "Lesson 2"), ("W3", "Swing test", "Lesson 3"),
         ("W4", "Drag test", "Lesson 4"), ("W5", "Motor codes and impulse", "Lesson 5"), ("W5b", "Thrust curve", "Lesson 5"),
         ("W6", "Design log", "Lesson 6"), ("W7", "Parachutes and landing energy", "Lesson 7"), ("W8", "Altitude tracking", "Lesson 8"),
         ("T", "Inclinometer template", "Lesson 8"), ("W8b", "Safety rules", "Lesson 8"), ("W8c", "Launch checklists", "Lesson 8"),
@@ -326,6 +355,7 @@ def middle():
     <div class="note warn"><b>Safety:</b> model rocket motors and kits are rated 12+, and adults handle all motors and igniters. Students under 12 do every page and take launch-day jobs away from the pad. Glasses on for straw and stomp rockets. Follow the NAR Model Rocket Safety Code.</div>
     </div>'''
     page("", "", cover, kind="cover")
+    unit_map("middle")
 
     # ---------------- W1 ----------------
     w1 = f'''{vocab(["force", "mass", "inertia", "acceleration", "action and reaction", "thrust"])}
@@ -870,7 +900,7 @@ def card45_svg():
 
 def elementary():
     """The elementary (grades 3–5) worksheets: one per lesson plus cards, pledge and certificate."""
-    contents = [("E1", "Balloon rocket", "Lesson 1"), ("E2", "Straw rocket forces", "Lesson 2"), ("E3", "Launch angles", "Lesson 3"),
+    contents = [("M", "My rocket journey (unit map)", "Lesson 1"), ("E1", "Balloon rocket", "Lesson 1"), ("E2", "Straw rocket forces", "Lesson 2"), ("E3", "Launch angles", "Lesson 3"),
                 ("E4", "Swing test", "Lesson 4"), ("E5", "Design plan", "Lesson 5"), ("E6", "Test and improve", "Lesson 6"),
                 ("E7", "Parachute drop", "Lesson 7"), ("E8", "Launch log", "Lesson 8"), ("P", "Parts of a rocket", "Any lesson"),
                 ("S", "Safety pledge", "Lesson 1"), ("45", "45° sighting cards", "Lesson 8"), ("★", "Rocket Scientist certificate", "Lesson 8"),
@@ -887,6 +917,7 @@ def elementary():
     <div class="note warn"><b>Safety:</b> paper and air rockets only. Model rocket motors are rated 12+ and only adults handle them. Glasses on for straw and stomp rockets.</div>
     </div>'''
     page("", "", cover, kind="cover")
+    unit_map("elementary")
 
     e1 = f'''<div class="words"><b>force</b>: a push or a pull · <b>thrust</b>: the push that moves a rocket</div>
     {balloon_svg()}

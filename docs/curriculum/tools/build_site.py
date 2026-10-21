@@ -32,6 +32,9 @@ from pathlib import Path
 
 import markdown
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import visuals as vis  # noqa: E402
+
 HERE = Path(__file__).resolve().parent
 CUR = HERE.parent                                   # docs/curriculum
 ROOT = CUR.parent.parent                            # repo root
@@ -129,11 +132,48 @@ def polish(body: str) -> str:
                   r'<details class="answers"><summary>Answer key</summary>\1</details>', body, flags=re.S)
     body = body.replace("<blockquote>", '<blockquote class="aloud"><span class="lab">Read aloud</span>')
     body = body.replace("<table>", '<div class="tbl"><table>').replace("</table>", "</table></div>")
+    # Pictures: ![caption](../art/name.svg) on its own line becomes the inlined drawing.
+    body = re.sub(r'<p><img alt="([^"]*)" src="(?:\.\./)*art/([\w-]+\.svg)"\s*/?></p>',
+                  lambda m: vis.art(m.group(2), m.group(1)), body)
+    body = section_lists(body)
     # The standards box at the top of a lesson, and the teacher notes at the end.
     body = re.sub(r'(<h2 id="standards">.*?)(?=<h2\b)', r'<section class="stdbox">\1</section>', body, count=1, flags=re.S)
     body = re.sub(r'(<h2 id="teacher-notes">.*?)(?=<h2\b|\Z)', r'<section class="call notes">\1</section>', body, count=1, flags=re.S)
     body = re.sub(r'(<h2 id="launch-day-rules">.*?)(?=<h2\b|\Z)', r'<section class="call safety rules">\1</section>', body, flags=re.S)
     return link_app_mentions(body)
+
+
+LIST_STYLES = {"i-can": ("ul", "ican"), "words-to-know": ("ul", "words"), "materials": ("ul", "checks"),
+               "check-for-understanding": ("ol", "qs")}
+
+
+def section_lists(body: str) -> str:
+    """Give the lists in the I can, Words, Materials and Check sections their own look."""
+    parts = re.split(r'(?=<h2 id=")', body)
+    for i, part in enumerate(parts):
+        m = re.match(r'<h2 id="([^"]+)"', part)
+        if m and m.group(1) in LIST_STYLES:
+            tag, cls = LIST_STYLES[m.group(1)]
+            parts[i] = re.sub(rf"<{tag}>", f'<{tag} class="{cls}">', part)
+            if cls == "words":     # "**Force**: a push" -> the word on top, the meaning below
+                parts[i] = re.sub(r"(<li><strong>.*?</strong>)\s*:\s*", r"\1 ", parts[i])
+    return "".join(parts)
+
+
+def steps_visual(body: str) -> str:
+    """Step headings get a numbered tag and a minutes pill, and a time bar goes under Steps."""
+    steps = []
+
+    def head(m):
+        sid, num, name, paren = m.group(1), m.group(2), m.group(3), m.group(4) or ""
+        mm = re.search(r"(\d+) minutes?", paren)
+        mins = int(mm.group(1)) if mm else None
+        note = re.sub(r",?\s*\d+ minutes?", "", paren).strip(" ,")
+        steps.append((sid, num, name, mins))
+        pills = (f'<span class="mins">{mins} min</span>' if mins else "") + (f'<span class="note">{note}</span>' if note else "")
+        return f'<h3 id="{sid}" class="stephead"><span class="step">{num}</span><span class="sname">{name}</span>{pills}</h3>'
+    body = re.sub(r'<h3 id="([^"]+)">(\d+)\. (.*?)(?: \(([^)]*)\))?</h3>', head, body)
+    return body.replace('<h2 id="steps">Steps</h2>', '<h2 id="steps">Steps</h2>' + vis.lesson_flow(steps), 1)
 
 
 # ---------------------------------------------------------------- page shell
@@ -217,10 +257,10 @@ def read_lesson(track: str, n: int) -> dict:
             "codes": [c for c in codes if "(" not in c and not re.match(r"\d\.|[A-Z]{2,4}\.", c)]}
 
 
-def lesson_page(d: dict, prev: dict | None, nxt: dict | None) -> str:
+def lesson_page(d: dict, prev: dict | None, nxt: dict | None, lessons: list[dict]) -> str:
     tr, cfg = d["track"], TRACKS[d["track"]]
     meta = md(d["meta"], tr).removeprefix("<p>").removesuffix("</p>")
-    body = polish(md(d["body"], tr))
+    body = steps_visual(polish(md(d["body"], tr)))
     toc = "".join(f'<li><a href="#{i}">{t}</a></li>' for i, t in re.findall(r'<h2 id="([^"]+)">(.*?)</h2>', body))
 
     def card(x, rel, label):
@@ -231,9 +271,10 @@ def lesson_page(d: dict, prev: dict | None, nxt: dict | None) -> str:
 
     main = f"""<article class="lesson {tr}">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> <a href="/learn/{tr}/">{cfg['grades']}</a> <span aria-hidden="true">›</span> Lesson {d['num']} of {cfg['lessons']}</nav>
+{vis.mini_path(tr, d['num'], lessons)}
 <p class="daytag"><span class="tag big">Lesson {d['num']}</span> <span class="tag grade">{cfg['grades']}</span></p>
 <h1>{html.escape(d['title'])}</h1>
-<p class="meta">{meta}</p>
+{vis.glance(meta)}
 <p class="tools"><a class="btn ink" href="/learn/{tr}/worksheets.pdf">Worksheets (PDF)</a> <a class="btn outline" href="{APP}">Open Rocket Builder</a> <button class="btn outline" type="button" onclick="print()">Print this lesson</button></p>
 <details class="toc"><summary>On this page</summary><ol>{toc}</ol></details>
 {body}
@@ -254,13 +295,10 @@ def track_page(tr: str, lessons: list[dict]) -> str:
     glance = re.sub(r"^\| (\d+) \|", lambda m: f"| [{m.group(1)}](/learn/{tr}/lesson-{int(m.group(1)):02d}) |", glance, flags=re.M)
     smap = re.sub(r"^\| (\d+) ([^|]+)\|", lambda m: f"| [{m.group(1)} {m.group(2).strip()}](/learn/{tr}/lesson-{int(m.group(1)):02d}) |",
                   s["Standards map"], flags=re.M)
-    cards = "".join(
-        f'<li><a href="/learn/{tr}/{d["slug"]}"><span class="tag">Lesson {d["num"]}</span>'
-        f'<b>{html.escape(d["title"])}</b><span class="hands">{html.escape(", ".join(d["codes"]))}</span></a></li>'
-        for d in lessons)
+    path = vis.track_path(tr, lessons, vis.glance_rows(s["Lessons at a glance"]))
     rest = "".join(f'<section id="{re.sub(r"[^a-z0-9]+", "-", k.lower()).strip("-")}"><h2>{k}</h2>{polish(md(v, tr))}</section>'
                    for k, v in s.items() if k not in ("Lessons at a glance", "Standards map"))
-    ws_pages = "14 pages" if tr == "elementary" else "21 pages"
+    ws_pages = "15 pages" if tr == "elementary" else "22 pages"
     main = f"""<div class="hero">
   <p class="eyebrow">Free lessons · {cfg['grades']} · {cfg['lessons']} lessons · Washington science standards</p>
   <h1>Rockets: {cfg['short'].lower()} track</h1>
@@ -271,11 +309,12 @@ def track_page(tr: str, lessons: list[dict]) -> str:
     <a class="btn outline big" href="/learn/{tr}/safety">Safety page</a>
   </div>
 </div>
-<section id="lessons"><h2>The {cfg['lessons']} lessons</h2>
-<ol class="days">{cards}</ol>
+<section id="lessons"><h2>The learning pathway</h2>
+{path}
+<h3>Lessons at a glance</h3>
 {polish(md(glance, tr))}
 </section>
-<section id="standards-map"><h2>Standards map</h2>{polish(md(smap, tr))}</section>
+<section id="standards-map"><h2>Standards map</h2>{vis.standards_matrix(tr, s["Standards map"])}{polish(md(smap, tr))}</section>
 {rest}"""
     return page(f"Rockets for {cfg['grades'].lower()}: free lessons · Rocket Builder",
                 f"Free rocketry lessons for {cfg['grades'].lower()}, mapped to Washington's K–12 Science Learning Standards (NGSS). "
@@ -305,12 +344,19 @@ def teachers_page() -> str:
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Rockets and Model Rocketry</a> <span aria-hidden="true">›</span> For parents and teachers</nav>
 <p class="daytag"><span class="tag big">Teachers</span></p>
 <h1>{html.escape(first.lstrip('# ').strip())}</h1>
-{polish(md(rest))}
+{teachers_body(rest)}
 </article>
 <p class="back"><a href="/learn/">← Back to the lessons</a></p>"""
     return page("Washington standards and sources · Rocket Builder Learn",
                 "How the free rocketry lessons line up with Washington's K–12 Science Learning Standards (NGSS), "
                 "WA Science 2026, and the math and ELA standards, with sources and further resources.", main, "teachers")
+
+
+def teachers_body(rest: str) -> str:
+    """The standards page, with the strand-by-strand progression under its PE heading."""
+    body = polish(md(rest))
+    return re.sub(r'(<h2 id="science-performance-expectations-used">.*?</h2>)',
+                  lambda m: m.group(1) + vis.progression(rest), body, count=1)
 
 
 def index_page() -> str:
@@ -327,6 +373,7 @@ def index_page() -> str:
   Each lesson lists its Washington K–12 Science Learning Standards (NGSS), "I can…" goals, materials, steps, a quick check
   with answers and teacher notes, with printable worksheets.</p>
 </div>
+{vis.tracks_map()}
 <nav class="choose" aria-label="Pick a track">{cards}
 <a class="chooser teachers" href="/learn/teachers"><span class="tag big">Parents &amp; teachers</span><b>Standards and sources</b>
 <span>The Washington standards behind each lesson, the new WA Science 2026 codes, math and ELA links, and free resources.</span><span class="go">Read the standards page →</span></a></nav>
@@ -377,7 +424,7 @@ def main():
         files[f"{tr}/safety.html"] = safety_page(tr)
         files[f"{tr}/worksheets.html"] = worksheets_page(tr)
         for i, d in enumerate(lessons):
-            files[f"{tr}/{d['slug']}.html"] = lesson_page(d, lessons[i - 1] if i else None, lessons[i + 1] if i + 1 < len(lessons) else None)
+            files[f"{tr}/{d['slug']}.html"] = lesson_page(d, lessons[i - 1] if i else None, lessons[i + 1] if i + 1 < len(lessons) else None, lessons)
     for name, text in files.items():
         (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUT / name).write_text(text, encoding="utf-8")

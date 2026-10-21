@@ -51,6 +51,8 @@ Drop a flat sheet of paper and a crumpled one at the same time. Ask: *Which one 
 
 ### 3. Do: the drop test (25 minutes)
 
+![The drop test: the same height every time. The bigger parachute falls slowest.](../art/e7-parachute-drop.svg)
+
 1. Cut two squares from a plastic bag: **small (20 cm)** and **big (40 cm)**.
 2. Tape a 30 cm string to each corner. Tie the 4 strings together to the washers.
 3. The adult drops each parachute from the same height. A student times it from "drop!" until it lands.

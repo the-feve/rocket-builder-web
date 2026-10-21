@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" font-family="Space Grotesk, Inter, sans-serif" font-weight="600">
+<title>Parachute drop test: different canopy sizes dropped from the same height and timed, and landing energy: a rocket landing at 4 m/s has a little energy, at 16 m/s sixteen times as much</title>
+<rect x="10" y="330" width="318" height="12" fill="#EDE6D8"/><path d="M10 330H328" stroke="#12203A" stroke-width="2"/>
+<path d="M18 18H34L39 23V37L34 42H18L13 37V23Z" fill="#F2652B"/><text x="26" y="36" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">1</text>
+<text x="46" y="36" font-size="17" fill="#12203A">drop test</text>
+<path d="M48 64H328" stroke="#6E6E73" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="326" y="58" font-size="13" fill="#6E6E73" text-anchor="end">same height</text>
+<path d="M30 70V324" stroke="#6E6E73" stroke-width="1"/><path d="M30 64L25 74H35ZM30 330L25 320H35Z" fill="#6E6E73"/><path d="M22 64H38" stroke="#6E6E73" stroke-width="1"/>
+<text x="0" y="0" font-size="15" fill="#6E6E73" text-anchor="middle" transform="translate(22 200) rotate(-90)">2.5 m</text>
+<rect x="65" y="262" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><rect x="65" y="267" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<path d="M74 278 L74 316.6" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M74 326L68 314.6L80 314.6Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<text x="74" y="362" font-size="15" fill="#12203A" text-anchor="middle">none</text>
+<path d="M116 211.1L134 245.1L152 211.1M128 211.1L134 245.1L140 211.1" fill="none" stroke="#12203A" stroke-width="1"/><path d="M116 211.1C116 192.2 152 192.2 152 211.1Q146 207.8 140 211.1Q134 207.8 128 211.1Q122 207.8 116 211.1Z" fill="#F2652B" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<rect x="125" y="245.1" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><rect x="125" y="250.1" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<path d="M134 261.1 L134 287.7" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M134 297.1L128 285.7L140 285.7Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<text x="134" y="362" font-size="15" fill="#12203A" text-anchor="middle">20 cm</text>
+<path d="M177 162.7L204 196.7L231 162.7M195 162.7L204 196.7L213 162.7" fill="none" stroke="#12203A" stroke-width="1"/><path d="M177 162.7C177 134.3 231 134.3 231 162.7Q222 157.7 213 162.7Q204 157.7 195 162.7Q186 157.7 177 162.7Z" fill="#F2652B" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<rect x="195" y="196.7" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><rect x="195" y="201.7" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<path d="M204 212.7 L204 231.3" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M204 240.7L198 229.3L210 229.3Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<text x="204" y="362" font-size="15" fill="#12203A" text-anchor="middle">30 cm</text>
+<path d="M250 106.2L286 140.2L322 106.2M274 106.2L286 140.2L298 106.2" fill="none" stroke="#12203A" stroke-width="1"/><path d="M250 106.2C250 68.4 322 68.4 322 106.2Q310 99.6 298 106.2Q286 99.6 274 106.2Q262 99.6 250 106.2Z" fill="#F2652B" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<rect x="277" y="140.2" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><rect x="277" y="145.2" width="18" height="5" rx="2" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<path d="M286 156.2 L286 168.8" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M286 178.2L280 166.8L292 166.8Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<text x="286" y="362" font-size="15" fill="#12203A" text-anchor="middle">40 cm</text>
+<circle cx="40" cy="390" r="13" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><path d="M36 371H44M40 371V377M40 390V382M40 390L45 393" stroke="#12203A" stroke-width="2" stroke-linecap="round" fill="none"/>
+<text x="64" y="396" font-size="17" fill="#12203A">speed = height ÷ time</text>
+<path d="M340 20V404" stroke="#6E6E73" stroke-width="1" stroke-dasharray="2 4"/>
+<path d="M358 18H374L379 23V37L374 42H358L353 37V23Z" fill="#F2652B"/><text x="366" y="36" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">2</text>
+<text x="386" y="36" font-size="17" fill="#12203A">landing energy</text>
+<text x="386" y="62" font-size="17" fill="#12203A">KE = ½ × m × v²</text>
+<text x="386" y="82" font-size="13" fill="#6E6E73">same 80 g rocket</text>
+<rect x="352" y="330" width="278" height="12" fill="#EDE6D8"/><path d="M352 330H630" stroke="#12203A" stroke-width="2"/>
+<path d="M388 151.9L426 191.9L464 151.9M413.3 151.9L426 191.9L438.7 151.9" fill="none" stroke="#12203A" stroke-width="1"/><path d="M388 151.9C388 112 464 112 464 151.9Q451.3 144.9 438.7 151.9Q426 144.9 413.3 151.9Q400.7 144.9 388 151.9Z" fill="#F2652B" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/>
+<path d="M419 245.9L410 263.9L419 261.9ZM433 245.9L442 263.9L433 261.9Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M419 261.9V209.9Q419 195.9 426 191.9Q433 195.9 433 209.9V261.9Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M419 209.9H433" stroke="#12203A" stroke-width="1"/>
+<path d="M474 214 L474 234.6" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M474 244L468 232.6L480 232.6Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<text x="486" y="236" font-size="15" fill="#12203A">4 m/s</text>
+<path d="M565 246L556 228L565 230ZM579 246L588 228L579 230Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M565 230V282Q565 296 572 300Q579 296 579 282V230Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M565 282H579" stroke="#12203A" stroke-width="1"/>
+<path d="M608 196 L608 286.6" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M608 296L602 284.6L614 284.6Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<text x="600" y="180" font-size="15" fill="#12203A" text-anchor="middle">16 m/s</text>
+<text x="404" y="369" font-size="15" fill="#6E6E73" text-anchor="end">4 m/s</text>
+<rect x="412" y="356" width="7.7" height="16" fill="#F2652B" stroke="#12203A" stroke-width="1.5"/>
+<text x="427.7" y="369" font-size="15" fill="#12203A">0.64 J</text>
+<path d="M482.7 364L487.7 369L497.7 357" fill="none" stroke="#2FB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="404" y="403" font-size="15" fill="#6E6E73" text-anchor="end">16 m/s</text>
+<rect x="412" y="390" width="122.9" height="16" fill="#F2652B" stroke="#12203A" stroke-width="1.5"/>
+<text x="542.9" y="403" font-size="15" fill="#12203A">10.24 J</text>
+<path d="M610.9 392L622.9 404M622.9 392L610.9 404" fill="none" stroke="#6E6E73" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

@@ -44,6 +44,8 @@ Read the launch rules together (see the [safety page](safety.md)). Give out jobs
 
 ### 2. Launch! (25 minutes)
 
+![Launch day: when the rocket's top lines up with the 45° card, its height is about the tracker's distance from the launcher.](../art/e8-launch-day.svg)
+
 1. Trackers stand 10 m from the launcher (measure it), off to the side.
 2. **Predict:** before each launch, the recorder writes a guess. *Higher or lower than the 45° line?*
 3. Countdown, stomp. Trackers call "above!" or "below!"

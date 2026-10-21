@@ -6,8 +6,8 @@ GitHub shows `.html` files as code. To review the visual ones, open the **PDF** 
 |---|---|---|
 | Brand sheet (logos, colours, type) | [brand/brand-sheet.pdf](brand/brand-sheet.pdf) · [PNG](brand/brand-sheet.png) | [brand/brand.md](brand/brand.md) |
 | Assembly guide (8 pages, Letter) | [assembly/assembly-guide.pdf](assembly/assembly-guide.pdf) | `assembly/assembly-guide.html` |
-| Lessons, elementary (grades 3–5) worksheets (14 pages, Letter) | [../server/static/learn/elementary/worksheets.pdf](../server/static/learn/elementary/worksheets.pdf) | [curriculum/elementary/](curriculum/elementary/README.md), also live at https://rocket.quiverdesignworks.net/learn/elementary/ |
-| Lessons, middle school (grades 6–8) worksheets (21 pages, Letter) | [../server/static/learn/middle/worksheets.pdf](../server/static/learn/middle/worksheets.pdf) | [curriculum/middle/](curriculum/middle/README.md), also live at https://rocket.quiverdesignworks.net/learn/middle/ |
+| Lessons, elementary (grades 3–5) worksheets (15 pages, Letter) | [../server/static/learn/elementary/worksheets.pdf](../server/static/learn/elementary/worksheets.pdf) | [curriculum/elementary/](curriculum/elementary/README.md), also live at https://rocket.quiverdesignworks.net/learn/elementary/ |
+| Lessons, middle school (grades 6–8) worksheets (22 pages, Letter) | [../server/static/learn/middle/worksheets.pdf](../server/static/learn/middle/worksheets.pdf) | [curriculum/middle/](curriculum/middle/README.md), also live at https://rocket.quiverdesignworks.net/learn/middle/ |
 | Washington standards map (WSSLS / WA Science 2026) | — | [curriculum/standards.md](curriculum/standards.md) |
 | Apogee review: suggested changes | — | [research/apogee-review.md](research/apogee-review.md) |
 | Starter kit tuck box, print art (11 × 17 in) | [kits/packaging/tuck-box-starter.pdf](kits/packaging/tuck-box-starter.pdf) | `kits/packaging/tuck-box-starter.html` |

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" font-family="Space Grotesk, Inter, sans-serif" font-weight="600">
+<title>The engineering design cycle: ask, imagine, plan, create, test, improve, and around again</title>
+<path d="M360 72.9A138 138 0 0 1 403.3 95" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/><path d="M412.6 102.7L398.1 99L407.4 88.6Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<path d="M454.4 173.6A138 138 0 0 1 456.9 222.2" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/><path d="M454.9 234L450.9 219.6L464.6 222.5Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<path d="M414.4 305.7A138 138 0 0 1 373.6 332.2" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/><path d="M362.3 336.4L372.8 325.6L377.1 338.9Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<path d="M280 337.1A138 138 0 0 1 236.7 315" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/><path d="M227.4 307.3L241.9 311L232.6 321.4Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<path d="M185.6 236.4A138 138 0 0 1 183.1 187.8" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/><path d="M185.1 176L189.1 190.4L175.4 187.5Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<path d="M225.6 104.3A138 138 0 0 1 266.4 77.8" fill="none" stroke="#F2652B" stroke-width="2.5" stroke-linecap="round"/><path d="M277.7 73.6L267.2 84.4L262.9 71.1Z" fill="#F2652B" stroke="#F2652B" stroke-width="1" stroke-linejoin="round"/>
+<circle cx="320" cy="67" r="33" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<g transform="translate(320 68)"><path d="M-8 -7C-8 -17 8 -17 8 -7C8 0 0 -1 0 7" fill="none" stroke="#12203A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="0" cy="14" r="2.2" fill="#12203A"/></g>
+<path d="M293 4H309L314 9V23L309 28H293L288 23V9Z" fill="#F2652B"/><text x="301" y="22" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">1</text>
+<text x="320" y="22" font-size="17" fill="#12203A" font-weight="700">Ask</text>
+<circle cx="439.5" cy="136" r="33" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<g transform="translate(439.5 137)"><path d="M-6 6C-6 0 -11 -2 -11 -8A11 11 0 0 1 11 -8C11 -2 6 0 6 6Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M-5 10H5M-4 14H4M-3 -6L0 -2L3 -6" fill="none" stroke="#12203A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-17 -16L-13 -13M17 -16L13 -13M0 -24V-21" stroke="#F2652B" stroke-width="2" stroke-linecap="round"/></g>
+<path d="M491.5 124H507.5L512.5 129V143L507.5 148H491.5L486.5 143V129Z" fill="#F2652B"/><text x="499.5" y="142" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">2</text>
+<text x="518.5" y="142" font-size="17" fill="#12203A" font-weight="700">Imagine</text>
+<circle cx="439.5" cy="274" r="33" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<g transform="translate(439.5 275)"><path d="M-12 -15H6V15H-12Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M-8 -8H2M-8 -2H2M-8 4H-2" stroke="#12203A" stroke-width="1"/><path d="M14 -12L18 -8L4 8L-1 9L0 4Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/></g>
+<path d="M491.5 262H507.5L512.5 267V281L507.5 286H491.5L486.5 281V267Z" fill="#F2652B"/><text x="499.5" y="280" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">3</text>
+<text x="518.5" y="280" font-size="17" fill="#12203A" font-weight="700">Plan</text>
+<circle cx="320" cy="343" r="33" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<g transform="translate(320 344)"><circle cx="-11" cy="10" r="5" fill="none" stroke="#12203A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="-1" cy="13" r="5" fill="none" stroke="#12203A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M-8 6L4 -16M2 9L-4 -16" fill="none" stroke="#12203A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="-1" r="8" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><circle cx="11" cy="-1" r="3.5" fill="none" stroke="#12203A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="M278 384H294L299 389V403L294 408H278L273 403V389Z" fill="#F2652B"/><text x="286" y="402" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">4</text>
+<text x="305" y="402" font-size="17" fill="#12203A" font-weight="700">Create</text>
+<circle cx="200.5" cy="274" r="33" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<g transform="translate(200.5 275)"><path d="M-6 8L-14 14L-12 4ZM6 8L14 14L12 4Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M-6 10V-8Q-6 -16 0 -21Q6 -16 6 -8V10Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M-3 14V20M3 14V22M0 14V25" stroke="#F2652B" stroke-width="2" stroke-linecap="round"/></g>
+<path d="M132.5 262H148.5L153.5 267V281L148.5 286H132.5L127.5 281V267Z" fill="#F2652B"/><text x="140.5" y="280" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">5</text>
+<text x="121.5" y="280" font-size="17" fill="#12203A" text-anchor="end" font-weight="700">Test</text>
+<circle cx="200.5" cy="136" r="33" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<g transform="translate(200.5 137)"><g transform="translate(-4 0) rotate(45)"><path d="M-3 -6H3V16Q3 19 0 19Q-3 19 -3 16Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M-3 -6A9 9 0 0 1 -6 -20V-12H6V-20A9 9 0 0 1 3 -6Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/></g><path d="M17 14V-8M12 -3L17 -9L22 -3" fill="none" stroke="#2FB67C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="M132.5 124H148.5L153.5 129V143L148.5 148H132.5L127.5 143V129Z" fill="#F2652B"/><text x="140.5" y="142" font-size="17" font-weight="700" fill="#12203A" text-anchor="middle">6</text>
+<text x="121.5" y="142" font-size="17" fill="#12203A" text-anchor="end" font-weight="700">Improve</text>
+<path d="M311 227L300 239L311 237ZM329 227L340 239L329 237Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M311 237V191Q311 175 320 165Q329 175 329 191V237Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M311 191H329" stroke="#12203A" stroke-width="1"/><circle cx="320" cy="205" r="4.5" fill="#3D8BFD"/><circle cx="320" cy="221" r="4.5" fill="#E5484D"/>
+</svg>

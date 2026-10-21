@@ -52,10 +52,14 @@ Write it on the board and on E5:
 
 ### 3. Imagine and plan (10 minutes)
 
+![Engineers go round this loop again and again.](../art/design-cycle.svg)
+
 1. On E5, draw **two different** rocket ideas. Change the fins, the nose or the length.
 2. Tick which criteria each one might meet. Pick one. Write why.
 
 ### 4. Build (15 minutes)
+
+![The stomp launcher: stomp on the bottle and the air shoots up the pipe into the rocket.](../art/e5-stomp-rocket.svg)
 
 1. Roll the paper around the tube and tape it. Close the top into a nose and tape it airtight.
 2. Cut fins from the index card. Tape them on evenly.

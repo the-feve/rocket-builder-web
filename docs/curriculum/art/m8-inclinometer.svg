@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" font-family="Space Grotesk, Inter, sans-serif" font-weight="600">
+<title>Measuring a flagpole with an inclinometer: stand a measured 20 m baseline away, sight the top through the straw, read 30 degrees, then height = 20 m × 0.58 + 1.5 m eye height, about 13 m</title>
+<rect x="8" y="360" width="624" height="12" fill="#EDE6D8"/><path d="M8 360H632" stroke="#12203A" stroke-width="2"/>
+<path d="M500 53.4V360" stroke="#12203A" stroke-width="5" stroke-linecap="butt"/><path d="M500 53.4V360" stroke="#FFFDF8" stroke-width="1.5"/><circle cx="500" cy="48.4" r="5" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><path d="M503 59.4H544L536 73.4L544 87.4H503Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><rect x="486" y="352" width="28" height="8" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/>
+<path d="M138 254.4L494 48.8" stroke="#6E6E73" stroke-width="1.5" stroke-dasharray="7 5"/>
+<path d="M134 274H496" stroke="#6E6E73" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="490" y="266" font-size="13" fill="#6E6E73" text-anchor="end">level</text>
+<text transform="rotate(-30 330 168)" x="330" y="168" font-size="13" fill="#6E6E73">line of sight</text>
+<path d="M196 274A92 92 0 0 0 183.7 228" fill="none" stroke="#F2652B" stroke-width="3"/><text x="204" y="260" font-size="17" fill="#12203A">30°</text>
+<path d="M522 47.4V272M522 276V358M517 45.4H527M517 274H527M517 360H527" stroke="#6E6E73" stroke-width="1" fill="none"/><text x="532" y="168" font-size="15" fill="#6E6E73">height</text>
+<text x="532" y="186" font-size="15" fill="#6E6E73">above eye</text>
+<text x="532" y="316" font-size="15" fill="#6E6E73">+ eye</text>
+<text x="532" y="334" font-size="15" fill="#6E6E73">height</text>
+<text x="532" y="352" font-size="15" fill="#12203A">1.5 m</text>
+<path d="M112 392H492" stroke="#6E6E73" stroke-width="1"/><path d="M104 392L114 387V397ZM500 392L490 387V397Z" fill="#6E6E73"/><path d="M104 376V400M500 376V400" stroke="#6E6E73" stroke-width="1"/>
+<rect x="232" y="381" width="140" height="22" fill="#FFFDF8"/><text x="302" y="398" font-size="15" fill="#12203A" text-anchor="middle">baseline 20 m</text>
+<path d="M92 326L88 360M104 326L108 360" fill="none" stroke="#12203A" stroke-width="3" stroke-linecap="round"/><path d="M86 294Q86 288 92 288H104Q110 288 110 294V330H86Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M102 296L118 282M102 302L120 290" fill="none" stroke="#12203A" stroke-width="2.5" stroke-linecap="round"/><circle cx="96" cy="274" r="13" fill="#FFFDF8" stroke="#12203A" stroke-width="2"/><circle cx="101" cy="272" r="1.6" fill="#12203A"/><circle cx="106" cy="272" r="1.6" fill="#12203A"/>
+<path d="M133.5 260.5A11 11 0 0 1 114.5 271.5Z" fill="#FFFDF8" stroke="#12203A" stroke-width="1.5" stroke-linejoin="round"/><path d="M111.1 273.4L136.9 258.6" stroke="#12203A" stroke-width="3.3000000000000003" stroke-linecap="round"/><path d="M111.1 273.4L136.9 258.6" stroke="#FFFDF8" stroke-width="1.35" stroke-linecap="round"/><path d="M124 266V278.3" stroke="#12203A" stroke-width="1"/><circle cx="124" cy="280.1" r="1.8" fill="#6E6E73" stroke="#12203A" stroke-width="1"/><circle cx="124" cy="266" r="1.5" fill="#12203A"/>
+<path d="M124 266L126 174" stroke="#12203A" stroke-width="1" stroke-dasharray="3 3"/><circle cx="124" cy="266" r="16" fill="none" stroke="#12203A" stroke-width="1"/>
+<defs><clipPath id="m8-inclinometer-zoom"><circle cx="138" cy="104" r="70"/></clipPath></defs>
+<circle cx="138" cy="104" r="70" fill="#FFFDF8"/><g clip-path="url(#m8-inclinometer-zoom)"><path d="M188.2 53A58 58 0 0 1 87.8 111Z" fill="#FFFDF8" stroke="#12203A" stroke-width="2" stroke-linejoin="round"/><path d="M70.2 121.2L205.8 42.9" stroke="#12203A" stroke-width="4.4" stroke-linecap="round"/><path d="M70.2 121.2L205.8 42.9" stroke="#FFFDF8" stroke-width="1.8" stroke-linecap="round"/><path d="M192.5 62.2L186.9 64.2M195.1 71.9L189.2 73M196 82L190 82M195.1 92.1L189.2 91M192.5 101.8L186.9 99.8M188.2 111L183 108M182.4 119.3L177.8 115.4M175.3 126.4L171.4 121.8M167 132.2L162.5 124.4M157.8 136.5L155.8 130.9M148.1 139.1L147 133.2M138 140L138 134M127.9 139.1L129 133.2M118.2 136.5L120.2 130.9M109 132.2L112 127M100.7 126.4L104.6 121.8M93.6 119.3L98.2 115.4" stroke="#12203A" stroke-width="1"/><path d="M138 82V147" stroke="#12203A" stroke-width="1.5"/><circle cx="138" cy="156.2" r="9.3" fill="#6E6E73" stroke="#12203A" stroke-width="1"/><circle cx="138" cy="82" r="2.3" fill="#12203A"/>
+<text x="172" y="145.9" font-size="13" fill="#6E6E73" text-anchor="middle">0°</text>
+<path d="M138 128V140" stroke="#F2652B" stroke-width="3"/></g><circle cx="138" cy="104" r="70" fill="none" stroke="#12203A" stroke-width="2"/>
+<text x="124" y="152" font-size="17" fill="#12203A" text-anchor="end">30°</text>
+<text x="222" y="34" font-size="16" fill="#12203A">height = 20 m × 0.58 + 1.5 m ≈ 13 m</text>
+<text x="222" y="56" font-size="13" fill="#6E6E73">baseline × multiplier + eye height</text>
+<text x="222" y="76" font-size="13" fill="#6E6E73">multiplier = tan 30° = 0.58</text>
+</svg>

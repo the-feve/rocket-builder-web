@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" font-family="Space Grotesk, Inter, sans-serif" role="img" aria-labelledby="m1-balloon-mass-title">
+<title id="m1-balloon-mass-title">Balloon rocket on a string, run twice with the same push: alone it goes 4.0 m; with 10 paper clips added it goes only 2.5 m</title>
+
+<!-- ===== Run 1: balloon alone ===== -->
+<g>
+  <!-- step tag -->
+  <path d="M29 24H45L50 29V43L45 48H29L24 43V29Z" fill="#F2652B"/>
+  <text x="37" y="42" font-size="16" font-weight="700" fill="#12203A" text-anchor="middle">1</text>
+  <text x="60" y="42" font-size="17" font-weight="600" fill="#12203A">Balloon alone</text>
+
+  <!-- chair backs and string -->
+  <g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8">
+    <rect x="12" y="80" width="10" height="110"/>
+    <rect x="618" y="80" width="10" height="110"/>
+  </g>
+  <path d="M22 90H618" stroke="#12203A" stroke-width="1"/>
+
+  <!-- start mark and stop mark on the string -->
+  <path d="M100 80V100" stroke="#6E6E73" stroke-width="2"/>
+  <text x="100" y="74" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">start</text>
+  <path d="M560 80V100" stroke="#6E6E73" stroke-width="2"/>
+  <text x="560" y="74" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">stopped</text>
+
+  <!-- balloon taped to the straw -->
+  <g stroke="#12203A" stroke-linejoin="round">
+    <path d="M110 118L96 112V128L110 122Z" fill="#FFFDF8" stroke-width="2"/>
+    <ellipse cx="170" cy="120" rx="60" ry="20" fill="#FFFDF8" stroke-width="2"/>
+    <rect x="140" y="86" width="60" height="8" rx="2" fill="#FFFDF8" stroke-width="2"/>
+    <rect x="150" y="88" width="9" height="16" fill="#EDE6D8" stroke-width="1"/>
+    <rect x="182" y="88" width="9" height="16" fill="#EDE6D8" stroke-width="1"/>
+  </g>
+  <!-- air rushing out the back -->
+  <path d="M90 110Q80 106 70 108M90 130Q80 134 70 132" fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- action and reaction -->
+  <g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M90 120H54" fill="none"/><path d="M40 120L56 112V128Z"/>
+    <path d="M240 120H318" fill="none"/><path d="M332 120L316 112V128Z"/>
+  </g>
+  <g font-size="15" font-weight="600" fill="#12203A">
+    <text x="30" y="154">action:</text>
+    <text x="30" y="171">air pushed back</text>
+    <text x="244" y="154">reaction:</text>
+    <text x="244" y="171">balloon pushed forward</text>
+  </g>
+
+  <!-- distance -->
+  <g stroke="#6E6E73" stroke-width="1" fill="none">
+    <path d="M100 182V204M560 182V204"/>
+    <path d="M104 196H300M360 196H556"/>
+  </g>
+  <g fill="#6E6E73"><path d="M100 196L110 192V200Z"/><path d="M560 196L550 192V200Z"/></g>
+  <text x="330" y="201" font-size="16" font-weight="600" fill="#12203A" text-anchor="middle">4.0 m</text>
+  <path d="M582 188L589 196L604 178" fill="none" stroke="#2FB67C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+
+<!-- ===== Run 2: same balloon, 10 paper clips added ===== -->
+<g transform="translate(0 200)">
+  <path d="M29 24H45L50 29V43L45 48H29L24 43V29Z" fill="#F2652B"/>
+  <text x="37" y="42" font-size="16" font-weight="700" fill="#12203A" text-anchor="middle">2</text>
+  <text x="60" y="42" font-size="17" font-weight="600" fill="#12203A">Same push, more mass</text>
+
+  <g stroke="#12203A" stroke-width="2" stroke-linejoin="round" fill="#FFFDF8">
+    <rect x="12" y="80" width="10" height="110"/>
+    <rect x="618" y="80" width="10" height="110"/>
+  </g>
+  <path d="M22 90H618" stroke="#12203A" stroke-width="1"/>
+
+  <path d="M100 80V100" stroke="#6E6E73" stroke-width="2"/>
+  <text x="100" y="74" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">start</text>
+  <path d="M388 80V100" stroke="#6E6E73" stroke-width="2"/>
+  <text x="388" y="74" font-size="14" font-weight="600" fill="#6E6E73" text-anchor="middle">stopped</text>
+
+  <g stroke="#12203A" stroke-linejoin="round">
+    <path d="M110 118L96 112V128L110 122Z" fill="#FFFDF8" stroke-width="2"/>
+    <ellipse cx="170" cy="120" rx="60" ry="20" fill="#FFFDF8" stroke-width="2"/>
+    <rect x="140" y="86" width="60" height="8" rx="2" fill="#FFFDF8" stroke-width="2"/>
+    <rect x="150" y="88" width="9" height="16" fill="#EDE6D8" stroke-width="1"/>
+    <rect x="182" y="88" width="9" height="16" fill="#EDE6D8" stroke-width="1"/>
+  </g>
+  <!-- paper clips taped along the straw -->
+  <g fill="none" stroke="#12203A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M146 84H168A5 5 0 0 0 168 74H148A4 4 0 0 0 148 82H164A3 3 0 0 0 164 76H152M176 84H198A5 5 0 0 0 198 74H178A4 4 0 0 0 178 82H194A3 3 0 0 0 194 76H182"/>
+  </g>
+  <text x="208" y="70" font-size="15" font-weight="600" fill="#12203A">+10 paper clips</text>
+
+  <path d="M90 110Q80 106 70 108M90 130Q80 134 70 132" fill="none" stroke="#6E6E73" stroke-width="1.5" stroke-linecap="round"/>
+  <g stroke="#F2652B" fill="#F2652B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M90 120H54" fill="none"/><path d="M40 120L56 112V128Z"/>
+    <path d="M240 120H318" fill="none"/><path d="M332 120L316 112V128Z"/>
+  </g>
+  <g font-size="15" font-weight="600" fill="#12203A">
+    <text x="30" y="154">action:</text>
+    <text x="30" y="171">air pushed back</text>
+    <text x="244" y="154">reaction:</text>
+    <text x="244" y="171">same push forward</text>
+  </g>
+
+  <g stroke="#6E6E73" stroke-width="1" fill="none">
+    <path d="M100 182V204M388 182V204"/>
+    <path d="M104 196H216M272 196H384"/>
+  </g>
+  <g fill="#6E6E73"><path d="M100 196L110 192V200Z"/><path d="M388 196L378 192V200Z"/></g>
+  <text x="244" y="201" font-size="16" font-weight="600" fill="#12203A" text-anchor="middle">2.5 m</text>
+
+  <g font-size="15" font-weight="600" text-anchor="end">
+    <text x="606" y="140" fill="#12203A">more mass, same force:</text>
+    <text x="606" y="158" fill="#12203A">less speed-up, shorter run</text>
+    <text x="606" y="178" fill="#6E6E73">F = m × a</text>
+  </g>
+</g>
+</svg>

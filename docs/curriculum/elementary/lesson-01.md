@@ -48,6 +48,8 @@ Blow up a balloon, hold it up, and let it go without tying it. Ask: *Which way d
 
 ### 3. Do: balloon rockets on a string (20 minutes)
 
+![Balloon rocket on a string: the air rushes out the back, and the balloon zooms forward.](../art/e1-balloon-rocket.svg)
+
 1. Thread the string through the straw. Tie the string tight between two chairs, at least 4 m apart.
 2. Blow up a balloon **a little** (small). Hold the end shut with the clip. Tape the balloon to the straw, opening toward the start.
 3. Pull the straw back to the start. Take off the clip. Measure how far it went. Do it **3 times**.
